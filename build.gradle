@@ -1,0 +1,43 @@
+// Top-level build file where you can add configuration options common to all sub-projects/modules.
+
+buildscript {
+    repositories {
+
+        apply from: 'versions.gradle'
+
+        jcenter()
+        google()
+    }
+    dependencies {
+        classpath 'com.android.tools.build:gradle:3.5.1'
+        classpath 'com.github.dcendents:android-maven-gradle-plugin:2.1'
+        // NOTE: Do not place your application dependencies here; they belong
+        // in the individual module build.gradle files
+    }
+}
+
+allprojects {
+    repositories {
+        jcenter()
+        google()
+        maven { url "https://jitpack.io" }
+    }
+}
+
+subprojects {
+    project.configurations.all {
+        //Here we applied only version wise fix configuration for lifecycle library based on group name only
+        //You can add any forced configuration for  the whole projects here
+        resolutionStrategy.eachDependency { details ->
+            if (details.requested.group == 'android.arch.lifecycle') {
+
+                details.useVersion versions.lifecycle
+
+            }
+        }
+    }
+}
+
+task clean(type: Delete) {
+    delete rootProject.buildDir
+}

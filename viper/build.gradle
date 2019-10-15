@@ -1,0 +1,53 @@
+plugins {
+    id 'com.android.library'
+    id 'com.github.dcendents.android-maven'
+}
+group='com.github.w3-engineers'
+
+configurations.all {
+    resolutionStrategy.cacheChangingModulesFor 0, 'seconds'
+}
+
+android {
+
+    compileSdkVersion build_versions.target_sdk
+
+    defaultConfig {
+        minSdkVersion build_versions.min_sdk
+        targetSdkVersion build_versions.target_sdk
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        multiDexEnabled true
+    }
+    buildTypes {
+        release {
+            minifyEnabled true
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+    dataBinding {
+        enabled = true
+    }
+}
+
+
+//ui, native
+dependencies {
+    implementation fileTree(include: ['*.jar'], dir: 'libs')
+
+    //Support
+    implementation deps.support.app_compat
+    implementation deps.support.design
+    implementation deps.lifecycle.extensions
+
+    //multidex
+    implementation deps.multidex
+    //room with Rx
+    implementation deps.room.rxjava2
+
+    debugImplementation deps.debugdb
+    api deps.strom_remote
+}
