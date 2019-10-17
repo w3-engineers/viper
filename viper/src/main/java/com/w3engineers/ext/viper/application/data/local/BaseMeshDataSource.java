@@ -8,8 +8,8 @@ import android.content.ServiceConnection;
 import android.os.IBinder;
 import android.os.RemoteException;
 
-import com.w3engineers.ext.viper.IRmCommunicator;
-import com.w3engineers.ext.viper.IRmServiceConnection;
+import com.w3engineers.ext.viper.ITmCommunicator;
+import com.w3engineers.ext.viper.ITmServiceConnection;
 import com.w3engineers.ext.viper.application.data.local.service.MeshService;
 import com.w3engineers.ext.viper.application.data.remote.model.BaseMeshData;
 import com.w3engineers.ext.viper.application.data.remote.model.MeshAcknowledgement;
@@ -29,7 +29,9 @@ Proprietary and confidential
 
 public abstract class BaseMeshDataSource {
 
-    private IRmServiceConnection iSetInfo;
+    //Todo: This one will be used if we don't want to start a extra service
+
+/*    private ITmServiceConnection iSetInfo;
     private Context context;
     private byte[] profileInfo;
 
@@ -49,11 +51,11 @@ public abstract class BaseMeshDataSource {
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
 
-            iSetInfo = IRmServiceConnection.Stub.asInterface(service);
+            iSetInfo = ITmServiceConnection.Stub.asInterface(service);
 
             try {
                 iSetInfo.setServiceForeground(false);
-                iSetInfo.setRmCommunicator(iGetInfo);
+                iSetInfo.setTmCommunicator(iGetInfo);
                 iSetInfo.setProfileInfo(profileInfo);
             } catch (Exception e) {
                 e.printStackTrace();
@@ -83,7 +85,7 @@ public abstract class BaseMeshDataSource {
     public void stopMeshService() {
         try {
             if(iSetInfo != null){
-                iSetInfo.stopRmService();
+                iSetInfo.stopTmService();
             }
         } catch (RemoteException e) {
             e.printStackTrace();
@@ -143,19 +145,19 @@ public abstract class BaseMeshDataSource {
         return 0;
     }
 
-    /**
+    *//**
      * To check underlying service properly initiated or not
      * @return true if connected
-     */
+     *//*
     public boolean isServiceConnected() {
         return iSetInfo != null;
     }
 
-    /**
+    *//**
      * If service is not initiated properly then this method throws {@link IllegalStateException}.
      * Before using the method check service initiation through {@link #isServiceConnected()}
      * @param isForeGround - set boolean for foreground mode
-     */
+     *//*
     public void setServiceForeground(boolean isForeGround) {
 
         if(iSetInfo == null) {
@@ -178,34 +180,34 @@ public abstract class BaseMeshDataSource {
         context.bindService(serviceIntent, serviceConnection, Service.BIND_AUTO_CREATE);
     }
 
-    /**
+    *//**
      * Overridable method to receive the event of Library init
      * @throws RemoteException
-     */
+     *//*
     protected abstract void onRmOn();
 
-    /**
+    *//**
      * Called upon receiving any Peer data
      * @param profileInfo
-     */
+     *//*
     protected abstract void onPeer(BaseMeshData profileInfo);
 
-    /**
+    *//**
      * Calls upon disappearing of peers
      * @param meshPeer
-     */
+     *//*
     protected abstract void onPeerGone(MeshPeer meshPeer);
 
-    /**
+    *//**
      * Upon receiving any data from any peer
      * @param meshData
-     */
+     *//*
     protected abstract void onData(MeshData meshData);
 
-    /**
+    *//**
      * Upon receiving Data delivery acknowledgement
      * @param meshAcknowledgement
-     */
+     *//*
     protected abstract void onAcknowledgement(MeshAcknowledgement meshAcknowledgement);
 
     protected abstract String getOwnUserId();
@@ -216,13 +218,13 @@ public abstract class BaseMeshDataSource {
 
     protected abstract void nodeIdDiscovered(String nodeId);
 
-    /**
+    *//**
      * Overridable method to receive the event of library destroy
      * @throws RemoteException
-     */
+     *//*
     protected abstract void onRmOff();
 
-    IRmCommunicator.Stub iGetInfo = new IRmCommunicator.Stub() {
+    ITmCommunicator.Stub iGetInfo = new ITmCommunicator.Stub() {
         @Override
         public void onLibraryInitSuccess() throws RemoteException {
             onRmOn();
@@ -267,5 +269,5 @@ public abstract class BaseMeshDataSource {
         public void nodeDiscovered(String nodeId) throws RemoteException {
             nodeIdDiscovered(nodeId);
         }
-    };
+    };*/
 }

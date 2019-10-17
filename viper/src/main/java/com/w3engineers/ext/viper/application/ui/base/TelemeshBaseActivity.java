@@ -1,4 +1,4 @@
-package com.w3engineers.ext.viper.application.ui.base.rm;
+package com.w3engineers.ext.viper.application.ui.base;
 
 
 /*
@@ -18,7 +18,7 @@ import com.w3engineers.ext.viper.application.data.local.BaseMeshDataSource;
  * This is a base to adapt common tasks for RM at activity layer over the time
  * https://code.leftofthedot.com/azim/android-framework/issues/5
  */
-public abstract class RmBaseActivity extends BaseActivity {
+public abstract class TelemeshBaseActivity extends BaseActivity {
 
     protected abstract BaseServiceLocator getServiceLocator();
 
@@ -43,11 +43,11 @@ public abstract class RmBaseActivity extends BaseActivity {
         BaseServiceLocator baseServiceLocator = getServiceLocator();
         if(baseServiceLocator != null) {
 
-            BaseMeshDataSource baseRmDataSource = baseServiceLocator.getRmDataSource();
+            BaseMeshDataSource baseTmDataSource = baseServiceLocator.getTmDataSource();
 
-            if(baseRmDataSource != null && baseRmDataSource.isServiceConnected()) {
-                baseRmDataSource.setServiceForeground(isForeground);
-            }
+ /*           if(baseTmDataSource != null && baseTmDataSource.isServiceConnected()) {
+                baseTmDataSource.setServiceForeground(isForeground);
+            }*/
 
         }
 

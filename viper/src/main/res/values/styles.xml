@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+
     <style name="DefaultAlertDialogStyle" parent="Theme.AppCompat.Dialog">
         <!--<item name="colorAccent">#009688</item>-->
         <!-- Used for the buttons -->
@@ -10,4 +11,15 @@
         <item name="android:lineSpacingExtra">8dp</item>
 
     </style>
+
+    <style name="AppTheme" parent="Theme.AppCompat.Light" />
+
+    <style name="AppTheme.NoActionBar">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+    </style>
+
+    <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
+
+    <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
 </resources>

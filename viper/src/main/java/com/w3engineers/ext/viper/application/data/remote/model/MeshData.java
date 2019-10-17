@@ -10,13 +10,6 @@ package com.w3engineers.ext.viper.application.data.remote.model;
 
 import android.os.Parcel;
 import android.os.Parcelable;
-import android.text.TextUtils;
-import android.util.Log;
-
-import com.w3engineers.ext.viper.util.lib.mesh.ProfileManager;
-
-import java.nio.ByteBuffer;
-import java.util.Arrays;
 
 /**
  * Represent piece of data. Contains: type, sender/receiver and data in bytes

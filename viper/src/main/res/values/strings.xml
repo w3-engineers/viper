@@ -11,6 +11,8 @@
 
     <!--service description-->
     <string name="app_local_service_description">To retain RM library workable with high priority</string>
+    <string name="title_activity_data_plan">DataPlanActivity</string>
+    <string name="title_activity_wallet">WalletActivity</string>
 
     <!--service broadcast upon task clear-->
 </resources>

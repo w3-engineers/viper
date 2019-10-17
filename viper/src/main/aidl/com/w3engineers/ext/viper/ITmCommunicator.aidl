@@ -6,7 +6,7 @@ import com.w3engineers.ext.viper.application.data.remote.model.MeshData;
 import com.w3engineers.ext.viper.application.data.remote.model.MeshPeer;
 import com.w3engineers.ext.viper.application.data.remote.model.MeshAcknowledgement;
 
-interface IRmCommunicator {
+interface ITmCommunicator {
 
     void onLibraryInitSuccess();
 

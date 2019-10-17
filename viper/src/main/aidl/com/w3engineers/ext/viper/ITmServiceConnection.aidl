@@ -1,11 +1,11 @@
-// IRmServiceConnection.aidl
+// ITmServiceConnection.aidl
 package com.w3engineers.ext.viper;
 
-import com.w3engineers.ext.viper.IRmCommunicator;
+import com.w3engineers.ext.viper.ITmCommunicator;
 import com.w3engineers.ext.viper.application.data.remote.model.MeshData;
 import com.w3engineers.ext.viper.application.data.remote.model.BaseMeshData;
 
-interface IRmServiceConnection {
+interface ITmServiceConnection {
 
     void setBroadCastActionString(in String actionString);
 
@@ -17,17 +17,17 @@ interface IRmServiceConnection {
 
     String sendMeshData(in MeshData meshData);
 
-    void setRmCommunicator(IRmCommunicator iRmCommunicator);
+    void setTmCommunicator(ITmCommunicator iTmCommunicator);
 
     void setServiceForeground(in boolean isForeGround);
 
-    void resetCommunicator(IRmCommunicator iRmCommunicator);
+    void resetCommunicator(ITmCommunicator iTmCommunicator);
 
     List<BaseMeshData> getLivePeers();
 
-    void openRmSettings();
+    void openTmSettings();
 
-    void stopRmService();
+    void stopTmService();
 
     void stopMeshProcess();
 

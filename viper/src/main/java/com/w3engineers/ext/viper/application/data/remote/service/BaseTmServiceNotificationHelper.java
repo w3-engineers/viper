@@ -18,13 +18,13 @@ import com.w3engineers.ext.viper.R;
  * Proprietary and confidential
  * ============================================================================
  */
-public class BaseRmServiceNotificationHelper {
+public class BaseTmServiceNotificationHelper {
 
     private static final int NOTIFICATION_ID = 1;
     public static final String ACTION_STOP_SERVICE = "stop_service";
     private Service mService;
 
-    public BaseRmServiceNotificationHelper(Service service) {
+    public BaseTmServiceNotificationHelper(Service service) {
 
         this.mService = service;
 

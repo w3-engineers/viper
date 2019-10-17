@@ -12,6 +12,6 @@ import com.w3engineers.ext.viper.application.data.local.BaseMeshDataSource;
  */
 public abstract class BaseServiceLocator {
 
-    public abstract BaseMeshDataSource getRmDataSource();
+    public abstract BaseMeshDataSource getTmDataSource();
 
 }

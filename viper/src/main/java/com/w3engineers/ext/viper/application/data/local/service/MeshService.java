@@ -11,24 +11,19 @@ Proprietary and confidential
 import android.app.Service;
 import android.content.Intent;
 import android.os.IBinder;
-import android.os.Process;
-import android.os.RemoteException;
 import android.support.annotation.Nullable;
 
-import com.w3engineers.ext.strom.util.Text;
-import com.w3engineers.ext.viper.IRmCommunicator;
-import com.w3engineers.ext.viper.IRmServiceConnection;
-import com.w3engineers.ext.viper.application.data.remote.model.BaseMeshData;
-import com.w3engineers.ext.viper.application.data.remote.model.MeshData;
-import com.w3engineers.ext.viper.application.data.remote.service.BaseRmServiceNotificationHelper;
-import com.w3engineers.ext.viper.util.lib.mesh.MeshConfig;
-
-import java.util.ArrayList;
-import java.util.List;
-// TODO mesh
 public class MeshService extends Service /*implements MeshProvider.ProviderCallback*/ {
 
-    private IRmCommunicator getInfo;
+    //Todo: This service would be developed accoding to MIMO's R&D
+
+    @Nullable
+    @Override
+    public IBinder onBind(Intent intent) {
+        return null;
+    }
+
+ /*   private IRmCommunicator getInfo;
     // TODO mesh
 //    private MeshProvider meshProvider;
 
@@ -47,21 +42,21 @@ public class MeshService extends Service /*implements MeshProvider.ProviderCallb
         meshConfig.mPort = 10626;
 
         // TODO mesh
-        /*meshProvider = MeshProvider.getInstance();
+        *//*meshProvider = MeshProvider.getInstance();
 
         meshProvider.setConfig(meshConfig);
         meshProvider.setMyProfileInfo(profileInfo);
         meshProvider.setProviderCallback(this);
 
-        meshProvider.startMesh();*/
+        meshProvider.startMesh();*//*
     }
 
     private void startInForeground(){
-        new BaseRmServiceNotificationHelper(MeshService.this).startForegroundService();
+        new BaseTmServiceNotificationHelper(MeshService.this).startForegroundService();
     }
 
     private void stopInForeground() {
-        new BaseRmServiceNotificationHelper(MeshService.this).stopForegroundService();
+        new BaseTmServiceNotificationHelper(MeshService.this).stopForegroundService();
     }
 
     @Override
@@ -69,9 +64,9 @@ public class MeshService extends Service /*implements MeshProvider.ProviderCallb
         super.onDestroy();
 
         // TODO mesh
-        /*if (meshProvider != null) {
+        *//*if (meshProvider != null) {
             meshProvider.stopMesh(true);
-        }*/
+        }*//*
     }
 
     @Override
@@ -79,7 +74,7 @@ public class MeshService extends Service /*implements MeshProvider.ProviderCallb
         if(intent != null) {
             String action = intent.getAction();
             if(Text.isNotEmpty(action)) {
-                if (BaseRmServiceNotificationHelper.ACTION_STOP_SERVICE.equals(action)) {
+                if (BaseTmServiceNotificationHelper.ACTION_STOP_SERVICE.equals(action)) {
                     closeProcess();
                 }
             }
@@ -90,7 +85,7 @@ public class MeshService extends Service /*implements MeshProvider.ProviderCallb
 
     //Stopping service
     private void closeProcess() {
-        new BaseRmServiceNotificationHelper(this).stopForegroundService();
+        new BaseTmServiceNotificationHelper(this).stopForegroundService();
         stopTheService(true);
         stopSelf();
     }
@@ -101,9 +96,9 @@ public class MeshService extends Service /*implements MeshProvider.ProviderCallb
 
     private void stopTheService(boolean isStopProcess) {
         // TODO mesh
-        /*if (meshProvider != null) {
+        *//*if (meshProvider != null) {
             meshProvider.stopMesh(isStopProcess);
-        }*/
+        }*//*
     }
 
     IRmServiceConnection.Stub iRmServiceConnection = new IRmServiceConnection.Stub() {
@@ -130,7 +125,7 @@ public class MeshService extends Service /*implements MeshProvider.ProviderCallb
         @Override
         public String sendMeshData(MeshData meshData) throws RemoteException {
             // TODO mesh
-            return /*meshProvider.sendMeshData(meshData)*/ null;
+            return *//*meshProvider.sendMeshData(meshData)*//* null;
         }
 
         @Override
@@ -175,32 +170,32 @@ public class MeshService extends Service /*implements MeshProvider.ProviderCallb
         @Override
         public String getMyId() throws RemoteException {
             // TODO mesh
-            return /*meshProvider.getMyUserId()*/ null;
+            return *//*meshProvider.getMyUserId()*//* null;
         }
 
         @Override
         public void restartMeshService() throws RemoteException {
             // TODO mesh
-            /*if (meshProvider != null) {
+            *//*if (meshProvider != null) {
                 meshProvider.restartMesh();
-            }*/
+            }*//*
         }
 
         @Override
         public List<String> getCurrentSellers() throws RemoteException {
             // TODO mesh
-            /*if (meshProvider != null) {
+            *//*if (meshProvider != null) {
                 return meshProvider.getAllSellers();
-            }*/
+            }*//*
             return new ArrayList<>();
         }
 
         @Override
         public int getUserLinkType(String userId) throws RemoteException {
             // TODO mesh
-            /*if (meshProvider != null) {
+            *//*if (meshProvider != null) {
                 return meshProvider.getUserActiveStatus(userId);
-            }*/
+            }*//*
             return 0;
         }
     };
@@ -216,7 +211,7 @@ public class MeshService extends Service /*implements MeshProvider.ProviderCallb
     public boolean onUnbind(Intent intent) {
         //Any task is available now as connection is being established
         return false;
-    }
+    }*/
 
     // TODO mesh
     /*@Override

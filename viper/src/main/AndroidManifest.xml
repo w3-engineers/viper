@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     package="com.w3engineers.ext.viper">
@@ -5,11 +6,23 @@
     <application
         android:name="com.w3engineers.ext.strom.App"
         tools:replace="android:name">
+        <activity
+            android:name=".application.ui.wallet.WalletActivity"
+            android:label="@string/title_activity_wallet"
+            android:theme="@style/AppTheme.NoActionBar"/>
+        <activity
+            android:name=".application.ui.dataplan.DataPlanActivity"
+            android:label="@string/title_activity_data_plan"
+            android:theme="@style/AppTheme.NoActionBar" />
 
-        <service android:name=".application.data.local.service.MeshService"
-            android:stopWithTask="false"
+        <service
+            android:name=".application.data.local.service.MeshService"
             android:enabled="true"
-            android:exported="true"/>
+            android:exported="true"
+            android:stopWithTask="false" />
+
+
+
     </application>
 
 </manifest>

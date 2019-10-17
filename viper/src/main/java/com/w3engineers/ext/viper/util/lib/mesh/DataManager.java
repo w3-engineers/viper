@@ -8,19 +8,37 @@ Proprietary and confidential
 ============================================================================
 */
 
-import android.content.pm.PackageInfo;
-import android.content.pm.PackageManager;
+import android.app.Service;
+import android.content.Intent;
 
-import com.w3engineers.ext.strom.App;
 import com.w3engineers.ext.viper.application.data.remote.model.MeshData;
 import com.w3engineers.ext.viper.application.data.remote.model.MeshPeer;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
-public class MeshDataManager {
+public class DataManager {
 
-    private static MeshDataManager meshLibManager = new MeshDataManager();
+    public static class AppDataManagerHolder{
+        public static DataManager appDataManager = new DataManager();
+    }
+
+    public static DataManager getInstance(){
+        return  AppDataManagerHolder.appDataManager;
+    }
+
+
+    void doBindService() {
+    //Todo:  from here have to start or bind service
+
+        // MeshService or BaseMeshDataSource class will be used
+
+    }
+
+
+
+
+/*    private static DataManager meshLibManager = new DataManager();
     private byte[] myProfileInfo = null;
     private String myPeerId;
     public static final byte TYPE_PING = 1, TYPE_PROFILE = 3;
@@ -28,11 +46,11 @@ public class MeshDataManager {
     private String VERSION_CODER_KEY = "version_code";
     private String SERVER_LINK_KEY = "server_link";
 
-    public static MeshDataManager getInstance() {
+    public static DataManager getInstance() {
         return meshLibManager;
     }
 
-    public MeshDataManager setMyProfileInfo(byte[] myProfileInfo) {
+    public DataManager setMyProfileInfo(byte[] myProfileInfo) {
         this.myProfileInfo = myProfileInfo;
         return this;
     }
@@ -86,6 +104,6 @@ public class MeshDataManager {
             return true;
         else
             return false;
-    }
+    }*/
 
 }
