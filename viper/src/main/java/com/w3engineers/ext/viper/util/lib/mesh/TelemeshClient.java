@@ -10,26 +10,36 @@ import java.util.concurrent.ExecutionException;
 public class TelemeshClient {
 
     private static TelemeshClient mTelemeshClient;
-    private static final Object lock = new Object();
+
+    //private constructor.
+    private TelemeshClient(){
+
+        //Prevent form the reflection api.
+        if (mTelemeshClient != null){
+            throw new RuntimeException("Use on() method to get the single instance of this class.");
+        }
+    }
 
     protected TelemeshClient(Context context, Context activityContext, String networkPrefix) {
 
-        DataManager.getInstance().doBindService();
+        DataManager.getInstance().doBindService(linkStateListener);
 
     }
 
     public static TelemeshClient on(Context context, Context activityContext, String networkPrefix) {
-        TelemeshClient instance = mTelemeshClient;
-        if (instance == null) {
-            synchronized (lock) {
-                instance = mTelemeshClient;
-                if (instance == null) {
-                    instance = mTelemeshClient = new TelemeshClient(context, activityContext, networkPrefix);
-                }
+
+        //Double check locking pattern
+        if (mTelemeshClient == null) { //Check for the first time
+
+            synchronized (TelemeshClient.class) {   //Check for the second time.
+                //if there is no instance available... create new one
+                if (mTelemeshClient == null) mTelemeshClient = new TelemeshClient(context, activityContext, networkPrefix);
             }
         }
-        return instance;
+
+        return mTelemeshClient;
     }
+
 
     // Todo: here we will set all the api to contact with application and at the same time we will take the decision which AIDL interface have to call
 

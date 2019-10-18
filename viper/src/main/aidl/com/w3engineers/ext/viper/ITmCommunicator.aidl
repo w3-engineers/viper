@@ -8,7 +8,7 @@ import com.w3engineers.ext.viper.application.data.remote.model.MeshAcknowledgeme
 
 interface ITmCommunicator {
 
-    void onLibraryInitSuccess();
+/*    void onLibraryInitSuccess();
 
     void onServiceDestroy();
 
@@ -24,5 +24,8 @@ interface ITmCommunicator {
 
     void showMeshLog(in String log);
 
-    void nodeDiscovered(in String nodeId);
+    void nodeDiscovered(in String nodeId);*/
+
+    void onPeer(in IPeer peer);
+
 }

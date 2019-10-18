@@ -19,20 +19,21 @@ import org.json.JSONObject;
 
 public class DataManager {
 
-    public static class AppDataManagerHolder{
+    private LinkStateListener linkStateListener;
+
+    public static class AppDataManagerHolder {
         public static DataManager appDataManager = new DataManager();
     }
 
-    public static DataManager getInstance(){
-        return  AppDataManagerHolder.appDataManager;
+    public static DataManager getInstance() {
+        return AppDataManagerHolder.appDataManager;
     }
 
 
-    void doBindService() {
-    //Todo: from here have to start or bind service
+    void doBindService(LinkStateListener linkStateListener) {
+        this.linkStateListener = linkStateListener;
 
         // MeshService or BaseMeshDataSource class will be used
-
     }
 
 
