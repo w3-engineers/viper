@@ -21,7 +21,13 @@
             android:exported="true"
             android:stopWithTask="false" />
 
-
+        <service android:name=".ClientLibraryService"
+            android:exported="true"
+            android:enabled="true">
+            <intent-filter>
+                <action android:name="service.viper_server" />
+            </intent-filter>
+        </service>
 
     </application>
 
