@@ -9,19 +9,19 @@ public class TelemeshClient {
     private static TelemeshClient mTelemeshClient;
     private static final Object lock = new Object();
 
-    protected TelemeshClient(Context context, Context activityContext, String networkPrefix, String multiverseUrl, LinkStateListener linkStateListener) {
+    protected TelemeshClient(Context context, Context activityContext, String networkPrefix) {
 
         DataManager.getInstance().doBindService();
 
     }
 
-    public static TelemeshClient on(Context context, Context activityContext, String networkPrefix, String multiverseUrl, LinkStateListener linkStateListener) {
+    public static TelemeshClient on(Context context, Context activityContext, String networkPrefix) {
         TelemeshClient instance = mTelemeshClient;
         if (instance == null) {
             synchronized (lock) {
                 instance = mTelemeshClient;
                 if (instance == null) {
-                    instance = mTelemeshClient = new TelemeshClient(context, activityContext, networkPrefix, multiverseUrl, linkStateListener);
+                    instance = mTelemeshClient = new TelemeshClient(context, activityContext, networkPrefix);
                 }
             }
         }

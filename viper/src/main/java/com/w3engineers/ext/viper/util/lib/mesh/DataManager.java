@@ -29,7 +29,7 @@ public class DataManager {
 
 
     void doBindService() {
-    //Todo:  from here have to start or bind service
+    //Todo: from here have to start or bind service
 
         // MeshService or BaseMeshDataSource class will be used
 
