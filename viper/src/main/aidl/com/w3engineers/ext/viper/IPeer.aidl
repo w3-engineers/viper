@@ -8,6 +8,6 @@ interface IPeer {
      * Demonstrates some basic types that you can use as parameters
      * and return values in AIDL.
      */
-void handlePeer(String peer);
+   void handlePeer(String peer);
 
 }

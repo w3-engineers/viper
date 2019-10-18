@@ -13,7 +13,6 @@ public class TelemeshClient {
 
     //private constructor.
     private TelemeshClient(){
-
         //Prevent form the reflection api.
         if (mTelemeshClient != null){
             throw new RuntimeException("Use on() method to get the single instance of this class.");
@@ -21,9 +20,7 @@ public class TelemeshClient {
     }
 
     protected TelemeshClient(Context context, Context activityContext, String networkPrefix) {
-
-        DataManager.getInstance().doBindService(linkStateListener);
-
+        DataManager.getInstance().doBindService(context, networkPrefix, linkStateListener);
     }
 
     public static TelemeshClient on(Context context, Context activityContext, String networkPrefix) {
@@ -36,12 +33,8 @@ public class TelemeshClient {
                 if (mTelemeshClient == null) mTelemeshClient = new TelemeshClient(context, activityContext, networkPrefix);
             }
         }
-
         return mTelemeshClient;
     }
-
-
-    // Todo: here we will set all the api to contact with application and at the same time we will take the decision which AIDL interface have to call
 
     public void sendMessage(String senderId, String receiverId, String messageId, byte[] data) {
 

@@ -16,7 +16,11 @@ import timber.log.Timber;
  * Proprietary and confidential
  * ============================================================================
  */
-public class RmUtility {
+public class Constant {
+
+    public interface IntentKey{
+        String SSID = "ssid";
+    }
 
 
 }

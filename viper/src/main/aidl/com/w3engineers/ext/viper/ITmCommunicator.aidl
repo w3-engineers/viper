@@ -5,27 +5,12 @@ import com.w3engineers.ext.viper.application.data.remote.model.BaseMeshData;
 import com.w3engineers.ext.viper.application.data.remote.model.MeshData;
 import com.w3engineers.ext.viper.application.data.remote.model.MeshPeer;
 import com.w3engineers.ext.viper.application.data.remote.model.MeshAcknowledgement;
+import com.w3engineers.ext.viper.IPeer;
 
 interface ITmCommunicator {
 
-/*    void onLibraryInitSuccess();
-
-    void onServiceDestroy();
-
-    void onProfileInfo(in BaseMeshData baseMeshData);
-
-    void onPeerRemoved(in MeshPeer meshPeer);
-
-    void onMeshData(in MeshData meshData);
-
-    void onMeshAcknowledgement(in MeshAcknowledgement meshAcknowledgement);
-
-    boolean isNodeExist(in String nodeId, in int isActive);
-
-    void showMeshLog(in String log);
-
-    void nodeDiscovered(in String nodeId);*/
-
-    void onPeer(in IPeer peer);
+   void sendData(in String senderId, in String receiverId, in String messageId, in byte[] data);
+   int  getLinkTypeById(in String nodeID);
+   void startMesh(in String ssid);
 
 }
