@@ -7,7 +7,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
 
-import com.w3engineers.ext.viper.R;
+import com.w3engineers.mesh.R;
+
 
 public class WalletActivity extends AppCompatActivity {
 

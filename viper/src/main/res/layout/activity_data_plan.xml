@@ -634,7 +634,7 @@
 
         </android.support.constraint.ConstraintLayout>
 
-        <com.w3engineers.mesh.datasharing.helper.CustomStatusbar
+        <com.w3engineers.mesh.application.data.local.helper.CustomStatusbar
             android:id="@+id/status_bar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -650,13 +650,14 @@
         <import type="android.view.View" />
 
 
-        <import type="com.w3engineers.ext.viper.application.data.local.purchase.PurchaseConstants"/>
-        <import type="com.w3engineers.ext.viper.util.Util" />
-        <import type="com.w3engineers.ext.viper.application.data.local.helper.PreferencesHelper" />
+        <import type="com.w3engineers.mesh.application.data.local.purchase.PurchaseConstants"/>
+        <import type="com.w3engineers.mesh.util.Util" />
+        <import type="com.w3engineers.mesh.application.data.local.helper.PreferencesHelper" />
+        <import type="com.w3engineers.mesh.util.Constant" />
 
         <variable
             name="dataLimitModel"
-            type="com.w3engineers.ext.viper.application.ui.dataplan.DataLimitModel" />
+            type="com.w3engineers.mesh.application.ui.dataplan.DataLimitModel" />
 
     </data>
 
