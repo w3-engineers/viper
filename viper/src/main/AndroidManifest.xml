@@ -7,7 +7,7 @@
         android:name="com.w3engineers.ext.strom.App"
         tools:replace="android:name">
         <activity
-            android:name=".application.ui.wallet.WalletActivity"
+            android:name=".WalletActivity"
             android:label="@string/title_activity_wallet"
             android:theme="@style/AppTheme.NoActionBar"/>
         <activity
