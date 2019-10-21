@@ -1,49 +1,40 @@
-package com.w3engineers.ext.viper.util.lib.mesh;
+package com.w3engineers.mesh.util.lib.mesh;
 
 import android.content.Context;
 
-import com.w3engineers.ext.viper.application.data.remote.model.MeshPeer;
+public class ViperClient {
 
-import java.util.List;
-import java.util.concurrent.ExecutionException;
+    private static ViperClient mViperClient;
 
-public class TelemeshClient {
-
-    private static TelemeshClient mTelemeshClient;
-
-    //private constructor.
-    private TelemeshClient(){
+    private ViperClient(){
         //Prevent form the reflection api.
-        if (mTelemeshClient != null){
+        if (mViperClient != null){
             throw new RuntimeException("Use on() method to get the single instance of this class.");
         }
     }
 
-    protected TelemeshClient(Context context, Context activityContext, String networkPrefix) {
+    protected ViperClient(Context context, String networkPrefix) {
         DataManager.getInstance().doBindService(context, networkPrefix, linkStateListener);
     }
 
-    public static TelemeshClient on(Context context, Context activityContext, String networkPrefix) {
-
-        //Double check locking pattern
-        if (mTelemeshClient == null) { //Check for the first time
-
-            synchronized (TelemeshClient.class) {   //Check for the second time.
-                //if there is no instance available... create new one
-                if (mTelemeshClient == null) mTelemeshClient = new TelemeshClient(context, activityContext, networkPrefix);
+    public static ViperClient on(Context context, String networkPrefix) {
+        if (mViperClient == null) {
+            synchronized (ViperClient.class) {
+                if (mViperClient == null) mViperClient = new ViperClient(context, networkPrefix);
             }
         }
-        return mTelemeshClient;
+        return mViperClient;
     }
 
     public void sendMessage(String senderId, String receiverId, String messageId, byte[] data) {
-
+        DataManager.getInstance().sendData(senderId, receiverId, messageId, data);
     }
 
 
     public int getLinkTypeById(String nodeID) {
 
-        return 0;
+        return DataManager.getInstance().getLinkTypeById(nodeID);
+
     }
 
     /**
@@ -54,7 +45,7 @@ public class TelemeshClient {
     LinkStateListener linkStateListener = new LinkStateListener() {
 
         @Override
-        public void onLocalUserConnected(String nodeId, byte[] data) {
+        public void onLocalUserConnected(String nodeId) {
 
 
         }
