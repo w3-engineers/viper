@@ -7,23 +7,24 @@
         android:name="com.w3engineers.ext.strom.App"
         tools:replace="android:name">
         <activity
-            android:name=".WalletActivity"
+            android:name="com.w3engineers.mesh.application.ui.wallet.WalletActivity"
             android:label="@string/title_activity_wallet"
             android:theme="@style/AppTheme.NoActionBar"/>
         <activity
-            android:name=".application.ui.dataplan.DataPlanActivity"
+            android:name="com.w3engineers.mesh.application.ui.dataplan.DataPlanActivity"
             android:label="@string/title_activity_data_plan"
             android:theme="@style/AppTheme.NoActionBar" />
 
         <service
-            android:name=".application.data.local.service.MeshService"
+            android:name="com.w3engineers.mesh.application.data.local.service.MeshService"
             android:enabled="true"
             android:exported="true"
             android:stopWithTask="false" />
 
-        <service android:name=".ClientLibraryService"
+        <service android:name="com.w3engineers.mesh.ClientLibraryService"
             android:exported="true"
-            android:enabled="true">
+            android:enabled="true"
+            android:process=":remote">
             <intent-filter>
                 <action android:name="service.viper_server" />
             </intent-filter>

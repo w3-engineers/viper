@@ -1,6 +1,7 @@
 // ViperCommunicator.aidl
 package com.w3engineers.mesh;
 
+
 /**
  This interface will be implementaed in client service,
  remote service will call this interface to send data to client
@@ -12,4 +13,6 @@ interface ViperCommunicator {
     void onRemotePeerAdd (in String peerId);
     void onDataReceived(in String senderId, in byte[] frameData);
     void onAckReceived(in String messageId, in int status);
+
+
 }

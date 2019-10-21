@@ -17,8 +17,8 @@ import android.support.annotation.Nullable;
 import com.w3engineers.mesh.util.lib.mesh.DataManager;
 
 
-public class ClientLibraryService extends Service {
 
+public class ClientLibraryService extends Service {
     @Override
     public void onCreate() {
         super.onCreate();
@@ -45,7 +45,7 @@ public class ClientLibraryService extends Service {
 
         @Override
         public void onPeerAdd(String peerId) throws RemoteException {
-            DataManager.getInstance().onPeerAdd(peerId);
+           DataManager.getInstance().onPeerAdd(peerId);
         }
 
         @Override

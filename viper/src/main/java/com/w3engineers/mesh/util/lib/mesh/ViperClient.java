@@ -1,6 +1,7 @@
 package com.w3engineers.mesh.util.lib.mesh;
 
 import android.content.Context;
+import android.widget.Toast;
 
 public class ViperClient {
 
@@ -46,7 +47,6 @@ public class ViperClient {
 
         @Override
         public void onLocalUserConnected(String nodeId) {
-
 
         }
 
