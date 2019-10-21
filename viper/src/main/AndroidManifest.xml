@@ -7,7 +7,7 @@
         android:name="com.w3engineers.ext.strom.App"
         tools:replace="android:name">
         <activity
-            android:name=".application.ui.wallet.WalletActivity"
+            android:name=".WalletActivity"
             android:label="@string/title_activity_wallet"
             android:theme="@style/AppTheme.NoActionBar"/>
         <activity
@@ -21,7 +21,13 @@
             android:exported="true"
             android:stopWithTask="false" />
 
-
+        <service android:name=".ClientLibraryService"
+            android:exported="true"
+            android:enabled="true">
+            <intent-filter>
+                <action android:name="service.viper_server" />
+            </intent-filter>
+        </service>
 
     </application>
 
