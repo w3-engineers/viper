@@ -1,33 +1,486 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context=".application.ui.wallet.WalletActivity">
+    xmlns:tools="http://schemas.android.com/tools">
 
-    <android.support.design.widget.AppBarLayout
+    <android.support.constraint.ConstraintLayout
+        android:id="@+id/layout_main"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:theme="@style/AppTheme.AppBarOverlay">
+        android:layout_height="match_parent">
 
-        <android.support.v7.widget.Toolbar
-            android:id="@+id/toolbar"
+        <com.w3engineers.mesh.application.data.local.helper.CustomStatusbar
+            android:id="@+id/status_bar"
             android:layout_width="match_parent"
-            android:layout_height="?attr/actionBarSize"
-            android:background="?attr/colorPrimary"
-            app:popupTheme="@style/AppTheme.PopupOverlay" />
+            android:layout_height="wrap_content"
+            android:background="@drawable/drawable_reg_page_shape"
+            app:layout_constraintBottom_toTopOf="@id/info_toolbar"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:ignore="MissingConstraints" />
 
-    </android.support.design.widget.AppBarLayout>
+        <android.support.constraint.ConstraintLayout
+            android:id="@+id/info_toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/drawable_reg_page_shape"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/status_bar">
 
-    <include layout="@layout/content_wallet" />
+            <ImageView
+                android:id="@+id/op_back"
+                android:layout_width="@dimen/width_40"
+                android:layout_height="@dimen/height_40"
+                android:layout_marginStart="@dimen/margin_5"
+                android:layout_marginTop="@dimen/margin_5"
+                android:contentDescription="@string/txt_description_back"
+                android:padding="@dimen/padding_10"
+                android:src="@mipmap/ic_back_white"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
 
-    <android.support.design.widget.FloatingActionButton
-        android:id="@+id/fab"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom|end"
-        android:layout_margin="@dimen/fab_margin"
-        app:srcCompat="@android:drawable/ic_dialog_email" />
+            <TextView
+                android:id="@+id/tv_title_my_wallet"
+                android:layout_width="@dimen/width_0"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/margin_15"
+                android:gravity="center"
+                android:text="@string/my_wallet"
+                android:textColor="@color/colorWhite"
+                android:textSize="@dimen/text_size_22"
+                app:layout_constraintBottom_toBottomOf="@+id/op_back"
+                app:layout_constraintLeft_toRightOf="@+id/op_back"
+                app:layout_constraintTop_toTopOf="@+id/op_back" />
 
-</android.support.design.widget.CoordinatorLayout>
+            <TextView
+                android:id="@+id/currency"
+                app:layout_constraintEnd_toStartOf="@+id/img_my_address"
+                app:layout_constraintTop_toTopOf="@+id/img_my_address"
+                app:layout_constraintBottom_toBottomOf="@+id/img_my_address"
+                android:textColor="@color/white"
+                android:drawableEnd="@drawable/down_small"
+                android:layout_marginEnd="@dimen/margin_10"
+                android:text="@string/etc"
+                android:textSize="@dimen/text_size_20"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+
+            <ImageView
+                android:id="@+id/img_my_address"
+                android:layout_width="@dimen/width_50"
+                android:layout_height="@dimen/width_45"
+                android:contentDescription="@string/withdraw"
+                android:src="@mipmap/ic_qrcode"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="@id/op_back" />
+
+        </android.support.constraint.ConstraintLayout>
+
+        <android.support.v4.widget.SwipeRefreshLayout
+            android:id="@+id/pull_to_refresh"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/height_0"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/info_toolbar">
+
+            <ScrollView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <android.support.constraint.ConstraintLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent">
+
+                    <LinearLayout
+                        android:id="@+id/info_layout"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/drawable_reg_page_shape"
+                        android:orientation="vertical"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent">
+
+                        <TextView
+                            android:id="@+id/tv_balance_last_updated"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="@dimen/margin_20"
+                            android:layout_marginTop="@dimen/margin_1"
+                            android:layout_marginEnd="@dimen/margin_10"
+                            android:text="@string/txt_balance"
+                            android:textColor="@color/white"
+                            android:textSize="@dimen/text_size_20"
+                            android:textStyle="bold" />
+
+                        <android.support.constraint.ConstraintLayout
+                            android:id="@+id/eth_block"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="@dimen/margin_5"
+                            android:layout_marginTop="@dimen/margin_5"
+                            android:layout_marginEnd="@dimen/margin_5"
+                            android:background="@drawable/bg_wallet_data"
+                            android:theme="@style/allTextInputOfLayoutBlack">
+
+                            <ImageView
+                                android:id="@+id/logo_eth"
+                                android:layout_width="@dimen/width_50"
+                                android:layout_height="@dimen/height_50"
+                                android:contentDescription="@string/txt_description_eth"
+                                android:paddingStart="@dimen/padding_5"
+                                android:paddingEnd="@dimen/padding_5"
+                                android:src="@mipmap/ic_eth"
+                                app:layout_constraintStart_toStartOf="parent"
+                                app:layout_constraintTop_toTopOf="parent" />
+
+                            <TextView
+                                android:id="@+id/title_eth_currency"
+                                android:layout_width="@dimen/width_0"
+                                android:layout_height="wrap_content"
+                                android:paddingStart="@dimen/padding_10"
+                                android:paddingEnd="@dimen/padding_15"
+                                android:textColor="@color/colorEthCurrency"
+                                android:textSize="@dimen/text_size_16"
+                                android:textStyle="bold"
+                                app:layout_constraintBottom_toBottomOf="@id/logo_eth"
+                                app:layout_constraintEnd_toEndOf="parent"
+                                app:layout_constraintTop_toTopOf="@id/logo_eth" />
+
+                            <TextView
+                                android:id="@+id/tv_eth_balance"
+                                android:layout_width="@dimen/width_0"
+                                android:layout_height="wrap_content"
+                                android:gravity="end"
+                                android:text="0.0"
+                                android:textSize="@dimen/text_size_16"
+                                android:textStyle="bold"
+                                app:layout_constraintBottom_toBottomOf="@id/logo_eth"
+                                app:layout_constraintEnd_toStartOf="@id/title_eth_currency"
+                                app:layout_constraintStart_toEndOf="@+id/logo_eth"
+                                app:layout_constraintTop_toTopOf="@id/logo_eth" />
+
+                        </android.support.constraint.ConstraintLayout>
+
+                        <android.support.constraint.ConstraintLayout
+                            android:id="@+id/tmesh_block"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="@dimen/margin_5"
+                            android:layout_marginEnd="@dimen/margin_5"
+                            android:background="@drawable/bg_wallet_data"
+                            android:theme="@style/allTextInputOfLayoutBlack"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toBottomOf="@id/eth_block">
+
+                            <ImageView
+                                android:id="@+id/logo_rmesh"
+                                android:layout_width="@dimen/width_50"
+                                android:layout_height="@dimen/height_50"
+                                android:contentDescription="@string/txt_description_eth"
+                                android:paddingStart="@dimen/padding_5"
+                                android:paddingEnd="@dimen/padding_5"
+                                android:src="@mipmap/ic_rmesh"
+                                app:layout_constraintStart_toStartOf="parent"
+                                app:layout_constraintTop_toTopOf="parent" />
+
+                            <TextView
+                                android:id="@+id/title_rmesh_currency"
+                                android:layout_width="@dimen/width_0"
+                                android:layout_height="wrap_content"
+                                android:paddingStart="@dimen/padding_10"
+                                android:paddingEnd="@dimen/padding_15"
+                                android:text="@string/txt_tmesh"
+                                android:textColor="@color/colorGradientPrimary"
+                                android:textSize="@dimen/text_size_16"
+                                android:textStyle="bold"
+                                app:layout_constraintBottom_toBottomOf="@id/logo_rmesh"
+                                app:layout_constraintEnd_toEndOf="parent"
+                                app:layout_constraintTop_toTopOf="@id/logo_rmesh" />
+
+                            <TextView
+                                android:id="@+id/tv_rmesh_balance"
+                                android:layout_width="@dimen/width_0"
+                                android:layout_height="wrap_content"
+                                android:gravity="end"
+                                android:text="0.0"
+                                android:textSize="@dimen/text_size_16"
+                                android:textStyle="bold"
+                                app:layout_constraintBottom_toBottomOf="@id/logo_rmesh"
+                                app:layout_constraintEnd_toStartOf="@id/title_rmesh_currency"
+                                app:layout_constraintStart_toEndOf="@id/logo_rmesh"
+                                app:layout_constraintTop_toTopOf="@id/logo_rmesh" />
+
+                        </android.support.constraint.ConstraintLayout>
+
+                        <View
+                            android:layout_width="match_parent"
+                            android:layout_height="@dimen/height_10" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:id="@+id/layout_details"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:orientation="vertical"
+                        app:layout_constraintTop_toBottomOf="@id/info_layout">
+
+                        <TextView
+                            android:id="@+id/tv_last_updated"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:background="@color/colorGradientPrimary"
+                            android:gravity="center"
+                            android:paddingTop="@dimen/padding_5"
+                            android:text="@string/txt_last_updated"
+                            android:textColor="@color/white"
+                            android:textSize="@dimen/text_size_14"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:background="@color/colorGradientPrimary"
+                            android:gravity="center"
+                            android:paddingBottom="@dimen/padding_5"
+                            android:text="@string/txt_pull_down_refresh"
+                            android:textColor="@color/white"
+                            android:textSize="@dimen/text_size_14"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:id="@+id/title_data_uses"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="@dimen/margin_25"
+                            android:layout_marginTop="@dimen/margin_10"
+                            android:layout_marginEnd="@dimen/margin_15"
+                            android:layout_marginBottom="@dimen/margin_10"
+                            android:text="@string/txt_data_use_statistics"
+                            android:textColor="@color/black"
+                            android:textSize="@dimen/text_size_20"
+                            android:textStyle="bold" />
+
+                        <android.support.constraint.ConstraintLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="@dimen/margin_5"
+                            android:layout_marginEnd="@dimen/margin_5"
+                            android:background="@drawable/bg_wallet_data"
+                            android:theme="@style/allTextInputOfLayoutBlack">
+
+                            <ImageView
+                                android:id="@+id/logo_total_earned"
+                                android:layout_width="@dimen/width_50"
+                                android:layout_height="@dimen/height_50"
+                                android:contentDescription="@string/txt_description_eth"
+                                android:paddingStart="@dimen/padding_5"
+                                android:paddingEnd="@dimen/padding_5"
+                                android:src="@mipmap/ic_rmesh"
+                                app:layout_constraintStart_toStartOf="parent"
+                                app:layout_constraintTop_toTopOf="parent" />
+
+                            <TextView
+                                android:id="@+id/tv_title_total_earned"
+                                android:layout_width="@dimen/width_0"
+                                android:layout_height="wrap_content"
+                                android:gravity="end"
+                                android:paddingStart="@dimen/padding_5"
+                                android:paddingTop="@dimen/padding_5"
+                                android:paddingEnd="@dimen/padding_15"
+                                android:text="@string/total_earned"
+                                android:textColor="@color/colorBlue"
+                                android:textSize="@dimen/text_size_16"
+                                android:textStyle="bold"
+                                app:layout_constraintEnd_toEndOf="parent"
+                                app:layout_constraintStart_toEndOf="@+id/logo_total_earned"
+                                app:layout_constraintTop_toTopOf="@id/logo_total_earned" />
+
+                            <TextView
+                                android:id="@+id/tv_earned"
+                                android:layout_width="@dimen/width_0"
+                                android:layout_height="wrap_content"
+                                android:gravity="end"
+                                android:paddingStart="@dimen/padding_5"
+                                android:paddingEnd="@dimen/padding_5"
+                                android:text="0.000000000000"
+                                android:textSize="@dimen/text_size_16"
+                                android:textStyle="bold"
+                                app:layout_constraintBottom_toBottomOf="@id/tv_currency_rmesh_2"
+                                app:layout_constraintEnd_toStartOf="@id/tv_currency_rmesh_2"
+                                app:layout_constraintStart_toEndOf="@id/logo_total_earned"
+                                app:layout_constraintTop_toTopOf="@+id/tv_currency_rmesh_2" />
+
+                            <TextView
+                                android:id="@+id/tv_currency_rmesh_2"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:paddingStart="@dimen/padding_5"
+                                android:paddingEnd="@dimen/padding_15"
+                                android:text="@string/txt_tmesh"
+                                android:textColor="@color/colorGradientPrimary"
+                                android:textStyle="bold"
+                                app:layout_constraintEnd_toEndOf="parent"
+                                app:layout_constraintStart_toEndOf="@id/tv_earned"
+                                app:layout_constraintTop_toBottomOf="@+id/tv_title_total_earned" />
+
+                            <View
+                                android:id="@+id/view"
+                                android:layout_width="match_parent"
+                                android:layout_height="@dimen/height_2"
+                                android:layout_marginTop="@dimen/margin_5"
+                                android:background="@drawable/dotted_line"
+                                android:layerType="software"
+                                app:layout_constraintBottom_toTopOf="@+id/tv_title_total_spent"
+                                app:layout_constraintTop_toBottomOf="@+id/tv_earned" />
+
+                            <TextView
+                                android:id="@+id/tv_title_total_spent"
+                                android:layout_width="@dimen/width_0"
+                                android:layout_height="wrap_content"
+                                android:gravity="end"
+                                android:paddingStart="@dimen/padding_5"
+                                android:paddingTop="@dimen/padding_5"
+                                android:paddingEnd="@dimen/padding_15"
+                                android:text="@string/total_spent"
+                                android:textColor="@color/colorRed"
+                                android:textSize="@dimen/text_size_16"
+                                android:textStyle="bold"
+                                app:layout_constraintEnd_toEndOf="parent"
+                                app:layout_constraintStart_toEndOf="@+id/logo_total_earned"
+                                app:layout_constraintTop_toBottomOf="@id/view" />
+
+                            <TextView
+                                android:id="@+id/tv_spent"
+                                android:layout_width="@dimen/width_0"
+                                android:layout_height="wrap_content"
+                                android:gravity="end"
+                                android:paddingStart="@dimen/padding_5"
+                                android:paddingEnd="@dimen/padding_5"
+                                android:paddingBottom="@dimen/padding_5"
+                                android:text="0.000000"
+                                android:textSize="@dimen/text_size_16"
+                                android:textStyle="bold"
+                                app:layout_constraintEnd_toStartOf="@id/tv_rmesh_currency_3"
+                                app:layout_constraintStart_toEndOf="@+id/logo_total_earned"
+                                app:layout_constraintTop_toBottomOf="@id/tv_title_total_spent" />
+
+                            <TextView
+                                android:id="@+id/tv_rmesh_currency_3"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:paddingStart="@dimen/padding_5"
+                                android:paddingEnd="@dimen/padding_15"
+                                android:paddingBottom="@dimen/padding_5"
+                                android:text="@string/txt_tmesh"
+                                android:textColor="@color/colorGradientPrimary"
+                                android:textStyle="bold"
+                                app:layout_constraintEnd_toEndOf="parent"
+                                app:layout_constraintStart_toEndOf="@+id/tv_spent"
+                                app:layout_constraintTop_toBottomOf="@id/tv_title_total_spent" />
+                        </android.support.constraint.ConstraintLayout>
+
+                        <android.support.constraint.ConstraintLayout
+                            android:id="@+id/total_spent_block"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="@dimen/margin_5"
+                            android:layout_marginEnd="@dimen/margin_5"
+                            android:background="@drawable/bg_wallet_data"
+                            android:theme="@style/allTextInputOfLayoutBlack"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintStart_toStartOf="parent">
+
+                            <ImageView
+                                android:id="@+id/logo_rmesh_4"
+                                android:layout_width="@dimen/width_50"
+                                android:layout_height="@dimen/height_50"
+                                android:contentDescription="@string/txt_description_eth"
+                                android:paddingStart="@dimen/padding_5"
+                                android:paddingTop="@dimen/padding_10"
+                                android:paddingEnd="@dimen/padding_5"
+                                android:src="@mipmap/ic_rmesh"
+                                app:layout_constraintStart_toStartOf="parent"
+                                app:layout_constraintTop_toTopOf="parent" />
+
+                            <TextView
+                                android:id="@+id/tv_title_pending_payable"
+                                android:layout_width="@dimen/width_0"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="@dimen/padding_5"
+                                android:gravity="end"
+                                android:paddingStart="@dimen/margin_5"
+                                android:paddingTop="@dimen/padding_5"
+                                android:paddingEnd="@dimen/padding_15"
+                                android:text="@string/txt_payable_deposit"
+                                android:textColor="@color/deep_grey"
+                                android:textSize="@dimen/text_size_16"
+                                android:textStyle="bold"
+                                app:layout_constraintBottom_toTopOf="@id/tv_pending_payable_deposit"
+                                app:layout_constraintEnd_toEndOf="parent"
+                                app:layout_constraintStart_toEndOf="@id/logo_rmesh_4"
+                                app:layout_constraintTop_toTopOf="parent" />
+
+                            <TextView
+                                android:id="@+id/tv_pending_payable_deposit"
+                                android:layout_width="@dimen/width_0"
+                                android:layout_height="wrap_content"
+                                android:gravity="end"
+                                android:paddingStart="@dimen/padding_5"
+                                android:paddingEnd="@dimen/padding_5"
+                                android:text="0.00000000000000"
+                                android:textSize="@dimen/text_size_16"
+                                android:textStyle="bold"
+                                app:layout_constraintEnd_toStartOf="@id/tv_currency_rmesh_4"
+                                app:layout_constraintStart_toEndOf="@+id/logo_rmesh_4"
+                                app:layout_constraintTop_toBottomOf="@+id/tv_title_pending_payable" />
+
+                            <TextView
+                                android:id="@+id/tv_currency_rmesh_4"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginEnd="@dimen/margin_15"
+                                android:text="@string/txt_tmesh"
+                                android:textColor="@color/colorGradientPrimary"
+                                android:textStyle="bold"
+                                app:layout_constraintEnd_toEndOf="parent"
+                                app:layout_constraintStart_toEndOf="@+id/tv_pending_payable_deposit"
+                                app:layout_constraintTop_toBottomOf="@id/tv_title_pending_payable" />
+
+
+                            <TextView
+                                android:id="@+id/btn_withdraw"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginEnd="@dimen/margin_10"
+                                android:layout_marginBottom="@dimen/margin_5"
+                                android:background="@drawable/ractangular_gradient"
+                                android:paddingStart="@dimen/padding_20"
+                                android:paddingTop="@dimen/padding_12"
+                                android:paddingEnd="@dimen/padding_20"
+                                android:paddingBottom="@dimen/padding_12"
+                                android:text="@string/withdraw"
+                                android:textColor="@color/white"
+                                app:layout_constraintBottom_toBottomOf="parent"
+                                app:layout_constraintEnd_toEndOf="parent"
+                                app:layout_constraintTop_toBottomOf="@+id/tv_pending_payable_deposit" />
+                        </android.support.constraint.ConstraintLayout>
+
+                        <TextView
+                            android:id="@+id/another_deposit"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textColor="@color/black"
+                            android:layout_marginTop="@dimen/margin_5"
+                            android:layout_marginBottom="@dimen/margin_10"
+                            android:layout_gravity="center_horizontal"
+                            android:textSize="@dimen/text_size_16"
+                            android:visibility="gone" />
+                    </LinearLayout>
+                </android.support.constraint.ConstraintLayout>
+            </ScrollView>
+        </android.support.v4.widget.SwipeRefreshLayout>
+    </android.support.constraint.ConstraintLayout>
+</layout>

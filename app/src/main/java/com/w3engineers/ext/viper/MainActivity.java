@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 
 import com.w3engineers.mesh.application.data.local.dataplan.DataPlan;
+import com.w3engineers.mesh.application.data.local.wallet.Wallet;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -13,6 +14,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.main_ac);
 
 
-        DataPlan.openActivity(this);
+//        DataPlan.openActivity(this);
+        Wallet.openActivity(this);
     }
 }
