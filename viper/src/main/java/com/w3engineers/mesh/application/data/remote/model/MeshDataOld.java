@@ -14,7 +14,7 @@ import android.os.Parcelable;
 /**
  * Represent piece of data. Contains: type, sender/receiver and data in bytes
  */
-public class MeshData extends BaseMeshData implements Parcelable {
+public class MeshDataOld extends BaseMeshData implements Parcelable {
 
     /**
      * Type of Data. Value {@value ProfileManager#MY_PROFILE_INFO_TYPE}
@@ -33,28 +33,28 @@ public class MeshData extends BaseMeshData implements Parcelable {
         dest.writeByte(this.mType);
     }
 
-    public MeshData() {
+    public MeshDataOld() {
     }
 
-    protected MeshData(Parcel in) {
+    protected MeshDataOld(Parcel in) {
         super(in);
         this.mType = in.readByte();
     }
 
-    public static final Parcelable.Creator<MeshData> CREATOR = new Parcelable.Creator<MeshData>() {
+    public static final Parcelable.Creator<MeshDataOld> CREATOR = new Parcelable.Creator<MeshDataOld>() {
         @Override
-        public MeshData createFromParcel(Parcel source) {
-            return new MeshData(source);
+        public MeshDataOld createFromParcel(Parcel source) {
+            return new MeshDataOld(source);
         }
 
         @Override
-        public MeshData[] newArray(int size) {
-            return new MeshData[size];
+        public MeshDataOld[] newArray(int size) {
+            return new MeshDataOld[size];
         }
     };
 
 
-    /*public static byte[] getMeshData(MeshData meshData) {
+    /*public static byte[] getMeshData(MeshDataOld meshData) {
 
         if(meshData == null || meshData.mData == null) {
             return null;
@@ -94,7 +94,7 @@ public class MeshData extends BaseMeshData implements Parcelable {
         return buffer.array();
     }
 
-    public static byte[] getPingData(MeshData meshData) {
+    public static byte[] getPingData(MeshDataOld meshData) {
         if (meshData == null)
             return null;
 
@@ -127,7 +127,7 @@ public class MeshData extends BaseMeshData implements Parcelable {
 
 
 
-    public static MeshData setMeshData(byte[] meshDataBytes) {
+    public static MeshDataOld setMeshData(byte[] meshDataBytes) {
 
         if(meshDataBytes == null || meshDataBytes.length < 2) {
             throw new IllegalStateException("Corrupted data");
@@ -135,7 +135,7 @@ public class MeshData extends BaseMeshData implements Parcelable {
 
         ByteBuffer byteBuffer = ByteBuffer.wrap(meshDataBytes);
 
-        MeshData meshData = new MeshData();
+        MeshDataOld meshData = new MeshDataOld();
         meshData.mType = byteBuffer.get();
 
         Log.v("MIMO_SAHA::", "Type: " + meshData.mType);
@@ -174,8 +174,8 @@ public class MeshData extends BaseMeshData implements Parcelable {
         return meshData;
     }
 
-    public MeshData copy() {
-        MeshData meshData = new MeshData();
+    public MeshDataOld copy() {
+        MeshDataOld meshData = new MeshDataOld();
         meshData.mType = mType;
         meshData.mData = mData;
 

@@ -18,10 +18,14 @@ import android.os.RemoteException;
 
 import com.w3engineers.mesh.ClientLibraryService;
 import com.w3engineers.mesh.ITmCommunicator;
+import com.w3engineers.mesh.application.data.AppDataObserver;
+import com.w3engineers.mesh.application.data.model.DataAckEvent;
+import com.w3engineers.mesh.application.data.model.DataEvent;
+import com.w3engineers.mesh.application.data.model.PeerAdd;
+import com.w3engineers.mesh.application.data.model.PeerRemoved;
 
 public class DataManager {
 
-    private LinkStateListener mLinkStateListener;
     private ITmCommunicator mTmCommunicator;
     private String mSsid;
     private Context mContext;
@@ -39,12 +43,10 @@ public class DataManager {
      *
      * @param context
      * @param networkPrefix
-     * @param linkStateListener
      */
-    void doBindService(Context context, String networkPrefix, LinkStateListener linkStateListener) {
+    void doBindService(Context context, String networkPrefix) {
         this.mContext = context;
         this.mSsid = networkPrefix;
-        this.mLinkStateListener = linkStateListener;
 
         Intent mIntent = new Intent(context, ClientLibraryService.class);
         context.startService(mIntent);
@@ -131,7 +133,10 @@ public class DataManager {
      * @param peerId
      */
     public void onPeerAdd(String peerId) {
-      mLinkStateListener.onLocalUserConnected(peerId);
+        PeerAdd peerAdd = new PeerAdd();
+        peerAdd.peerId = peerId;
+
+        AppDataObserver.on().sendObserverData(peerAdd);
     }
 
     /**
@@ -139,7 +144,10 @@ public class DataManager {
      * @param nodeId
      */
     public void onPeerRemoved(String nodeId) {
-      mLinkStateListener.onUserDisconnected(nodeId);
+        PeerRemoved peerRemoved = new PeerRemoved();
+        peerRemoved.peerId = nodeId;
+
+        AppDataObserver.on().sendObserverData(peerRemoved);
     }
 
     /**
@@ -147,7 +155,11 @@ public class DataManager {
      * @param peerId
      */
     public void onRemotePeerAdd(String peerId) {
-      mLinkStateListener.onRemoteUserConnected(peerId);
+
+        PeerAdd peerAdd = new PeerAdd();
+        peerAdd.peerId = peerId;
+
+        AppDataObserver.on().sendObserverData(peerAdd);
     }
 
     /**
@@ -156,7 +168,12 @@ public class DataManager {
      * @param frameData
      */
     public void onDataReceived(String senderId, byte[] frameData) {
-      mLinkStateListener.onMessageReceived(senderId, frameData);
+        DataEvent dataEvent = new DataEvent();
+
+        dataEvent.peerId = senderId;
+        dataEvent.data = frameData;
+
+        AppDataObserver.on().sendObserverData(dataEvent);
     }
 
 
@@ -166,7 +183,12 @@ public class DataManager {
      * @param status
      */
     public void onAckReceived(String messageId, int status) {
-     mLinkStateListener.onMessageDelivered(messageId, status);
+
+        DataAckEvent dataAckEvent = new DataAckEvent();
+        dataAckEvent.dataId = messageId;
+        dataAckEvent.status = status;
+
+        AppDataObserver.on().sendObserverData(dataAckEvent);
     }
 
 }

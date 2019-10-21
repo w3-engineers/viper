@@ -12,7 +12,7 @@ interface ITmServiceConnection {
 
     void setProfileInfo(in byte[] profileInfo);
 
-    String sendMeshData(in MeshData meshData);
+    String sendMeshData(in MeshDataOld meshDataOld);
 
     void setTmCommunicator(ITmCommunicator iTmCommunicator);
 
