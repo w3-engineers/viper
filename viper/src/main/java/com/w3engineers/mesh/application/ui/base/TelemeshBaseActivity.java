@@ -12,6 +12,7 @@ package com.w3engineers.mesh.application.ui.base;
 import com.w3engineers.ext.strom.application.ui.base.BaseActivity;
 import com.w3engineers.mesh.application.data.BaseServiceLocator;
 import com.w3engineers.mesh.application.data.local.BaseMeshDataSource;
+import com.w3engineers.mesh.util.lib.mesh.DataManager;
 
 
 /**
@@ -41,16 +42,7 @@ public abstract class TelemeshBaseActivity extends BaseActivity {
      */
     protected void setServiceForeground(boolean isForeground) {
 
-        BaseServiceLocator baseServiceLocator = getServiceLocator();
-        if(baseServiceLocator != null) {
-
-            BaseMeshDataSource baseTmDataSource = baseServiceLocator.getTmDataSource();
-
- /*           if(baseTmDataSource != null && baseTmDataSource.isServiceConnected()) {
-                baseTmDataSource.setServiceForeground(isForeground);
-            }*/
-
-        }
+        DataManager.getInstance().setServiceForeground(isForeground);
 
     }
 }

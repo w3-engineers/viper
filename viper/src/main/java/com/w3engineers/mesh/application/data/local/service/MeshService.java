@@ -123,7 +123,7 @@ public class MeshService extends Service /*implements MeshProvider.ProviderCallb
         }
 
         @Override
-        public String sendMeshData(MeshData meshData) throws RemoteException {
+        public String sendMeshData(MeshDataOld meshData) throws RemoteException {
             // TODO mesh
             return *//*meshProvider.sendMeshData(meshData)*//* null;
         }
@@ -226,7 +226,7 @@ public class MeshService extends Service /*implements MeshProvider.ProviderCallb
     }
 
     @Override
-    public void connectionAdd(MeshData meshData) {
+    public void connectionAdd(MeshDataOld meshData) {
         try {
             if (getInfo != null) {
                 getInfo.onProfileInfo(meshData);
@@ -248,7 +248,7 @@ public class MeshService extends Service /*implements MeshProvider.ProviderCallb
     }
 
     @Override
-    public void receiveData(MeshData meshData) {
+    public void receiveData(MeshDataOld meshData) {
         try {
             if (getInfo != null) {
                 getInfo.onMeshData(meshData);

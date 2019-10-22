@@ -3,7 +3,7 @@ package com.w3engineers.mesh.util.lib.mesh;
 
 import com.w3engineers.mesh.application.data.remote.model.BaseMeshData;
 import com.w3engineers.mesh.application.data.remote.model.MeshAcknowledgement;
-import com.w3engineers.mesh.application.data.remote.model.MeshData;
+import com.w3engineers.mesh.application.data.remote.model.MeshDataOld;
 import com.w3engineers.mesh.application.data.remote.model.MeshPeer;
 
 /*
@@ -15,7 +15,7 @@ import com.w3engineers.mesh.application.data.remote.model.MeshPeer;
  */
 public interface IMeshCallBack {
 
-    void onMesh(MeshData meshData);
+    void onMesh(MeshDataOld meshDataOld);
     void onMesh(MeshAcknowledgement meshAcknowledgement);
 
     void onProfileInfo(BaseMeshData baseMeshData);

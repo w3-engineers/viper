@@ -1,6 +1,7 @@
 package com.w3engineers.mesh.util.lib.mesh;
 
 import android.content.Context;
+import android.widget.Toast;
 
 public class ViperClient {
 
@@ -14,7 +15,7 @@ public class ViperClient {
     }
 
     protected ViperClient(Context context, String networkPrefix) {
-        DataManager.getInstance().doBindService(context, networkPrefix, linkStateListener);
+        DataManager.getInstance().doBindService(context, networkPrefix);
     }
 
     public static ViperClient on(Context context, String networkPrefix) {
@@ -32,45 +33,6 @@ public class ViperClient {
 
 
     public int getLinkTypeById(String nodeID) {
-
         return DataManager.getInstance().getLinkTypeById(nodeID);
-
     }
-
-    /**
-     * Listener is initialise here to get all kind of callback here
-     * and after that send callback to app level
-     */
-
-    LinkStateListener linkStateListener = new LinkStateListener() {
-
-        @Override
-        public void onLocalUserConnected(String nodeId) {
-
-
-        }
-
-        @Override
-        public void onRemoteUserConnected(String nodeId) {
-
-        }
-
-        @Override
-        public void onUserDisconnected(String nodeId) {
-
-        }
-
-        @Override
-        public void onMessageReceived(String senderId, byte[] frameData) {
-
-        }
-
-
-        @Override
-        public void onMessageDelivered(String messageId, int status) {
-
-        }
-
-    };
-
 }

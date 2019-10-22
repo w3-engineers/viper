@@ -54,7 +54,7 @@ public abstract class BaseMeshDataSource {
         }
     };
 
-    public String sendMeshData(MeshData meshData) {
+    public String sendMeshData(MeshDataOld meshData) {
         try {
             if(iSetInfo != null){
                 return iSetInfo.sendMeshData(meshData);
@@ -185,7 +185,7 @@ public abstract class BaseMeshDataSource {
      * Upon receiving any data from any peer
      * @param meshData
      *//*
-    protected abstract void onData(MeshData meshData);
+    protected abstract void onData(MeshDataOld meshData);
 
     *//**
      * Upon receiving Data delivery acknowledgement
@@ -229,7 +229,7 @@ public abstract class BaseMeshDataSource {
         }
 
         @Override
-        public void onMeshData(MeshData meshData) throws RemoteException {
+        public void onMeshData(MeshDataOld meshData) throws RemoteException {
             onData(meshData);
         }
 
