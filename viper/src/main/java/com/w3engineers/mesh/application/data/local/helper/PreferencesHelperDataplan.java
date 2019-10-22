@@ -1,18 +1,11 @@
 package com.w3engineers.mesh.application.data.local.helper;
 
 
+import com.w3engineers.mesh.application.data.local.DataPlanConstants;
 import com.w3engineers.mesh.application.data.local.db.SharedPref;
 import com.w3engineers.mesh.application.data.local.purchase.PurchaseConstants;
 
 public class PreferencesHelperDataplan {
-
-    public static final int  MESH_USER = 0;
-    public static final int DATA_SELLER = 1;
-    public static final int DATA_BUYER = 2;
-    public static final int INTERNET_USER = 3;
-
-    public static final int DATA_AMOUNT_UNLIMITED = 0;
-    public static final int DATA_AMOUNT_LIMITED = 1;
 
     private static final String DATA_SHARE_MODE = "data_share_mode"; //Mesh User, Buyer, Seller
     private static final String DATA_AMOUNT_MODE = "data_amount_mode"; // Unlimited, Limited
@@ -50,14 +43,14 @@ public class PreferencesHelperDataplan {
         SharedPref.write(DATA_SHARE_MODE, value);
     }
     public int getDataShareMode() {
-      return SharedPref.readInt(DATA_SHARE_MODE, MESH_USER);
+      return SharedPref.readInt(DATA_SHARE_MODE, DataPlanConstants.USER_TYPES.MESH_USER);
     }
 
     public void setDataAmountMode(int value) {
         SharedPref.write(DATA_AMOUNT_MODE, value);
     }
     public int getDataAmountMode() {
-        return SharedPref.readInt(DATA_AMOUNT_MODE, DATA_AMOUNT_UNLIMITED);
+        return SharedPref.readInt(DATA_AMOUNT_MODE, DataPlanConstants.DATA_MODE.UNLIMITED);
     }
 
     public void setSellDataAmount(long value) {

@@ -7,6 +7,7 @@ import android.os.Looper;
 import android.os.Message;
 import android.text.TextUtils;
 
+import com.w3engineers.mesh.application.data.local.DataPlanConstants;
 import com.w3engineers.mesh.application.data.local.helper.PreferencesHelperDataplan;
 import com.w3engineers.mesh.util.MeshLog;
 
@@ -841,7 +842,7 @@ public class PayController implements PayEventListener {
     private void sendUserConnected(String address, boolean isConnected) {
         int userMode = PreferencesHelperDataplan.on().getDataShareMode();
 
-        if (userMode == PreferencesHelperDataplan.DATA_SELLER) {
+        if (userMode == DataPlanConstants.USER_TYPES.DATA_SELLER) {
             if (payControllerListenerForSeller != null) {
                 if (isConnected) {
                     payControllerListenerForSeller.onUserConnected(address);
@@ -853,7 +854,7 @@ public class PayController implements PayEventListener {
             } else {
                 MeshLog.v("listener not found");
             }
-        } else if (userMode == PreferencesHelperDataplan.DATA_BUYER) {
+        } else if (userMode == DataPlanConstants.USER_TYPES.DATA_BUYER) {
             if (payControllerListenerForBuyer != null) {
                 if (isConnected) {
                     payControllerListenerForBuyer.onUserConnected(address);

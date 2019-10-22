@@ -11,6 +11,7 @@ import com.w3engineers.eth.data.remote.EthereumService;
 import com.w3engineers.eth.util.helper.HandlerUtil;
 import com.w3engineers.eth.util.helper.InternetUtil;
 
+import com.w3engineers.mesh.application.data.local.DataPlanConstants;
 import com.w3engineers.mesh.application.data.local.db.buyerpendingmessage.BuyerPendingMessage;
 import com.w3engineers.mesh.application.data.local.db.datausage.Datausage;
 import com.w3engineers.mesh.application.data.local.db.purchase.Purchase;
@@ -49,7 +50,7 @@ public class PurchaseManagerSeller extends PurchaseManager implements PayControl
         super();
         setPayControllerListener();
         ethService.setTransactionObserver(this);
-        if (preferencesHelperDataplan.getDataShareMode() == preferencesHelperDataplan.DATA_SELLER) {
+        if (preferencesHelperDataplan.getDataShareMode() == DataPlanConstants.USER_TYPES.DATA_SELLER) {
             sendFailedPurchaseRequest();
             setObserverForPendingRequest();
         }
@@ -1165,7 +1166,7 @@ public class PurchaseManagerSeller extends PurchaseManager implements PayControl
 
 //                                if (sender.equalsIgnoreCase(address)) {
 
-                        if (preferencesHelperDataplan.getDataAmountMode() == PreferencesHelperDataplan.DATA_AMOUNT_LIMITED) {
+                        if (preferencesHelperDataplan.getDataAmountMode() == DataPlanConstants.DATA_MODE.LIMITED) {
                             long fromDate = preferencesHelperDataplan.getSellFromDate();
                             long toDate = preferencesHelperDataplan.getSellToDate();
                             long sharedData = preferencesHelperDataplan.getSellDataAmount();

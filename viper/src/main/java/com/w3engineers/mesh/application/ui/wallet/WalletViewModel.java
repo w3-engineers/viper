@@ -13,6 +13,7 @@ import android.arch.lifecycle.MutableLiveData;
 
 import com.w3engineers.eth.data.helper.PreferencesHelperPaylib;
 import com.w3engineers.ext.strom.application.ui.base.BaseRxViewModel;
+import com.w3engineers.mesh.application.data.local.DataPlanConstants;
 import com.w3engineers.mesh.application.data.local.db.DatabaseService;
 import com.w3engineers.mesh.application.data.local.db.networkinfo.NetworkInfo;
 import com.w3engineers.mesh.application.data.local.helper.PreferencesHelperDataplan;
@@ -95,12 +96,12 @@ public class WalletViewModel extends BaseRxViewModel {
             int endPointType = PreferencesHelperPaylib.onInstance(MeshApp.getContext()).getEndpointMode();
 
             if (PreferencesHelperDataplan.on().getDataShareMode() ==
-                    PreferencesHelperDataplan.DATA_SELLER) {
+                    DataPlanConstants.USER_TYPES.DATA_SELLER) {
 
                 return databaseService.getDifferentNetworkData(myAddress, endPointType);
 
             } else if (PreferencesHelperDataplan.on().getDataShareMode() ==
-                    PreferencesHelperDataplan.DATA_BUYER) {
+                    DataPlanConstants.USER_TYPES.DATA_BUYER) {
 
                 return databaseService.getDifferentNetworkPurchase(myAddress, endPointType);
             }

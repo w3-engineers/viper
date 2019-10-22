@@ -33,6 +33,7 @@ import android.widget.Toast;
 import com.w3engineers.eth.util.helper.ToastUtil;
 import com.w3engineers.ext.strom.application.ui.base.BaseActivity;
 import com.w3engineers.mesh.R;
+import com.w3engineers.mesh.application.data.local.DataPlanConstants;
 import com.w3engineers.mesh.application.data.local.db.DatabaseService;
 import com.w3engineers.mesh.application.data.local.helper.PreferencesHelperDataplan;
 import com.w3engineers.mesh.application.data.local.helper.TimeHelper;
@@ -95,28 +96,28 @@ public class DataPlanActivity extends BaseActivity implements PurchaseManagerBuy
         msgMap = new ConcurrentHashMap<>();
 
 
-        if (PreferencesHelperDataplan.on().getDataShareMode() == PreferencesHelperDataplan.DATA_BUYER) {
+        if (PreferencesHelperDataplan.on().getDataShareMode() == DataPlanConstants.USER_TYPES.DATA_BUYER) {
             PurchaseManagerBuyer.getInstance().setPurchaseManagerBuyerListener(this);
         }
 
 
         manageSellerList = ManageSellerList.getInstance(this);
 
-        msgMap.put(getKey(PreferencesHelperDataplan.MESH_USER, preferencesHelperDataplan.DATA_BUYER), getResources().getString(R.string.mesh_user_to_buyer));
-        msgMap.put(getKey(PreferencesHelperDataplan.MESH_USER, preferencesHelperDataplan.DATA_SELLER), getResources().getString(R.string.mesh_user_to_seller));
-        msgMap.put(getKey(PreferencesHelperDataplan.MESH_USER, preferencesHelperDataplan.INTERNET_USER), getResources().getString(R.string.mesh_user_to_internet_user));
+        msgMap.put(getKey(DataPlanConstants.USER_TYPES.MESH_USER, DataPlanConstants.USER_TYPES.DATA_BUYER), getResources().getString(R.string.mesh_user_to_buyer));
+        msgMap.put(getKey(DataPlanConstants.USER_TYPES.MESH_USER, DataPlanConstants.USER_TYPES.DATA_SELLER), getResources().getString(R.string.mesh_user_to_seller));
+        msgMap.put(getKey(DataPlanConstants.USER_TYPES.MESH_USER, DataPlanConstants.USER_TYPES.INTERNET_USER), getResources().getString(R.string.mesh_user_to_internet_user));
 
-        msgMap.put(getKey(PreferencesHelperDataplan.DATA_BUYER, preferencesHelperDataplan.DATA_SELLER), getResources().getString(R.string.data_buyer_to_seller));
-        msgMap.put(getKey(PreferencesHelperDataplan.DATA_BUYER, preferencesHelperDataplan.MESH_USER), getResources().getString(R.string.data_buyer_to_mesh_user));
-        msgMap.put(getKey(PreferencesHelperDataplan.DATA_BUYER, preferencesHelperDataplan.INTERNET_USER), getResources().getString(R.string.data_buyer_to_internet_user));
+        msgMap.put(getKey(DataPlanConstants.USER_TYPES.DATA_BUYER, DataPlanConstants.USER_TYPES.DATA_SELLER), getResources().getString(R.string.data_buyer_to_seller));
+        msgMap.put(getKey(DataPlanConstants.USER_TYPES.DATA_BUYER, DataPlanConstants.USER_TYPES.MESH_USER), getResources().getString(R.string.data_buyer_to_mesh_user));
+        msgMap.put(getKey(DataPlanConstants.USER_TYPES.DATA_BUYER, DataPlanConstants.USER_TYPES.INTERNET_USER), getResources().getString(R.string.data_buyer_to_internet_user));
 
-        msgMap.put(getKey(PreferencesHelperDataplan.DATA_SELLER, preferencesHelperDataplan.DATA_BUYER), getResources().getString(R.string.data_seller_to_buyer));
-        msgMap.put(getKey(PreferencesHelperDataplan.DATA_SELLER, preferencesHelperDataplan.MESH_USER), getResources().getString(R.string.data_seller_to_mesh_user));
-        msgMap.put(getKey(PreferencesHelperDataplan.DATA_SELLER, preferencesHelperDataplan.INTERNET_USER), getResources().getString(R.string.data_seller_to_internet_user));
+        msgMap.put(getKey(DataPlanConstants.USER_TYPES.DATA_SELLER, DataPlanConstants.USER_TYPES.DATA_BUYER), getResources().getString(R.string.data_seller_to_buyer));
+        msgMap.put(getKey(DataPlanConstants.USER_TYPES.DATA_SELLER, DataPlanConstants.USER_TYPES.MESH_USER), getResources().getString(R.string.data_seller_to_mesh_user));
+        msgMap.put(getKey(DataPlanConstants.USER_TYPES.DATA_SELLER, DataPlanConstants.USER_TYPES.INTERNET_USER), getResources().getString(R.string.data_seller_to_internet_user));
 
-        msgMap.put(getKey(PreferencesHelperDataplan.INTERNET_USER, preferencesHelperDataplan.DATA_BUYER), getResources().getString(R.string.internet_user_to_buyer));
-        msgMap.put(getKey(PreferencesHelperDataplan.INTERNET_USER, preferencesHelperDataplan.DATA_SELLER), getResources().getString(R.string.internet_user_to_seller));
-        msgMap.put(getKey(PreferencesHelperDataplan.INTERNET_USER, preferencesHelperDataplan.MESH_USER), getResources().getString(R.string.internet_user_to_internet_user));
+        msgMap.put(getKey(DataPlanConstants.USER_TYPES.INTERNET_USER, DataPlanConstants.USER_TYPES.DATA_BUYER), getResources().getString(R.string.internet_user_to_buyer));
+        msgMap.put(getKey(DataPlanConstants.USER_TYPES.INTERNET_USER, DataPlanConstants.USER_TYPES.DATA_SELLER), getResources().getString(R.string.internet_user_to_seller));
+        msgMap.put(getKey(DataPlanConstants.USER_TYPES.INTERNET_USER, DataPlanConstants.USER_TYPES.MESH_USER), getResources().getString(R.string.internet_user_to_internet_user));
 
 
         mCurrentRole = preferencesHelperDataplan.getDataShareMode();
@@ -272,10 +273,10 @@ public class DataPlanActivity extends BaseActivity implements PurchaseManagerBuy
     }
 
     public void onRadioMeshButtonClicked() {
-        if (mCurrentRole == PreferencesHelperDataplan.MESH_USER)
+        if (mCurrentRole == DataPlanConstants.USER_TYPES.MESH_USER)
             return;
 
-        showRoleSwitchConfirmation(mCurrentRole, PreferencesHelperDataplan.MESH_USER);
+        showRoleSwitchConfirmation(mCurrentRole, DataPlanConstants.USER_TYPES.MESH_USER);
     }
 
     public void onRadioSellerButtonClicked() {
@@ -284,25 +285,25 @@ public class DataPlanActivity extends BaseActivity implements PurchaseManagerBuy
             mBinding.textViewDataLimitWarning.setVisibility(View.GONE);
         }
 
-        if (mCurrentRole == PreferencesHelperDataplan.DATA_SELLER)
+        if (mCurrentRole == DataPlanConstants.USER_TYPES.DATA_SELLER)
             return;
 
 
-        showRoleSwitchConfirmation(mCurrentRole, PreferencesHelperDataplan.DATA_SELLER);
+        showRoleSwitchConfirmation(mCurrentRole, DataPlanConstants.USER_TYPES.DATA_SELLER);
     }
 
     public void onRadioBuyerButtonClicked() {
-        if (mCurrentRole == PreferencesHelperDataplan.DATA_BUYER)
+        if (mCurrentRole == DataPlanConstants.USER_TYPES.DATA_BUYER)
             return;
 
-        showRoleSwitchConfirmation(mCurrentRole, PreferencesHelperDataplan.DATA_BUYER);
+        showRoleSwitchConfirmation(mCurrentRole, DataPlanConstants.USER_TYPES.DATA_BUYER);
     }
 
     public void onRadioInternetButtonClicked() {
-        if (mCurrentRole == PreferencesHelperDataplan.INTERNET_USER)
+        if (mCurrentRole == DataPlanConstants.USER_TYPES.INTERNET_USER)
             return;
 
-        showRoleSwitchConfirmation(mCurrentRole, PreferencesHelperDataplan.INTERNET_USER);
+        showRoleSwitchConfirmation(mCurrentRole, DataPlanConstants.USER_TYPES.INTERNET_USER);
     }
 
     private void showRoleSwitchConfirmation(int prevRole, int currentRole) {
@@ -446,8 +447,8 @@ public class DataPlanActivity extends BaseActivity implements PurchaseManagerBuy
 
         mBinding.fromDate.setEnabled(false);
 
-        mBinding.dataUsageLimited.setVisibility(preferencesHelperDataplan.getDataAmountMode() == PreferencesHelperDataplan.DATA_AMOUNT_LIMITED ? View.VISIBLE : View.INVISIBLE);
-        mBinding.dataUsageUnlimited.setVisibility(preferencesHelperDataplan.getDataAmountMode() == PreferencesHelperDataplan.DATA_AMOUNT_UNLIMITED ? View.VISIBLE : View.INVISIBLE);
+        mBinding.dataUsageLimited.setVisibility(preferencesHelperDataplan.getDataAmountMode() == DataPlanConstants.DATA_MODE.LIMITED ? View.VISIBLE : View.INVISIBLE);
+        mBinding.dataUsageUnlimited.setVisibility(preferencesHelperDataplan.getDataAmountMode() == DataPlanConstants.DATA_MODE.UNLIMITED ? View.VISIBLE : View.INVISIBLE);
 
         disableSaveButton();
 
