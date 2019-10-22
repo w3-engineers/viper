@@ -17,7 +17,7 @@ public class MainActivity extends AppCompatActivity {
 
         Button helloBtn = findViewById(R.id.helloBtn);
 
-        DataManager.getInstance().doBindService(this, "jkhlh", null);
+        DataManager.getInstance().doBindService(this, "jkhlh");
 
         helloBtn.setOnClickListener(new View.OnClickListener() {
             @Override

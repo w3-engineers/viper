@@ -47,7 +47,7 @@ public class DataManager {
      * @param context
      * @param networkPrefix
      */
-    void doBindService(Context context, String networkPrefix) {
+  public   void doBindService(Context context, String networkPrefix) {
         this.mContext = context;
         this.mSsid = networkPrefix;
 
