@@ -7,7 +7,7 @@ import android.os.Looper;
 import android.os.Message;
 import android.text.TextUtils;
 
-import com.w3engineers.mesh.application.data.local.helper.PreferencesHelper;
+import com.w3engineers.mesh.application.data.local.helper.PreferencesHelperDataplan;
 import com.w3engineers.mesh.util.MeshLog;
 
 import org.json.JSONArray;
@@ -839,9 +839,9 @@ public class PayController implements PayEventListener {
     }
 
     private void sendUserConnected(String address, boolean isConnected) {
-        int userMode = PreferencesHelper.on().getDataShareMode();
+        int userMode = PreferencesHelperDataplan.on().getDataShareMode();
 
-        if (userMode == PreferencesHelper.DATA_SELLER) {
+        if (userMode == PreferencesHelperDataplan.DATA_SELLER) {
             if (payControllerListenerForSeller != null) {
                 if (isConnected) {
                     payControllerListenerForSeller.onUserConnected(address);
@@ -853,7 +853,7 @@ public class PayController implements PayEventListener {
             } else {
                 MeshLog.v("listener not found");
             }
-        } else if (userMode == PreferencesHelper.DATA_BUYER) {
+        } else if (userMode == PreferencesHelperDataplan.DATA_BUYER) {
             if (payControllerListenerForBuyer != null) {
                 if (isConnected) {
                     payControllerListenerForBuyer.onUserConnected(address);

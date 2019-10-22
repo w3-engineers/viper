@@ -4,7 +4,7 @@ import android.content.Context;
 import android.text.TextUtils;
 
 import com.w3engineers.eth.data.constant.PayLibConstant;
-import com.w3engineers.eth.data.helper.PreferencesHelper;
+import com.w3engineers.eth.data.helper.PreferencesHelperPaylib;
 import com.w3engineers.mesh.R;
 import com.w3engineers.mesh.application.data.local.db.DatabaseService;
 import com.w3engineers.mesh.application.data.local.db.message.Message;
@@ -184,7 +184,7 @@ public class Util {
     }
 
     public static String getEndPointCurrency() {
-        int endPoint = PreferencesHelper.onInstance(MeshApp.getContext()).getEndpointMode();
+        int endPoint = PreferencesHelperPaylib.onInstance(MeshApp.getContext()).getEndpointMode();
         return endPoint == PayLibConstant.END_POINT_TYPE.ETH_ROPSTEN ? MeshApp.getContext().getString(R.string.eth) : MeshApp.getContext().getString(R.string.etc);
     }
 }

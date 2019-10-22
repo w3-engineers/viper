@@ -5,7 +5,7 @@ import android.arch.lifecycle.MutableLiveData;
 import android.content.Context;
 
 import com.w3engineers.mesh.application.data.local.db.DatabaseService;
-import com.w3engineers.mesh.application.data.local.helper.PreferencesHelper;
+import com.w3engineers.mesh.application.data.local.helper.PreferencesHelperDataplan;
 
 
 public class DataLimitModel {
@@ -24,18 +24,18 @@ public class DataLimitModel {
         mInitialRole = initialRole;
     }
 
-    private PreferencesHelper preferencesHelper;
+    private PreferencesHelperDataplan preferencesHelperDataplan;
     private LiveData<Long> usedData;
     private MutableLiveData<Long> sharedData = new MutableLiveData<>();
     private static DataLimitModel dataLimitModelObj;
 
     public DataLimitModel(Context context){
-        this.preferencesHelper = PreferencesHelper.on();
+        this.preferencesHelperDataplan = PreferencesHelperDataplan.on();
 
-        isDataLimited = preferencesHelper.getDataAmountMode() == 1;
-        fromDate = preferencesHelper.getSellFromDate();
-        toDate = preferencesHelper.getSellToDate();
-        sharedData.postValue(preferencesHelper.getSellDataAmount());
+        isDataLimited = preferencesHelperDataplan.getDataAmountMode() == 1;
+        fromDate = preferencesHelperDataplan.getSellFromDate();
+        toDate = preferencesHelperDataplan.getSellToDate();
+        sharedData.postValue(preferencesHelperDataplan.getSellDataAmount());
 
         if (!isDataLimited){
             long toDate1 = System.currentTimeMillis();
@@ -58,7 +58,7 @@ public class DataLimitModel {
     }
     public void setFromDate(long fromDate) {
         this.fromDate = fromDate;
-        preferencesHelper.setSellFromDate(fromDate);
+        preferencesHelperDataplan.setSellFromDate(fromDate);
     }
 
     public boolean getDataLimited(){
@@ -66,7 +66,7 @@ public class DataLimitModel {
     }
     public void setDataLimited(boolean dataLimited) {
         isDataLimited = dataLimited;
-        preferencesHelper.setDataAmountMode((dataLimited) ? 1 : 0);
+        preferencesHelperDataplan.setDataAmountMode((dataLimited) ? 1 : 0);
     }
 
     public MutableLiveData<Long> getSharedData() {
@@ -74,7 +74,7 @@ public class DataLimitModel {
     }
     public void setSharedData(Long sharedData) {
         this.sharedData.setValue(sharedData);
-        preferencesHelper.setSellDataAmount(sharedData);
+        preferencesHelperDataplan.setSellDataAmount(sharedData);
     }
 
     public long getToDate() {
@@ -82,7 +82,7 @@ public class DataLimitModel {
     }
     public void setToDate(long toDate) {
         this.toDate = toDate;
-        preferencesHelper.setSellToDate(toDate);
+        preferencesHelperDataplan.setSellToDate(toDate);
     }
 
     public LiveData<Long> getUsedData() {

@@ -10,17 +10,17 @@ import com.w3engineers.eth.util.lib.shared_preferences.SharedPreferencePrivateMo
  * This helper class will be used from any place of the application to save/read data
  * from shared preference library
  */
-public class PreferencesHelper extends SharedPreferencePrivateMode {
+public class PreferencesHelperPaylib extends SharedPreferencePrivateMode {
 
-    private static PreferencesHelper sInstance;
+    private static PreferencesHelperPaylib sInstance;
 
-    private PreferencesHelper(Context context) {
+    private PreferencesHelperPaylib(Context context) {
         super(context);
     }
 
-    synchronized public static PreferencesHelper onInstance(Context context) {
+    synchronized public static PreferencesHelperPaylib onInstance(Context context) {
         if (sInstance == null) {
-            sInstance = new PreferencesHelper(context);
+            sInstance = new PreferencesHelperPaylib(context);
         }
         return sInstance;
     }

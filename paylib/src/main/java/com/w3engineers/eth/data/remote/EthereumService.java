@@ -6,9 +6,8 @@ import android.util.Log;
 
 import com.w3engineers.eth.contracts.CustomToken;
 import com.w3engineers.eth.contracts.RaidenMicroTransferChannels;
-import com.w3engineers.eth.data.helper.PreferencesHelper;
+import com.w3engineers.eth.data.helper.PreferencesHelperPaylib;
 import com.w3engineers.eth.data.helper.model.EthGift;
-import com.w3engineers.eth.data.helper.model.EthGiftModel;
 import com.w3engineers.eth.data.helper.model.PayLibNetworkInfo;
 import com.w3engineers.eth.util.data.CellularDataNetworkUtil;
 
@@ -127,11 +126,11 @@ public class EthereumService implements BlockRequest.BlockTransactionObserver, E
     }
 
     public void saveAddress(String address) {
-        PreferencesHelper.onInstance(mContext).saveAddress(address);
+        PreferencesHelperPaylib.onInstance(mContext).saveAddress(address);
     }
 
     public String  getAddress() {
-        return PreferencesHelper.onInstance(mContext).getAddress();
+        return PreferencesHelperPaylib.onInstance(mContext).getAddress();
     }
 
     public interface ReqEther {
@@ -252,12 +251,12 @@ public class EthereumService implements BlockRequest.BlockTransactionObserver, E
 
 
     /*public double getMyTokenBalance() {
-        double tokenValue = PreferencesHelper.onInstance(mContext).getTokenBalance();
+        double tokenValue = PreferencesHelperPaylib.onInstance(mContext).getTokenBalance();
         return tokenValue;
     }*/
 
     /*public void setMyTokenBalance(double value) {
-        PreferencesHelper.onInstance(mContext).setTokenBalance(value);
+        PreferencesHelperPaylib.onInstance(mContext).setTokenBalance(value);
     }*/
 
     public Double getUserTokenAllowance(final String owner, int endpointType) throws ExecutionException, InterruptedException {
@@ -296,13 +295,13 @@ public class EthereumService implements BlockRequest.BlockTransactionObserver, E
     }
 
 //    public double getMyEthBalance() {
-//        double ethValue = PreferencesHelper.onInstance(mContext).getEtherBalance();
+//        double ethValue = PreferencesHelperPaylib.onInstance(mContext).getEtherBalance();
 //
 //        return ethValue;
 //    }
 
     /*public void setMyEthBalance(double value) {
-        PreferencesHelper.onInstance(mContext).setEtherBalance(value);
+        PreferencesHelperPaylib.onInstance(mContext).setEtherBalance(value);
     }*/
 
     public Double getUserTokenBalance(String address, int endpointType) throws ExecutionException, InterruptedException {

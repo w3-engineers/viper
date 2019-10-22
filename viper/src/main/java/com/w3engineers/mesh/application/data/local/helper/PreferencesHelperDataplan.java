@@ -4,7 +4,7 @@ package com.w3engineers.mesh.application.data.local.helper;
 import com.w3engineers.mesh.application.data.local.db.SharedPref;
 import com.w3engineers.mesh.application.data.local.purchase.PurchaseConstants;
 
-public class PreferencesHelper{
+public class PreferencesHelperDataplan {
 
     public static final int  MESH_USER = 0;
     public static final int DATA_SELLER = 1;
@@ -33,15 +33,15 @@ public class PreferencesHelper{
 //    private static final String CURRENCY_MODE = "currency_mode";
 
 
-    private PreferencesHelper() {
+    private PreferencesHelperDataplan() {
 
     }
 
-    private static PreferencesHelper sInstance;
+    private static PreferencesHelperDataplan sInstance;
 
-    synchronized public static PreferencesHelper on() {
+    synchronized public static PreferencesHelperDataplan on() {
         if (sInstance == null) {
-            sInstance = new PreferencesHelper();
+            sInstance = new PreferencesHelperDataplan();
         }
         return sInstance;
     }

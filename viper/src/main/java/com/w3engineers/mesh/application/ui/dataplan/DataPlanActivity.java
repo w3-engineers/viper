@@ -34,7 +34,7 @@ import com.w3engineers.eth.util.helper.ToastUtil;
 import com.w3engineers.ext.strom.application.ui.base.BaseActivity;
 import com.w3engineers.mesh.R;
 import com.w3engineers.mesh.application.data.local.db.DatabaseService;
-import com.w3engineers.mesh.application.data.local.helper.PreferencesHelper;
+import com.w3engineers.mesh.application.data.local.helper.PreferencesHelperDataplan;
 import com.w3engineers.mesh.application.data.local.helper.TimeHelper;
 import com.w3engineers.mesh.application.data.local.model.Seller;
 import com.w3engineers.mesh.application.data.local.purchase.PurchaseConstants;
@@ -67,7 +67,7 @@ public class DataPlanActivity extends BaseActivity implements PurchaseManagerBuy
     private List<RadioButton> dataLimitRadioButtons = new ArrayList<>();
     // private TextView dataUsage;
     private int mEarlierRole, mCurrentRole;
-    private PreferencesHelper preferencesHelper;
+    private PreferencesHelperDataplan preferencesHelperDataplan;
     private Calendar myCalendar;
     private String myFormat = "dd/MM/yy";
     private SimpleDateFormat sdf;
@@ -88,38 +88,38 @@ public class DataPlanActivity extends BaseActivity implements PurchaseManagerBuy
     protected void startUI() {
         mBinding = (ActivityDataPlanBinding) getViewDataBinding();
         dataPlanViewModel = getViewModel();
-        preferencesHelper = PreferencesHelper.on();
+        preferencesHelperDataplan = PreferencesHelperDataplan.on();
         myCalendar = Calendar.getInstance();
         sdf = new SimpleDateFormat(myFormat);
 
         msgMap = new ConcurrentHashMap<>();
 
 
-        if (PreferencesHelper.on().getDataShareMode() == PreferencesHelper.DATA_BUYER) {
+        if (PreferencesHelperDataplan.on().getDataShareMode() == PreferencesHelperDataplan.DATA_BUYER) {
             PurchaseManagerBuyer.getInstance().setPurchaseManagerBuyerListener(this);
         }
 
 
         manageSellerList = ManageSellerList.getInstance(this);
 
-        msgMap.put(getKey(PreferencesHelper.MESH_USER, preferencesHelper.DATA_BUYER), getResources().getString(R.string.mesh_user_to_buyer));
-        msgMap.put(getKey(PreferencesHelper.MESH_USER, preferencesHelper.DATA_SELLER), getResources().getString(R.string.mesh_user_to_seller));
-        msgMap.put(getKey(PreferencesHelper.MESH_USER, preferencesHelper.INTERNET_USER), getResources().getString(R.string.mesh_user_to_internet_user));
+        msgMap.put(getKey(PreferencesHelperDataplan.MESH_USER, preferencesHelperDataplan.DATA_BUYER), getResources().getString(R.string.mesh_user_to_buyer));
+        msgMap.put(getKey(PreferencesHelperDataplan.MESH_USER, preferencesHelperDataplan.DATA_SELLER), getResources().getString(R.string.mesh_user_to_seller));
+        msgMap.put(getKey(PreferencesHelperDataplan.MESH_USER, preferencesHelperDataplan.INTERNET_USER), getResources().getString(R.string.mesh_user_to_internet_user));
 
-        msgMap.put(getKey(PreferencesHelper.DATA_BUYER, preferencesHelper.DATA_SELLER), getResources().getString(R.string.data_buyer_to_seller));
-        msgMap.put(getKey(PreferencesHelper.DATA_BUYER, preferencesHelper.MESH_USER), getResources().getString(R.string.data_buyer_to_mesh_user));
-        msgMap.put(getKey(PreferencesHelper.DATA_BUYER, preferencesHelper.INTERNET_USER), getResources().getString(R.string.data_buyer_to_internet_user));
+        msgMap.put(getKey(PreferencesHelperDataplan.DATA_BUYER, preferencesHelperDataplan.DATA_SELLER), getResources().getString(R.string.data_buyer_to_seller));
+        msgMap.put(getKey(PreferencesHelperDataplan.DATA_BUYER, preferencesHelperDataplan.MESH_USER), getResources().getString(R.string.data_buyer_to_mesh_user));
+        msgMap.put(getKey(PreferencesHelperDataplan.DATA_BUYER, preferencesHelperDataplan.INTERNET_USER), getResources().getString(R.string.data_buyer_to_internet_user));
 
-        msgMap.put(getKey(PreferencesHelper.DATA_SELLER, preferencesHelper.DATA_BUYER), getResources().getString(R.string.data_seller_to_buyer));
-        msgMap.put(getKey(PreferencesHelper.DATA_SELLER, preferencesHelper.MESH_USER), getResources().getString(R.string.data_seller_to_mesh_user));
-        msgMap.put(getKey(PreferencesHelper.DATA_SELLER, preferencesHelper.INTERNET_USER), getResources().getString(R.string.data_seller_to_internet_user));
+        msgMap.put(getKey(PreferencesHelperDataplan.DATA_SELLER, preferencesHelperDataplan.DATA_BUYER), getResources().getString(R.string.data_seller_to_buyer));
+        msgMap.put(getKey(PreferencesHelperDataplan.DATA_SELLER, preferencesHelperDataplan.MESH_USER), getResources().getString(R.string.data_seller_to_mesh_user));
+        msgMap.put(getKey(PreferencesHelperDataplan.DATA_SELLER, preferencesHelperDataplan.INTERNET_USER), getResources().getString(R.string.data_seller_to_internet_user));
 
-        msgMap.put(getKey(PreferencesHelper.INTERNET_USER, preferencesHelper.DATA_BUYER), getResources().getString(R.string.internet_user_to_buyer));
-        msgMap.put(getKey(PreferencesHelper.INTERNET_USER, preferencesHelper.DATA_SELLER), getResources().getString(R.string.internet_user_to_seller));
-        msgMap.put(getKey(PreferencesHelper.INTERNET_USER, preferencesHelper.MESH_USER), getResources().getString(R.string.internet_user_to_internet_user));
+        msgMap.put(getKey(PreferencesHelperDataplan.INTERNET_USER, preferencesHelperDataplan.DATA_BUYER), getResources().getString(R.string.internet_user_to_buyer));
+        msgMap.put(getKey(PreferencesHelperDataplan.INTERNET_USER, preferencesHelperDataplan.DATA_SELLER), getResources().getString(R.string.internet_user_to_seller));
+        msgMap.put(getKey(PreferencesHelperDataplan.INTERNET_USER, preferencesHelperDataplan.MESH_USER), getResources().getString(R.string.internet_user_to_internet_user));
 
 
-        mCurrentRole = preferencesHelper.getDataShareMode();
+        mCurrentRole = preferencesHelperDataplan.getDataShareMode();
 
         dataLimitModel = DataLimitModel.getInstance(getApplicationContext());
         dataLimitModel.setInitialRole(mCurrentRole);
@@ -272,10 +272,10 @@ public class DataPlanActivity extends BaseActivity implements PurchaseManagerBuy
     }
 
     public void onRadioMeshButtonClicked() {
-        if (mCurrentRole == PreferencesHelper.MESH_USER)
+        if (mCurrentRole == PreferencesHelperDataplan.MESH_USER)
             return;
 
-        showRoleSwitchConfirmation(mCurrentRole, PreferencesHelper.MESH_USER);
+        showRoleSwitchConfirmation(mCurrentRole, PreferencesHelperDataplan.MESH_USER);
     }
 
     public void onRadioSellerButtonClicked() {
@@ -284,25 +284,25 @@ public class DataPlanActivity extends BaseActivity implements PurchaseManagerBuy
             mBinding.textViewDataLimitWarning.setVisibility(View.GONE);
         }
 
-        if (mCurrentRole == PreferencesHelper.DATA_SELLER)
+        if (mCurrentRole == PreferencesHelperDataplan.DATA_SELLER)
             return;
 
 
-        showRoleSwitchConfirmation(mCurrentRole, PreferencesHelper.DATA_SELLER);
+        showRoleSwitchConfirmation(mCurrentRole, PreferencesHelperDataplan.DATA_SELLER);
     }
 
     public void onRadioBuyerButtonClicked() {
-        if (mCurrentRole == PreferencesHelper.DATA_BUYER)
+        if (mCurrentRole == PreferencesHelperDataplan.DATA_BUYER)
             return;
 
-        showRoleSwitchConfirmation(mCurrentRole, PreferencesHelper.DATA_BUYER);
+        showRoleSwitchConfirmation(mCurrentRole, PreferencesHelperDataplan.DATA_BUYER);
     }
 
     public void onRadioInternetButtonClicked() {
-        if (mCurrentRole == PreferencesHelper.INTERNET_USER)
+        if (mCurrentRole == PreferencesHelperDataplan.INTERNET_USER)
             return;
 
-        showRoleSwitchConfirmation(mCurrentRole, PreferencesHelper.INTERNET_USER);
+        showRoleSwitchConfirmation(mCurrentRole, PreferencesHelperDataplan.INTERNET_USER);
     }
 
     private void showRoleSwitchConfirmation(int prevRole, int currentRole) {
@@ -310,18 +310,18 @@ public class DataPlanActivity extends BaseActivity implements PurchaseManagerBuy
             @Override
             public void onClickPositive() {
  /*               if (Build.VERSION.SDK_INT > Build.VERSION_CODES.N) {
-                    if (currentRole == PreferencesHelper.MESH_USER) {
-                        mCurrentRole = PreferencesHelper.MESH_USER;
+                    if (currentRole == PreferencesHelperPaylib.MESH_USER) {
+                        mCurrentRole = PreferencesHelperPaylib.MESH_USER;
                         //  setMeshUserInfo();
                         mBinding.tvHint.setVisibility(View.GONE);
                         FloatingView.on().hideFloatingView();
                         setRoleTasks(prevRole, currentRole);
-                    } else if (currentRole == PreferencesHelper.DATA_SELLER) {
-                        mCurrentRole = PreferencesHelper.DATA_SELLER;
+                    } else if (currentRole == PreferencesHelperPaylib.DATA_SELLER) {
+                        mCurrentRole = PreferencesHelperPaylib.DATA_SELLER;
                         //   setDataSellInfo();
                         manageSpannableAboveV24(prevRole, currentRole);
-                    } else if (currentRole == PreferencesHelper.DATA_BUYER) {
-                        mCurrentRole = PreferencesHelper.DATA_BUYER;
+                    } else if (currentRole == PreferencesHelperPaylib.DATA_BUYER) {
+                        mCurrentRole = PreferencesHelperPaylib.DATA_BUYER;
                         mBinding.tvHint.setVisibility(View.GONE);
                         // setDataBuyInfo();
                         FloatingView.on().hideFloatingView();
@@ -361,7 +361,7 @@ public class DataPlanActivity extends BaseActivity implements PurchaseManagerBuy
 
         mEarlierRole = mCurrentRole;
         mCurrentRole = current;
-        preferencesHelper.setDataShareMode(mCurrentRole);
+        preferencesHelperDataplan.setDataShareMode(mCurrentRole);
 
         //TODO arif
 //        TransportManager.getInstance().setNetworkModeListener(this::onTransportInit);
@@ -412,9 +412,9 @@ public class DataPlanActivity extends BaseActivity implements PurchaseManagerBuy
 
     private void loadUI() {
 
-        dataSharingViews.get(preferencesHelper.getDataShareMode()).setVisibility(View.VISIBLE);
+        dataSharingViews.get(preferencesHelperDataplan.getDataShareMode()).setVisibility(View.VISIBLE);
 
-        // currentLayout = dataSharingViews.get(preferencesHelper.getDataShareMode());
+        // currentLayout = dataSharingViews.get(preferencesHelperDataplan.getDataShareMode());
 
         dataLimitRadioButtons.get(dataLimitModel.getDataLimited() ? 1 : 0).setChecked(true);
 
@@ -434,7 +434,7 @@ public class DataPlanActivity extends BaseActivity implements PurchaseManagerBuy
             dataLimitModel.setToDate(myCalendar.getTimeInMillis());
         }
 
-        long sharedData = PreferencesHelper.on().getSellDataAmount();
+        long sharedData = PreferencesHelperDataplan.on().getSellDataAmount();
 
         if (sharedData <= 0) {
             dataLimitModel.setSharedData(Util.convertMegabytesToBytes(10));
@@ -446,8 +446,8 @@ public class DataPlanActivity extends BaseActivity implements PurchaseManagerBuy
 
         mBinding.fromDate.setEnabled(false);
 
-        mBinding.dataUsageLimited.setVisibility(preferencesHelper.getDataAmountMode() == PreferencesHelper.DATA_AMOUNT_LIMITED ? View.VISIBLE : View.INVISIBLE);
-        mBinding.dataUsageUnlimited.setVisibility(preferencesHelper.getDataAmountMode() == PreferencesHelper.DATA_AMOUNT_UNLIMITED ? View.VISIBLE : View.INVISIBLE);
+        mBinding.dataUsageLimited.setVisibility(preferencesHelperDataplan.getDataAmountMode() == PreferencesHelperDataplan.DATA_AMOUNT_LIMITED ? View.VISIBLE : View.INVISIBLE);
+        mBinding.dataUsageUnlimited.setVisibility(preferencesHelperDataplan.getDataAmountMode() == PreferencesHelperDataplan.DATA_AMOUNT_UNLIMITED ? View.VISIBLE : View.INVISIBLE);
 
         disableSaveButton();
 
@@ -610,7 +610,7 @@ public class DataPlanActivity extends BaseActivity implements PurchaseManagerBuy
                 mBinding.dateError.setText(getString(R.string.date_expired));
 
        /*         if (dataSharingManager.isProxyOn()) {
-                    dataSharingManager.offRole(PreferencesHelper.DATA_SELLER, true);
+                    dataSharingManager.offRole(PreferencesHelperPaylib.DATA_SELLER, true);
                 }*/
             } else {
                 mBinding.dateError.setVisibility(View.INVISIBLE);
@@ -623,13 +623,13 @@ public class DataPlanActivity extends BaseActivity implements PurchaseManagerBuy
                     e.printStackTrace();
                 }
 
-                //long sharedData = preferencesHelper.getSellDataAmount();
+                //long sharedData = preferencesHelperDataplan.getSellDataAmount();
 
                 if (tempSharedData <= usedData) {
                     mBinding.dataLimitError.setVisibility(View.VISIBLE);
                     mBinding.dataLimitError.setText(this.getString(R.string.data_lomit_larger_needed));
            /*         if (dataSharingManager.isProxyOn()) {
-                        dataSharingManager.offRole(PreferencesHelper.DATA_SELLER, true);
+                        dataSharingManager.offRole(PreferencesHelperPaylib.DATA_SELLER, true);
                     }*/
 
                 } else {
@@ -637,7 +637,7 @@ public class DataPlanActivity extends BaseActivity implements PurchaseManagerBuy
                     dataLimitModel.setFromDate(from);
                     dataLimitModel.setToDate(to);
                     dataLimitModel.setSharedData(tempSharedData);
-                    //  dataSharingManager.onRole(PreferencesHelper.DATA_SELLER, true);
+                    //  dataSharingManager.onRole(PreferencesHelperPaylib.DATA_SELLER, true);
 
                     dataLimitModel.setDataLimited(true);
 
@@ -710,10 +710,10 @@ public class DataPlanActivity extends BaseActivity implements PurchaseManagerBuy
                 if (dialog.isShowing()) {
                     dialog.dismiss();
                 }
-                if (PreferencesHelper.on().getDataShareMode() == PreferencesHelper.DATA_BUYER) {
+                if (PreferencesHelperPaylib.on().getDataShareMode() == PreferencesHelperPaylib.DATA_BUYER) {
                     PurchaseManagerBuyer.getInstance().setPurchaseManagerBuyerListener(DataPlanActivity.this);
                     PurchaseManagerSeller.getInstance().destroyObject();
-                } else if (PreferencesHelper.on().getDataShareMode() == PreferencesHelper.DATA_SELLER) {
+                } else if (PreferencesHelperPaylib.on().getDataShareMode() == PreferencesHelperPaylib.DATA_SELLER) {
                     PurchaseManagerBuyer.getInstance().setPurchaseManagerBuyerListener(null);
                     PurchaseManagerBuyer.getInstance().destroyObject();
                 }
@@ -948,7 +948,7 @@ public class DataPlanActivity extends BaseActivity implements PurchaseManagerBuy
     }
 
     private void showSellerWarningDialog(int activeBuyer) {
-        long sharedData = PreferencesHelper.on().getSellDataAmount();
+        long sharedData = PreferencesHelperDataplan.on().getSellDataAmount();
         DialogUtil.showConfirmationDialog(DataPlanActivity.this, "Data Limit exceed",
                 "Your data shared limit" + " " + sharedData + " " + "exceeded, there are" + " " + activeBuyer + " " + "active buyer." + "Do you want to enhance shared data limit? If not then all the active channel would be closed",
                 getResources().getString(R.string.no),

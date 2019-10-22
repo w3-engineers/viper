@@ -9,22 +9,19 @@ Proprietary and confidential
 */
 
 import android.arch.lifecycle.LiveData;
-import android.arch.lifecycle.LiveDataReactiveStreams;
 import android.arch.lifecycle.MutableLiveData;
-import android.util.Log;
 
-import com.w3engineers.eth.data.helper.PreferencesHelper;
+import com.w3engineers.eth.data.helper.PreferencesHelperPaylib;
 import com.w3engineers.ext.strom.application.ui.base.BaseRxViewModel;
 import com.w3engineers.mesh.application.data.local.db.DatabaseService;
 import com.w3engineers.mesh.application.data.local.db.networkinfo.NetworkInfo;
+import com.w3engineers.mesh.application.data.local.helper.PreferencesHelperDataplan;
 import com.w3engineers.mesh.application.data.local.purchase.PurchaseConstants;
 import com.w3engineers.mesh.util.MeshApp;
 
 import java.util.concurrent.ExecutionException;
 
-import io.reactivex.Scheduler;
 import io.reactivex.android.schedulers.AndroidSchedulers;
-import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
 
 public class WalletViewModel extends BaseRxViewModel {
@@ -47,7 +44,7 @@ public class WalletViewModel extends BaseRxViewModel {
                     .subscribe(networkInfos -> {
                         for (NetworkInfo networkInfo : networkInfos) {
 
-                            if (networkInfo.networkType == PreferencesHelper.onInstance(MeshApp.getContext()).getEndpointMode()) {
+                            if (networkInfo.networkType == PreferencesHelperPaylib.onInstance(MeshApp.getContext()).getEndpointMode()) {
                                 networkMutableLiveData.postValue(networkInfo);
                             }
                         }
@@ -59,7 +56,7 @@ public class WalletViewModel extends BaseRxViewModel {
 
     public LiveData<Double> getTotalEarn(String myAddress) {
         try {
-            int endPointType = PreferencesHelper.onInstance(MeshApp.getContext()).getEndpointMode();
+            int endPointType = PreferencesHelperPaylib.onInstance(MeshApp.getContext()).getEndpointMode();
 
             return databaseService.getTotalEarnByUser(myAddress, endPointType);
 
@@ -72,7 +69,7 @@ public class WalletViewModel extends BaseRxViewModel {
     public LiveData<Double> getTotalSpent(String myAddress) {
 
         try {
-            int endPointType = PreferencesHelper.onInstance(MeshApp.getContext()).getEndpointMode();
+            int endPointType = PreferencesHelperPaylib.onInstance(MeshApp.getContext()).getEndpointMode();
             return databaseService.getTotalSpentByUser(myAddress, endPointType);
 
         } catch (ExecutionException | InterruptedException e) {
@@ -83,7 +80,7 @@ public class WalletViewModel extends BaseRxViewModel {
 
     public LiveData<Double> getTotalPendingEarning(String myAddress) {
         try {
-            int endPointType = PreferencesHelper.onInstance(MeshApp.getContext()).getEndpointMode();
+            int endPointType = PreferencesHelperPaylib.onInstance(MeshApp.getContext()).getEndpointMode();
 
             return databaseService.getTotalPendingEarningBySeller(myAddress, PurchaseConstants.CHANNEL_STATE.OPEN, endPointType);
 
@@ -95,15 +92,15 @@ public class WalletViewModel extends BaseRxViewModel {
 
     public LiveData<Integer> getDifferentNetworkData(String myAddress) {
         try {
-            int endPointType = PreferencesHelper.onInstance(MeshApp.getContext()).getEndpointMode();
+            int endPointType = PreferencesHelperPaylib.onInstance(MeshApp.getContext()).getEndpointMode();
 
-            if (com.w3engineers.mesh.application.data.local.helper.PreferencesHelper.on().getDataShareMode() ==
-                    com.w3engineers.mesh.application.data.local.helper.PreferencesHelper.DATA_SELLER) {
+            if (PreferencesHelperDataplan.on().getDataShareMode() ==
+                    PreferencesHelperDataplan.DATA_SELLER) {
 
                 return databaseService.getDifferentNetworkData(myAddress, endPointType);
 
-            } else if (com.w3engineers.mesh.application.data.local.helper.PreferencesHelper.on().getDataShareMode() ==
-                    com.w3engineers.mesh.application.data.local.helper.PreferencesHelper.DATA_BUYER) {
+            } else if (PreferencesHelperDataplan.on().getDataShareMode() ==
+                    PreferencesHelperDataplan.DATA_BUYER) {
 
                 return databaseService.getDifferentNetworkPurchase(myAddress, endPointType);
             }
