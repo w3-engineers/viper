@@ -15,6 +15,8 @@ import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.IBinder;
 import android.os.RemoteException;
+import android.util.Log;
+import android.widget.Toast;
 
 import com.w3engineers.mesh.ClientLibraryService;
 import com.w3engineers.mesh.ITmCommunicator;
@@ -61,6 +63,7 @@ public class DataManager {
     ServiceConnection serviceConnection = new ServiceConnection() {
         @Override
         public void onServiceConnected(ComponentName name, IBinder binder) {
+            Log.e("service_status", "onServiceConnected");
             mTmCommunicator = ITmCommunicator.Stub.asInterface(binder);
 
             try {
@@ -73,6 +76,7 @@ public class DataManager {
         @Override
         public void onServiceDisconnected(ComponentName name) {
             mTmCommunicator = null;
+            Log.e("service_status", "onServiceDisconnected");
         }
     };
 
@@ -85,10 +89,10 @@ public class DataManager {
             Intent intent = new Intent(ITmCommunicator.class.getName());
 
             /*this is service name that is associated with server end*/
-            intent.setAction("com.w3engineers.data");
+            intent.setAction("service.viper_server");
 
             /*From 5.0 annonymous intent calls are suspended so replacing with server app's package name*/
-            intent.setPackage("com.w3engineers.client.service");
+            intent.setPackage("com.w3engineers.meshrnd");
 
             // binding to remote service
             mContext.bindService(intent, serviceConnection, Service.BIND_AUTO_CREATE);
