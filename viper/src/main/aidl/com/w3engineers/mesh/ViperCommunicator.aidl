@@ -14,5 +14,5 @@ interface ViperCommunicator {
     void onDataReceived(in String senderId, in byte[] frameData);
     void onAckReceived(in String messageId, in int status);
 
-
+    void setServiceForeground(boolean isForeGround);
 }

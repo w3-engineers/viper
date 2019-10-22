@@ -14,6 +14,7 @@ import android.os.IBinder;
 import android.os.RemoteException;
 import android.support.annotation.Nullable;
 
+import com.w3engineers.mesh.application.data.remote.service.BaseTmServiceNotificationHelper;
 import com.w3engineers.mesh.util.lib.mesh.DataManager;
 
 
@@ -67,6 +68,23 @@ public class ClientLibraryService extends Service {
         public void onAckReceived(String messageId, int status) throws RemoteException {
           DataManager.getInstance().onAckReceived(messageId, status);
         }
+
+        @Override
+        public void setServiceForeground(boolean isForeGround) throws RemoteException {
+            if(isForeGround){
+                startInForeground();
+            }else {
+                stopInForeground();
+            }
+        }
     };
+
+    private void startInForeground(){
+        new BaseTmServiceNotificationHelper(this).startForegroundService();
+    }
+
+    private void stopInForeground() {
+        new BaseTmServiceNotificationHelper(this).stopForegroundService();
+    }
 
 }

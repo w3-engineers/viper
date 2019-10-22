@@ -35,40 +35,4 @@ public class ViperClient {
     public int getLinkTypeById(String nodeID) {
         return DataManager.getInstance().getLinkTypeById(nodeID);
     }
-
-    /**
-     * Listener is initialise here to get all kind of callback here
-     * and after that send callback to app level
-     */
-
-    LinkStateListener linkStateListener = new LinkStateListener() {
-
-        @Override
-        public void onLocalUserConnected(String nodeId) {
-
-        }
-
-        @Override
-        public void onRemoteUserConnected(String nodeId) {
-
-        }
-
-        @Override
-        public void onUserDisconnected(String nodeId) {
-
-        }
-
-        @Override
-        public void onMessageReceived(String senderId, byte[] frameData) {
-
-        }
-
-
-        @Override
-        public void onMessageDelivered(String messageId, int status) {
-
-        }
-
-    };
-
 }

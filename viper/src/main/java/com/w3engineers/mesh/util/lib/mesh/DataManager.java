@@ -16,10 +16,10 @@ import android.content.ServiceConnection;
 import android.os.IBinder;
 import android.os.RemoteException;
 import android.util.Log;
-import android.widget.Toast;
 
 import com.w3engineers.mesh.ClientLibraryService;
 import com.w3engineers.mesh.ITmCommunicator;
+import com.w3engineers.mesh.ViperCommunicator;
 import com.w3engineers.mesh.application.data.AppDataObserver;
 import com.w3engineers.mesh.application.data.model.DataAckEvent;
 import com.w3engineers.mesh.application.data.model.DataEvent;
@@ -29,6 +29,7 @@ import com.w3engineers.mesh.application.data.model.PeerRemoved;
 public class DataManager {
 
     private ITmCommunicator mTmCommunicator;
+    private ViperCommunicator viperCommunicator;
     private String mSsid;
     private Context mContext;
 
@@ -52,9 +53,22 @@ public class DataManager {
 
         Intent mIntent = new Intent(context, ClientLibraryService.class);
         context.startService(mIntent);
+        context.bindService(mIntent, clientServiceConnection, Service.BIND_AUTO_CREATE);
 
         initServiceConnection();
     }
+
+    ServiceConnection clientServiceConnection = new ServiceConnection() {
+        @Override
+        public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
+            viperCommunicator = ViperCommunicator.Stub.asInterface(iBinder);
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName componentName) {
+
+        }
+    };
 
 
     /**
@@ -193,6 +207,14 @@ public class DataManager {
         dataAckEvent.status = status;
 
         AppDataObserver.on().sendObserverData(dataAckEvent);
+    }
+
+    public void setServiceForeground(boolean isForeground) {
+        try {
+            viperCommunicator.setServiceForeground(isForeground);
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        }
     }
 
 }
