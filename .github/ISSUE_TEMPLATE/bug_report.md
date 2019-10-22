@@ -15,6 +15,8 @@ assignees: ''
 ## Expected Behavior
 <!--- Tell us what should happen -->
 
+## Actual Behavior
+<!--- Tell us what happens instead -->
 
 ## Possible Fix
 <!--- Not obligatory, but suggest a fix or reason for the bug -->
