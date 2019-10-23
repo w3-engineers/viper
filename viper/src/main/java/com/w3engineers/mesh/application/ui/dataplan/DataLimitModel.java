@@ -4,8 +4,7 @@ import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.MutableLiveData;
 import android.content.Context;
 
-import com.w3engineers.mesh.application.data.local.db.DatabaseService;
-import com.w3engineers.mesh.application.data.local.helper.PreferencesHelperDataplan;
+import com.w3engineers.mesh.application.data.local.dataplan.DataPlan;
 
 
 public class DataLimitModel {
@@ -16,33 +15,23 @@ public class DataLimitModel {
     private int mInitialRole;
     private int numberOfDay = 7;
 
-    public int getInitialRole() {
-        return mInitialRole;
-    }
-
-    public void setInitialRole(int initialRole) {
-        mInitialRole = initialRole;
-    }
-
-    private PreferencesHelperDataplan preferencesHelperDataplan;
     private LiveData<Long> usedData;
     private MutableLiveData<Long> sharedData = new MutableLiveData<>();
     private static DataLimitModel dataLimitModelObj;
 
     public DataLimitModel(Context context){
-        this.preferencesHelperDataplan = PreferencesHelperDataplan.on();
 
-        isDataLimited = preferencesHelperDataplan.getDataAmountMode() == 1;
-        fromDate = preferencesHelperDataplan.getSellFromDate();
-        toDate = preferencesHelperDataplan.getSellToDate();
-        sharedData.postValue(preferencesHelperDataplan.getSellDataAmount());
+        isDataLimited = DataPlan.getInstance().getDataAmountMode() == 1;
+        fromDate = DataPlan.getInstance().getSellFromDate();
+        toDate = DataPlan.getInstance().getSellToDate();
+        sharedData.postValue(DataPlan.getInstance().getSellDataAmount());
 
         if (!isDataLimited){
             long toDate1 = System.currentTimeMillis();
             long fromDate1 = toDate1 - (numberOfDay*24*60*60*1000);
-            usedData = DatabaseService.getInstance(context).getDatausageDao().getDataUsage(fromDate1, toDate1);
+            usedData = DataPlan.getInstance().getDataUsage(context, fromDate1, toDate1);
         } else {
-            usedData = DatabaseService.getInstance(context).getDatausageDao().getDataUsage(fromDate, toDate);
+            usedData = DataPlan.getInstance().getDataUsage(context, fromDate, toDate);
         }
     }
 
@@ -53,28 +42,35 @@ public class DataLimitModel {
         return dataLimitModelObj;
     }
 
+    public MutableLiveData<Long> getSharedData() {
+        return sharedData;
+    }
+
+    public LiveData<Long> getUsedData() {
+        return usedData;
+    }
+
     public long getFromDate() {
         return fromDate;
     }
+
     public void setFromDate(long fromDate) {
         this.fromDate = fromDate;
-        preferencesHelperDataplan.setSellFromDate(fromDate);
+        DataPlan.getInstance().setSellFromDate(fromDate);
     }
 
     public boolean getDataLimited(){
         return isDataLimited;
     }
+
     public void setDataLimited(boolean dataLimited) {
         isDataLimited = dataLimited;
-        preferencesHelperDataplan.setDataAmountMode((dataLimited) ? 1 : 0);
+        DataPlan.getInstance().setDataAmountMode((dataLimited) ? 1 : 0);
     }
 
-    public MutableLiveData<Long> getSharedData() {
-        return sharedData;
-    }
     public void setSharedData(Long sharedData) {
         this.sharedData.setValue(sharedData);
-        preferencesHelperDataplan.setSellDataAmount(sharedData);
+        DataPlan.getInstance().setSellDataAmount(sharedData);
     }
 
     public long getToDate() {
@@ -82,14 +78,18 @@ public class DataLimitModel {
     }
     public void setToDate(long toDate) {
         this.toDate = toDate;
-        preferencesHelperDataplan.setSellToDate(toDate);
-    }
-
-    public LiveData<Long> getUsedData() {
-        return usedData;
+        DataPlan.getInstance().setSellToDate(toDate);
     }
 
     public int getNumberOfDay(){
         return numberOfDay;
+    }
+
+    public int getInitialRole() {
+        return mInitialRole;
+    }
+
+    public void setInitialRole(int initialRole) {
+        mInitialRole = initialRole;
     }
 }

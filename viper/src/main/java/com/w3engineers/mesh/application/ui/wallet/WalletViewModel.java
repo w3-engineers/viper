@@ -95,13 +95,13 @@ public class WalletViewModel extends BaseRxViewModel {
         try {
             int endPointType = PreferencesHelperPaylib.onInstance(MeshApp.getContext()).getEndpointMode();
 
-            if (PreferencesHelperDataplan.on().getDataShareMode() ==
-                    DataPlanConstants.USER_TYPES.DATA_SELLER) {
+            if (PreferencesHelperDataplan.on().getDataPlanRole() ==
+                    DataPlanConstants.USER_ROLE.DATA_SELLER) {
 
                 return databaseService.getDifferentNetworkData(myAddress, endPointType);
 
-            } else if (PreferencesHelperDataplan.on().getDataShareMode() ==
-                    DataPlanConstants.USER_TYPES.DATA_BUYER) {
+            } else if (PreferencesHelperDataplan.on().getDataPlanRole() ==
+                    DataPlanConstants.USER_ROLE.DATA_BUYER) {
 
                 return databaseService.getDifferentNetworkPurchase(myAddress, endPointType);
             }

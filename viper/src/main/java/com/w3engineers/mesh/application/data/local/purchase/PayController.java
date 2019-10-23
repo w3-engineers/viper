@@ -840,9 +840,9 @@ public class PayController implements PayEventListener {
     }
 
     private void sendUserConnected(String address, boolean isConnected) {
-        int userMode = PreferencesHelperDataplan.on().getDataShareMode();
+        int userMode = PreferencesHelperDataplan.on().getDataPlanRole();
 
-        if (userMode == DataPlanConstants.USER_TYPES.DATA_SELLER) {
+        if (userMode == DataPlanConstants.USER_ROLE.DATA_SELLER) {
             if (payControllerListenerForSeller != null) {
                 if (isConnected) {
                     payControllerListenerForSeller.onUserConnected(address);
@@ -854,7 +854,7 @@ public class PayController implements PayEventListener {
             } else {
                 MeshLog.v("listener not found");
             }
-        } else if (userMode == DataPlanConstants.USER_TYPES.DATA_BUYER) {
+        } else if (userMode == DataPlanConstants.USER_ROLE.DATA_BUYER) {
             if (payControllerListenerForBuyer != null) {
                 if (isConnected) {
                     payControllerListenerForBuyer.onUserConnected(address);

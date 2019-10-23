@@ -24,6 +24,8 @@ public class MainActivity extends AppCompatActivity {
 
         Button helloBtn = findViewById(R.id.helloBtn);
 
+        Button dataPlan = findViewById(R.id.data_plan);
+
         DataManager.getInstance().doBindService(this, "jkhlh");
 
         helloBtn.setOnClickListener(new View.OnClickListener() {
@@ -32,6 +34,10 @@ public class MainActivity extends AppCompatActivity {
               int id =  DataManager.getInstance().getLinkTypeById("peerId");
                 Toast.makeText(MainActivity.this, "Link Type:: " + id, Toast.LENGTH_SHORT).show();
             }
+        });
+
+        dataPlan.setOnClickListener(view -> {
+            DataPlan.openActivity(MainActivity.this);
         });
     }
 }

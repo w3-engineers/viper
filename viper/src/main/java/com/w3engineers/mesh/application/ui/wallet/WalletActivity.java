@@ -101,13 +101,13 @@ public class WalletActivity extends BaseActivity {
 
 
 
-        if (preferencesHelperDataplan.getDataShareMode() == DataPlanConstants.USER_TYPES.DATA_BUYER) {
+        if (preferencesHelperDataplan.getDataPlanRole() == DataPlanConstants.USER_ROLE.DATA_BUYER) {
             mBinding.totalSpentBlock.setVisibility(View.GONE);
 
             if (!PurchaseManagerBuyer.getInstance().giftEtherForOtherNetwork()){
                 refreshMyBalance();
             }
-        } else if (preferencesHelperDataplan.getDataShareMode() == DataPlanConstants.USER_TYPES.DATA_SELLER){
+        } else if (preferencesHelperDataplan.getDataPlanRole() == DataPlanConstants.USER_ROLE.DATA_SELLER){
             if (!PurchaseManagerSeller.getInstance().requestForGiftForSeller()){
                 refreshMyBalance();
             }
@@ -276,9 +276,9 @@ public class WalletActivity extends BaseActivity {
 
     private void refreshMyBalance() {
         PreferencesHelperDataplan preferencesHelperDataplan = PreferencesHelperDataplan.on();
-        if (preferencesHelperDataplan.getDataShareMode() == DataPlanConstants.USER_TYPES.MESH_USER) {
+        if (preferencesHelperDataplan.getDataPlanRole() == DataPlanConstants.USER_ROLE.MESH_USER) {
             ToastUtil.showLong(this, "This feature is available only for data seller and data buyer.");
-        } else if (preferencesHelperDataplan.getDataShareMode() == DataPlanConstants.USER_TYPES.DATA_SELLER) {
+        } else if (preferencesHelperDataplan.getDataPlanRole() == DataPlanConstants.USER_ROLE.DATA_SELLER) {
             dialog.setMessage("Refreshing balance, please wait.");
             dialog.setCancelable(false);
             dialog.show();
@@ -340,9 +340,9 @@ public class WalletActivity extends BaseActivity {
     private void sendEtherRequest() {
         PreferencesHelperDataplan preferencesHelperDataplan = PreferencesHelperDataplan.on();
 
-        if (preferencesHelperDataplan.getDataShareMode() == DataPlanConstants.USER_TYPES.MESH_USER) {
+        if (preferencesHelperDataplan.getDataPlanRole() == DataPlanConstants.USER_ROLE.MESH_USER) {
             ToastUtil.showLong(this, "This feature is available only for data seller and data buyer.");
-        } else if (preferencesHelperDataplan.getDataShareMode() == DataPlanConstants.USER_TYPES.DATA_SELLER) {
+        } else if (preferencesHelperDataplan.getDataPlanRole() == DataPlanConstants.USER_ROLE.DATA_SELLER) {
 
             dialog.setMessage("Sending request, please wait.");
             dialog.setCancelable(false);
@@ -386,9 +386,9 @@ public class WalletActivity extends BaseActivity {
     private void sendTokenRequest() {
         PreferencesHelperDataplan preferencesHelperDataplan = PreferencesHelperDataplan.on();
 
-        if (preferencesHelperDataplan.getDataShareMode() == DataPlanConstants.USER_TYPES.MESH_USER) {
+        if (preferencesHelperDataplan.getDataPlanRole() == DataPlanConstants.USER_ROLE.MESH_USER) {
             ToastUtil.showLong(this, "This feature is available only for data seller and data buyer.");
-        } else if (preferencesHelperDataplan.getDataShareMode() == DataPlanConstants.USER_TYPES.DATA_SELLER) {
+        } else if (preferencesHelperDataplan.getDataPlanRole() == DataPlanConstants.USER_ROLE.DATA_SELLER) {
 
             dialog.setMessage("Sending request, please wait.");
             dialog.show();
@@ -514,9 +514,9 @@ public class WalletActivity extends BaseActivity {
                 if (integer != null && integer > 0) {
                     mBinding.anotherDeposit.setVisibility(View.VISIBLE);
 
-                    if (PreferencesHelperDataplan.on().getDataShareMode() == DataPlanConstants.USER_TYPES.DATA_SELLER) {
+                    if (PreferencesHelperDataplan.on().getDataPlanRole() == DataPlanConstants.USER_ROLE.DATA_SELLER) {
                         mBinding.anotherDeposit.setText(getString(R.string.different_network_data_for_seller));
-                    } else if (PreferencesHelperDataplan.on().getDataShareMode() == DataPlanConstants.USER_TYPES.DATA_BUYER) {
+                    } else if (PreferencesHelperDataplan.on().getDataPlanRole() == DataPlanConstants.USER_ROLE.DATA_BUYER) {
                         mBinding.anotherDeposit.setText(getString(R.string.different_network_data_for_buyer));
                     }
 
@@ -580,9 +580,9 @@ public class WalletActivity extends BaseActivity {
                 mBinding.tvEthBalance.setText(convertTwoDigitString(networkInfo.currencyAmount));
                 mBinding.tvRmeshBalance.setText(convertTwoDigitString(networkInfo.tokenAmount));
 
-                int dataShareMode = preferencesHelperDataplan.getDataShareMode();
+                int dataShareMode = preferencesHelperDataplan.getDataPlanRole();
 
-                if (dataShareMode == DataPlanConstants.USER_TYPES.DATA_SELLER || dataShareMode == DataPlanConstants.USER_TYPES.DATA_BUYER) {
+                if (dataShareMode == DataPlanConstants.USER_ROLE.DATA_SELLER || dataShareMode == DataPlanConstants.USER_ROLE.DATA_BUYER) {
 
                     mBinding.currency.setText(networkInfo.currencySymbol);
                     mBinding.currency.setVisibility(View.VISIBLE);
@@ -638,13 +638,13 @@ public class WalletActivity extends BaseActivity {
             getTotalPendingEarningBySeller();
             setDifferentNetworkInfo();
 
-            if (preferencesHelperDataplan.getDataShareMode() == DataPlanConstants.USER_TYPES.DATA_BUYER) {
+            if (preferencesHelperDataplan.getDataPlanRole() == DataPlanConstants.USER_ROLE.DATA_BUYER) {
                 mBinding.totalSpentBlock.setVisibility(View.GONE);
 
                 if (!PurchaseManagerBuyer.getInstance().giftEtherForOtherNetwork()){
                     refreshMyBalance();
                 }
-            } else if (preferencesHelperDataplan.getDataShareMode() == DataPlanConstants.USER_TYPES.DATA_SELLER){
+            } else if (preferencesHelperDataplan.getDataPlanRole() == DataPlanConstants.USER_ROLE.DATA_SELLER){
                 if (!PurchaseManagerSeller.getInstance().requestForGiftForSeller()){
                     refreshMyBalance();
                 }

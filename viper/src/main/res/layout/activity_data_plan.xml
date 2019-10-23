@@ -141,7 +141,7 @@
                 <RadioButton
                     android:id="@+id/mesh_user"
                     style="@style/data_share_radio"
-                    android:checked="@{dataLimitModel.initialRole == DataPlanConstants.USER_TYPES.MESH_USER}"
+                    android:checked="@{dataLimitModel.initialRole == DataPlanConstants.USER_ROLE.MESH_USER}"
                     android:text="@string/mesh_user"
                     tools:ignore="UnusedAttribute" />
 
@@ -149,7 +149,7 @@
                     android:id="@+id/data_seller"
                     style="@style/data_share_radio"
                     android:layout_marginTop="@dimen/margin_10"
-                    android:checked="@{dataLimitModel.initialRole == DataPlanConstants.USER_TYPES.DATA_SELLER}"
+                    android:checked="@{dataLimitModel.initialRole == DataPlanConstants.USER_ROLE.DATA_SELLER}"
                     android:text="@string/data_seller"
                     tools:ignore="UnusedAttribute" />
 
@@ -157,7 +157,7 @@
                     android:id="@+id/data_buyer"
                     style="@style/data_share_radio"
                     android:layout_marginTop="@dimen/margin_10"
-                    android:checked="@{dataLimitModel.initialRole == DataPlanConstants.USER_TYPES.DATA_BUYER}"
+                    android:checked="@{dataLimitModel.initialRole == DataPlanConstants.USER_ROLE.DATA_BUYER}"
                     android:text="@string/data_buyer"
                     tools:ignore="UnusedAttribute" />
 
@@ -165,7 +165,7 @@
                     android:id="@+id/internet_user"
                     style="@style/data_share_radio"
                     android:layout_marginTop="@dimen/margin_10"
-                    android:checked="@{dataLimitModel.initialRole == DataPlanConstants.USER_TYPES.INTERNET_USER}"
+                    android:checked="@{dataLimitModel.initialRole == DataPlanConstants.USER_ROLE.INTERNET_USER}"
                     android:text="@string/internet_user"
                     tools:ignore="UnusedAttribute" />
 

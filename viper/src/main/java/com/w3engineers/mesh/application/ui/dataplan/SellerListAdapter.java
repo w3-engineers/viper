@@ -24,7 +24,7 @@ import com.w3engineers.mesh.application.data.local.model.Seller;
 import com.w3engineers.mesh.databinding.ItemDataSellerBinding;
 
 
-public class SellerListAdapter extends BaseAdapter<Seller> {
+class SellerListAdapter extends BaseAdapter<Seller> {
 
     private final int NEW_SELLER = 1, ONLINE_SELLER = 2, OFFLINE_SELLER = 3, SELLERS = 4;
     private View.OnClickListener clickListener;
