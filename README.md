@@ -1,8 +1,22 @@
 # Viper
 
-Viper is the Telemesh Android Client that acts as a communication bridge between Telemesh Android Application (TA) and Telemesh Service (TS).
+Viper is the Telemesh Android library that acts as a communication bridge between Telemesh Android Application (TA) and Telemesh Service (TS).
 It is responsible for coordinating the actions to the Telemesh Service. 
 It can also perform some mappings to prepare the objects coming from the Telemesh Application.
+
+## Usage
+
+### Dependency
+
+Include the library in telemesh app `build.gradle`
+
+    dependencies{
+        implementation '......'
+    }
+
+To start using the library you just need to call :
+
+TBA
 
 ## Supports
 It contains few tools to ease developers daily development. Support provides:
