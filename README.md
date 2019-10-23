@@ -16,7 +16,7 @@ It can also perform some mappings to prepare the objects coming from the Android
 Include the library in app `build.gradle`
 
     dependencies{
-        implementation '......'
+        implementation ' TBA......'
     }
 
 To start using the library you just need to call :
@@ -73,9 +73,9 @@ Please read [CONTRIBUTING.md](https://github.com/w3-engineers/viper/blob/master/
 
 ## Versioning
 
-We use [SemVer](http://semver.org/) for versioning. For the versions available, see the [tags on this repository](https://github.com/your/project/tags). 
+We use [SemVer](http://semver.org/) for versioning.
 
 ## License
 
-This project is licensed under the GNU GPLv3 License - see the [LICENSE.md](LICENSE.md) file for details
+This project is licensed under the GNU GPLv3 License - see the [LICENSE.md](https://github.com/w3-engineers/viper/blob/master/LICENSE) file for details
 
