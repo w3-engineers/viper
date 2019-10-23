@@ -3,39 +3,58 @@ package com.w3engineers.mesh.application.ui.dataplan;
 import android.arch.lifecycle.MutableLiveData;
 
 import com.w3engineers.ext.strom.application.ui.base.BaseRxViewModel;
-import com.w3engineers.mesh.application.data.local.model.Seller;
-import com.w3engineers.mesh.util.Constant;
+import com.w3engineers.mesh.application.data.local.dataplan.DataPlan;
+
+class DataPlanViewModel extends BaseRxViewModel implements DataPlan.DataPlanListener {
 
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
 
-public class DataPlanViewModel extends BaseRxViewModel {
-
-    public MutableLiveData<List<Seller>> getBuyerUsers = new MutableLiveData<>();
-
-    private List<Seller> prepareBuyerList() {
-        List<Seller> sellerUsers = new ArrayList<>();
-        Random random = new Random();
-        String[] names = {"Danial Alvez", "Andre Russle", "Alvie D Costa", "Devid Warner", "Moin Aly"};
-        int[] status = {Constant.SellerStatus.PURCHASE, Constant.SellerStatus.PURCHASING, Constant.SellerStatus.PURCHASED, Constant.SellerStatus.CONNECTING, Constant.SellerStatus.CONNECTED, Constant.SellerStatus.DISCONNECT, Constant.SellerStatus.DISCONNECTING,
-                Constant.SellerStatus.DISCONNECTED, Constant.SellerStatus.CLOSE, Constant.SellerStatus.CLOSING, Constant.SellerStatus.CLOSED};
-
-        for (String name : names) {
-            int randomIndex = random.nextInt(3);
-            Seller seller = new Seller();
-            seller.setName(name);
-            seller.setUsedData(randomIndex == 0 ? 0 : +random.nextInt(100));
-            seller.setStatus(status[randomIndex]);
-
-            sellerUsers.add(seller);
-        }
-        return sellerUsers;
+    void roleSwitch(int newRole) {
+        DataPlan.getInstance().roleSwitch(newRole);
     }
 
-    public void getBuyerList() {
-        getBuyerUsers.postValue(prepareBuyerList());
+    @Override
+    public void onConnectingWithSeller(String sellerAddress) {
+
     }
 
+    @Override
+    public void onPurchaseFailed(String sellerAddress, String msg) {
+
+    }
+
+    @Override
+    public void onPurchaseSuccess(String sellerAddress, double purchasedData, long blockNumber) {
+
+    }
+
+    @Override
+    public void onPurchaseClosing(String sellerAddress) {
+
+    }
+
+    @Override
+    public void onPurchaseCloseFailed(String sellerAddress, String msg) {
+
+    }
+
+    @Override
+    public void onPurchaseCloseSuccess(String sellerAddress) {
+
+    }
+
+    @Override
+    public void showToastMessage(String msg) {
+
+    }
+
+    @Override
+    public void onBalancedFinished(String sellerAddress, int remain) {
+
+    }
+
+    @Override
+    public void onTopUpFailed(String sellerAddress, String msg) {
+
+    }
 }

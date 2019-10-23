@@ -22,8 +22,6 @@ import com.w3engineers.mesh.util.lib.mesh.DataManager;
  */
 public abstract class TelemeshBaseActivity extends BaseActivity {
 
-    protected abstract BaseServiceLocator getServiceLocator();
-
     @Override
     protected void onPause() {
         super.onPause();

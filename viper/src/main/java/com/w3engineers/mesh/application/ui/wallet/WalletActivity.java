@@ -78,7 +78,7 @@ public class WalletActivity extends BaseActivity {
 
         dialog = new ProgressDialog(this);
 
-        if (dataPlan.getDataPlanRole() == DataPlanConstants.USER_TYPES.DATA_BUYER) {
+        if (dataPlan.getDataPlanRole() == DataPlanConstants.USER_ROLE.DATA_BUYER) {
             mBinding.totalSpentBlock.setVisibility(View.GONE);
         }
 
@@ -379,9 +379,9 @@ public class WalletActivity extends BaseActivity {
                 if (integer != null && integer > 0) {
                     mBinding.anotherDeposit.setVisibility(View.VISIBLE);
 
-                    if (dataPlan.getDataPlanRole() == DataPlanConstants.USER_TYPES.DATA_SELLER) {
+                    if (dataPlan.getDataPlanRole() == DataPlanConstants.USER_ROLE.DATA_SELLER) {
                         mBinding.anotherDeposit.setText(getString(R.string.different_network_data_for_seller));
-                    } else if (dataPlan.getDataPlanRole() == DataPlanConstants.USER_TYPES.DATA_BUYER) {
+                    } else if (dataPlan.getDataPlanRole() == DataPlanConstants.USER_ROLE.DATA_BUYER) {
                         mBinding.anotherDeposit.setText(getString(R.string.different_network_data_for_buyer));
                     }
 
@@ -447,7 +447,7 @@ public class WalletActivity extends BaseActivity {
 
                 int dataShareMode = dataPlan.getDataPlanRole();
 
-                if (dataShareMode == DataPlanConstants.USER_TYPES.DATA_SELLER || dataShareMode == DataPlanConstants.USER_TYPES.DATA_BUYER) {
+                if (dataShareMode == DataPlanConstants.USER_ROLE.DATA_SELLER || dataShareMode == DataPlanConstants.USER_ROLE.DATA_BUYER) {
 
                     mBinding.currency.setText(walletInfo.currencySymbol);
                     mBinding.currency.setVisibility(View.VISIBLE);
@@ -504,7 +504,7 @@ public class WalletActivity extends BaseActivity {
             getTotalPendingEarningBySeller();
             setDifferentNetworkInfo();
 
-            if (dataPlan.getDataPlanRole() == DataPlanConstants.USER_TYPES.DATA_BUYER) {
+            if (dataPlan.getDataPlanRole() == DataPlanConstants.USER_ROLE.DATA_BUYER) {
                 mBinding.totalSpentBlock.setVisibility(View.GONE);
             }
 

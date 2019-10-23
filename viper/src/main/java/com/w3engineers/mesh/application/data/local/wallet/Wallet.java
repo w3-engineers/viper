@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.Intent;
 
 import com.w3engineers.mesh.application.data.local.DataPlanConstants;
+import com.w3engineers.mesh.application.data.local.dataplan.DataPlan;
 import com.w3engineers.mesh.application.data.local.db.networkinfo.NetworkInfo;
 import com.w3engineers.mesh.application.data.local.db.networkinfo.WalletInfo;
 import com.w3engineers.mesh.application.data.local.helper.PreferencesHelperDataplan;
@@ -24,6 +25,8 @@ import io.reactivex.Flowable;
 public class Wallet {
     private static Wallet wallet;
     private PreferencesHelperDataplan preferencesHelperDataplan;
+    private DataPlan dataPlan;
+
 
     public static void openActivity(Context context){
         Intent intent = new Intent(context, WalletActivity.class);
@@ -39,13 +42,14 @@ public class Wallet {
 
     private Wallet(){
         preferencesHelperDataplan = PreferencesHelperDataplan.on();
+        dataPlan = DataPlan.getInstance();
     }
 
 
     public boolean giftEther(){
-        if (preferencesHelperDataplan.getDataShareMode() == DataPlanConstants.USER_TYPES.DATA_BUYER) {
+        if (dataPlan.getDataPlanRole() == DataPlanConstants.USER_ROLE.DATA_BUYER) {
             return PurchaseManagerBuyer.getInstance().giftEtherForOtherNetwork();
-        } else if (preferencesHelperDataplan.getDataShareMode() == DataPlanConstants.USER_TYPES.DATA_SELLER){
+        } else if (dataPlan.getDataPlanRole() == DataPlanConstants.USER_ROLE.DATA_SELLER){
             return PurchaseManagerSeller.getInstance().requestForGiftForSeller();
         }
         return false;
@@ -76,9 +80,9 @@ public class Wallet {
 
     public void refreshMyBalance(BalanceInfoListener listener) {
 
-        if (preferencesHelperDataplan.getDataShareMode() == DataPlanConstants.USER_TYPES.MESH_USER) {
+        if (dataPlan.getDataPlanRole() == DataPlanConstants.USER_ROLE.MESH_USER) {
             listener.onBalanceInfo(false, "This feature is available only for data seller and data buyer and internet user.");
-        } else if (preferencesHelperDataplan.getDataShareMode() == DataPlanConstants.USER_TYPES.DATA_SELLER || preferencesHelperDataplan.getDataShareMode() == DataPlanConstants.USER_TYPES.INTERNET_USER) {
+        } else if (dataPlan.getDataPlanRole() == DataPlanConstants.USER_ROLE.DATA_SELLER || dataPlan.getDataPlanRole() == DataPlanConstants.USER_ROLE.INTERNET_USER) {
 
             PurchaseManagerSeller.getInstance().getMyBalanceInfo(new PurchaseManagerSeller.MyBalanceInfoListener() {
                 @Override
@@ -91,7 +95,7 @@ public class Wallet {
                     listener.onBalanceInfo(false, msg);
                 }
             });
-        } else if (preferencesHelperDataplan.getDataShareMode() == DataPlanConstants.USER_TYPES.DATA_BUYER){
+        } else if (dataPlan.getDataPlanRole() == DataPlanConstants.USER_ROLE.DATA_BUYER){
             PurchaseManagerBuyer.getInstance().getMyBalanceInfo(new PurchaseManagerBuyer.MyBalanceInfoListener() {
                 @Override
                 public void onBalanceInfoReceived(double ethBalance, double tknBalance) {
@@ -115,12 +119,12 @@ public class Wallet {
     public void sendEtherRequest(EtherRequestListener etherRequestListener) {
         PreferencesHelperDataplan preferencesHelperDataplan = PreferencesHelperDataplan.on();
 
-        if (preferencesHelperDataplan.getDataShareMode() == DataPlanConstants.USER_TYPES.DATA_SELLER) {
+        if (dataPlan.getDataPlanRole() == DataPlanConstants.USER_ROLE.DATA_SELLER) {
 
             PurchaseManagerSeller.getInstance().sendEtherRequest((success, msg) ->{
               etherRequestListener.onEtherRequestResponse(success, msg);
             });
-        } else if (preferencesHelperDataplan.getDataShareMode() == DataPlanConstants.USER_TYPES.DATA_BUYER){
+        } else if (dataPlan.getDataPlanRole() == DataPlanConstants.USER_ROLE.DATA_BUYER){
 
             PurchaseManagerBuyer.getInstance().sendEtherRequest((success, from, msg) -> {
                 etherRequestListener.onEtherRequestResponse(success, msg);
@@ -135,11 +139,11 @@ public class Wallet {
 
     public void sendTokenRequest(TokenRequestListener tokenRequestListener) {
 
-        if (preferencesHelperDataplan.getDataShareMode() == DataPlanConstants.USER_TYPES.DATA_SELLER) {
+        if (dataPlan.getDataPlanRole() == DataPlanConstants.USER_ROLE.DATA_SELLER) {
             PurchaseManagerSeller.getInstance().sendTokenRequest((success, msg, tokenValue, etherValue) ->{
                 tokenRequestListener.onTokenRequestResponse(success, msg);
             });
-        } else if (preferencesHelperDataplan.getDataShareMode() == DataPlanConstants.USER_TYPES.DATA_BUYER){
+        } else if (dataPlan.getDataPlanRole() == DataPlanConstants.USER_ROLE.DATA_BUYER){
             PurchaseManagerBuyer.getInstance().sendTokenRequest(new PurchaseManagerBuyer.TokenRequestListener() {
                 @Override
                 public void onTokenRequestResponseReceived(boolean success, String from, String msg, double tokenValue, double ethValue) {
@@ -161,9 +165,9 @@ public class Wallet {
     }
 
     public LiveData<Integer> getDifferentNetworkData(String myAddress, int endpoint) {
-        if (preferencesHelperDataplan.getDataShareMode() == DataPlanConstants.USER_TYPES.DATA_SELLER) {
+        if (dataPlan.getDataPlanRole() == DataPlanConstants.USER_ROLE.DATA_SELLER) {
             return PurchaseManagerSeller.getInstance().getDifferentNetworkData(myAddress, endpoint);
-        } else if (PreferencesHelperDataplan.on().getDataShareMode() == DataPlanConstants.USER_TYPES.DATA_BUYER) {
+        } else if (dataPlan.getDataPlanRole() == DataPlanConstants.USER_ROLE.DATA_BUYER) {
             return PurchaseManagerBuyer.getInstance().getDifferentNetworkData(myAddress, endpoint);
         }
         return null;

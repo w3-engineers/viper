@@ -39,11 +39,11 @@ public class PreferencesHelperDataplan {
         return sInstance;
     }
 
-    public void setDataShareMode(int value) {
+    public void setDataPlanRole(int value) {
         SharedPref.write(DATA_SHARE_MODE, value);
     }
-    public int getDataShareMode() {
-      return SharedPref.readInt(DATA_SHARE_MODE, DataPlanConstants.USER_TYPES.MESH_USER);
+    public int getDataPlanRole() {
+      return SharedPref.readInt(DATA_SHARE_MODE, DataPlanConstants.USER_ROLE.MESH_USER);
     }
 
     public void setDataAmountMode(int value) {

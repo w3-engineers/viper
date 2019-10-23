@@ -50,7 +50,7 @@ public class PurchaseManagerSeller extends PurchaseManager implements PayControl
         super();
         setPayControllerListener();
         ethService.setTransactionObserver(this);
-        if (preferencesHelperDataplan.getDataShareMode() == DataPlanConstants.USER_TYPES.DATA_SELLER) {
+        if (preferencesHelperDataplan.getDataPlanRole() == DataPlanConstants.USER_ROLE.DATA_SELLER) {
             sendFailedPurchaseRequest();
             setObserverForPendingRequest();
         }
