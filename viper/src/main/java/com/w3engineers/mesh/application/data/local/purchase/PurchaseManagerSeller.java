@@ -1961,4 +1961,12 @@ public class PurchaseManagerSeller extends PurchaseManager implements PayControl
         void onTokenRequestResponseReceived(boolean success, String msg, double tknBalance, double ethBalance);
 
     }
+    public LiveData<Integer> getDifferentNetworkData(String myAddress, int endpoint) {
+        try {
+            return databaseService.getDifferentNetworkData(myAddress, endpoint);
+        } catch (ExecutionException | InterruptedException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
 }

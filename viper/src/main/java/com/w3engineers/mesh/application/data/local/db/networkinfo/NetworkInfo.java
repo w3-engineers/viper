@@ -13,28 +13,18 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-@Entity(indices = {@Index(value = {"network_type"},
-        unique = true)})
-public class NetworkInfo {
+@Entity(indices = {@Index(value = {"network_type"}, unique = true)})
+public class NetworkInfo extends WalletInfo{
 
     @NonNull
     @PrimaryKey(autoGenerate = true)
     public int nid;
-
-    @ColumnInfo(name = "network_type")
-    public int networkType;
 
     @ColumnInfo(name = "network_name")
     public String networkName;
 
     @ColumnInfo(name = "network_url")
     public String networkUrl;
-
-    @ColumnInfo(name = "currency_symbol")
-    public String currencySymbol;
-
-    @ColumnInfo(name = "token_symbol")
-    public String tokenSymbol;
 
     @ColumnInfo(name = "token_address")
     public String tokenAddress;
@@ -48,11 +38,7 @@ public class NetworkInfo {
     @ColumnInfo(name = "gas_limit")
     public long gasLimit;
 
-    @ColumnInfo(name = "token_amount")
-    public double tokenAmount;
 
-    @ColumnInfo(name = "currency_amount")
-    public double currencyAmount;
 
     public PayLibNetworkInfo toPayLibNetworkInfo() {
         return new PayLibNetworkInfo().setNetworkType(networkType).setNetworkName(networkName)

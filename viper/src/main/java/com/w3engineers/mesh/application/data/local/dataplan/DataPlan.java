@@ -74,9 +74,11 @@ public class DataPlan {
         void onTopUpFailed(String sellerAddress, String msg);
     }
 
-
-
-
+    public int getDataPlanRole() {
+        //TODO
+//        return preferencesHelperDataplan.getDataPlanRole();
+        return 1;
+    }
 
 
 

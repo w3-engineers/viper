@@ -23,24 +23,15 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.widget.PopupMenu;
 
-import com.w3engineers.eth.data.constant.PayLibConstant;
-import com.w3engineers.eth.data.helper.PreferencesHelperPaylib;
-import com.w3engineers.eth.data.remote.EthereumService;
-import com.w3engineers.eth.util.helper.ToastUtil;
-import com.w3engineers.ext.strom.application.ui.base.BaseActivity;
 import com.w3engineers.ext.strom.util.helper.Toaster;
+import com.w3engineers.mesh.application.data.local.dataplan.DataPlan;
+import com.w3engineers.ext.strom.application.ui.base.BaseActivity;
 import com.w3engineers.mesh.R;
 import com.w3engineers.mesh.application.data.local.DataPlanConstants;
-import com.w3engineers.mesh.application.data.local.db.SharedPref;
-import com.w3engineers.mesh.application.data.local.helper.PreferencesHelperDataplan;
-import com.w3engineers.mesh.application.data.local.purchase.PurchaseManagerBuyer;
-import com.w3engineers.mesh.application.data.local.purchase.PurchaseManagerSeller;
+import com.w3engineers.mesh.application.data.local.wallet.Wallet;
 import com.w3engineers.mesh.databinding.ActivityWalletBinding;
 import com.w3engineers.mesh.databinding.PromptWalletWithdrowBinding;
-import com.w3engineers.mesh.util.Constant;
 import com.w3engineers.mesh.util.DialogUtil;
-import com.w3engineers.mesh.util.EthereumServiceUtil;
-import com.w3engineers.mesh.util.Util;
 
 import java.text.Format;
 import java.text.SimpleDateFormat;
@@ -51,26 +42,21 @@ import java.util.concurrent.ExecutionException;
 public class WalletActivity extends BaseActivity {
 
     private ActivityWalletBinding mBinding;
-    private EthereumService ethService;
-    private String walletAddress;
-    //    double tokenBalance;
-//    double ethBalance;
     private ProgressDialog dialog;
     private WalletViewModel walletViewModel;
-    // private PurchaseManagerBuyer purchaseManagerBuyer;
-    private PreferencesHelperDataplan preferencesHelperDataplan;
     private double payableDeposit;
 
-    private LiveData<Double> totalEarningObserver, totalSpentObserver,
-            totalPendingEarningObserver;
+    private LiveData<Double> totalEarningObserver, totalSpentObserver, totalPendingEarningObserver;
     private LiveData<Integer>  haveDifferentNetworkDataObserver;
+
+    private Wallet wallet;
+    private DataPlan dataPlan;
 
     private interface REQUEST_TYPE {
         int ETHER = 1;
         int TOKEN = 2;
     }
 
-    //private PurchaseManagerSeller purchaseManagerSeller;
 
     @Override
     protected int getLayoutId() {
@@ -79,38 +65,26 @@ public class WalletActivity extends BaseActivity {
 
     @Override
     protected void startUI() {
+
         mBinding = (ActivityWalletBinding) getViewDataBinding();
         walletViewModel = getWalletViewModel();
+        wallet = Wallet.getInstance();
+        dataPlan = DataPlan.getInstance();
+
+
         setClickListener(mBinding.opBack, mBinding.imgMyAddress, mBinding.btnWithdraw, mBinding.ethBlock, mBinding.tmeshBlock);
-        // purchaseManagerSeller = PurchaseManagerSeller.getInstance(this);
-        // purchaseManagerBuyer = PurchaseManagerBuyer.getInstance(this);
-        preferencesHelperDataplan = PreferencesHelperDataplan.on();
 
-        ethService = EthereumServiceUtil.getInstance(this).getEthereumService();
-        walletAddress = ethService.getAddress();
-
-        setCurrencyAndToken();
+        setCurrencyAndTokenObserver();
 
         dialog = new ProgressDialog(this);
 
-        //For now we are refreshing balance every time we open the wallet --Major Arif 24/09/2019
-//        if (tokenBalance == 0 || ethBalance == 0) {
-        //refreshMyBalance();
-//        }
-
-
-
-
-        if (preferencesHelperDataplan.getDataShareMode() == DataPlanConstants.USER_TYPES.DATA_BUYER) {
+        if (dataPlan.getDataPlanRole() == DataPlanConstants.USER_TYPES.DATA_BUYER) {
             mBinding.totalSpentBlock.setVisibility(View.GONE);
+        }
 
-            if (!PurchaseManagerBuyer.getInstance().giftEtherForOtherNetwork()){
-                refreshMyBalance();
-            }
-        } else if (preferencesHelperDataplan.getDataShareMode() == DataPlanConstants.USER_TYPES.DATA_SELLER){
-            if (!PurchaseManagerSeller.getInstance().requestForGiftForSeller()){
-                refreshMyBalance();
-            }
+        boolean giftEther = wallet.giftEther();
+        if (!giftEther) {
+            refreshMyBalance();
         }
 
         setTotalEarn();
@@ -147,7 +121,7 @@ public class WalletActivity extends BaseActivity {
         if (v.getId() == R.id.op_back) {
             finish();
         } else if (v.getId() == R.id.img_my_address) {
-            AddressLayout cdd = new AddressLayout(WalletActivity.this);
+            AddressLayout cdd = new AddressLayout(WalletActivity.this, wallet.getMyAddress());
             cdd.show();
         } else if (v.getId() == R.id.btn_withdraw) {
             if (payableDeposit <= 0) {
@@ -156,7 +130,7 @@ public class WalletActivity extends BaseActivity {
                 showAlertWithdraw();
             }
         } else if (v.getId() == R.id.eth_block) {
-            showRequestAlert(Util.getCurrencyTypeMessage("%s Request"), Util.getCurrencyTypeMessage("Do you want to send a request for %s?"), REQUEST_TYPE.ETHER);
+            showRequestAlert(wallet.getCurrencyTypeMessage("%s Request"), wallet.getCurrencyTypeMessage("Do you want to send a request for %s?"), REQUEST_TYPE.ETHER);
         } else if (v.getId() == R.id.tmesh_block) {
             showRequestAlert("Purchase Token", "Do you want to send a request for token?", REQUEST_TYPE.TOKEN);
         } else if (v.getId() == R.id.currency) {
@@ -214,9 +188,9 @@ public class WalletActivity extends BaseActivity {
 
         alertDialog.setCancelable(false);
 
-        promptBinding.tvEthCurrency.setText(Util.getCurrencyTypeMessage("%s"));
-        promptBinding.tvEthCurrency2.setText(Util.getCurrencyTypeMessage("%s"));
-        promptBinding.tvEthCurrency3.setText(Util.getCurrencyTypeMessage("%s"));
+        promptBinding.tvEthCurrency.setText(wallet.getCurrencyTypeMessage("%s"));
+        promptBinding.tvEthCurrency2.setText(wallet.getCurrencyTypeMessage("%s"));
+        promptBinding.tvEthCurrency3.setText(wallet.getCurrencyTypeMessage("%s"));
 
 
         deselectWithdrawOptions(promptBinding.layoutSlow,
@@ -275,167 +249,65 @@ public class WalletActivity extends BaseActivity {
     }
 
     private void refreshMyBalance() {
-        PreferencesHelperDataplan preferencesHelperDataplan = PreferencesHelperDataplan.on();
-        if (preferencesHelperDataplan.getDataShareMode() == DataPlanConstants.USER_TYPES.MESH_USER) {
-            ToastUtil.showLong(this, "This feature is available only for data seller and data buyer.");
-        } else if (preferencesHelperDataplan.getDataShareMode() == DataPlanConstants.USER_TYPES.DATA_SELLER) {
-            dialog.setMessage("Refreshing balance, please wait.");
-            dialog.setCancelable(false);
-            dialog.show();
-            PurchaseManagerSeller.getInstance().getMyBalanceInfo(new PurchaseManagerSeller.MyBalanceInfoListener() {
-                @Override
-                public void onBalanceInfoReceived(double ethBalance, double tknBalance) {
-                    runOnUiThread(() -> {
-                        if (dialog.isShowing()) {
-                            dialog.dismiss();
-                        }
-                        // Remove eth and token
-                        mBinding.btnWithdraw.setEnabled(true);
-                    });
-                }
+        dialog.setMessage("Refreshing balance, please wait.");
+        dialog.setCancelable(false);
+        dialog.show();
 
-                @Override
-                public void onBalanceErrorReceived(String msg) {
-                    runOnUiThread(() -> {
-                        if (dialog.isShowing()) {
-                            dialog.dismiss();
-                        }
-                        mBinding.btnWithdraw.setEnabled(true);
-                        ToastUtil.showLong(WalletActivity.this, msg);
-                    });
-                }
-            });
-        } else {
-            dialog.setMessage("Refreshing balance, please wait.");
-            dialog.setCancelable(false);
-            dialog.show();
-
-            PurchaseManagerBuyer.getInstance().getMyBalanceInfo(new PurchaseManagerBuyer.MyBalanceInfoListener() {
-                @Override
-                public void onBalanceInfoReceived(double ethBalance, double tknBalance) {
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            if (dialog.isShowing()) {
-                                dialog.dismiss();
-                            }
-                            // Remove eth and token
-                        }
-                    });
-                }
-
-                @Override
-                public void onBalanceErrorReceived(String msg) {
-                    runOnUiThread(() -> {
-                        if (dialog.isShowing()) {
-                            dialog.dismiss();
-                        }
-                        ToastUtil.showLong(WalletActivity.this, msg);
-                    });
-                }
-            });
-        }
+        wallet.refreshMyBalance(new Wallet.BalanceInfoListener() {
+            @Override
+            public void onBalanceInfo(boolean success, String msg) {
+                runOnUiThread(() -> {
+                    if (dialog.isShowing()) {
+                        dialog.dismiss();
+                    }
+                    mBinding.btnWithdraw.setEnabled(true);
+                    Toaster.showLong(msg);
+                });
+            }
+        });
     }
 
     private void sendEtherRequest() {
-        PreferencesHelperDataplan preferencesHelperDataplan = PreferencesHelperDataplan.on();
+        dialog.setMessage("Sending request, please wait.");
+        dialog.setCancelable(false);
+        dialog.show();
+        wallet.sendEtherRequest(new Wallet.EtherRequestListener() {
+            @Override
+            public void onEtherRequestResponse(boolean success, String msg) {
+                runOnUiThread(() -> {
+                    if (dialog.isShowing()) {
+                        dialog.dismiss();
+                    }
+                    if (success) {
+                        WalletActivity.this.refreshMyBalance();
+                    }
+                    Toaster.showLong(msg);
 
-        if (preferencesHelperDataplan.getDataShareMode() == DataPlanConstants.USER_TYPES.MESH_USER) {
-            ToastUtil.showLong(this, "This feature is available only for data seller and data buyer.");
-        } else if (preferencesHelperDataplan.getDataShareMode() == DataPlanConstants.USER_TYPES.DATA_SELLER) {
-
-            dialog.setMessage("Sending request, please wait.");
-            dialog.setCancelable(false);
-            dialog.show();
-
-            PurchaseManagerSeller.getInstance().sendEtherRequest((success, msg) -> runOnUiThread(() -> {
-                if (dialog.isShowing()) {
-                    dialog.dismiss();
-                }
-                if (success) {
-                    refreshMyBalance();
-                }
-                ToastUtil.showLong(WalletActivity.this, msg);
-
-            }));
-        } else {
-            dialog.setMessage("Sending request, please wait.");
-            dialog.show();
-            PurchaseManagerBuyer.getInstance().sendEtherRequest(new PurchaseManagerBuyer.EtherRequestListener() {
-                @Override
-                public void onResponseReceived(boolean success, String from, String msg) {
-
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            if (dialog.isShowing()) {
-                                dialog.dismiss();
-                            }
-                            if (success) {
-                                refreshMyBalance();
-                            }
-                            ToastUtil.showLong(WalletActivity.this, msg);
-
-                        }
-                    });
-                }
-            });
-        }
+                });
+            }
+        });
     }
 
     private void sendTokenRequest() {
-        PreferencesHelperDataplan preferencesHelperDataplan = PreferencesHelperDataplan.on();
+        dialog.setMessage("Sending request, please wait.");
+        dialog.show();
 
-        if (preferencesHelperDataplan.getDataShareMode() == DataPlanConstants.USER_TYPES.MESH_USER) {
-            ToastUtil.showLong(this, "This feature is available only for data seller and data buyer.");
-        } else if (preferencesHelperDataplan.getDataShareMode() == DataPlanConstants.USER_TYPES.DATA_SELLER) {
-
-            dialog.setMessage("Sending request, please wait.");
-            dialog.show();
-
-            PurchaseManagerSeller.getInstance().sendTokenRequest(new PurchaseManagerSeller.TokenRequestListener() {
+        wallet.sendTokenRequest((success, msg) -> {
+            runOnUiThread(new Runnable() {
                 @Override
-                public void onTokenRequestResponseReceived(boolean success, String msg, double tokenValue, double etherValue) {
-
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            if (dialog.isShowing()) {
-                                dialog.dismiss();
-                            }
-                            // Remove eth and token
-                            ToastUtil.showLong(WalletActivity.this, msg);
-                        }
-                    });
+                public void run() {
+                    if (dialog.isShowing()) {
+                        dialog.dismiss();
+                    }
+                    Toaster.showLong(msg);
                 }
             });
-        } else {
-            dialog.setMessage("Sending request, please wait.");
-            dialog.show();
-            PurchaseManagerBuyer.getInstance().sendTokenRequest(new PurchaseManagerBuyer.TokenRequestListener() {
-                @Override
-                public void onTokenRequestResponseReceived(boolean success, String from, String msg, double tokenValue, double ethValue) {
-
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            if (dialog.isShowing()) {
-                                dialog.dismiss();
-                            }
-                            // Remove eth and token
-                            ToastUtil.showLong(WalletActivity.this, msg);
-                        }
-                    });
-                }
-
-                ;
-            });
-        }
+        });
     }
 
     private void setTotalEarn() {
 
-        String dateTime = SharedPref.read(Constant.LATEST_UPDATE);
+        String dateTime = WalletPreference.read(WalletPreference.LATEST_UPDATE);
         if (!TextUtils.isEmpty(dateTime)) {
             mBinding.tvLastUpdated.setText(getString(R.string.txt_last_updated) + dateTime);
         }
@@ -444,7 +316,7 @@ public class WalletActivity extends BaseActivity {
             totalEarningObserver.removeObservers(this);
         }
 
-        totalEarningObserver = walletViewModel.getTotalEarn(ethService.getAddress());
+        totalEarningObserver = walletViewModel.getTotalEarn();
 
         if (totalEarningObserver != null) {
             totalEarningObserver.observe(this, aDouble -> {
@@ -455,28 +327,21 @@ public class WalletActivity extends BaseActivity {
 
     public void setTotalSpent() {
 
+        String dateTime = WalletPreference.read(WalletPreference.LATEST_UPDATE);
+        if (!TextUtils.isEmpty(dateTime)) {
+            mBinding.tvLastUpdated.setText(getString(R.string.txt_last_updated) + dateTime);
+        }
+
         if (totalSpentObserver != null) {
             totalSpentObserver.removeObservers(this);
         }
 
-        totalSpentObserver = walletViewModel.getTotalSpent(ethService.getAddress());
+        totalSpentObserver = walletViewModel.getTotalSpent();
 
         if (totalSpentObserver != null) {
             totalSpentObserver.observe(this, totalSpent -> {
                 mBinding.tvSpent.setText(totalSpent == null ? "0" : totalSpent.toString());
             });
-        }
-    }
-
-    public void getTotalOpenChannel() {
-        try {
-            PurchaseManagerSeller.getInstance().getTotalOpenChannel().observe(this, totalOpenChannel -> {
-                //mBinding.textViewSpent.setText(String.format(getResources().getString(R.string.total_spent), totalOpenChannel == null ? "0" : totalOpenChannel.toString()));
-            });
-        } catch (ExecutionException e) {
-            e.printStackTrace();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
         }
     }
 
@@ -486,7 +351,7 @@ public class WalletActivity extends BaseActivity {
             totalPendingEarningObserver.removeObservers(this);
         }
 
-        totalPendingEarningObserver = walletViewModel.getTotalPendingEarning(ethService.getAddress());
+        totalPendingEarningObserver = walletViewModel.getTotalPendingEarning();
 
         if (totalPendingEarningObserver != null) {
             totalPendingEarningObserver.observe(this, totalPendingEarn -> {
@@ -506,7 +371,7 @@ public class WalletActivity extends BaseActivity {
             haveDifferentNetworkDataObserver.removeObservers(this);
         }
 
-        haveDifferentNetworkDataObserver = walletViewModel.getDifferentNetworkData(ethService.getAddress());
+        haveDifferentNetworkDataObserver = walletViewModel.getDifferentNetworkData(wallet.getMyAddress());
 
         if ( haveDifferentNetworkDataObserver != null) {
             haveDifferentNetworkDataObserver.observe(this, integer -> {
@@ -514,9 +379,9 @@ public class WalletActivity extends BaseActivity {
                 if (integer != null && integer > 0) {
                     mBinding.anotherDeposit.setVisibility(View.VISIBLE);
 
-                    if (PreferencesHelperDataplan.on().getDataShareMode() == DataPlanConstants.USER_TYPES.DATA_SELLER) {
+                    if (dataPlan.getDataPlanRole() == DataPlanConstants.USER_TYPES.DATA_SELLER) {
                         mBinding.anotherDeposit.setText(getString(R.string.different_network_data_for_seller));
-                    } else if (PreferencesHelperDataplan.on().getDataShareMode() == DataPlanConstants.USER_TYPES.DATA_BUYER) {
+                    } else if (dataPlan.getDataPlanRole() == DataPlanConstants.USER_TYPES.DATA_BUYER) {
                         mBinding.anotherDeposit.setText(getString(R.string.different_network_data_for_buyer));
                     }
 
@@ -529,7 +394,7 @@ public class WalletActivity extends BaseActivity {
 
     public void performWithdrawBalance() {
         try {
-            PurchaseManagerSeller.getInstance().getAllOpenDrawableBlock(new PurchaseManagerSeller.BalanceWithdrawtListener() {
+            wallet.getAllOpenDrawableBlock(new Wallet.BalanceWithdrawtListener() {
                 @Override
                 public void onRequestSubmitted(boolean success, String msg) {
                     runOnUiThread(new Runnable() {
@@ -571,34 +436,35 @@ public class WalletActivity extends BaseActivity {
         Format format = new SimpleDateFormat("yyyy-MM-dd hh:mm aaa");
         String dateTime = format.format(date);
         mBinding.tvLastUpdated.setText(getString(R.string.txt_last_updated) + " " + dateTime);
-        SharedPref.write(Constant.LATEST_UPDATE, dateTime);
+        WalletPreference.write(WalletPreference.LATEST_UPDATE, dateTime);
     }
 
-    private void setCurrencyAndToken() {
-        walletViewModel.networkMutableLiveData.observe(this, networkInfo -> {
-            if (networkInfo != null) {
-                mBinding.tvEthBalance.setText(convertTwoDigitString(networkInfo.currencyAmount));
-                mBinding.tvRmeshBalance.setText(convertTwoDigitString(networkInfo.tokenAmount));
+    private void setCurrencyAndTokenObserver() {
+        walletViewModel.networkMutableLiveData.observe(this, walletInfo -> {
+            if (walletInfo != null) {
+                mBinding.tvEthBalance.setText(convertTwoDigitString(walletInfo.currencyAmount));
+                mBinding.tvRmeshBalance.setText(convertTwoDigitString(walletInfo.tokenAmount));
 
-                int dataShareMode = preferencesHelperDataplan.getDataShareMode();
+                int dataShareMode = dataPlan.getDataPlanRole();
 
                 if (dataShareMode == DataPlanConstants.USER_TYPES.DATA_SELLER || dataShareMode == DataPlanConstants.USER_TYPES.DATA_BUYER) {
 
-                    mBinding.currency.setText(networkInfo.currencySymbol);
+                    mBinding.currency.setText(walletInfo.currencySymbol);
                     mBinding.currency.setVisibility(View.VISIBLE);
                 } else {
                     mBinding.currency.setVisibility(View.GONE);
                 }
 
-                mBinding.titleEthCurrency.setText(networkInfo.currencySymbol);
-                mBinding.titleRmeshCurrency.setText(networkInfo.tokenSymbol);
+                mBinding.titleEthCurrency.setText(walletInfo.currencySymbol);
+                mBinding.titleRmeshCurrency.setText(walletInfo.tokenSymbol);
 
-                mBinding.currency.setText(networkInfo.currencySymbol);
+                mBinding.currency.setText(walletInfo.currencySymbol);
             }
         });
 
         walletViewModel.getCurrencyAmount();
     }
+
 
     private void openCurrencyPopup(View view) {
         PopupMenu popup = new PopupMenu(this, view);
@@ -607,15 +473,15 @@ public class WalletActivity extends BaseActivity {
         MenuItem itemETC = popup.getMenu().findItem(R.id.action_etc);
         MenuItem itemETH = popup.getMenu().findItem(R.id.action_eth);
 
-        int endPointType = PreferencesHelperPaylib.onInstance(this).getEndpointMode();
+        int endPointType = wallet.getMyEndpoint();
 
         itemETC.setCheckable(false);
         itemETH.setCheckable(false);
 
-        if (endPointType == PayLibConstant.END_POINT_TYPE.ETC_KOTTI) {
+        if (endPointType == DataPlanConstants.END_POINT_TYPE.ETC_KOTTI) {
             itemETC.setCheckable(true);
             itemETC.setChecked(true);
-        } else if (endPointType == PayLibConstant.END_POINT_TYPE.ETH_ROPSTEN) {
+        } else if (endPointType == DataPlanConstants.END_POINT_TYPE.ETH_ROPSTEN) {
             itemETH.setCheckable(true);
             itemETH.setChecked(true);
         }
@@ -624,12 +490,12 @@ public class WalletActivity extends BaseActivity {
 
             int endPoint = 0;
             if (item.getItemId() == R.id.action_etc) {
-                endPoint = PayLibConstant.END_POINT_TYPE.ETC_KOTTI;
+                endPoint = DataPlanConstants.END_POINT_TYPE.ETC_KOTTI;
             } else if (item.getItemId() == R.id.action_eth) {
-                endPoint = PayLibConstant.END_POINT_TYPE.ETH_ROPSTEN;
+                endPoint = DataPlanConstants.END_POINT_TYPE.ETH_ROPSTEN;
             }
 
-            PreferencesHelperPaylib.onInstance(this).setEndPointMode(endPoint);
+            wallet.setEndpoint(endPoint);
 
             walletViewModel.getCurrencyAmount();
             setTotalEarn();
@@ -638,16 +504,13 @@ public class WalletActivity extends BaseActivity {
             getTotalPendingEarningBySeller();
             setDifferentNetworkInfo();
 
-            if (preferencesHelperDataplan.getDataShareMode() == DataPlanConstants.USER_TYPES.DATA_BUYER) {
+            if (dataPlan.getDataPlanRole() == DataPlanConstants.USER_TYPES.DATA_BUYER) {
                 mBinding.totalSpentBlock.setVisibility(View.GONE);
+            }
 
-                if (!PurchaseManagerBuyer.getInstance().giftEtherForOtherNetwork()){
-                    refreshMyBalance();
-                }
-            } else if (preferencesHelperDataplan.getDataShareMode() == DataPlanConstants.USER_TYPES.DATA_SELLER){
-                if (!PurchaseManagerSeller.getInstance().requestForGiftForSeller()){
-                    refreshMyBalance();
-                }
+            boolean giftEther = wallet.giftEther();
+            if (!giftEther) {
+                refreshMyBalance();
             }
             return false;
         });
@@ -663,6 +526,8 @@ public class WalletActivity extends BaseActivity {
             }
         }).get(WalletViewModel.class);
     }
+
+
 }
 
 

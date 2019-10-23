@@ -32,13 +32,13 @@ public class AddressLayout extends Dialog implements View.OnClickListener {
     Bitmap bitmap;
     String address;
 
-    public AddressLayout(Activity a) {
+    public AddressLayout(Activity a, String address) {
         super(a);
-        // TODO Auto-generated constructor stub
 
         this.c = a;
-        this.address = SharedPref.read(Constant.PreferenceKeys.ADDRESS);
+        this.address = address;
 
+        //TODO
         String bitmapString = SharedPref.read(Constant.PreferenceKeys.ADDRESS_BITMAP);
         byte [] encodeByte = Base64.decode(bitmapString, Base64.DEFAULT);
         bitmap = BitmapFactory.decodeByteArray(encodeByte, 0, encodeByte.length);

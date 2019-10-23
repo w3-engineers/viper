@@ -1,8 +1,10 @@
-package com.w3engineers.eth.util.helper;
+package com.w3engineers.mesh.application.ui.util;
 
 import android.content.Context;
 import android.util.Log;
 import android.widget.Toast;
+
+import com.w3engineers.eth.util.helper.HandlerUtil;
 
 /**
  * Uses: For all type of toast showing

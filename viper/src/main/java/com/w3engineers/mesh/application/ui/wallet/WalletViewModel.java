@@ -16,8 +16,10 @@ import com.w3engineers.ext.strom.application.ui.base.BaseRxViewModel;
 import com.w3engineers.mesh.application.data.local.DataPlanConstants;
 import com.w3engineers.mesh.application.data.local.db.DatabaseService;
 import com.w3engineers.mesh.application.data.local.db.networkinfo.NetworkInfo;
+import com.w3engineers.mesh.application.data.local.db.networkinfo.WalletInfo;
 import com.w3engineers.mesh.application.data.local.helper.PreferencesHelperDataplan;
 import com.w3engineers.mesh.application.data.local.purchase.PurchaseConstants;
+import com.w3engineers.mesh.application.data.local.wallet.Wallet;
 import com.w3engineers.mesh.util.MeshApp;
 
 import java.util.concurrent.ExecutionException;
@@ -27,88 +29,40 @@ import io.reactivex.schedulers.Schedulers;
 
 public class WalletViewModel extends BaseRxViewModel {
 
-    public MutableLiveData<NetworkInfo> networkMutableLiveData = new MutableLiveData<>();
-    public MutableLiveData<Double> pendingEarningMutable = new MutableLiveData<>();
-    public MutableLiveData<Double> totalEarnMutable = new MutableLiveData<>();
-
-    private DatabaseService databaseService;
+    public MutableLiveData<WalletInfo> networkMutableLiveData = new MutableLiveData<>();
+    private Wallet wallet;
 
     public WalletViewModel() {
-        databaseService = DatabaseService.getInstance(MeshApp.getContext());
+        wallet = Wallet.getInstance();
     }
 
     public void getCurrencyAmount() {
-        try {
-            getCompositeDisposable().add(databaseService.getNetworkInfoByNetworkType()
-                    .subscribeOn(Schedulers.newThread())
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe(networkInfos -> {
-                        for (NetworkInfo networkInfo : networkInfos) {
+        getCompositeDisposable().add(wallet.getNetworkInfoByNetworkType()
+                .subscribeOn(Schedulers.newThread())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(walletInfos -> {
+                    for (WalletInfo walletInfo : walletInfos) {
 
-                            if (networkInfo.networkType == PreferencesHelperPaylib.onInstance(MeshApp.getContext()).getEndpointMode()) {
-                                networkMutableLiveData.postValue(networkInfo);
-                            }
+                        if (walletInfo.networkType == PreferencesHelperPaylib.onInstance(MeshApp.getContext()).getEndpointMode()) {
+                            networkMutableLiveData.postValue(walletInfo);
                         }
-                    }, Throwable::printStackTrace));
-        } catch (ExecutionException | InterruptedException e) {
-            e.printStackTrace();
-        }
+                    }
+                }, Throwable::printStackTrace));
     }
 
-    public LiveData<Double> getTotalEarn(String myAddress) {
-        try {
-            int endPointType = PreferencesHelperPaylib.onInstance(MeshApp.getContext()).getEndpointMode();
-
-            return databaseService.getTotalEarnByUser(myAddress, endPointType);
-
-        } catch (ExecutionException | InterruptedException e) {
-            e.printStackTrace();
-        }
-        return null;
+    public LiveData<Double> getTotalEarn() {
+        return wallet.getTotalEarn(wallet.getMyAddress(), wallet.getMyEndpoint());
     }
 
-    public LiveData<Double> getTotalSpent(String myAddress) {
-
-        try {
-            int endPointType = PreferencesHelperPaylib.onInstance(MeshApp.getContext()).getEndpointMode();
-            return databaseService.getTotalSpentByUser(myAddress, endPointType);
-
-        } catch (ExecutionException | InterruptedException e) {
-            e.printStackTrace();
-        }
-        return null;
+    public LiveData<Double> getTotalSpent() {
+        return wallet.getTotalSpent(wallet.getMyAddress(), wallet.getMyEndpoint());
     }
 
-    public LiveData<Double> getTotalPendingEarning(String myAddress) {
-        try {
-            int endPointType = PreferencesHelperPaylib.onInstance(MeshApp.getContext()).getEndpointMode();
-
-            return databaseService.getTotalPendingEarningBySeller(myAddress, PurchaseConstants.CHANNEL_STATE.OPEN, endPointType);
-
-        } catch (ExecutionException | InterruptedException e) {
-            e.printStackTrace();
-        }
-        return null;
+    public LiveData<Double> getTotalPendingEarning() {
+        return wallet.getTotalPendingEarning(wallet.getMyAddress(), wallet.getMyEndpoint());
     }
 
     public LiveData<Integer> getDifferentNetworkData(String myAddress) {
-        try {
-            int endPointType = PreferencesHelperPaylib.onInstance(MeshApp.getContext()).getEndpointMode();
-
-            if (PreferencesHelperDataplan.on().getDataShareMode() ==
-                    DataPlanConstants.USER_TYPES.DATA_SELLER) {
-
-                return databaseService.getDifferentNetworkData(myAddress, endPointType);
-
-            } else if (PreferencesHelperDataplan.on().getDataShareMode() ==
-                    DataPlanConstants.USER_TYPES.DATA_BUYER) {
-
-                return databaseService.getDifferentNetworkPurchase(myAddress, endPointType);
-            }
-
-        } catch (ExecutionException | InterruptedException e) {
-            e.printStackTrace();
-        }
-        return null;
+        return wallet.getDifferentNetworkData(wallet.getMyAddress(), wallet.getMyEndpoint());
     }
 }

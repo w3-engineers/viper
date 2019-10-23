@@ -36,7 +36,6 @@ public class Constant {
 
     public static String KEY_NETWORK_PREFIX = "mesh_network_prefix";
 
-    public static String LATEST_UPDATE = "latest_update";
     public static long SELLER_MINIMUM_WARNING_DATA = 1024; // The format is byte
     public static String AUTO_IMAGE_CAPTURE = "auto_image_capture";
 

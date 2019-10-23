@@ -1,12 +1,14 @@
 package com.w3engineers.mesh.application.data.local.purchase;
 
 import android.app.Activity;
+import android.arch.lifecycle.LiveData;
 import android.text.TextUtils;
 import android.widget.Toast;
 
 import com.w3engineers.eth.data.helper.PreferencesHelperPaylib;
 import com.w3engineers.eth.util.helper.HandlerUtil;
-import com.w3engineers.eth.util.helper.ToastUtil;
+import com.w3engineers.mesh.application.data.local.DataPlanConstants;
+import com.w3engineers.mesh.application.ui.util.ToastUtil;
 import com.w3engineers.mesh.application.data.local.db.datausage.Datausage;
 import com.w3engineers.mesh.application.data.local.db.purchase.Purchase;
 import com.w3engineers.mesh.application.data.local.helper.PreferencesHelperDataplan;
@@ -1259,5 +1261,14 @@ public class PurchaseManagerBuyer extends PurchaseManager implements PayControll
 
     public interface TokenRequestListener {
         void onTokenRequestResponseReceived(boolean success, String from, String msg, double tokenValue, double ethValue);
+    }
+
+    public LiveData<Integer> getDifferentNetworkData(String myAddress, int endpoint) {
+        try {
+            return databaseService.getDifferentNetworkPurchase(myAddress, endpoint);
+        } catch (ExecutionException | InterruptedException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 }

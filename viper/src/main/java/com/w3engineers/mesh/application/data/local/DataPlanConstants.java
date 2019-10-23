@@ -12,4 +12,9 @@ public interface DataPlanConstants {
         int UNLIMITED = 0;
         int LIMITED = 1;
     }
+
+    interface END_POINT_TYPE {
+        int ETH_ROPSTEN = 1;
+        int ETC_KOTTI = 2;
+    }
 }
