@@ -8,6 +8,7 @@ import android.widget.Toast;
 import com.w3engineers.eth.data.helper.PreferencesHelperPaylib;
 import com.w3engineers.eth.util.helper.HandlerUtil;
 import com.w3engineers.mesh.application.data.local.DataPlanConstants;
+import com.w3engineers.mesh.application.data.local.dataplan.DataPlanManager;
 import com.w3engineers.mesh.application.ui.util.ToastUtil;
 import com.w3engineers.mesh.application.data.local.db.datausage.Datausage;
 import com.w3engineers.mesh.application.data.local.db.purchase.Purchase;
@@ -40,6 +41,8 @@ public class PurchaseManagerBuyer extends PurchaseManager implements PayControll
     private String currentSellerId;
     private String giftRequestedSeller = null;
 
+    private DataPlanManager.DataPlanListener dataPlanListener;
+
     private PurchaseManagerBuyer() {
         super();
         setPayControllerListener();
@@ -52,8 +55,9 @@ public class PurchaseManagerBuyer extends PurchaseManager implements PayControll
         return purchaseManagerBuyer;
     }
 
-
-
+    public void setDataPlanListener(DataPlanManager.DataPlanListener dataPlanListener) {
+        this.dataPlanListener = dataPlanListener;
+    }
 
     //***************************************************//
     //******************Private Methods******************//
@@ -122,8 +126,8 @@ public class PurchaseManagerBuyer extends PurchaseManager implements PayControll
                 payController.sendBlockChainRequest(jsonObject, sellerId, PurchaseConstants.INFO_PURPOSES.TOPUP_CHANNEL);
             } else {
                 setCurrentSellerWithStatus(sellerId, PurchaseConstants.SELLERS_BTN_TEXT.PURCHASE);
-                if (purchaseManagerBuyerListener != null) {
-                    purchaseManagerBuyerListener.onPurchaseFailed(sellerId, "no purchase");
+                if (dataPlanListener != null) {
+                    dataPlanListener.onPurchaseFailed(sellerId, "no purchase");
                 }
             }
 
@@ -179,8 +183,8 @@ public class PurchaseManagerBuyer extends PurchaseManager implements PayControll
     private void purchaseCloseFailed(String sellerId, String s) {
         setCurrentSellerWithStatus(sellerId, PurchaseConstants.SELLERS_BTN_TEXT.CLOSE);
 
-        if (purchaseManagerBuyerListener != null) {
-            purchaseManagerBuyerListener.onPurchaseCloseFailed(sellerId, s);
+        if (dataPlanListener != null) {
+            dataPlanListener.onPurchaseCloseFailed(sellerId, s);
         }
     }
 
@@ -285,14 +289,14 @@ public class PurchaseManagerBuyer extends PurchaseManager implements PayControll
 
         setCurrentSellerWithStatus(sellerAddress, PurchaseConstants.SELLERS_BTN_TEXT.PURCHASING);
 
-        if (purchaseManagerBuyerListener != null) {
-            purchaseManagerBuyerListener.onConnectingWithSeller(sellerAddress);
+        if (dataPlanListener != null) {
+            dataPlanListener.onConnectingWithSeller(sellerAddress);
         }
     }
 
-    public void setPurchaseManagerBuyerListener(PurchaseManagerBuyerListener listener) {
+    /*public void setPurchaseManagerBuyerListener(PurchaseManagerBuyerListener listener) {
         this.purchaseManagerBuyerListener = listener;
-    }
+    }*/
 
     public void setCurrentSellerId(String sellerId){
         MeshLog.v("CurrentSellerId " + sellerId);
@@ -383,8 +387,8 @@ public class PurchaseManagerBuyer extends PurchaseManager implements PayControll
 
                     setCurrentSellerWithStatus(sellerId, PurchaseConstants.SELLERS_BTN_TEXT.CLOSING);
 
-                    if (purchaseManagerBuyerListener != null) {
-                        purchaseManagerBuyerListener.onPurchaseClosing(sellerId);
+                    if (dataPlanListener != null) {
+                        dataPlanListener.onPurchaseClosing(sellerId);
                     }
 
                     String query = PurchaseConstants.INFO_KEYS.ETH_BALANCE + "," + PurchaseConstants.INFO_KEYS.NONCE;
@@ -416,7 +420,7 @@ public class PurchaseManagerBuyer extends PurchaseManager implements PayControll
         purchaseManagerBuyer = null;
         payController = null;
         ethService = null;
-        purchaseManagerBuyerListener = null;
+        dataPlanListener = null;
         databaseService = null;
         myBalanceInfoListener = null;
         etherRequestListener = null;
@@ -593,8 +597,8 @@ public class PurchaseManagerBuyer extends PurchaseManager implements PayControll
                                 payController.sendBlockChainRequest(jsonObject, from,
                                         PurchaseConstants.INFO_PURPOSES.CLOSE_PURCHASE);
 
-                                if (purchaseManagerBuyerListener != null) {
-                                    purchaseManagerBuyerListener.showToastMessage("Closing request sent.");
+                                if (dataPlanListener != null) {
+                                    dataPlanListener.showToastMessage("Closing request sent.");
                                 }
                             }
                         } else {
@@ -657,8 +661,8 @@ public class PurchaseManagerBuyer extends PurchaseManager implements PayControll
                     }
                     if (failedMessage != null) {
                         setCurrentSellerWithStatus(from, PurchaseConstants.SELLERS_BTN_TEXT.PURCHASE);
-                        if (purchaseManagerBuyerListener != null) {
-                            purchaseManagerBuyerListener.onPurchaseFailed(from, failedMessage);
+                        if (dataPlanListener != null) {
+                            dataPlanListener.onPurchaseFailed(from, failedMessage);
                         }
                     } else {
                         int nonce = infoJson.getInt(PurchaseConstants.INFO_KEYS.NONCE);
@@ -769,8 +773,8 @@ public class PurchaseManagerBuyer extends PurchaseManager implements PayControll
 
         if (ethBalance == 0 || tokenBallance < totalPrice) {
             setCurrentSellerWithStatus(sellerAddress, PurchaseConstants.SELLERS_BTN_TEXT.PURCHASE);
-            if (purchaseManagerBuyerListener != null) {
-                purchaseManagerBuyerListener.onPurchaseFailed(sellerAddress, "Not enough balance");
+            if (dataPlanListener != null) {
+                dataPlanListener.onPurchaseFailed(sellerAddress, "Not enough balance");
             }
 
         }
@@ -853,8 +857,8 @@ public class PurchaseManagerBuyer extends PurchaseManager implements PayControll
     public void onInitPurchaseErrorReceived(String sellerAddress, String msg) {
         MeshLog.v(msg);
         setCurrentSellerWithStatus(sellerAddress, PurchaseConstants.SELLERS_BTN_TEXT.PURCHASE);
-        if (purchaseManagerBuyerListener != null) {
-            purchaseManagerBuyerListener.onPurchaseFailed(sellerAddress, msg);
+        if (dataPlanListener != null) {
+            dataPlanListener.onPurchaseFailed(sellerAddress, msg);
         }
     }
 
@@ -870,8 +874,8 @@ public class PurchaseManagerBuyer extends PurchaseManager implements PayControll
                         0, "", 0, PurchaseConstants.CHANNEL_STATE.OPEN, endPointType);
 
                 setCurrentSellerWithStatus(null, PurchaseConstants.SELLERS_BTN_TEXT.CLOSE);
-                if (purchaseManagerBuyerListener != null) {
-                    purchaseManagerBuyerListener.onPurchaseSuccess(from, totalDta, openBlock);
+                if (dataPlanListener != null) {
+                    dataPlanListener.onPurchaseSuccess(from, totalDta, openBlock);
                 }
             }
         } catch (Exception e) {
@@ -883,8 +887,8 @@ public class PurchaseManagerBuyer extends PurchaseManager implements PayControll
     public void onChannelCreateErrorReceived(String from, String msg) {
         MeshLog.v("onChannelCreateErrorReceived " + from + " " + msg);
         setCurrentSellerWithStatus(from, PurchaseConstants.SELLERS_BTN_TEXT.PURCHASE);
-        if (purchaseManagerBuyerListener != null) {
-            purchaseManagerBuyerListener.onPurchaseFailed(from, msg);
+        if (dataPlanListener != null) {
+            dataPlanListener.onPurchaseFailed(from, msg);
         }
     }
 
@@ -902,13 +906,12 @@ public class PurchaseManagerBuyer extends PurchaseManager implements PayControll
                     if (purchase.deposit - totalBalance < 0.5) {
                         double remain = purchase.totalDataAmount - purchase.usedDataAmount;
                         if (!isWarningShown) {
-                            //  purchaseManagerBuyerListener.onBalancedFinished(purchase.sellerAddress,remain); // for this line check null
                             NotificationUtil.showNotification(mContext, "Internet Usage", "Your purchased internet is almost finished");
                             isWarningShown = true;
                         }
 
-                        if (purchaseManagerBuyerListener != null) {
-                            purchaseManagerBuyerListener.onBalancedFinished(purchase.sellerAddress, 1); // for this line check null
+                        if (dataPlanListener != null) {
+                            dataPlanListener.onBalancedFinished(purchase.sellerAddress, 1); // for this line check null
                         }
                     }
 
@@ -944,8 +947,8 @@ public class PurchaseManagerBuyer extends PurchaseManager implements PayControll
                     payController.sendPayForMessageError(jo, fromAddress);
 
                     NotificationUtil.showNotification(mContext, "Internet Usage", "Your current internet volume insufficient");
-                    if (purchaseManagerBuyerListener != null) {
-                        purchaseManagerBuyerListener.onBalancedFinished(purchase.sellerAddress, 0);
+                    if (dataPlanListener != null) {
+                        dataPlanListener.onBalancedFinished(purchase.sellerAddress, 0);
                     } else {
                         HandlerUtil.postForeground(() -> ToastUtil.showLong(mContext, "Your purchased data has finished."));
                     }
@@ -1081,8 +1084,8 @@ public class PurchaseManagerBuyer extends PurchaseManager implements PayControll
 
             setCurrentSellerWithStatus(null, PurchaseConstants.SELLERS_BTN_TEXT.PURCHASE);
 
-            if (purchaseManagerBuyerListener != null) {
-                purchaseManagerBuyerListener.onPurchaseCloseSuccess(closingPurchase.sellerAddress);
+            if (dataPlanListener != null) {
+                dataPlanListener.onPurchaseCloseSuccess(closingPurchase.sellerAddress);
             }
 
         } catch (Exception e) {
@@ -1104,8 +1107,8 @@ public class PurchaseManagerBuyer extends PurchaseManager implements PayControll
             databaseService.updatePurchase(topupPurchase);
 
             setCurrentSellerWithStatus(null, PurchaseConstants.SELLERS_BTN_TEXT.CLOSE);
-            if (purchaseManagerBuyerListener != null) {
-                purchaseManagerBuyerListener.onPurchaseSuccess(fromAddress, totalData, openBlock);
+            if (dataPlanListener != null) {
+                dataPlanListener.onPurchaseSuccess(fromAddress, totalData, openBlock);
             }
 
         } catch (Exception e) {
@@ -1121,8 +1124,8 @@ public class PurchaseManagerBuyer extends PurchaseManager implements PayControll
             case PurchaseConstants.REQUEST_TYPES.CREATE_CHANNEL:
             case PurchaseConstants.REQUEST_TYPES.TOPUP_CHANNEL:
                 if (!success) {
-                    if (purchaseManagerBuyerListener != null) {
-                        purchaseManagerBuyerListener.onPurchaseFailed(fromAddress, msg);
+                    if (dataPlanListener != null) {
+                        dataPlanListener.onPurchaseFailed(fromAddress, msg);
                     }
                 }
                 break;
@@ -1134,9 +1137,9 @@ public class PurchaseManagerBuyer extends PurchaseManager implements PayControll
                 break;
 
             case PurchaseConstants.REQUEST_TYPES.CLOSE_CHANNEL:
-                if (purchaseManagerBuyerListener != null) {
+                if (dataPlanListener != null) {
                     if (success) {
-                        purchaseManagerBuyerListener.showToastMessage(msg);
+                        dataPlanListener.showToastMessage(msg);
                     } else {
                         //Todo check from adress and seller adress are same
                         purchaseCloseFailed(fromAddress, msg);

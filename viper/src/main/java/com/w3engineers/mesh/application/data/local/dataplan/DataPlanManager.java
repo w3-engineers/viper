@@ -4,9 +4,9 @@ import android.arch.lifecycle.LiveData;
 import android.content.Context;
 import android.content.Intent;
 
+import com.w3engineers.mesh.application.data.local.DataPlanConstants;
 import com.w3engineers.mesh.application.data.local.db.DatabaseService;
 import com.w3engineers.mesh.application.data.local.helper.PreferencesHelperDataplan;
-import com.w3engineers.mesh.application.data.local.model.Seller;
 import com.w3engineers.mesh.application.data.local.purchase.PurchaseManagerBuyer;
 import com.w3engineers.mesh.application.data.local.purchase.PurchaseManagerSeller;
 import com.w3engineers.mesh.application.ui.dataplan.DataPlanActivity;
@@ -14,26 +14,22 @@ import com.w3engineers.mesh.application.ui.dataplan.DataPlanActivity;
 import java.util.concurrent.ExecutionException;
 
 
-public class DataPlan {
+public class DataPlanManager {
 
-    private boolean isDataLimited;
-    private long fromDate;
-    private long toDate;
-    private int mInitialRole;
-    private int numberOfDay = 7;
-    private static DataPlan dataPlan;
+    private static DataPlanManager dataPlanManager;
 
     private PreferencesHelperDataplan preferencesHelperDataplan;
+    private DataPlanListener dataPlanListener;
 
-    private DataPlan() {
+    private DataPlanManager() {
         preferencesHelperDataplan = PreferencesHelperDataplan.on();
     }
 
-    public static DataPlan getInstance(){
-        if (dataPlan == null){
-            dataPlan = new DataPlan();
+    public static DataPlanManager getInstance(){
+        if (dataPlanManager == null){
+            dataPlanManager = new DataPlanManager();
         }
-        return dataPlan;
+        return dataPlanManager;
     }
 
     public static void openActivity(Context context){
@@ -41,34 +37,13 @@ public class DataPlan {
         context.startActivity(intent);
     }
 
-    public int getDataPlanMode(){
-        return 0;
-    }
-    public void setDataPlanMode(int mode){
+    public void setDataPlanListener(DataPlanListener dataPlanListener) {
+        this.dataPlanListener = dataPlanListener;
 
+        if (getDataPlanRole() == DataPlanConstants.USER_ROLE.DATA_BUYER) {
+            PurchaseManagerBuyer.getInstance().setDataPlanListener(dataPlanListener);
+        }
     }
-
-    public int getDataLimitMode(){
-        return 0;
-    }
-    public void setDataLimitMode(int mode){
-
-    }
-
-    public double getDataLimit(){
-        return 0;
-    }
-    public void setDataLimit(double mode){
-
-    }
-
-    public long getFromDate() {
-        return fromDate;
-    }
-    public void setFromDate(long fromDate) {
-        this.fromDate = fromDate;
-    }
-
 
     public interface DataPlanListener {
 
@@ -96,6 +71,20 @@ public class DataPlan {
 //        TransportManager.getInstance().setNetworkModeListener(this::onTransportInit);
 //        TransportManager.getInstance().restart();
         preferencesHelperDataplan.setDataPlanRole(newRole);
+    }
+
+    private void roleSwitchCompleted() {
+
+        if (getDataPlanRole() == DataPlanConstants.USER_ROLE.DATA_BUYER) {
+
+            PurchaseManagerBuyer.getInstance().setDataPlanListener(dataPlanListener);
+            PurchaseManagerSeller.getInstance().destroyObject();
+
+        } else if (getDataPlanRole() == DataPlanConstants.USER_ROLE.DATA_SELLER) {
+
+            PurchaseManagerBuyer.getInstance().setDataPlanListener(null);
+            PurchaseManagerBuyer.getInstance().destroyObject();
+        }
     }
 
     public int getDataPlanRole() {
