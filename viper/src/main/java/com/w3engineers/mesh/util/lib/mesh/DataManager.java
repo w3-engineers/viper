@@ -16,6 +16,7 @@ import android.content.ServiceConnection;
 import android.os.IBinder;
 import android.os.RemoteException;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.w3engineers.mesh.ClientLibraryService;
 import com.w3engineers.mesh.util.MeshLog;
@@ -35,7 +36,7 @@ public class DataManager {
     private Context mContext;
 
     private static DataManager mDataManager;
-
+    private boolean isFirstAttempt = true;
     private DataManager() {
         //Prevent form the reflection api.
         if (mDataManager != null) {
@@ -67,7 +68,7 @@ public class DataManager {
 
         context.bindService(mIntent, clientServiceConnection, Service.BIND_AUTO_CREATE);
 
-        initServiceConnection();
+        checkAndBindService();
     }
 
     ServiceConnection clientServiceConnection = new ServiceConnection() {
@@ -88,9 +89,43 @@ public class DataManager {
 
 
     /**
+     * <h1>Note:</h1>
+     *
+     * <h1>Author: Azizul Islam</h1>
+     *
+     * <p>Purpose to check service connection with a time interval.
+     * If TeleMeshService is not installed then notify user to install
+     * the service app. In future we will show an alert dialog with play store
+     * link to install the service app</p>
+     *
+     */
+    private void checkAndBindService(){
+       HandlerUtil.postBackground(new Runnable() {
+           @Override
+           public void run() {
+               if(mTmCommunicator == null) {
+                   boolean isSuccess =initServiceConnection();
+
+                   if(isSuccess){
+                       Toast.makeText(mContext,"Bind service successful", Toast.LENGTH_LONG).show();
+                       return;
+                   }
+                   HandlerUtil.postBackground(this, 5000);
+
+                   if(!isFirstAttempt){
+                       Toast.makeText(mContext,"Please install TeleMeshService app", Toast.LENGTH_LONG).show();
+                   }
+                   isFirstAttempt = false;
+               }
+           }
+       });
+    }
+
+
+    /**
      * Bind to the remote service
      */
-    public void initServiceConnection() {
+    public boolean initServiceConnection() {
         if (mTmCommunicator == null) {
             Intent intent = new Intent(ITmCommunicator.class.getName());
             /*this is service name that is associated with server end*/
@@ -99,7 +134,9 @@ public class DataManager {
             /*From 5.0 annonymous intent calls are suspended so replacing with server app's package name*/
             intent.setPackage("com.w3engineers.meshrnd");
             // binding to remote service
-            mContext.bindService(intent, serviceConnection, Service.BIND_AUTO_CREATE);
+            return mContext.bindService(intent, serviceConnection, Service.BIND_AUTO_CREATE);
+        }else {
+            return false;
         }
     }
 
