@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    package="com.w3engineers.ext.viper">
+    package="com.w3engineers.mesh">
 
     <application
         android:name="com.w3engineers.ext.strom.App"
         tools:replace="android:name">
         <activity
-            android:name="com.w3engineers.mesh.application.ui.wallet.WalletActivity"
+            android:name=".application.ui.wallet.WalletActivity"
             android:label="@string/title_activity_wallet"
             android:theme="@style/AppTheme.NoActionBar"/>
         <activity
@@ -15,21 +15,35 @@
             android:label="@string/title_activity_data_plan"
             android:theme="@style/AppTheme.NoActionBar" />
 
-        <service
+<!--        <service
             android:name="com.w3engineers.mesh.application.data.local.service.MeshService"
             android:enabled="true"
             android:exported="true"
-            android:stopWithTask="false" />
+            android:stopWithTask="false" />-->
 
-        <service android:name="com.w3engineers.mesh.ClientLibraryService"
+        <service android:name=".ClientLibraryService"
             android:exported="true"
-            android:enabled="true"
-            android:process=":remote">
+            android:enabled="true">
             <intent-filter>
-                <action android:name="service.viper_server" />
+                <action android:name="service.viper" />
             </intent-filter>
         </service>
 
     </application>
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <uses-permission android:name="android.permission.BLUETOOTH" />
+    <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
+    <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
+    <uses-permission android:name="android.permission.CHANGE_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="com.google.android.providers.gsf.permission.READ_GSERVICES" /> <!-- Required to run keep-alive service when targeting API 28 or higher -->
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
+
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
 
 </manifest>

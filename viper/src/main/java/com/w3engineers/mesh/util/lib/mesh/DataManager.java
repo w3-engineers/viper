@@ -18,7 +18,8 @@ import android.os.RemoteException;
 import android.util.Log;
 
 import com.w3engineers.mesh.ClientLibraryService;
-import com.w3engineers.mesh.ITmCommunicator;
+import com.w3engineers.mesh.util.MeshLog;
+import com.w3engineers.meshrnd.ITmCommunicator;
 import com.w3engineers.mesh.ViperCommunicator;
 import com.w3engineers.mesh.application.data.AppDataObserver;
 import com.w3engineers.mesh.application.data.model.DataAckEvent;
@@ -33,12 +34,22 @@ public class DataManager {
     private String mSsid;
     private Context mContext;
 
-    public static class AppDataManagerHolder {
-        public static DataManager appDataManager = new DataManager();
+    private static DataManager mDataManager;
+
+    private DataManager() {
+        //Prevent form the reflection api.
+        if (mDataManager != null) {
+            throw new RuntimeException("Use on() method to get the single instance of this class.");
+        }
     }
 
-    public static DataManager getInstance() {
-        return AppDataManagerHolder.appDataManager;
+    public static DataManager on() {
+        if (mDataManager == null) {
+            synchronized (DataManager.class) {
+                if (mDataManager == null) mDataManager = new DataManager();
+            }
+        }
+        return mDataManager;
     }
 
     /**
@@ -47,12 +58,13 @@ public class DataManager {
      * @param context
      * @param networkPrefix
      */
-  public   void doBindService(Context context, String networkPrefix) {
+    public void doBindService(Context context, String networkPrefix) {
         this.mContext = context;
         this.mSsid = networkPrefix;
 
         Intent mIntent = new Intent(context, ClientLibraryService.class);
         context.startService(mIntent);
+
         context.bindService(mIntent, clientServiceConnection, Service.BIND_AUTO_CREATE);
 
         initServiceConnection();
@@ -70,6 +82,27 @@ public class DataManager {
         }
     };
 
+    public void stopService() {
+        mContext.unbindService(serviceConnection);
+    }
+
+
+    /**
+     * Bind to the remote service
+     */
+    public void initServiceConnection() {
+        if (mTmCommunicator == null) {
+            Intent intent = new Intent(ITmCommunicator.class.getName());
+            /*this is service name that is associated with server end*/
+            intent.setAction("service.viper_server");
+
+            /*From 5.0 annonymous intent calls are suspended so replacing with server app's package name*/
+            intent.setPackage("com.w3engineers.meshrnd");
+            // binding to remote service
+            mContext.bindService(intent, serviceConnection, Service.BIND_AUTO_CREATE);
+        }
+    }
+
 
     /**
      * Initializing with remote connection
@@ -81,7 +114,7 @@ public class DataManager {
             mTmCommunicator = ITmCommunicator.Stub.asInterface(binder);
 
             try {
-                mTmCommunicator.startMesh(mSsid);
+                mTmCommunicator.startMesh(mContext.getPackageName());
             } catch (RemoteException e) {
                 e.printStackTrace();
             }
@@ -95,23 +128,10 @@ public class DataManager {
     };
 
 
-    /**
-     * Bind to the remote service
-     */
-    private void initServiceConnection() {
-        if (mTmCommunicator == null) {
-            Intent intent = new Intent(ITmCommunicator.class.getName());
 
-            /*this is service name that is associated with server end*/
-            intent.setAction("service.viper_server");
-
-            /*From 5.0 annonymous intent calls are suspended so replacing with server app's package name*/
-            intent.setPackage("com.w3engineers.meshrnd");
-
-            // binding to remote service
-            mContext.bindService(intent, serviceConnection, Service.BIND_AUTO_CREATE);
-        }
-    }
+/*    public void stopService() {
+        mContext.unbindService(serviceConnection);
+    }*/
 
     /**
      * To send any type of data
@@ -121,12 +141,10 @@ public class DataManager {
      * @param messageId
      * @param data
      */
-    public void sendData(String senderId, String receiverId, String messageId, byte[] data) {
-        try {
-            mTmCommunicator.sendData(senderId, receiverId, messageId, data);
-        } catch (RemoteException e) {
-            e.printStackTrace();
-        }
+    public void sendData(String senderId, String receiverId, String messageId, byte[] data) throws RemoteException {
+
+        mTmCommunicator.sendData(senderId, receiverId, messageId, data);
+
     }
 
     /**
@@ -135,22 +153,24 @@ public class DataManager {
      * @param nodeID
      * @return
      */
-    public int getLinkTypeById(String nodeID) {
-        try {
-            return mTmCommunicator.getLinkTypeById(nodeID);
-        } catch (RemoteException e) {
-            e.printStackTrace();
-        }
+    public int getLinkTypeById(String nodeID) throws RemoteException {
+        return mTmCommunicator.getLinkTypeById(nodeID);
+    }
 
-        return 0;
+    public String getUserId() throws RemoteException {
+        return mTmCommunicator.getUserId();
     }
 
 
     /**
      * called when new peer is added
+     *
      * @param peerId
      */
     public void onPeerAdd(String peerId) {
+
+        MeshLog.e("discover peer id: " + peerId);
+
         PeerAdd peerAdd = new PeerAdd();
         peerAdd.peerId = peerId;
 
@@ -159,6 +179,7 @@ public class DataManager {
 
     /**
      * called when a peer leave or removed
+     *
      * @param nodeId
      */
     public void onPeerRemoved(String nodeId) {
@@ -170,6 +191,7 @@ public class DataManager {
 
     /**
      * called when remote/internet user found
+     *
      * @param peerId
      */
     public void onRemotePeerAdd(String peerId) {
@@ -182,6 +204,7 @@ public class DataManager {
 
     /**
      * called when any kind of data receive
+     *
      * @param senderId
      * @param frameData
      */
@@ -197,6 +220,7 @@ public class DataManager {
 
     /**
      * called when any kind of ack is received
+     *
      * @param messageId
      * @param status
      */
@@ -211,7 +235,10 @@ public class DataManager {
 
     public void setServiceForeground(boolean isForeground) {
         try {
-            viperCommunicator.setServiceForeground(isForeground);
+            if (viperCommunicator != null) {
+                viperCommunicator.setServiceForeground(isForeground);
+            }
+
         } catch (RemoteException e) {
             e.printStackTrace();
         }

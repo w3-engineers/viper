@@ -1,6 +1,31 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#008577</color>
+    <!--    <color name="colorPrimary">#008577</color>-->
+    <color name="colorPrimary">#00bb5c</color>
+    <!--<color name="colorPrimary">#00bb5c</color>-->
     <color name="colorPrimaryDark">#00574B</color>
-    <color name="colorAccent">#D81B60</color>
+    <!--<color name="colorAccent">#D81B60</color>-->
+    <color name="colorAccent">#00bb5c</color>
+    <color name="select_photo_text_color">#3C3C3C</color>
+    <color name="grey_400">#BDBDBD</color>
+    <color name="incoming_message_color">#D6FDEE</color>
+    <color name="outcoming_message_color">#F0F0F0</color>
+    <color name="bottom_bar_color">#B2DFDB</color>
+    <color name="colorBackgroundDark">#d7d9db</color>
+    <color name="colorBackground">#00aa81</color>
+    <color name="colorWhite">#FFFFFF</color>
+
+    <color name="colorGradientStart">#46c1d3</color>
+    <color name="colorChatHeadMsg">#0FB589</color>
+    <color name="colorGradientPrimary">#00bb5c</color>
+
+    <color name="colorRed">#FF0000</color>
+
+    <color name="error_color">#7F0000</color>
+    <color name="warning_color">#3939FF</color>
+    <color name="info_color">#398EEA</color>
+
+
+    <color name="body_text">#4C4C4C</color>
+
 </resources>

@@ -1,0 +1,278 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <android.support.constraint.ConstraintLayout
+        android:id="@+id/layout_main"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:theme="@style/allTextInputOfLayoutBlack">
+
+        <TextView
+            android:id="@+id/title_alert"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/margin_10"
+            android:layout_marginTop="@dimen/margin_10"
+            android:text="@string/txt_withdraw_amount"
+            android:textSize="@dimen/text_size_16"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <ImageView
+            android:id="@+id/logo_rmesh"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/margin_4"
+            android:contentDescription="@string/txt_description_back"
+            android:src="@mipmap/ic_rmesh"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/title_alert" />
+
+        <TextView
+            android:id="@+id/tv_rmesh_balance"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="0.0000"
+            android:textSize="@dimen/text_size_16"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toBottomOf="@id/logo_rmesh"
+            app:layout_constraintStart_toEndOf="@id/logo_rmesh"
+            app:layout_constraintTop_toTopOf="@id/logo_rmesh" />
+
+
+        <TextView
+            android:id="@+id/title_withdraw_fee"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/margin_10"
+            android:text="@string/txt_withdraw_fee"
+            android:textSize="@dimen/text_size_16"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/logo_rmesh" />
+
+        <android.support.constraint.ConstraintLayout
+            android:id="@+id/layout_transection"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/height_80"
+            android:layout_marginStart="@dimen/margin_10"
+            android:layout_marginTop="@dimen/margin_10"
+            android:layout_marginEnd="@dimen/margin_10"
+            android:background="@drawable/bg_withdraw_list"
+            android:clickable="false"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/title_withdraw_fee">
+
+            <android.support.constraint.ConstraintLayout
+                android:id="@+id/layout_slow"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@+id/layout_avg"
+                app:layout_constraintHorizontal_weight="0.33"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent">
+
+                <TextView
+                    android:id="@+id/title_slow"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:clickable="false"
+                    android:drawableStart="@mipmap/ic_eth"
+                    android:gravity="center"
+                    android:text="@string/txt_slow"
+                    android:textSize="@dimen/text_size_12"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <TextView
+                    android:id="@+id/tv_slow_eth_rate"
+                    android:layout_width="@dimen/width_0"
+                    android:layout_height="wrap_content"
+                    android:clickable="false"
+                    android:paddingStart="@dimen/padding_5"
+                    android:paddingEnd="@dimen/padding_5"
+                    android:text="0.2560786"
+                    android:textSize="@dimen/text_size_10sp"
+                    app:layout_constraintEnd_toStartOf="@+id/tv_eth_currency"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/title_slow" />
+
+                <TextView
+                    android:id="@+id/tv_eth_currency"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:paddingStart="@dimen/padding_1"
+                    android:paddingEnd="@dimen/padding_10"
+                    android:textColor="@color/colorEthCurrency"
+                    android:textSize="@dimen/text_size_10sp"
+                    android:textStyle="bold"
+                    app:layout_constraintBottom_toBottomOf="@id/tv_slow_eth_rate"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toEndOf="@id/tv_slow_eth_rate"
+                    app:layout_constraintTop_toTopOf="@id/tv_slow_eth_rate" />
+
+            </android.support.constraint.ConstraintLayout>
+
+            <View
+                android:layout_width="@dimen/width_1"
+                android:layout_height="match_parent"
+                android:background="@color/colorDarkGray"
+                app:layout_constraintEnd_toStartOf="@id/layout_avg"
+                app:layout_constraintStart_toEndOf="@id/layout_slow" />
+
+            <android.support.constraint.ConstraintLayout
+                android:id="@+id/layout_avg"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@+id/layout_fast"
+                app:layout_constraintHorizontal_weight="0.33"
+                app:layout_constraintStart_toEndOf="@id/layout_slow"
+                app:layout_constraintTop_toTopOf="parent">
+
+                <TextView
+                    android:id="@+id/title_avg"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:clickable="false"
+                    android:drawableStart="@mipmap/ic_eth"
+                    android:gravity="center"
+                    android:text="@string/txt_average"
+                    android:textSize="@dimen/text_size_12"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <TextView
+                    android:id="@+id/tv_avg_eth_rate"
+                    android:layout_width="@dimen/width_0"
+                    android:layout_height="wrap_content"
+                    android:clickable="false"
+                    android:paddingStart="@dimen/padding_5"
+                    android:paddingEnd="@dimen/padding_5"
+                    android:text="0.256888880000"
+                    android:textSize="@dimen/text_size_10sp"
+                    app:layout_constraintEnd_toStartOf="@id/tv_eth_currency_2"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/title_avg" />
+
+                <TextView
+                    android:id="@+id/tv_eth_currency_2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:paddingStart="@dimen/padding_0"
+                    android:paddingEnd="@dimen/padding_10"
+                    android:textColor="@color/colorEthCurrency"
+                    android:textSize="@dimen/text_size_10sp"
+                    android:textStyle="bold"
+                    app:layout_constraintBottom_toBottomOf="@id/tv_avg_eth_rate"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toEndOf="@id/tv_avg_eth_rate"
+                    app:layout_constraintTop_toTopOf="@id/tv_avg_eth_rate" />
+
+            </android.support.constraint.ConstraintLayout>
+
+            <View
+                android:layout_width="@dimen/width_1"
+                android:layout_height="match_parent"
+                android:background="@color/colorDarkGray"
+                app:layout_constraintEnd_toStartOf="@id/layout_fast"
+                app:layout_constraintStart_toEndOf="@id/layout_avg" />
+
+            <android.support.constraint.ConstraintLayout
+                android:id="@+id/layout_fast"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:orientation="vertical"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_weight="0.33"
+                app:layout_constraintStart_toEndOf="@id/layout_avg"
+                app:layout_constraintTop_toTopOf="parent">
+
+                <TextView
+                    android:id="@+id/title_fast"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:clickable="false"
+                    android:drawableStart="@mipmap/ic_eth"
+                    android:gravity="center"
+                    android:text="@string/txt_fast"
+                    android:textSize="@dimen/text_size_12"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <TextView
+                    android:id="@+id/tv_fast_eth_rate"
+                    android:layout_width="@dimen/width_0"
+                    android:layout_height="wrap_content"
+                    android:clickable="false"
+                    android:paddingStart="@dimen/padding_5"
+                    android:paddingEnd="@dimen/padding_5"
+                    android:text="0.25688888"
+                    android:textSize="@dimen/text_size_10sp"
+                    app:layout_constraintEnd_toStartOf="@id/tv_eth_currency_3"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/title_fast" />
+
+                <TextView
+                    android:id="@+id/tv_eth_currency_3"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:paddingStart="@dimen/padding_0"
+                    android:paddingEnd="@dimen/padding_10"
+                    android:textColor="@color/colorEthCurrency"
+                    android:textSize="@dimen/text_size_10sp"
+                    android:textStyle="bold"
+                    app:layout_constraintBottom_toBottomOf="@id/tv_fast_eth_rate"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toEndOf="@id/tv_fast_eth_rate"
+                    app:layout_constraintTop_toTopOf="@id/tv_fast_eth_rate" />
+
+            </android.support.constraint.ConstraintLayout>
+
+        </android.support.constraint.ConstraintLayout>
+
+
+        <TextView
+            android:id="@+id/btn_withdraw"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/margin_10"
+            android:layout_marginEnd="@dimen/margin_10"
+            android:layout_marginBottom="@dimen/margin_30"
+            android:background="@drawable/ractangular_gradient"
+            android:paddingStart="@dimen/padding_20"
+            android:paddingTop="@dimen/padding_12"
+            android:paddingEnd="@dimen/padding_20"
+            android:paddingBottom="@dimen/padding_12"
+            android:text="@string/withdraw"
+            android:textColor="@color/white"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/layout_transection" />
+
+
+        <TextView
+            android:id="@+id/btn_cancel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/margin_10"
+            android:layout_marginEnd="@dimen/margin_10"
+            android:background="@drawable/ractangular_gradient"
+            android:paddingStart="@dimen/padding_20"
+            android:paddingTop="@dimen/padding_12"
+            android:paddingEnd="@dimen/padding_20"
+            android:paddingBottom="@dimen/padding_12"
+            android:text="@string/cancel"
+            android:textColor="@color/white"
+            android:textStyle="bold"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/btn_withdraw"
+            app:layout_constraintTop_toBottomOf="@id/layout_transection" />
+
+    </android.support.constraint.ConstraintLayout>
+</layout>

@@ -13,17 +13,27 @@ import android.content.Intent;
 import android.os.IBinder;
 import android.os.RemoteException;
 import android.support.annotation.Nullable;
+import android.util.Log;
 
 import com.w3engineers.mesh.application.data.remote.service.BaseTmServiceNotificationHelper;
 import com.w3engineers.mesh.util.lib.mesh.DataManager;
-
+import com.w3engineers.meshrnd.ITmCommunicator;
 
 
 public class ClientLibraryService extends Service {
+
+    private ITmCommunicator mTmCommunicator;
+
     @Override
     public void onCreate() {
         super.onCreate();
     }
+
+    @Override
+    public int onStartCommand(Intent intent, int flags, int startId) {
+        return START_STICKY;
+    }
+
 
     @Nullable
     @Override
@@ -46,40 +56,47 @@ public class ClientLibraryService extends Service {
 
         @Override
         public void onPeerAdd(String peerId) throws RemoteException {
-           DataManager.getInstance().onPeerAdd(peerId);
+            DataManager.on().onPeerAdd(peerId);
         }
 
         @Override
         public void onPeerRemoved(String nodeId) throws RemoteException {
-          DataManager.getInstance().onPeerRemoved(nodeId);
+            DataManager.on().onPeerRemoved(nodeId);
         }
 
         @Override
         public void onRemotePeerAdd(String peerId) throws RemoteException {
-         DataManager.getInstance().onRemotePeerAdd(peerId);
+            DataManager.on().onRemotePeerAdd(peerId);
         }
 
         @Override
         public void onDataReceived(String senderId, byte[] frameData) throws RemoteException {
-            DataManager.getInstance().onDataReceived(senderId, frameData);
+            DataManager.on().onDataReceived(senderId, frameData);
         }
 
         @Override
         public void onAckReceived(String messageId, int status) throws RemoteException {
-          DataManager.getInstance().onAckReceived(messageId, status);
+            DataManager.on().onAckReceived(messageId, status);
         }
 
         @Override
+        public void onServiceAvailable(int status) throws RemoteException {
+            Log.e("peerid", "from server: " + status);
+            //  DataManager.on().initServiceConnection();
+        }
+
+
+        @Override
         public void setServiceForeground(boolean isForeGround) throws RemoteException {
-            if(isForeGround){
+            if (isForeGround) {
                 startInForeground();
-            }else {
+            } else {
                 stopInForeground();
             }
         }
     };
 
-    private void startInForeground(){
+    private void startInForeground() {
         new BaseTmServiceNotificationHelper(this).startForegroundService();
     }
 

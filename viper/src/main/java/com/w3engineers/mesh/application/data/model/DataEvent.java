@@ -3,6 +3,8 @@ package com.w3engineers.mesh.application.data.model;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import com.w3engineers.mesh.util.lib.mesh.ViperClient;
+
 public class DataEvent extends Event implements Parcelable {
 
     public String peerId;
