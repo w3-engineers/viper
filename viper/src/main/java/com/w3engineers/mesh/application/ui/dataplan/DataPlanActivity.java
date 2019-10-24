@@ -54,7 +54,6 @@ public class DataPlanActivity extends TelemeshBaseActivity implements DataPlanMa
     private ConstraintLayout[] dataPlanViews;
     private Calendar myCalendar;
     private SimpleDateFormat sdf;
-    private ManageSellerList manageSellerList;
 
     private ProgressDialog progressDialog;
 
@@ -244,12 +243,14 @@ public class DataPlanActivity extends TelemeshBaseActivity implements DataPlanMa
 
     private void prepareSellerData() {
 
-        manageSellerList.getAllSellers().observe(this, sellers -> {
-            getAdapter().clear();
-            getAdapter().addItem(sellers);
+        viewModel.allSellers.observe(this, sellers -> {
+            if (sellers != null) {
+                getAdapter().clear();
+                getAdapter().addItem(sellers);
+            }
         });
 
-        manageSellerList.processAllUsers();
+        viewModel.getAllSellers();
     }
 
     private SellerListAdapter getAdapter() {
@@ -271,8 +272,6 @@ public class DataPlanActivity extends TelemeshBaseActivity implements DataPlanMa
         mCurrentRole = DataPlanManager.getInstance().getDataPlanRole();
         dataLimitModel.setInitialRole(mCurrentRole);
         mBinding.setDataLimitModel(dataLimitModel);
-
-        manageSellerList = ManageSellerList.getInstance(this);
 
         setClickListener(mBinding.imageViewBack, mBinding.icWallet,
                 mBinding.layoutDataplan, mBinding.saveButton);
