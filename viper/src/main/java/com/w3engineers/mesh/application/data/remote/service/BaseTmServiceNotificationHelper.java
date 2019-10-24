@@ -26,9 +26,7 @@ public class BaseTmServiceNotificationHelper {
     private Service mService;
 
     public BaseTmServiceNotificationHelper(Service service) {
-
         this.mService = service;
-
     }
 
 

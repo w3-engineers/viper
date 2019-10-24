@@ -13,6 +13,8 @@ interface ViperCommunicator {
     void onRemotePeerAdd (in String peerId);
     void onDataReceived(in String senderId, in byte[] frameData);
     void onAckReceived(in String messageId, in int status);
+    void onServiceAvailable(in int status);
 
     void setServiceForeground(boolean isForeGround);
+
 }

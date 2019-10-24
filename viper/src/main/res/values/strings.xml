@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">FrameWork</string>
+    <string name="app_name">Viper</string>
     <string name="ok">OK</string>
     <string name="cancel">CANCEL</string>
     <string name="drawable_exception">Drawable not found</string>

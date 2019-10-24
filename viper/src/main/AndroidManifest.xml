@@ -15,18 +15,17 @@
             android:label="@string/title_activity_data_plan"
             android:theme="@style/AppTheme.NoActionBar" />
 
-        <service
+<!--        <service
             android:name="com.w3engineers.mesh.application.data.local.service.MeshService"
             android:enabled="true"
             android:exported="true"
-            android:stopWithTask="false" />
+            android:stopWithTask="false" />-->
 
-        <service android:name="com.w3engineers.mesh.ClientLibraryService"
+        <service android:name=".ClientLibraryService"
             android:exported="true"
-            android:enabled="true"
-            android:process=":remote">
+            android:enabled="true">
             <intent-filter>
-                <action android:name="service.viper_server" />
+                <action android:name="service.viper" />
             </intent-filter>
         </service>
 

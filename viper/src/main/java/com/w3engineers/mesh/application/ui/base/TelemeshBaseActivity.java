@@ -40,7 +40,7 @@ public abstract class TelemeshBaseActivity extends BaseActivity {
      */
     protected void setServiceForeground(boolean isForeground) {
 
-        DataManager.getInstance().setServiceForeground(isForeground);
+        DataManager.on().setServiceForeground(isForeground);
 
     }
 }
