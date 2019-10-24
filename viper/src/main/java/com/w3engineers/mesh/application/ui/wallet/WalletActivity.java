@@ -28,7 +28,7 @@ import com.w3engineers.mesh.application.data.local.dataplan.DataPlanManager;
 import com.w3engineers.ext.strom.application.ui.base.BaseActivity;
 import com.w3engineers.mesh.R;
 import com.w3engineers.mesh.application.data.local.DataPlanConstants;
-import com.w3engineers.mesh.application.data.local.wallet.Wallet;
+import com.w3engineers.mesh.application.data.local.wallet.WalletManager;
 import com.w3engineers.mesh.databinding.ActivityWalletBinding;
 import com.w3engineers.mesh.databinding.PromptWalletWithdrowBinding;
 import com.w3engineers.mesh.util.DialogUtil;
@@ -49,7 +49,7 @@ public class WalletActivity extends BaseActivity {
     private LiveData<Double> totalEarningObserver, totalSpentObserver, totalPendingEarningObserver;
     private LiveData<Integer>  haveDifferentNetworkDataObserver;
 
-    private Wallet wallet;
+    private WalletManager walletManager;
     private DataPlanManager dataPlanManager;
 
     private interface REQUEST_TYPE {
@@ -68,7 +68,7 @@ public class WalletActivity extends BaseActivity {
 
         mBinding = (ActivityWalletBinding) getViewDataBinding();
         walletViewModel = getWalletViewModel();
-        wallet = Wallet.getInstance();
+        walletManager = WalletManager.getInstance();
         dataPlanManager = DataPlanManager.getInstance();
 
 
@@ -82,7 +82,7 @@ public class WalletActivity extends BaseActivity {
             mBinding.totalSpentBlock.setVisibility(View.GONE);
         }
 
-        boolean giftEther = wallet.giftEther();
+        boolean giftEther = walletManager.giftEther();
         if (!giftEther) {
             refreshMyBalance();
         }
@@ -121,7 +121,7 @@ public class WalletActivity extends BaseActivity {
         if (v.getId() == R.id.op_back) {
             finish();
         } else if (v.getId() == R.id.img_my_address) {
-            AddressLayout cdd = new AddressLayout(WalletActivity.this, wallet.getMyAddress());
+            AddressLayout cdd = new AddressLayout(WalletActivity.this, walletManager.getMyAddress());
             cdd.show();
         } else if (v.getId() == R.id.btn_withdraw) {
             if (payableDeposit <= 0) {
@@ -130,7 +130,7 @@ public class WalletActivity extends BaseActivity {
                 showAlertWithdraw();
             }
         } else if (v.getId() == R.id.eth_block) {
-            showRequestAlert(wallet.getCurrencyTypeMessage("%s Request"), wallet.getCurrencyTypeMessage("Do you want to send a request for %s?"), REQUEST_TYPE.ETHER);
+            showRequestAlert(walletManager.getCurrencyTypeMessage("%s Request"), walletManager.getCurrencyTypeMessage("Do you want to send a request for %s?"), REQUEST_TYPE.ETHER);
         } else if (v.getId() == R.id.tmesh_block) {
             showRequestAlert("Purchase Token", "Do you want to send a request for token?", REQUEST_TYPE.TOKEN);
         } else if (v.getId() == R.id.currency) {
@@ -188,9 +188,9 @@ public class WalletActivity extends BaseActivity {
 
         alertDialog.setCancelable(false);
 
-        promptBinding.tvEthCurrency.setText(wallet.getCurrencyTypeMessage("%s"));
-        promptBinding.tvEthCurrency2.setText(wallet.getCurrencyTypeMessage("%s"));
-        promptBinding.tvEthCurrency3.setText(wallet.getCurrencyTypeMessage("%s"));
+        promptBinding.tvEthCurrency.setText(walletManager.getCurrencyTypeMessage("%s"));
+        promptBinding.tvEthCurrency2.setText(walletManager.getCurrencyTypeMessage("%s"));
+        promptBinding.tvEthCurrency3.setText(walletManager.getCurrencyTypeMessage("%s"));
 
 
         deselectWithdrawOptions(promptBinding.layoutSlow,
@@ -253,7 +253,7 @@ public class WalletActivity extends BaseActivity {
         dialog.setCancelable(false);
         dialog.show();
 
-        wallet.refreshMyBalance(new Wallet.BalanceInfoListener() {
+        walletManager.refreshMyBalance(new WalletManager.BalanceInfoListener() {
             @Override
             public void onBalanceInfo(boolean success, String msg) {
                 runOnUiThread(() -> {
@@ -271,7 +271,7 @@ public class WalletActivity extends BaseActivity {
         dialog.setMessage("Sending request, please wait.");
         dialog.setCancelable(false);
         dialog.show();
-        wallet.sendEtherRequest(new Wallet.EtherRequestListener() {
+        walletManager.sendEtherRequest(new WalletManager.EtherRequestListener() {
             @Override
             public void onEtherRequestResponse(boolean success, String msg) {
                 runOnUiThread(() -> {
@@ -292,7 +292,7 @@ public class WalletActivity extends BaseActivity {
         dialog.setMessage("Sending request, please wait.");
         dialog.show();
 
-        wallet.sendTokenRequest((success, msg) -> {
+        walletManager.sendTokenRequest((success, msg) -> {
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
@@ -371,7 +371,7 @@ public class WalletActivity extends BaseActivity {
             haveDifferentNetworkDataObserver.removeObservers(this);
         }
 
-        haveDifferentNetworkDataObserver = walletViewModel.getDifferentNetworkData(wallet.getMyAddress());
+        haveDifferentNetworkDataObserver = walletViewModel.getDifferentNetworkData(walletManager.getMyAddress());
 
         if ( haveDifferentNetworkDataObserver != null) {
             haveDifferentNetworkDataObserver.observe(this, integer -> {
@@ -394,7 +394,7 @@ public class WalletActivity extends BaseActivity {
 
     public void performWithdrawBalance() {
         try {
-            wallet.getAllOpenDrawableBlock(new Wallet.BalanceWithdrawtListener() {
+            walletManager.getAllOpenDrawableBlock(new WalletManager.BalanceWithdrawtListener() {
                 @Override
                 public void onRequestSubmitted(boolean success, String msg) {
                     runOnUiThread(new Runnable() {
@@ -473,7 +473,7 @@ public class WalletActivity extends BaseActivity {
         MenuItem itemETC = popup.getMenu().findItem(R.id.action_etc);
         MenuItem itemETH = popup.getMenu().findItem(R.id.action_eth);
 
-        int endPointType = wallet.getMyEndpoint();
+        int endPointType = walletManager.getMyEndpoint();
 
         itemETC.setCheckable(false);
         itemETH.setCheckable(false);
@@ -495,7 +495,7 @@ public class WalletActivity extends BaseActivity {
                 endPoint = DataPlanConstants.END_POINT_TYPE.ETH_ROPSTEN;
             }
 
-            wallet.setEndpoint(endPoint);
+            walletManager.setEndpoint(endPoint);
 
             walletViewModel.getCurrencyAmount();
             setTotalEarn();
@@ -508,7 +508,7 @@ public class WalletActivity extends BaseActivity {
                 mBinding.totalSpentBlock.setVisibility(View.GONE);
             }
 
-            boolean giftEther = wallet.giftEther();
+            boolean giftEther = walletManager.giftEther();
             if (!giftEther) {
                 refreshMyBalance();
             }

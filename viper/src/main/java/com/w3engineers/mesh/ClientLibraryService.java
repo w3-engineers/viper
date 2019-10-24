@@ -81,6 +81,7 @@ public class ClientLibraryService extends Service {
 
     private void startInForeground(){
         new BaseTmServiceNotificationHelper(this).startForegroundService();
+
     }
 
     private void stopInForeground() {

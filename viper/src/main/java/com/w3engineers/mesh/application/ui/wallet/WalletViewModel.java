@@ -13,16 +13,9 @@ import android.arch.lifecycle.MutableLiveData;
 
 import com.w3engineers.eth.data.helper.PreferencesHelperPaylib;
 import com.w3engineers.ext.strom.application.ui.base.BaseRxViewModel;
-import com.w3engineers.mesh.application.data.local.DataPlanConstants;
-import com.w3engineers.mesh.application.data.local.db.DatabaseService;
-import com.w3engineers.mesh.application.data.local.db.networkinfo.NetworkInfo;
 import com.w3engineers.mesh.application.data.local.db.networkinfo.WalletInfo;
-import com.w3engineers.mesh.application.data.local.helper.PreferencesHelperDataplan;
-import com.w3engineers.mesh.application.data.local.purchase.PurchaseConstants;
-import com.w3engineers.mesh.application.data.local.wallet.Wallet;
+import com.w3engineers.mesh.application.data.local.wallet.WalletManager;
 import com.w3engineers.mesh.util.MeshApp;
-
-import java.util.concurrent.ExecutionException;
 
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
@@ -30,14 +23,14 @@ import io.reactivex.schedulers.Schedulers;
 public class WalletViewModel extends BaseRxViewModel {
 
     public MutableLiveData<WalletInfo> networkMutableLiveData = new MutableLiveData<>();
-    private Wallet wallet;
+    private WalletManager walletManager;
 
     public WalletViewModel() {
-        wallet = Wallet.getInstance();
+        walletManager = WalletManager.getInstance();
     }
 
     public void getCurrencyAmount() {
-        getCompositeDisposable().add(wallet.getNetworkInfoByNetworkType()
+        getCompositeDisposable().add(walletManager.getNetworkInfoByNetworkType()
                 .subscribeOn(Schedulers.newThread())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(walletInfos -> {
@@ -51,18 +44,18 @@ public class WalletViewModel extends BaseRxViewModel {
     }
 
     public LiveData<Double> getTotalEarn() {
-        return wallet.getTotalEarn(wallet.getMyAddress(), wallet.getMyEndpoint());
+        return walletManager.getTotalEarn(walletManager.getMyAddress(), walletManager.getMyEndpoint());
     }
 
     public LiveData<Double> getTotalSpent() {
-        return wallet.getTotalSpent(wallet.getMyAddress(), wallet.getMyEndpoint());
+        return walletManager.getTotalSpent(walletManager.getMyAddress(), walletManager.getMyEndpoint());
     }
 
     public LiveData<Double> getTotalPendingEarning() {
-        return wallet.getTotalPendingEarning(wallet.getMyAddress(), wallet.getMyEndpoint());
+        return walletManager.getTotalPendingEarning(walletManager.getMyAddress(), walletManager.getMyEndpoint());
     }
 
     public LiveData<Integer> getDifferentNetworkData(String myAddress) {
-        return wallet.getDifferentNetworkData(wallet.getMyAddress(), wallet.getMyEndpoint());
+        return walletManager.getDifferentNetworkData(walletManager.getMyAddress(), walletManager.getMyEndpoint());
     }
 }

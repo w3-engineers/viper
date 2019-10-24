@@ -30,8 +30,8 @@ import androidmads.library.qrgenearator.QRGEncoder;
 import io.reactivex.Flowable;
 
 
-public class Wallet {
-    private static Wallet wallet;
+public class WalletManager {
+    private static WalletManager walletManager;
     private PreferencesHelperDataplan preferencesHelperDataplan;
     private DataPlanManager dataPlanManager;
 
@@ -41,14 +41,14 @@ public class Wallet {
         context.startActivity(intent);
     }
 
-    public static Wallet getInstance(){
-        if (wallet == null){
-            wallet = new Wallet();
+    public static WalletManager getInstance(){
+        if (walletManager == null){
+            walletManager = new WalletManager();
         }
-        return wallet;
+        return walletManager;
     }
 
-    private Wallet(){
+    private WalletManager(){
         preferencesHelperDataplan = PreferencesHelperDataplan.on();
         dataPlanManager = DataPlanManager.getInstance();
     }
@@ -213,7 +213,7 @@ public class Wallet {
         mWalletService.createOrLoadWallet(WalletService.PASSWORD, new WalletService.Listener() {
             @Override
             public void onWalletLoaded(String walletAddress, String publicKey) {
-                MeshLog.i(" Wallet loaded succesful");
+                MeshLog.i(" WalletManager loaded succesful");
 
                 if (!walletAddress.equalsIgnoreCase(SharedPref.read(Constant.PreferenceKeys.ADDRESS))){
 
@@ -240,7 +240,7 @@ public class Wallet {
 
             @Override
             public void onErrorOccurred(String message) {
-                MeshLog.v("wallet loading failed");
+                MeshLog.v("walletManager loading failed");
             }
         });
     }

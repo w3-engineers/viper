@@ -6,7 +6,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
-import com.w3engineers.mesh.application.data.local.wallet.Wallet;
+import com.w3engineers.mesh.application.data.local.wallet.WalletManager;
 import com.w3engineers.mesh.util.lib.mesh.DataManager;
 
 public class MainActivity extends AppCompatActivity {
@@ -16,11 +16,10 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main_ac);
 
-        Wallet.getInstance().readWallet(this);
-
+        WalletManager.getInstance().readWallet(this);
 
 //        DataPlan.openActivity(this);
-//        Wallet.openActivity(this);
+//        WalletManager.openActivity(this);
 
         Button helloBtn = findViewById(R.id.helloBtn);
 
@@ -38,7 +37,9 @@ public class MainActivity extends AppCompatActivity {
 
         dataPlan.setOnClickListener(view -> {
            // DataPlan.openActivity(MainActivity.this);
-            Wallet.openActivity(this);
+            WalletManager.openActivity(this);
+
+
         });
     }
 }

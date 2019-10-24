@@ -29,7 +29,7 @@ import com.w3engineers.mesh.R;
 import com.w3engineers.mesh.application.data.local.DataPlanConstants;
 import com.w3engineers.mesh.application.data.local.dataplan.DataPlanManager;
 import com.w3engineers.mesh.application.data.local.model.Seller;
-import com.w3engineers.mesh.application.data.local.wallet.Wallet;
+import com.w3engineers.mesh.application.data.local.wallet.WalletManager;
 import com.w3engineers.mesh.application.ui.base.TelemeshBaseActivity;
 import com.w3engineers.mesh.databinding.ActivityDataPlanBinding;
 import com.w3engineers.mesh.util.DialogUtil;
@@ -97,7 +97,7 @@ public class DataPlanActivity extends TelemeshBaseActivity implements DataPlanMa
         if (view.getId() == R.id.imageView_back) {
             finish();
         } else if (view.getId() == R.id.ic_wallet) {
-            Wallet.openActivity(this);
+            WalletManager.openActivity(this);
         } else if (view.getId() == R.id.save_button) {
             checkSharingLimit();
         } else if (view.getId() == R.id.status) {

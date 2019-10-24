@@ -83,7 +83,7 @@ public class WalletService {
                     listener.onWalletLoaded(mCredentials.getAddress(), SharedPref.read(PUBLIC_KEY));
 
                 } else {
-                    listener.onErrorOccurred("Wallet credential load failed");
+                    listener.onErrorOccurred("WalletManager credential load failed");
                 }
             } else {
                 String keyStoreFileName = Web3jWalletHelper.onInstance(mContext).createWallet(password, walletSuffixDir);
@@ -99,11 +99,11 @@ public class WalletService {
 
                     } else {
 
-                        listener.onErrorOccurred("Wallet credential load failed");
+                        listener.onErrorOccurred("WalletManager credential load failed");
                     }
                 } else {
 
-                    listener.onErrorOccurred("Wallet file generate failed");
+                    listener.onErrorOccurred("WalletManager file generate failed");
                 }
             }
         });
