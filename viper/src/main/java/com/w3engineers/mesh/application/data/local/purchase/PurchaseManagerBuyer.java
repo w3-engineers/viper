@@ -5,7 +5,6 @@ import android.arch.lifecycle.LiveData;
 import android.text.TextUtils;
 import android.widget.Toast;
 
-import com.w3engineers.eth.data.helper.PreferencesHelperPaylib;
 import com.w3engineers.eth.util.helper.HandlerUtil;
 import com.w3engineers.mesh.application.data.local.DataPlanConstants;
 import com.w3engineers.mesh.application.ui.util.ToastUtil;
@@ -194,7 +193,7 @@ public class PurchaseManagerBuyer extends PurchaseManager implements PayControll
 
             PreferencesHelperDataplan preferencesHelperDataplan =
                     PreferencesHelperDataplan.on();
-            int endPointMode = PreferencesHelperPaylib.onInstance(mContext).getEndpointMode();
+            int endPointMode = getEndpoint();
             int requestState = preferencesHelperDataplan.getEtherRequestStatus(endPointMode);
 
             if (requestState == PurchaseConstants.GIFT_REQUEST_STATE.NOT_REQUESTED_YET || requestState == PurchaseConstants.GIFT_REQUEST_STATE.REQUESTED_TO_SELLER) {
@@ -249,7 +248,7 @@ public class PurchaseManagerBuyer extends PurchaseManager implements PayControll
             jsonObject.put("fr", ethService.getAddress());
             jsonObject.put("text", "wanna purchase data");
 
-            int endPointMode = PreferencesHelperPaylib.onInstance(mContext).getEndpointMode();
+            int endPointMode = getEndpoint();
 
             setEndPointInfoInJson(jsonObject, endPointMode);
 
@@ -270,7 +269,7 @@ public class PurchaseManagerBuyer extends PurchaseManager implements PayControll
 
         try {
 
-            int currentEndPoint = PreferencesHelperPaylib.onInstance(mContext).getEndpointMode();
+            int currentEndPoint = getEndpoint();
 
             Purchase purchase = databaseService.getPurchaseByState(PurchaseConstants.CHANNEL_STATE.OPEN,
                     ethService.getAddress(), sellerAddress, currentEndPoint);
@@ -313,7 +312,7 @@ public class PurchaseManagerBuyer extends PurchaseManager implements PayControll
         } else {
             String sellerId = sellerIds.get(0);
             String query = PurchaseConstants.INFO_KEYS.ETH_BALANCE + "," + PurchaseConstants.INFO_KEYS.TKN_BALANCE;
-            int endPointType = PreferencesHelperPaylib.onInstance(mContext).getEndpointMode();
+            int endPointType = getEndpoint();
 
             getMyInfo(sellerId, query, PurchaseConstants.INFO_PURPOSES.REFRESH_BALANCE, endPointType);
         }
@@ -331,7 +330,7 @@ public class PurchaseManagerBuyer extends PurchaseManager implements PayControll
             JSONObject jsonObject = new JSONObject();
             try {
                 jsonObject.put(PurchaseConstants.JSON_KEYS.MESSAME_FROM, ethService.getAddress());
-                int endpointType = PreferencesHelperPaylib.onInstance(mContext).getEndpointMode();
+                int endpointType = getEndpoint();
                 setEndPointInfoInJson(jsonObject, endpointType);
             } catch (JSONException e) {
                 e.printStackTrace();
@@ -350,7 +349,7 @@ public class PurchaseManagerBuyer extends PurchaseManager implements PayControll
 
             String query = PurchaseConstants.INFO_KEYS.ETH_BALANCE + "," + PurchaseConstants.INFO_KEYS.NONCE;
 
-            int endPointType = PreferencesHelperPaylib.onInstance(mContext).getEndpointMode();
+            int endPointType = getEndpoint();
 
             getMyInfo(sellerId, query, PurchaseConstants.INFO_PURPOSES.BUY_TOKEN, endPointType);
 
@@ -447,7 +446,6 @@ public class PurchaseManagerBuyer extends PurchaseManager implements PayControll
     @Override
     public void onUserDisconnected(String address) {
 
-//        int endPointMode = PreferencesHelperPaylib.onInstance(mContext).getEndpointMode();
         PreferencesHelperDataplan preferencesHelperDataplan =
                 PreferencesHelperDataplan.on();
 
@@ -912,7 +910,7 @@ public class PurchaseManagerBuyer extends PurchaseManager implements PayControll
                         }
                     }
 
-                    int endPointType = PreferencesHelperPaylib.onInstance(mContext).getEndpointMode();
+                    int endPointType = getEndpoint();
                     String bps = ethService.getBalanceProof(purchase.sellerAddress, purchase.openBlockNumber, totalBalance, endPointType);
 //                    MeshLog.p("balanceproofcheck 1 " + purchase.sellerAddress);
 //                    MeshLog.p("balanceproofcheck 2 " + purchase.openBlockNumber);
@@ -1004,6 +1002,8 @@ public class PurchaseManagerBuyer extends PurchaseManager implements PayControll
 //                MeshLog.p(" onInternetMessageResponseSuccess EX " + e.getMessage());
         }
     }
+
+
 
     @Override
     public void onInternetMessageResponseFailed(String sender, String message) {

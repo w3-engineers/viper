@@ -18,6 +18,8 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main_ac);
 
+        Wallet.getInstance().readWallet(this);
+
 
 //        DataPlan.openActivity(this);
 //        Wallet.openActivity(this);
@@ -37,7 +39,8 @@ public class MainActivity extends AppCompatActivity {
         });
 
         dataPlan.setOnClickListener(view -> {
-            DataPlan.openActivity(MainActivity.this);
+           // DataPlan.openActivity(MainActivity.this);
+            Wallet.openActivity(this);
         });
     }
 }

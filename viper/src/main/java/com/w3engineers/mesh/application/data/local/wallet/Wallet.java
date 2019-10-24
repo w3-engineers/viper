@@ -4,9 +4,14 @@ import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.MutableLiveData;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.os.AsyncTask;
+import android.util.Base64;
 
+import com.google.zxing.WriterException;
 import com.w3engineers.mesh.application.data.local.DataPlanConstants;
 import com.w3engineers.mesh.application.data.local.dataplan.DataPlan;
+import com.w3engineers.mesh.application.data.local.db.SharedPref;
 import com.w3engineers.mesh.application.data.local.db.networkinfo.NetworkInfo;
 import com.w3engineers.mesh.application.data.local.db.networkinfo.WalletInfo;
 import com.w3engineers.mesh.application.data.local.helper.PreferencesHelperDataplan;
@@ -14,11 +19,16 @@ import com.w3engineers.mesh.application.data.local.purchase.PurchaseManager;
 import com.w3engineers.mesh.application.data.local.purchase.PurchaseManagerBuyer;
 import com.w3engineers.mesh.application.data.local.purchase.PurchaseManagerSeller;
 import com.w3engineers.mesh.application.ui.wallet.WalletActivity;
+import com.w3engineers.mesh.util.Constant;
+import com.w3engineers.mesh.util.MeshLog;
 import com.w3engineers.mesh.util.Util;
 
+import java.io.ByteArrayOutputStream;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
+import androidmads.library.qrgenearator.QRGContents;
+import androidmads.library.qrgenearator.QRGEncoder;
 import io.reactivex.Flowable;
 
 
@@ -195,5 +205,56 @@ public class Wallet {
 
     public Flowable<List<NetworkInfo>> getNetworkInfoByNetworkType() {
         return PurchaseManager.getInstance().getNetworkInfoByNetworkType();
+    }
+
+    public void readWallet(Context context) {
+        WalletService mWalletService =  WalletService.getInstance(context);
+
+
+
+        mWalletService.createOrLoadWallet(WalletService.PASSWORD, new WalletService.Listener() {
+            @Override
+            public void onWalletLoaded(String walletAddress, String publicKey) {
+                MeshLog.i(" Wallet loaded succesful");
+
+                if (!walletAddress.equalsIgnoreCase(SharedPref.read(Constant.PreferenceKeys.ADDRESS))){
+
+                    AsyncTask.execute(new Runnable() {
+                        @Override
+                        public void run() {
+                            SharedPref.write(Constant.PreferenceKeys.ADDRESS, walletAddress);
+                            QRGEncoder qrgEncoder = new QRGEncoder(walletAddress, null, QRGContents.Type.TEXT, 300);
+                            try {
+                                // Getting QR-Code as Bitmap
+                                Bitmap bitmap = qrgEncoder.encodeAsBitmap();
+
+                                String bitmapAddress = bitMapToString(bitmap);
+
+                                SharedPref.write(Constant.PreferenceKeys.ADDRESS_BITMAP, bitmapAddress);
+
+                            } catch (WriterException e) {
+
+                            }
+                        }
+                    });
+                }
+            }
+
+            @Override
+            public void onErrorOccurred(String message) {
+                MeshLog.v("wallet loading failed");
+            }
+        });
+    }
+    /**
+     * @param bitmap
+     * @return converting bitmap and return a string
+     */
+    public String bitMapToString(Bitmap bitmap){
+        ByteArrayOutputStream baos=new  ByteArrayOutputStream();
+        bitmap.compress(Bitmap.CompressFormat.PNG,100, baos);
+        byte [] b=baos.toByteArray();
+        String temp= Base64.encodeToString(b, Base64.DEFAULT);
+        return temp;
     }
 }

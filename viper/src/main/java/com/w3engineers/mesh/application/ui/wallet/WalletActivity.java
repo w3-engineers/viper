@@ -307,7 +307,7 @@ public class WalletActivity extends BaseActivity {
 
     private void setTotalEarn() {
 
-        String dateTime = WalletPreference.read(WalletPreference.LATEST_UPDATE);
+        String dateTime = WalletPreference.on().read(WalletPreference.LATEST_UPDATE);
         if (!TextUtils.isEmpty(dateTime)) {
             mBinding.tvLastUpdated.setText(getString(R.string.txt_last_updated) + dateTime);
         }
@@ -327,7 +327,7 @@ public class WalletActivity extends BaseActivity {
 
     public void setTotalSpent() {
 
-        String dateTime = WalletPreference.read(WalletPreference.LATEST_UPDATE);
+        String dateTime = WalletPreference.on().read(WalletPreference.LATEST_UPDATE);
         if (!TextUtils.isEmpty(dateTime)) {
             mBinding.tvLastUpdated.setText(getString(R.string.txt_last_updated) + dateTime);
         }
@@ -436,7 +436,7 @@ public class WalletActivity extends BaseActivity {
         Format format = new SimpleDateFormat("yyyy-MM-dd hh:mm aaa");
         String dateTime = format.format(date);
         mBinding.tvLastUpdated.setText(getString(R.string.txt_last_updated) + " " + dateTime);
-        WalletPreference.write(WalletPreference.LATEST_UPDATE, dateTime);
+        WalletPreference.on().write(WalletPreference.LATEST_UPDATE, dateTime);
     }
 
     private void setCurrencyAndTokenObserver() {

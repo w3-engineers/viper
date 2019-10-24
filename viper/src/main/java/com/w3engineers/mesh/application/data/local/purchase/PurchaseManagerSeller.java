@@ -571,7 +571,7 @@ public class PurchaseManagerSeller extends PurchaseManager implements PayControl
         if (InternetUtil.isNetworkConnected(mContext)) {
             try {
 
-                int endPointType = preferencesHelperPaylib.getEndpointMode();
+                int endPointType = getEndpoint();
 
                 Double etherBalance = ethService.getUserEthBalance(ethService.getAddress(), endPointType);
                 Double tokenBalance = ethService.getUserTokenBalance(ethService.getAddress(), endPointType);
@@ -602,7 +602,7 @@ public class PurchaseManagerSeller extends PurchaseManager implements PayControl
 
     public void sendEtherRequest(EtherRequestListener listener) {
         if (InternetUtil.isNetworkConnected(mContext)) {
-            int endpointType = preferencesHelperPaylib.getEndpointMode();
+            int endpointType = getEndpoint();
             ethService.requestEther(ethService.getAddress(), endpointType, new EthereumService.ReqEther() {
                 @Override
                 public void onEtherRequested(int responseCode) {
@@ -622,7 +622,7 @@ public class PurchaseManagerSeller extends PurchaseManager implements PayControl
 
         try {
 
-            int endPointType = preferencesHelperPaylib.getEndpointMode();
+            int endPointType = getEndpoint();
             double token = EthereumServiceUtil.getInstance(mContext).getToken(endPointType);
             double currency = EthereumServiceUtil.getInstance(mContext).getCurrency(endPointType);
 
@@ -672,7 +672,7 @@ public class PurchaseManagerSeller extends PurchaseManager implements PayControl
     public void getAllOpenDrawableBlock(BalanceWithdrawtListener listener) throws ExecutionException, InterruptedException {
         balanceWithdrawtListener = listener;
 
-        int endPointType = preferencesHelperPaylib.getEndpointMode();
+        int endPointType = getEndpoint();
 
         List<Purchase> allOpenDrawablePurchaseList = databaseService.getAllOpenDrawableBlock(ethService.getAddress(),
                 PurchaseConstants.CHANNEL_STATE.OPEN, endPointType);
@@ -716,7 +716,7 @@ public class PurchaseManagerSeller extends PurchaseManager implements PayControl
     public void closeAllActiveBuyerChannel() {
         try {
 
-            int endPointType = preferencesHelperPaylib.getEndpointMode();
+            int endPointType = getEndpoint();
 
             List<Purchase> activeChannelList = databaseService.getAllActiveChannel(ethService.getAddress(), PurchaseConstants.CHANNEL_STATE.OPEN, endPointType);
 
@@ -761,7 +761,7 @@ public class PurchaseManagerSeller extends PurchaseManager implements PayControl
         if (InternetUtil.isNetworkConnected(mContext)) {
 
             String address = ethService.getAddress();
-            int endpoint = preferencesHelperPaylib.getEndpointMode();
+            int endpoint = getEndpoint();
             int requestState = preferencesHelperDataplan.getEtherRequestStatus(endpoint);
 
             if (requestState == PurchaseConstants.GIFT_REQUEST_STATE.NOT_REQUESTED_YET || requestState == PurchaseConstants.GIFT_REQUEST_STATE.REQUESTED_TO_SELLER) {

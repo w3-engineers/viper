@@ -1,6 +1,7 @@
 package com.w3engineers.mesh.application.data.local.purchase;
 
 import com.w3engineers.mesh.application.data.local.wallet.WalletService;
+import com.w3engineers.mesh.util.MeshApp;
 
 import java.util.List;
 
@@ -16,7 +17,7 @@ public class DemoTransport {
         return demoTransport;
     }
     public WalletService getWalletService() {
-        return this.mWalletService;
+        return WalletService.getInstance(MeshApp.getContext());
     }
     public void initPayListener(PayEventListener payEventListener) {
 
