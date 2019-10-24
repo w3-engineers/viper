@@ -11,7 +11,7 @@ public class Seller {
     private String btnText;
     private int status;
     private boolean isBtnEnabled;
-
+    private int label;
 
     public Seller(){
 
@@ -89,6 +89,15 @@ public class Seller {
 
     public Seller setBtnEnabled(boolean btnEnabled) {
         isBtnEnabled = btnEnabled;
+        return this;
+    }
+
+    public int getLabel() {
+        return label;
+    }
+
+    public Seller setLabel(int label) {
+        this.label = label;
         return this;
     }
 }

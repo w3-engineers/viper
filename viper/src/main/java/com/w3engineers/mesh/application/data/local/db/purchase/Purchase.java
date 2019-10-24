@@ -57,12 +57,13 @@ public class Purchase {
     @ColumnInfo(name = "block_chain_endpoint")
     public int blockChainEndpoint;
 
-    public Seller toSeller() {
+    public Seller toSeller(int label) {
         Seller seller =  new Seller()
                 .setId(sellerAddress)
                 .setName(sellerAddress)
                 .setPurchasedData(totalDataAmount)
-                .setUsedData(usedDataAmount);
+                .setUsedData(usedDataAmount)
+                .setLabel(label);
 
         if (state == PurchaseConstants.CHANNEL_STATE.CLOSING) {
             seller.setBtnEnabled(false).setBtnText(PurchaseConstants.SELLERS_BTN_TEXT.CLOSING);

@@ -20,13 +20,14 @@ import com.w3engineers.ext.strom.application.ui.base.BaseAdapter;
 
 
 import com.w3engineers.mesh.R;
+import com.w3engineers.mesh.application.data.local.DataPlanConstants;
 import com.w3engineers.mesh.application.data.local.model.Seller;
 import com.w3engineers.mesh.databinding.ItemDataSellerBinding;
 
 
 class SellerListAdapter extends BaseAdapter<Seller> {
 
-    private final int NEW_SELLER = 1, ONLINE_SELLER = 2, OFFLINE_SELLER = 3, SELLERS = 4;
+    private final int SELLERS = 4;
     private View.OnClickListener clickListener;
 
     public SellerListAdapter(View.OnClickListener onClickListener) {
@@ -40,13 +41,13 @@ class SellerListAdapter extends BaseAdapter<Seller> {
 
         switch (seller.getId()) {
             case "1":
-                return NEW_SELLER;
+                return DataPlanConstants.SELLER_LABEL.ONLINE_NOT_PURCHASED;
 
             case "2":
-                return ONLINE_SELLER;
+                return DataPlanConstants.SELLER_LABEL.ONLINE_PURCHASED;
 
             case "3":
-                return OFFLINE_SELLER;
+                return DataPlanConstants.SELLER_LABEL.OFFLINE_PURCHASED;
 
             default:
                 return SELLERS;
@@ -64,11 +65,11 @@ class SellerListAdapter extends BaseAdapter<Seller> {
     public BaseAdapterViewHolder<Seller> newViewHolder(ViewGroup parent, int viewType) {
 
         switch (viewType) {
-            case NEW_SELLER:
+            case DataPlanConstants.SELLER_LABEL.ONLINE_NOT_PURCHASED:
                 return new TagViewModel(inflate(parent, R.layout.item_label_new_seller));
-            case ONLINE_SELLER:
+            case DataPlanConstants.SELLER_LABEL.ONLINE_PURCHASED:
                 return new TagViewModel(inflate(parent, R.layout.item_label_online_seller));
-            case OFFLINE_SELLER:
+            case DataPlanConstants.SELLER_LABEL.OFFLINE_PURCHASED:
                 return new TagViewModel(inflate(parent, R.layout.item_label_offline_seller));
             case SELLERS:
                 return new SellerViewModel(inflate(parent, R.layout.item_data_seller));

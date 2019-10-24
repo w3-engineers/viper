@@ -32,4 +32,10 @@ public interface DataPlanConstants {
     interface IntentKeys {
         String NUMBER_OF_ACTIVE_BUYER = "num_of_active_buyer";
     }
+
+    interface SELLER_LABEL {
+        int ONLINE_NOT_PURCHASED = 1;
+        int ONLINE_PURCHASED = 2;
+        int OFFLINE_PURCHASED = 3;
+    }
 }

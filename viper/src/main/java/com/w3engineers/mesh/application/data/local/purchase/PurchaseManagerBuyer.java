@@ -6,15 +6,13 @@ import android.text.TextUtils;
 import android.widget.Toast;
 
 import com.w3engineers.eth.util.helper.HandlerUtil;
-import com.w3engineers.mesh.application.data.local.DataPlanConstants;
 import com.w3engineers.mesh.application.data.local.dataplan.DataPlanManager;
-import com.w3engineers.mesh.application.ui.util.ToastUtil;
+import com.w3engineers.mesh.application.data.local.db.DatabaseService;
 import com.w3engineers.mesh.application.data.local.db.datausage.Datausage;
 import com.w3engineers.mesh.application.data.local.db.purchase.Purchase;
 import com.w3engineers.mesh.application.data.local.helper.PreferencesHelperDataplan;
-import com.w3engineers.mesh.application.ui.dataplan.ManageSellerList;
+import com.w3engineers.mesh.application.ui.util.ToastUtil;
 import com.w3engineers.mesh.util.DialogUtil;
-import com.w3engineers.mesh.application.data.local.db.DatabaseService;
 import com.w3engineers.mesh.util.EthereumServiceUtil;
 import com.w3engineers.mesh.util.MeshApp;
 import com.w3engineers.mesh.util.MeshLog;
@@ -188,7 +186,7 @@ public class PurchaseManagerBuyer extends PurchaseManager implements PayControll
     }
 
     private void setCurrentSellerWithStatus(String id, String status) {
-        ManageSellerList.getInstance(mContext).setCurrentSeller(id, status);
+        DataPlanManager.getInstance().setCurrentSeller(mContext, id, status);
     }
 
     private boolean giftEther(String sellerAddress) {
@@ -443,7 +441,7 @@ public class PurchaseManagerBuyer extends PurchaseManager implements PayControll
         if (payController.transportManager.isInternetSeller(address)) {
             //  syncWithSeller(address);
 //            giftEther(address);
-            ManageSellerList.getInstance(mContext).processAllUsers();
+            DataPlanManager.getInstance().processAllSeller(mContext);
         }
     }
 
@@ -463,7 +461,7 @@ public class PurchaseManagerBuyer extends PurchaseManager implements PayControll
             }
         }
 
-        ManageSellerList.getInstance(mContext).precessDisconnectedSeller(address);
+        DataPlanManager.getInstance().precessDisconnectedSeller(mContext, address);
     }
 
     @Override
