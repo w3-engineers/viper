@@ -24,7 +24,7 @@ import android.view.WindowManager;
 import android.widget.PopupMenu;
 
 import com.w3engineers.ext.strom.util.helper.Toaster;
-import com.w3engineers.mesh.application.data.local.dataplan.DataPlan;
+import com.w3engineers.mesh.application.data.local.dataplan.DataPlanManager;
 import com.w3engineers.ext.strom.application.ui.base.BaseActivity;
 import com.w3engineers.mesh.R;
 import com.w3engineers.mesh.application.data.local.DataPlanConstants;
@@ -50,7 +50,7 @@ public class WalletActivity extends BaseActivity {
     private LiveData<Integer>  haveDifferentNetworkDataObserver;
 
     private Wallet wallet;
-    private DataPlan dataPlan;
+    private DataPlanManager dataPlanManager;
 
     private interface REQUEST_TYPE {
         int ETHER = 1;
@@ -69,7 +69,7 @@ public class WalletActivity extends BaseActivity {
         mBinding = (ActivityWalletBinding) getViewDataBinding();
         walletViewModel = getWalletViewModel();
         wallet = Wallet.getInstance();
-        dataPlan = DataPlan.getInstance();
+        dataPlanManager = DataPlanManager.getInstance();
 
 
         setClickListener(mBinding.opBack, mBinding.imgMyAddress, mBinding.btnWithdraw, mBinding.ethBlock, mBinding.tmeshBlock);
@@ -78,7 +78,7 @@ public class WalletActivity extends BaseActivity {
 
         dialog = new ProgressDialog(this);
 
-        if (dataPlan.getDataPlanRole() == DataPlanConstants.USER_ROLE.DATA_BUYER) {
+        if (dataPlanManager.getDataPlanRole() == DataPlanConstants.USER_ROLE.DATA_BUYER) {
             mBinding.totalSpentBlock.setVisibility(View.GONE);
         }
 
@@ -379,9 +379,9 @@ public class WalletActivity extends BaseActivity {
                 if (integer != null && integer > 0) {
                     mBinding.anotherDeposit.setVisibility(View.VISIBLE);
 
-                    if (dataPlan.getDataPlanRole() == DataPlanConstants.USER_ROLE.DATA_SELLER) {
+                    if (dataPlanManager.getDataPlanRole() == DataPlanConstants.USER_ROLE.DATA_SELLER) {
                         mBinding.anotherDeposit.setText(getString(R.string.different_network_data_for_seller));
-                    } else if (dataPlan.getDataPlanRole() == DataPlanConstants.USER_ROLE.DATA_BUYER) {
+                    } else if (dataPlanManager.getDataPlanRole() == DataPlanConstants.USER_ROLE.DATA_BUYER) {
                         mBinding.anotherDeposit.setText(getString(R.string.different_network_data_for_buyer));
                     }
 
@@ -445,7 +445,7 @@ public class WalletActivity extends BaseActivity {
                 mBinding.tvEthBalance.setText(convertTwoDigitString(walletInfo.currencyAmount));
                 mBinding.tvRmeshBalance.setText(convertTwoDigitString(walletInfo.tokenAmount));
 
-                int dataShareMode = dataPlan.getDataPlanRole();
+                int dataShareMode = dataPlanManager.getDataPlanRole();
 
                 if (dataShareMode == DataPlanConstants.USER_ROLE.DATA_SELLER || dataShareMode == DataPlanConstants.USER_ROLE.DATA_BUYER) {
 
@@ -504,7 +504,7 @@ public class WalletActivity extends BaseActivity {
             getTotalPendingEarningBySeller();
             setDifferentNetworkInfo();
 
-            if (dataPlan.getDataPlanRole() == DataPlanConstants.USER_ROLE.DATA_BUYER) {
+            if (dataPlanManager.getDataPlanRole() == DataPlanConstants.USER_ROLE.DATA_BUYER) {
                 mBinding.totalSpentBlock.setVisibility(View.GONE);
             }
 

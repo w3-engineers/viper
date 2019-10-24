@@ -27,7 +27,7 @@ import android.widget.Toast;
 import com.w3engineers.ext.strom.util.helper.Toaster;
 import com.w3engineers.mesh.R;
 import com.w3engineers.mesh.application.data.local.DataPlanConstants;
-import com.w3engineers.mesh.application.data.local.dataplan.DataPlan;
+import com.w3engineers.mesh.application.data.local.dataplan.DataPlanManager;
 import com.w3engineers.mesh.application.data.local.model.Seller;
 import com.w3engineers.mesh.application.data.local.wallet.Wallet;
 import com.w3engineers.mesh.application.ui.base.TelemeshBaseActivity;
@@ -43,7 +43,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutionException;
 
 
-public class DataPlanActivity extends TelemeshBaseActivity implements DataPlan.DataPlanListener {
+public class DataPlanActivity extends TelemeshBaseActivity implements DataPlanManager.DataPlanListener {
     private ActivityDataPlanBinding mBinding;
     private SellerListAdapter sellerListAdapter;
     private DataPlanViewModel viewModel;
@@ -268,7 +268,7 @@ public class DataPlanActivity extends TelemeshBaseActivity implements DataPlan.D
         myCalendar = Calendar.getInstance();
         sdf = new SimpleDateFormat("dd/MM/yy");
 
-        mCurrentRole = DataPlan.getInstance().getDataPlanRole();
+        mCurrentRole = DataPlanManager.getInstance().getDataPlanRole();
         dataLimitModel.setInitialRole(mCurrentRole);
         mBinding.setDataLimitModel(dataLimitModel);
 
@@ -276,6 +276,8 @@ public class DataPlanActivity extends TelemeshBaseActivity implements DataPlan.D
 
         setClickListener(mBinding.imageViewBack, mBinding.icWallet,
                 mBinding.layoutDataplan, mBinding.saveButton);
+
+        DataPlanManager.getInstance().setDataPlanListener(this);
     }
 
 
@@ -391,7 +393,7 @@ public class DataPlanActivity extends TelemeshBaseActivity implements DataPlan.D
 
     private void loadUI() {
 
-        dataPlanViews[DataPlan.getInstance().getDataPlanRole()].setVisibility(View.VISIBLE);
+        dataPlanViews[DataPlanManager.getInstance().getDataPlanRole()].setVisibility(View.VISIBLE);
         dataLimitRadioButtons[dataLimitModel.getDataLimited() ? 1 : 0].setChecked(true);
 
         setDataLimitEnabled(dataLimitModel.getDataLimited());
@@ -409,7 +411,7 @@ public class DataPlanActivity extends TelemeshBaseActivity implements DataPlan.D
             dataLimitModel.setToDate(myCalendar.getTimeInMillis());
         }
 
-        long sharedData = DataPlan.getInstance().getSellAmountData();
+        long sharedData = DataPlanManager.getInstance().getSellAmountData();
 
         if (sharedData <= 0) {
             dataLimitModel.setSharedData(convertMegabytesToBytes(10));
@@ -421,9 +423,9 @@ public class DataPlanActivity extends TelemeshBaseActivity implements DataPlan.D
 
         mBinding.fromDate.setEnabled(false);
 
-        mBinding.dataUsageLimited.setVisibility(DataPlan.getInstance().getDataAmountMode() == DataPlanConstants.DATA_MODE.LIMITED
+        mBinding.dataUsageLimited.setVisibility(DataPlanManager.getInstance().getDataAmountMode() == DataPlanConstants.DATA_MODE.LIMITED
                 ? View.VISIBLE : View.INVISIBLE);
-        mBinding.dataUsageUnlimited.setVisibility(DataPlan.getInstance().getDataAmountMode() == DataPlanConstants.DATA_MODE.UNLIMITED
+        mBinding.dataUsageUnlimited.setVisibility(DataPlanManager.getInstance().getDataAmountMode() == DataPlanConstants.DATA_MODE.UNLIMITED
                 ? View.VISIBLE : View.INVISIBLE);
 
         disableSaveButton();
@@ -500,7 +502,7 @@ public class DataPlanActivity extends TelemeshBaseActivity implements DataPlan.D
     }
 
     private void showSellerWarningDialog(int activeBuyer) {
-        long sharedData = DataPlan.getInstance().getSellAmountData();
+        long sharedData = DataPlanManager.getInstance().getSellAmountData();
         DialogUtil.showConfirmationDialog(DataPlanActivity.this, "Data Limit exceed",
                 "Your data shared limit" + " " + sharedData + " " + "exceeded, there are" + " " + activeBuyer + " " + "active buyer." + "Do you want to enhance shared data limit? If not then all the active channel would be closed",
                 getResources().getString(R.string.no),
@@ -517,7 +519,7 @@ public class DataPlanActivity extends TelemeshBaseActivity implements DataPlan.D
 
                     @Override
                     public void onClickNegative() {
-                        DataPlan.getInstance().closeAllActiveChannel();
+                        DataPlanManager.getInstance().closeAllActiveChannel();
                     }
                 });
     }
@@ -550,7 +552,7 @@ public class DataPlanActivity extends TelemeshBaseActivity implements DataPlan.D
         AlertDialog alertDialog = alertDialogBuilder.create();
         alertDialog.setCancelable(false);
         stopAndRefund.setOnClickListener(v -> {
-            DataPlan.getInstance().closePurchase(seller.getId());
+            DataPlanManager.getInstance().closePurchase(seller.getId());
             alertDialog.cancel();
         });
         cancel.setOnClickListener(v -> {
@@ -578,7 +580,7 @@ public class DataPlanActivity extends TelemeshBaseActivity implements DataPlan.D
                 if (inputText.length() > 0) {
                     double amount = Double.valueOf(inputText);
                     if (amount > 0) {
-                        DataPlan.getInstance().initPurchase(amount, seller.getId());
+                        DataPlanManager.getInstance().initPurchase(amount, seller.getId());
                     } else {
                         Toast.makeText(DataPlanActivity.this, "Data amount should be bigger than zero.", Toast.LENGTH_SHORT).show();
                     }
@@ -652,7 +654,7 @@ public class DataPlanActivity extends TelemeshBaseActivity implements DataPlan.D
                 mBinding.dateError.setVisibility(View.INVISIBLE);
                 long usedData = 0;
                 try {
-                    usedData = DataPlan.getInstance().getUsedData(this, from, to);
+                    usedData = DataPlanManager.getInstance().getUsedData(this, from, to);
                 } catch (ExecutionException e) {
                     e.printStackTrace();
                 } catch (InterruptedException e) {

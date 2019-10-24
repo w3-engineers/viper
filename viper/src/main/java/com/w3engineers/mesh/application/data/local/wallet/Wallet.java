@@ -1,7 +1,6 @@
 package com.w3engineers.mesh.application.data.local.wallet;
 
 import android.arch.lifecycle.LiveData;
-import android.arch.lifecycle.MutableLiveData;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -10,10 +9,9 @@ import android.util.Base64;
 
 import com.google.zxing.WriterException;
 import com.w3engineers.mesh.application.data.local.DataPlanConstants;
-import com.w3engineers.mesh.application.data.local.dataplan.DataPlan;
 import com.w3engineers.mesh.application.data.local.db.SharedPref;
+import com.w3engineers.mesh.application.data.local.dataplan.DataPlanManager;
 import com.w3engineers.mesh.application.data.local.db.networkinfo.NetworkInfo;
-import com.w3engineers.mesh.application.data.local.db.networkinfo.WalletInfo;
 import com.w3engineers.mesh.application.data.local.helper.PreferencesHelperDataplan;
 import com.w3engineers.mesh.application.data.local.purchase.PurchaseManager;
 import com.w3engineers.mesh.application.data.local.purchase.PurchaseManagerBuyer;
@@ -35,7 +33,7 @@ import io.reactivex.Flowable;
 public class Wallet {
     private static Wallet wallet;
     private PreferencesHelperDataplan preferencesHelperDataplan;
-    private DataPlan dataPlan;
+    private DataPlanManager dataPlanManager;
 
 
     public static void openActivity(Context context){
@@ -52,14 +50,14 @@ public class Wallet {
 
     private Wallet(){
         preferencesHelperDataplan = PreferencesHelperDataplan.on();
-        dataPlan = DataPlan.getInstance();
+        dataPlanManager = DataPlanManager.getInstance();
     }
 
 
     public boolean giftEther(){
-        if (dataPlan.getDataPlanRole() == DataPlanConstants.USER_ROLE.DATA_BUYER) {
+        if (dataPlanManager.getDataPlanRole() == DataPlanConstants.USER_ROLE.DATA_BUYER) {
             return PurchaseManagerBuyer.getInstance().giftEtherForOtherNetwork();
-        } else if (dataPlan.getDataPlanRole() == DataPlanConstants.USER_ROLE.DATA_SELLER){
+        } else if (dataPlanManager.getDataPlanRole() == DataPlanConstants.USER_ROLE.DATA_SELLER){
             return PurchaseManagerSeller.getInstance().requestForGiftForSeller();
         }
         return false;
@@ -90,9 +88,9 @@ public class Wallet {
 
     public void refreshMyBalance(BalanceInfoListener listener) {
 
-        if (dataPlan.getDataPlanRole() == DataPlanConstants.USER_ROLE.MESH_USER) {
+        if (dataPlanManager.getDataPlanRole() == DataPlanConstants.USER_ROLE.MESH_USER) {
             listener.onBalanceInfo(false, "This feature is available only for data seller and data buyer and internet user.");
-        } else if (dataPlan.getDataPlanRole() == DataPlanConstants.USER_ROLE.DATA_SELLER || dataPlan.getDataPlanRole() == DataPlanConstants.USER_ROLE.INTERNET_USER) {
+        } else if (dataPlanManager.getDataPlanRole() == DataPlanConstants.USER_ROLE.DATA_SELLER || dataPlanManager.getDataPlanRole() == DataPlanConstants.USER_ROLE.INTERNET_USER) {
 
             PurchaseManagerSeller.getInstance().getMyBalanceInfo(new PurchaseManagerSeller.MyBalanceInfoListener() {
                 @Override
@@ -105,7 +103,7 @@ public class Wallet {
                     listener.onBalanceInfo(false, msg);
                 }
             });
-        } else if (dataPlan.getDataPlanRole() == DataPlanConstants.USER_ROLE.DATA_BUYER){
+        } else if (dataPlanManager.getDataPlanRole() == DataPlanConstants.USER_ROLE.DATA_BUYER){
             PurchaseManagerBuyer.getInstance().getMyBalanceInfo(new PurchaseManagerBuyer.MyBalanceInfoListener() {
                 @Override
                 public void onBalanceInfoReceived(double ethBalance, double tknBalance) {
@@ -129,12 +127,12 @@ public class Wallet {
     public void sendEtherRequest(EtherRequestListener etherRequestListener) {
         PreferencesHelperDataplan preferencesHelperDataplan = PreferencesHelperDataplan.on();
 
-        if (dataPlan.getDataPlanRole() == DataPlanConstants.USER_ROLE.DATA_SELLER) {
+        if (dataPlanManager.getDataPlanRole() == DataPlanConstants.USER_ROLE.DATA_SELLER) {
 
             PurchaseManagerSeller.getInstance().sendEtherRequest((success, msg) ->{
               etherRequestListener.onEtherRequestResponse(success, msg);
             });
-        } else if (dataPlan.getDataPlanRole() == DataPlanConstants.USER_ROLE.DATA_BUYER){
+        } else if (dataPlanManager.getDataPlanRole() == DataPlanConstants.USER_ROLE.DATA_BUYER){
 
             PurchaseManagerBuyer.getInstance().sendEtherRequest((success, from, msg) -> {
                 etherRequestListener.onEtherRequestResponse(success, msg);
@@ -149,11 +147,11 @@ public class Wallet {
 
     public void sendTokenRequest(TokenRequestListener tokenRequestListener) {
 
-        if (dataPlan.getDataPlanRole() == DataPlanConstants.USER_ROLE.DATA_SELLER) {
+        if (dataPlanManager.getDataPlanRole() == DataPlanConstants.USER_ROLE.DATA_SELLER) {
             PurchaseManagerSeller.getInstance().sendTokenRequest((success, msg, tokenValue, etherValue) ->{
                 tokenRequestListener.onTokenRequestResponse(success, msg);
             });
-        } else if (dataPlan.getDataPlanRole() == DataPlanConstants.USER_ROLE.DATA_BUYER){
+        } else if (dataPlanManager.getDataPlanRole() == DataPlanConstants.USER_ROLE.DATA_BUYER){
             PurchaseManagerBuyer.getInstance().sendTokenRequest(new PurchaseManagerBuyer.TokenRequestListener() {
                 @Override
                 public void onTokenRequestResponseReceived(boolean success, String from, String msg, double tokenValue, double ethValue) {
@@ -175,9 +173,9 @@ public class Wallet {
     }
 
     public LiveData<Integer> getDifferentNetworkData(String myAddress, int endpoint) {
-        if (dataPlan.getDataPlanRole() == DataPlanConstants.USER_ROLE.DATA_SELLER) {
+        if (dataPlanManager.getDataPlanRole() == DataPlanConstants.USER_ROLE.DATA_SELLER) {
             return PurchaseManagerSeller.getInstance().getDifferentNetworkData(myAddress, endpoint);
-        } else if (dataPlan.getDataPlanRole() == DataPlanConstants.USER_ROLE.DATA_BUYER) {
+        } else if (dataPlanManager.getDataPlanRole() == DataPlanConstants.USER_ROLE.DATA_BUYER) {
             return PurchaseManagerBuyer.getInstance().getDifferentNetworkData(myAddress, endpoint);
         }
         return null;

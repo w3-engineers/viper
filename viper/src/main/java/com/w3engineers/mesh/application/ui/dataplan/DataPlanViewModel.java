@@ -1,16 +1,14 @@
 package com.w3engineers.mesh.application.ui.dataplan;
 
-import android.arch.lifecycle.MutableLiveData;
-
 import com.w3engineers.ext.strom.application.ui.base.BaseRxViewModel;
-import com.w3engineers.mesh.application.data.local.dataplan.DataPlan;
+import com.w3engineers.mesh.application.data.local.dataplan.DataPlanManager;
 
-class DataPlanViewModel extends BaseRxViewModel implements DataPlan.DataPlanListener {
+class DataPlanViewModel extends BaseRxViewModel implements DataPlanManager.DataPlanListener {
 
 
 
     void roleSwitch(int newRole) {
-        DataPlan.getInstance().roleSwitch(newRole);
+        DataPlanManager.getInstance().roleSwitch(newRole);
     }
 
     @Override

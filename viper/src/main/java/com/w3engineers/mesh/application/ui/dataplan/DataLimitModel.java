@@ -4,7 +4,7 @@ import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.MutableLiveData;
 import android.content.Context;
 
-import com.w3engineers.mesh.application.data.local.dataplan.DataPlan;
+import com.w3engineers.mesh.application.data.local.dataplan.DataPlanManager;
 
 
 public class DataLimitModel {
@@ -21,17 +21,17 @@ public class DataLimitModel {
 
     public DataLimitModel(Context context){
 
-        isDataLimited = DataPlan.getInstance().getDataAmountMode() == 1;
-        fromDate = DataPlan.getInstance().getSellFromDate();
-        toDate = DataPlan.getInstance().getSellToDate();
-        sharedData.postValue(DataPlan.getInstance().getSellDataAmount());
+        isDataLimited = DataPlanManager.getInstance().getDataAmountMode() == 1;
+        fromDate = DataPlanManager.getInstance().getSellFromDate();
+        toDate = DataPlanManager.getInstance().getSellToDate();
+        sharedData.postValue(DataPlanManager.getInstance().getSellDataAmount());
 
         if (!isDataLimited){
             long toDate1 = System.currentTimeMillis();
             long fromDate1 = toDate1 - (numberOfDay*24*60*60*1000);
-            usedData = DataPlan.getInstance().getDataUsage(context, fromDate1, toDate1);
+            usedData = DataPlanManager.getInstance().getDataUsage(context, fromDate1, toDate1);
         } else {
-            usedData = DataPlan.getInstance().getDataUsage(context, fromDate, toDate);
+            usedData = DataPlanManager.getInstance().getDataUsage(context, fromDate, toDate);
         }
     }
 
@@ -56,7 +56,7 @@ public class DataLimitModel {
 
     public void setFromDate(long fromDate) {
         this.fromDate = fromDate;
-        DataPlan.getInstance().setSellFromDate(fromDate);
+        DataPlanManager.getInstance().setSellFromDate(fromDate);
     }
 
     public boolean getDataLimited(){
@@ -65,12 +65,12 @@ public class DataLimitModel {
 
     public void setDataLimited(boolean dataLimited) {
         isDataLimited = dataLimited;
-        DataPlan.getInstance().setDataAmountMode((dataLimited) ? 1 : 0);
+        DataPlanManager.getInstance().setDataAmountMode((dataLimited) ? 1 : 0);
     }
 
     public void setSharedData(Long sharedData) {
         this.sharedData.setValue(sharedData);
-        DataPlan.getInstance().setSellDataAmount(sharedData);
+        DataPlanManager.getInstance().setSellDataAmount(sharedData);
     }
 
     public long getToDate() {
@@ -78,7 +78,7 @@ public class DataLimitModel {
     }
     public void setToDate(long toDate) {
         this.toDate = toDate;
-        DataPlan.getInstance().setSellToDate(toDate);
+        DataPlanManager.getInstance().setSellToDate(toDate);
     }
 
     public int getNumberOfDay(){

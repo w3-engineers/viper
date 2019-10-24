@@ -6,10 +6,8 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
-import com.w3engineers.mesh.util.lib.mesh.DataManager;
-
-import com.w3engineers.mesh.application.data.local.dataplan.DataPlan;
 import com.w3engineers.mesh.application.data.local.wallet.Wallet;
+import com.w3engineers.mesh.util.lib.mesh.DataManager;
 
 public class MainActivity extends AppCompatActivity {
 
