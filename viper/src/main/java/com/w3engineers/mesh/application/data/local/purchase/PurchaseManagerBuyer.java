@@ -35,7 +35,6 @@ public class PurchaseManagerBuyer extends PurchaseManager implements PayControll
     private EtherRequestListener etherRequestListener;
     private TokenRequestListener tokenRequestListener;
     private boolean isWarningShown;
-    private String currentSellerId;
     private String giftRequestedSeller = null;
 
     private DataPlanManager.DataPlanListener dataPlanListener;
@@ -294,81 +293,94 @@ public class PurchaseManagerBuyer extends PurchaseManager implements PayControll
     /*public void setPurchaseManagerBuyerListener(PurchaseManagerBuyerListener listener) {
         this.purchaseManagerBuyerListener = listener;
     }*/
-
-    public void setCurrentSellerId(String sellerId){
-        MeshLog.v("CurrentSellerId " + sellerId);
-        this.currentSellerId = sellerId;
-    }
-
-    public String getCurrentSellerId(){
-        return this.currentSellerId;
-    }
+    
 
     public void getMyBalanceInfo(MyBalanceInfoListener listener) {
         MeshLog.p("getMyBalanceInfo");
         myBalanceInfoListener = listener;
-        List<String> sellerIds = payController.transportManager.getInternetSellers();
-        if (sellerIds.size() == 0) {
-            if (myBalanceInfoListener != null)
-                myBalanceInfoListener.onBalanceErrorReceived("No internet seller connected.");
-        } else {
-            String sellerId = sellerIds.get(0);
-            String query = PurchaseConstants.INFO_KEYS.ETH_BALANCE + "," + PurchaseConstants.INFO_KEYS.TKN_BALANCE;
-            int endPointType = getEndpoint();
+        try {
+            List<String> sellerIds = payController.getDataManager().getInternetSellers();
+            if (sellerIds.size() == 0) {
+                if (myBalanceInfoListener != null)
+                    myBalanceInfoListener.onBalanceErrorReceived("No internet seller connected.");
+            } else {
+                String sellerId = sellerIds.get(0);
+                String query = PurchaseConstants.INFO_KEYS.ETH_BALANCE + "," + PurchaseConstants.INFO_KEYS.TKN_BALANCE;
+                int endPointType = getEndpoint();
 
-            getMyInfo(sellerId, query, PurchaseConstants.INFO_PURPOSES.REFRESH_BALANCE, endPointType);
+                getMyInfo(sellerId, query, PurchaseConstants.INFO_PURPOSES.REFRESH_BALANCE, endPointType);
+            }
+        } catch (Exception ex){
+            ex.printStackTrace();
         }
+
     }
 
     public void sendEtherRequest(EtherRequestListener listener) {
 
         etherRequestListener = listener;
 
-        List<String> sellerIds = payController.transportManager.getInternetSellers();
-        if (sellerIds.size() == 0) {
-            listener.onResponseReceived(false, null, "No internet provider connected");
-        } else {
-            String sellerId = sellerIds.get(0);
-            JSONObject jsonObject = new JSONObject();
-            try {
-                jsonObject.put(PurchaseConstants.JSON_KEYS.MESSAME_FROM, ethService.getAddress());
-                int endpointType = getEndpoint();
-                setEndPointInfoInJson(jsonObject, endpointType);
-            } catch (JSONException e) {
-                e.printStackTrace();
+        try {
+            List<String> sellerIds = payController.getDataManager().getInternetSellers();
+            if (sellerIds.size() == 0) {
+                listener.onResponseReceived(false, null, "No internet provider connected");
+            } else {
+                String sellerId = sellerIds.get(0);
+                JSONObject jsonObject = new JSONObject();
+                try {
+                    jsonObject.put(PurchaseConstants.JSON_KEYS.MESSAME_FROM, ethService.getAddress());
+                    int endpointType = getEndpoint();
+                    setEndPointInfoInJson(jsonObject, endpointType);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+                payController.sendEtherRequestMessage(jsonObject, sellerId);
             }
-            payController.sendEtherRequestMessage(jsonObject, sellerId);
+        } catch (Exception e){
+            e.printStackTrace();
         }
+
     }
 
     public void sendTokenRequest(TokenRequestListener listener) {
         tokenRequestListener = listener;
-        List<String> sellerIds = payController.transportManager.getInternetSellers();
-        if (sellerIds.size() == 0) {
-            listener.onTokenRequestResponseReceived(false, null, "No internet provider connected", 0, 0);
-        } else {
-            String sellerId = sellerIds.get(0);
+        try {
+            List<String> sellerIds = payController.getDataManager().getInternetSellers();
+            if (sellerIds.size() == 0) {
+                listener.onTokenRequestResponseReceived(false, null, "No internet provider connected", 0, 0);
+            } else {
+                String sellerId = sellerIds.get(0);
 
-            String query = PurchaseConstants.INFO_KEYS.ETH_BALANCE + "," + PurchaseConstants.INFO_KEYS.NONCE;
+                String query = PurchaseConstants.INFO_KEYS.ETH_BALANCE + "," + PurchaseConstants.INFO_KEYS.NONCE;
 
-            int endPointType = getEndpoint();
+                int endPointType = getEndpoint();
 
-            getMyInfo(sellerId, query, PurchaseConstants.INFO_PURPOSES.BUY_TOKEN, endPointType);
+                getMyInfo(sellerId, query, PurchaseConstants.INFO_PURPOSES.BUY_TOKEN, endPointType);
 
+            }
+        }catch (Exception ex){
+            ex.printStackTrace();
         }
+
 
     }
 
     public void closePurchase(String sellerId) {
         String receiverId = null;
-        if (payController.transportManager.isUserConnected(sellerId)) {
-            receiverId = sellerId;
-        } else {
-            List<String> sellerIds = payController.transportManager.getInternetSellers();
-            if (sellerIds.size() > 0) {
-                receiverId = sellerIds.get(0);
+
+        try {
+            if (payController.getDataManager().isUserConnected(sellerId)) {
+                receiverId = sellerId;
+            } else {
+                List<String> sellerIds = payController.getDataManager().getInternetSellers();
+                if (sellerIds.size() > 0) {
+                    receiverId = sellerIds.get(0);
+                }
             }
+        }catch (Exception ex){
+            ex.printStackTrace();
         }
+
 
         if (receiverId == null) {
 
@@ -404,10 +416,15 @@ public class PurchaseManagerBuyer extends PurchaseManager implements PayControll
     }
 
     public boolean giftEtherForOtherNetwork(){
-        List<String> sellerIds = payController.transportManager.getInternetSellers();
-        if (sellerIds.size() > 0) {
-            return  giftEther(sellerIds.get(0));
+        try {
+            List<String> sellerIds = payController.getDataManager().getInternetSellers();
+            if (sellerIds.size() > 0) {
+                return  giftEther(sellerIds.get(0));
+            }
+        } catch (Exception ex){
+            ex.printStackTrace();
         }
+
         return false;
     }
 
@@ -438,10 +455,12 @@ public class PurchaseManagerBuyer extends PurchaseManager implements PayControll
     //*********************************************************//
     @Override
     public void onUserConnected(String address) {
-        if (payController.transportManager.isInternetSeller(address)) {
-            //  syncWithSeller(address);
-//            giftEther(address);
-            DataPlanManager.getInstance().processAllSeller(mContext);
+        try {
+            if (payController.getDataManager().isInternetSeller(address)) {
+                DataPlanManager.getInstance().processAllSeller(mContext);
+            }
+        } catch (Exception e){
+            e.printStackTrace();
         }
     }
 
@@ -469,7 +488,7 @@ public class PurchaseManagerBuyer extends PurchaseManager implements PayControll
         switch (purpose) {
             case PurchaseConstants.INFO_PURPOSES.REFRESH_BALANCE:
                 try {
-                    // TODO you have endPoint
+
                     double ethBalance = infoJson.optDouble(PurchaseConstants.INFO_KEYS.ETH_BALANCE)/* ? infoJson.getDouble(PurchaseConstants.INFO_KEYS.ETH_BALANCE) : ethService.getMyEthBalance()*/;
                     double tknBalance = infoJson.optDouble(PurchaseConstants.INFO_KEYS.TKN_BALANCE)/* ? infoJson.getDouble(PurchaseConstants.INFO_KEYS.TKN_BALANCE) : ethService.getMyTokenBalance()*/;
 
@@ -487,7 +506,7 @@ public class PurchaseManagerBuyer extends PurchaseManager implements PayControll
                 double token = EthereumServiceUtil.getInstance(mContext).getToken(endPointType);
                 double currency = EthereumServiceUtil.getInstance(mContext).getCurrency(endPointType);
                 try {
-                    // TODO you have endPoint
+
 
 
                     if (infoJson.has(PurchaseConstants.INFO_KEYS.NONCE) && infoJson.has(PurchaseConstants.INFO_KEYS.ETH_BALANCE)) {

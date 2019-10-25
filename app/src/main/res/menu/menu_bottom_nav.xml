@@ -8,7 +8,6 @@
         app:showAsAction="always" />
     <item
         android:id="@+id/menu_data_plan_setting"
-        android:enabled="false"
         android:title="@string/my_data_plan"
         app:showAsAction="always" />
     <item

@@ -29,6 +29,7 @@ import com.w3engineers.ext.strom.application.ui.base.BaseActivity;
 import com.w3engineers.mesh.R;
 import com.w3engineers.mesh.application.data.local.DataPlanConstants;
 import com.w3engineers.mesh.application.data.local.wallet.WalletManager;
+import com.w3engineers.mesh.application.ui.base.TelemeshBaseActivity;
 import com.w3engineers.mesh.databinding.ActivityWalletBinding;
 import com.w3engineers.mesh.databinding.PromptWalletWithdrowBinding;
 import com.w3engineers.mesh.util.DialogUtil;
@@ -39,7 +40,7 @@ import java.util.Date;
 import java.util.concurrent.ExecutionException;
 
 
-public class WalletActivity extends BaseActivity {
+public class WalletActivity extends TelemeshBaseActivity {
 
     private ActivityWalletBinding mBinding;
     private ProgressDialog dialog;

@@ -4,6 +4,9 @@ import android.content.Context;
 import android.os.RemoteException;
 import android.widget.Toast;
 
+import com.w3engineers.mesh.application.data.local.wallet.WalletManager;
+import com.w3engineers.mesh.application.data.local.wallet.WalletService;
+
 public class ViperClient {
 
     private static ViperClient mViperClient;
@@ -17,6 +20,8 @@ public class ViperClient {
 
     protected ViperClient(Context context, String networkPrefix) {
         DataManager.on().doBindService(context, networkPrefix);
+        WalletManager.getInstance().readWallet(context);
+
     }
 
     public static ViperClient on(Context context, String networkPrefix) {

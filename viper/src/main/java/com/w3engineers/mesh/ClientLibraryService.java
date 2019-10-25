@@ -94,6 +94,26 @@ public class ClientLibraryService extends Service {
                 stopInForeground();
             }
         }
+
+        @Override
+        public void onMessagePayReceived(String sender, byte[] paymentData) throws RemoteException {
+            DataManager.on().onMessagePayReceived(sender, paymentData);
+        }
+
+        @Override
+        public void onPayMessageAckReceived(String sender, String receiver, String messageId) throws RemoteException {
+            DataManager.on().onPayMessageAckReceived(sender, receiver, messageId);
+        }
+
+        @Override
+        public void buyerInternetMessageReceived(String sender, String receiver, String messageId, String messageData, long dataLength, boolean isIncoming) throws RemoteException {
+            DataManager.on().buyerInternetMessageReceived(sender, receiver, messageId, messageData, dataLength, isIncoming);
+        }
+
+        @Override
+        public void onTransportInit(String nodeId, String publicKey, boolean success, String msg) throws RemoteException {
+            DataManager.on().onTransportInit(nodeId, publicKey, success, msg);
+        }
     };
 
     private void startInForeground() {

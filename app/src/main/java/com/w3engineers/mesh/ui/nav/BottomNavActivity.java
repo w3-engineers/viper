@@ -16,6 +16,7 @@ import android.widget.Toast;
 
 import com.w3engineers.ext.viper.R;
 import com.w3engineers.ext.viper.databinding.ActivityCreateGroupBinding;
+import com.w3engineers.mesh.application.data.local.dataplan.DataPlanManager;
 import com.w3engineers.mesh.application.data.local.db.SharedPref;
 
 import com.w3engineers.mesh.model.MessageModel;
@@ -244,9 +245,10 @@ public class BottomNavActivity extends AppCompatActivity implements UserConnecti
      */
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-/*        if (item.getItemId() == R.id.menu_data_plan_setting) {
-            startActivity(new Intent(this, DataPlanActivity.class));
-        } else if (item.getItemId() == R.id.menu_ping_self) {
+        if (item.getItemId() == R.id.menu_data_plan_setting) {
+            DataPlanManager.openActivity(this);
+        }
+        /*else if (item.getItemId() == R.id.menu_ping_self) {
             connectionManager.sendPing();
         } else if (item.getItemId() == R.id.menu_log_history) {
             startActivity(new Intent(this, MeshLogHistoryActivity.class));

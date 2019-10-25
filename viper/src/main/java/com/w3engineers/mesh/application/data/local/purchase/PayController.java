@@ -5,11 +5,22 @@ import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.Looper;
 import android.os.Message;
+import android.os.RemoteException;
 import android.text.TextUtils;
 
+import com.w3engineers.mesh.application.data.ApiEvent;
+import com.w3engineers.mesh.application.data.AppDataObserver;
 import com.w3engineers.mesh.application.data.local.DataPlanConstants;
 import com.w3engineers.mesh.application.data.local.helper.PreferencesHelperDataplan;
+import com.w3engineers.mesh.application.data.local.wallet.WalletService;
+import com.w3engineers.mesh.application.data.model.PayMessage;
+import com.w3engineers.mesh.application.data.model.PayMessageAck;
+import com.w3engineers.mesh.application.data.model.PeerAdd;
+import com.w3engineers.mesh.application.data.model.PeerRemoved;
+import com.w3engineers.mesh.application.data.remote.model.BuyerPendingMessage;
+import com.w3engineers.mesh.util.MeshApp;
 import com.w3engineers.mesh.util.MeshLog;
+import com.w3engineers.mesh.util.lib.mesh.DataManager;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -19,18 +30,21 @@ import org.web3j.crypto.Credentials;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
-public class PayController implements PayEventListener {
+public class PayController {
     private static PayController payController;
-    public DemoTransport transportManager;
+//    public DemoTransport transportManager;
     private static PayControllerListenerForSeller payControllerListenerForSeller;
     private static PayControllerListenerForBuyer payControllerListenerForBuyer;
+    private DataManager dataManager;
 
     private Handler handler;
     private long delayTime = 30 * 1000;
     private ConcurrentHashMap<String, TimeoutModel> timeoutMap = new ConcurrentHashMap<>();
 
     PayController() {
-        transportManager = DemoTransport.getInstance();
+//        transportManager = DemoTransport.getInstance();
+        dataManager = DataManager.on();
+        setDataManagerObserver();
     }
 
     public static PayController getInstance() {
@@ -41,11 +55,51 @@ public class PayController implements PayEventListener {
     }
 
     public Credentials getCredentials() {
-        return transportManager.getWalletService().getCredentials();
+        return WalletService.getInstance(MeshApp.getContext()).getCredentials();
     }
 
-    @Override
-    public void onMessageReceived(String sender, byte[] paymentData) {
+    public DataManager getDataManager(){
+        if (dataManager == null){
+            dataManager = DataManager.on();
+        }
+        return dataManager;
+    }
+
+    private void setDataManagerObserver(){
+        AppDataObserver.on().startObserver(ApiEvent.PEER_ADD,event -> {
+            String nodeId = ((PeerAdd) event).peerId;
+            sendUserConnected(nodeId, true);
+        });
+
+
+        AppDataObserver.on().startObserver(ApiEvent.PEER_REMOVED,event -> {
+            String nodeId = ((PeerRemoved) event).peerId;
+            sendUserConnected(nodeId, false);
+        });
+
+
+        AppDataObserver.on().startObserver(ApiEvent.PAY_MESSAGE,event -> {
+            PayMessage msg = (PayMessage) event;
+            onMessageReceived(msg.sender, msg.paymentData);
+        });
+
+        AppDataObserver.on().startObserver(ApiEvent.PAY_MESSAGE_ACK,event -> {
+            PayMessageAck msgAck = (PayMessageAck) event;
+
+            onPayMessageAckReceived(msgAck.sender, msgAck.receiver, msgAck.messageId);
+        });
+
+        AppDataObserver.on().startObserver(ApiEvent.BUYER_PENDING_MESSAGE,event -> {
+            BuyerPendingMessage pendingMessage = (BuyerPendingMessage) event;
+            if (payControllerListenerForSeller != null){
+                payControllerListenerForSeller.buyerInternetMessageReceived(pendingMessage.sender, pendingMessage.receiver, pendingMessage.messageId, pendingMessage.messageData, pendingMessage.dataLength, pendingMessage.isIncoming);
+            }
+        });
+
+
+    }
+
+    private void onMessageReceived(String sender, byte[] paymentData) {
         String receiveMsg = new String(paymentData);
 
 
@@ -379,20 +433,7 @@ public class PayController implements PayEventListener {
 
     }
 
-    @Override
-    public void onUserConnected(String nodeId) {
-        MeshLog.v("[Multiverse] onDirectUserConnected " + nodeId);
-        sendUserConnected(nodeId, true);
-    }
-
-    @Override
-    public void onUserDisconnected(String nodeId) {
-        MeshLog.v("onDirectUserDisconnected " + nodeId);
-        sendUserConnected(nodeId, false);
-    }
-
-    @Override
-    public void onPayMessageAckReceived(String sender, String receiver, String messageId) {
+    private void onPayMessageAckReceived(String sender, String receiver, String messageId) {
         MeshLog.v("onPayMessageAckReceived s " + sender + " r " + receiver + " i " + messageId);
         if (!TextUtils.isEmpty(messageId)) {
 
@@ -642,9 +683,9 @@ public class PayController implements PayEventListener {
     public void setBuyerListener(PayControllerListenerForBuyer listener1) {
       //  MeshLog.v("set listener" + listener1.toString());
         payControllerListenerForBuyer = listener1;
-        if (transportManager != null) {
-            transportManager.initPayListener(this);
-        }
+//        if (transportManager != null) {
+//            transportManager.initPayListener(this);
+//        }
     }
 
     public interface PayControllerListenerForSeller {
@@ -683,13 +724,15 @@ public class PayController implements PayEventListener {
 
         void requestForGiftEtherWithHash(String fromAddress, String ethTranxHash, String tknTranxHash, int endPointType);
         void timeoutCallback(TimeoutModel timeoutModel);
+
+        void buyerInternetMessageReceived(String sender, String owner, String msg_id, String msgData, long dataSize, boolean isIncomming);
     }
 
     public void setSellerListener(PayControllerListenerForSeller listener2) {
         this.payControllerListenerForSeller = listener2;
-        if (transportManager != null) {
-            transportManager.initPayListener(this);
-        }
+//        if (transportManager != null) {
+//            transportManager.initPayListener(this);
+//        }
     }
 
     public void sendInitPurchase(JSONObject object, String receiver) {
@@ -890,7 +933,11 @@ public class PayController implements PayEventListener {
 
     private void sendPayMessageToTransport(String address, String message, String messageId) {
         //String encryptedMessage = CryptoHelper.encryptMessage(transportManager.getContext(), address, message.getBytes());
-        transportManager.sendPayMessage(address, message, messageId);
+        try {
+            dataManager.sendPayMessage(address, message, messageId);
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        }
     }
 
     public void sendSyncOkMessage(JSONObject object, String receiver) {

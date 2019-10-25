@@ -18,6 +18,10 @@ import android.os.RemoteException;
 import android.util.Log;
 
 import com.w3engineers.mesh.ClientLibraryService;
+import com.w3engineers.mesh.application.data.model.PayMessage;
+import com.w3engineers.mesh.application.data.model.PayMessageAck;
+import com.w3engineers.mesh.application.data.model.TransportInit;
+import com.w3engineers.mesh.application.data.remote.model.BuyerPendingMessage;
 import com.w3engineers.mesh.util.MeshLog;
 import com.w3engineers.meshrnd.ITmCommunicator;
 import com.w3engineers.mesh.ViperCommunicator;
@@ -26,6 +30,8 @@ import com.w3engineers.mesh.application.data.model.DataAckEvent;
 import com.w3engineers.mesh.application.data.model.DataEvent;
 import com.w3engineers.mesh.application.data.model.PeerAdd;
 import com.w3engineers.mesh.application.data.model.PeerRemoved;
+
+import java.util.List;
 
 public class DataManager {
 
@@ -175,6 +181,7 @@ public class DataManager {
         peerAdd.peerId = peerId;
 
         AppDataObserver.on().sendObserverData(peerAdd);
+
     }
 
     /**
@@ -242,6 +249,74 @@ public class DataManager {
         } catch (RemoteException e) {
             e.printStackTrace();
         }
+    }
+
+    public void sendPayMessage(String receiverId, String message, String messageId) throws RemoteException {
+        mTmCommunicator.sendPayMessage(receiverId, message, messageId);
+    }
+
+    public void onPaymentGotForIncomingMessage( boolean success,  String receiver,  String sender,  String messageId,  String msgData) throws RemoteException {
+        mTmCommunicator.onPaymentGotForIncomingMessage(success,receiver, sender, messageId,msgData);
+    }
+    public void onPaymentGotForOutgoingMessage( boolean success,  String receiver,  String sender,  String messageId,  String msgData) throws RemoteException {
+        mTmCommunicator.onPaymentGotForOutgoingMessage(success, receiver, sender, messageId, msgData);
+    }
+    public List<String> getInternetSellers() throws RemoteException {
+        return mTmCommunicator.getInternetSellers();
+    }
+    public boolean isInternetSeller( String address) throws RemoteException {
+        return mTmCommunicator.isInternetSeller(address);
+    }
+    public boolean isUserConnected( String address) throws RemoteException {
+        return mTmCommunicator.isUserConnected(address);
+    }
+    public void onBuyerConnected( String address) throws RemoteException {
+        mTmCommunicator.onBuyerConnected(address);
+    }
+    public void onBuyerDisconnected( String address) throws RemoteException {
+        mTmCommunicator.onBuyerDisconnected(address);
+    }
+    public void restartMesh(int newRole) throws RemoteException{
+        mTmCommunicator.restartMesh(newRole);
+    }
+
+
+    public void onMessagePayReceived( String sender, byte[] paymentData){
+        PayMessage payMessage = new PayMessage();
+        payMessage.sender = sender;
+        payMessage.paymentData = paymentData;
+        AppDataObserver.on().sendObserverData(payMessage);
+    }
+    public void onPayMessageAckReceived( String sender,  String receiver,  String messageId){
+        PayMessageAck payMessageAck = new PayMessageAck();
+        payMessageAck.sender = sender;
+        payMessageAck.receiver = receiver;
+        payMessageAck.messageId = messageId;
+        AppDataObserver.on().sendObserverData(payMessageAck);
+    }
+
+    public void buyerInternetMessageReceived(String sender, String receiver, String messageId, String messageData, long dataLength, boolean isIncoming) {
+        BuyerPendingMessage buyerPendingMessage = new BuyerPendingMessage();
+        buyerPendingMessage.sender = sender;
+        buyerPendingMessage.receiver = receiver;
+        buyerPendingMessage.messageId = messageId;
+        buyerPendingMessage.messageData = messageData;
+        buyerPendingMessage.dataLength = dataLength;
+        buyerPendingMessage.isIncoming = isIncoming;
+
+        AppDataObserver.on().sendObserverData(buyerPendingMessage);
+
+
+    }
+
+    public void onTransportInit( String nodeId,  String publicKey,  boolean success, String msg){
+        TransportInit transportInit = new TransportInit();
+        transportInit.nodeId = nodeId;
+        transportInit.publicKey = publicKey;
+        transportInit.success = success;
+        transportInit.msg = msg;
+
+        AppDataObserver.on().sendObserverData(transportInit);
     }
 
 }

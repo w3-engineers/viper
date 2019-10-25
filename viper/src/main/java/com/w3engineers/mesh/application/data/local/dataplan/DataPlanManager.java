@@ -4,9 +4,12 @@ import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.LiveDataReactiveStreams;
 import android.content.Context;
 import android.content.Intent;
+import android.os.RemoteException;
 import android.text.TextUtils;
 
 import com.w3engineers.eth.data.remote.EthereumService;
+import com.w3engineers.mesh.application.data.ApiEvent;
+import com.w3engineers.mesh.application.data.AppDataObserver;
 import com.w3engineers.mesh.application.data.local.DataPlanConstants;
 import com.w3engineers.mesh.application.data.local.db.DatabaseService;
 import com.w3engineers.mesh.application.data.local.db.purchase.Purchase;
@@ -18,6 +21,7 @@ import com.w3engineers.mesh.application.data.local.purchase.PurchaseManagerBuyer
 import com.w3engineers.mesh.application.data.local.purchase.PurchaseManagerSeller;
 import com.w3engineers.mesh.application.ui.dataplan.DataPlanActivity;
 import com.w3engineers.mesh.util.EthereumServiceUtil;
+import com.w3engineers.mesh.util.lib.mesh.DataManager;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -90,10 +94,13 @@ public class DataPlanManager {
     }
 
     public void roleSwitch(int newRole) {
-        // TODO Dataplan need to sync with mesh
-//        TransportManager.getInstance().setNetworkModeListener(this::onTransportInit);
-//        TransportManager.getInstance().restart();
-        preferencesHelperDataplan.setDataPlanRole(newRole);
+
+        try {
+            preferencesHelperDataplan.setDataPlanRole(newRole);
+            payController.getDataManager().restartMesh(newRole);
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        }
     }
 
     private void roleSwitchCompleted() {
@@ -182,9 +189,14 @@ public class DataPlanManager {
     }
 
     public void processAllSeller(Context context) {
-        List<String> connectedSellers = payController.transportManager.getInternetSellers();
-        if (connectedSellers != null)
-            processAllSeller(context, connectedSellers);
+        try {
+            List<String> connectedSellers = payController.getDataManager().getInternetSellers();
+            if (connectedSellers != null)
+                processAllSeller(context, connectedSellers);
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        }
+
     }
 
     public void setCurrentSeller(Context context, String sellerId, String currentSellerStatus) {
@@ -285,12 +297,17 @@ public class DataPlanManager {
 
             if (seller.getId().equals(sellerId)) {
 
-                List<String> connectedSellers = payController.transportManager.getInternetSellers();
-                if (connectedSellers != null){
-                    connectedSellers.remove(sellerId);
+                try {
+                    List<String> connectedSellers = payController.getDataManager().getInternetSellers();
+                    if (connectedSellers != null){
+                        connectedSellers.remove(sellerId);
 
-                    processAllSeller(context, connectedSellers);
+                        processAllSeller(context, connectedSellers);
+                    }
+                }catch (RemoteException e){
+                    e.printStackTrace();
                 }
+
                 return;
             }
         }
@@ -305,5 +322,12 @@ public class DataPlanManager {
                 .setBtnEnabled(true)
                 .setLabel(label)
                 .setBtnText(PurchaseConstants.SELLERS_BTN_TEXT.PURCHASE);
+    }
+
+
+    private void setDataManagerObserver(){
+        AppDataObserver.on().startObserver(ApiEvent.TRANSPORT_INIT, event -> {
+            roleSwitchCompleted();
+        });
     }
 }
