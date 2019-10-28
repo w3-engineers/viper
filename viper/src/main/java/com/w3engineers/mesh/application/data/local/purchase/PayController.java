@@ -79,11 +79,13 @@ public class PayController {
 
 
         AppDataObserver.on().startObserver(ApiEvent.PAY_MESSAGE,event -> {
+            MeshLog.v("PAY_MESSAGE received " );
             PayMessage msg = (PayMessage) event;
             onMessageReceived(msg.sender, msg.paymentData);
         });
 
         AppDataObserver.on().startObserver(ApiEvent.PAY_MESSAGE_ACK,event -> {
+            MeshLog.v("PAY_MESSAGE_ACK received " );
             PayMessageAck msgAck = (PayMessageAck) event;
 
             onPayMessageAckReceived(msgAck.sender, msgAck.receiver, msgAck.messageId);
@@ -933,6 +935,7 @@ public class PayController {
 
     private void sendPayMessageToTransport(String address, String message, String messageId) {
         //String encryptedMessage = CryptoHelper.encryptMessage(transportManager.getContext(), address, message.getBytes());
+        MeshLog.v("sendPayMessageToTransport " + address + "   " + message + "  " + messageId);
         try {
             dataManager.sendPayMessage(address, message, messageId);
         } catch (RemoteException e) {

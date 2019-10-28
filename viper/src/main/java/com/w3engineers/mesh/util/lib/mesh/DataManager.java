@@ -209,7 +209,7 @@ public class DataManager {
 
         @Override
         public void onAckReceived(String messageId, int status) throws RemoteException {
-            onAckReceived(messageId, status);
+             DataManager.this.onAckReceived(messageId, status);
         }
 
         @Override
@@ -224,22 +224,22 @@ public class DataManager {
 
         @Override
         public void onMessagePayReceived(String sender, byte[] paymentData) throws RemoteException {
-            onMessagePayReceived(sender, paymentData);
+            DataManager.this.onMessagePayReceived(sender, paymentData);
         }
 
         @Override
         public void onPayMessageAckReceived(String sender, String receiver, String messageId) throws RemoteException {
-            onPayMessageAckReceived(sender, receiver, messageId);
+            DataManager.this.onPayMessageAckReceived(sender, receiver, messageId);
         }
 
         @Override
         public void buyerInternetMessageReceived(String sender, String receiver, String messageId, String messageData, long dataLength, boolean isIncoming) throws RemoteException {
-            buyerInternetMessageReceived(sender, receiver, messageId, messageData, dataLength, isIncoming);
+            DataManager.this.buyerInternetMessageReceived(sender, receiver, messageId, messageData, dataLength, isIncoming);
         }
 
         @Override
         public void onTransportInit(String nodeId, String publicKey, boolean success, String msg) throws RemoteException {
-            onTransportInit(nodeId, publicKey, success, msg);
+            DataManager.this.onTransportInit(nodeId, publicKey, success, msg);
         }
     };
 
@@ -362,6 +362,7 @@ public class DataManager {
     }
 
     public void sendPayMessage(String receiverId, String message, String messageId) throws RemoteException {
+        MeshLog.v("sendPayMessage dtm");
         mTmCommunicator.sendPayMessage(receiverId, message, messageId);
     }
 
@@ -392,12 +393,14 @@ public class DataManager {
 
 
     public void onMessagePayReceived( String sender, byte[] paymentData){
+        MeshLog.v("onMessagePayReceived dtm " + sender);
         PayMessage payMessage = new PayMessage();
         payMessage.sender = sender;
         payMessage.paymentData = paymentData;
         AppDataObserver.on().sendObserverData(payMessage);
     }
     public void onPayMessageAckReceived( String sender,  String receiver,  String messageId){
+        MeshLog.v("onPayMessageAckReceived dtm " + sender);
         PayMessageAck payMessageAck = new PayMessageAck();
         payMessageAck.sender = sender;
         payMessageAck.receiver = receiver;
@@ -406,6 +409,7 @@ public class DataManager {
     }
 
     public void buyerInternetMessageReceived(String sender, String receiver, String messageId, String messageData, long dataLength, boolean isIncoming) {
+        MeshLog.v("buyerInternetMessageReceived dtm " + sender);
         BuyerPendingMessage buyerPendingMessage = new BuyerPendingMessage();
         buyerPendingMessage.sender = sender;
         buyerPendingMessage.receiver = receiver;
@@ -420,6 +424,7 @@ public class DataManager {
     }
 
     public void onTransportInit( String nodeId,  String publicKey,  boolean success, String msg){
+        MeshLog.v("onTransportInit dtm " + nodeId);
         TransportInit transportInit = new TransportInit();
         transportInit.nodeId = nodeId;
         transportInit.publicKey = publicKey;
