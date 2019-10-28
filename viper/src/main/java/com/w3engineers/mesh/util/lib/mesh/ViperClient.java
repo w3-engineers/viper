@@ -4,6 +4,10 @@ import android.content.Context;
 import android.os.RemoteException;
 import android.widget.Toast;
 
+import com.w3engineers.mesh.application.data.local.DataPlanConstants;
+import com.w3engineers.mesh.application.data.local.helper.PreferencesHelperDataplan;
+import com.w3engineers.mesh.application.data.local.purchase.PurchaseManagerBuyer;
+import com.w3engineers.mesh.application.data.local.purchase.PurchaseManagerSeller;
 import com.w3engineers.mesh.application.data.local.wallet.WalletManager;
 import com.w3engineers.mesh.application.data.local.wallet.WalletService;
 
@@ -21,6 +25,13 @@ public class ViperClient {
     protected ViperClient(Context context, String networkPrefix) {
         DataManager.on().doBindService(context, networkPrefix);
         WalletManager.getInstance().readWallet(context);
+        if (PreferencesHelperDataplan.on().getDataPlanRole() == DataPlanConstants.USER_ROLE.DATA_SELLER) {
+            PurchaseManagerSeller.getInstance().setPayControllerListener();
+        }
+
+        if (PreferencesHelperDataplan.on().getDataPlanRole() == DataPlanConstants.USER_ROLE.DATA_BUYER) {
+            PurchaseManagerBuyer.getInstance().setPayControllerListener();
+        }
 
     }
 

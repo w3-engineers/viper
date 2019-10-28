@@ -199,7 +199,7 @@ public class DataManager {
 
         @Override
         public void onRemotePeerAdd(String peerId) throws RemoteException {
-
+            DataManager.this.onPeerAdd(peerId);
         }
 
         @Override
@@ -209,7 +209,7 @@ public class DataManager {
 
         @Override
         public void onAckReceived(String messageId, int status) throws RemoteException {
-
+            onAckReceived(messageId, status);
         }
 
         @Override
@@ -220,6 +220,26 @@ public class DataManager {
         @Override
         public void setServiceForeground(boolean isForeGround) throws RemoteException {
 
+        }
+
+        @Override
+        public void onMessagePayReceived(String sender, byte[] paymentData) throws RemoteException {
+            onMessagePayReceived(sender, paymentData);
+        }
+
+        @Override
+        public void onPayMessageAckReceived(String sender, String receiver, String messageId) throws RemoteException {
+            onPayMessageAckReceived(sender, receiver, messageId);
+        }
+
+        @Override
+        public void buyerInternetMessageReceived(String sender, String receiver, String messageId, String messageData, long dataLength, boolean isIncoming) throws RemoteException {
+            buyerInternetMessageReceived(sender, receiver, messageId, messageData, dataLength, isIncoming);
+        }
+
+        @Override
+        public void onTransportInit(String nodeId, String publicKey, boolean success, String msg) throws RemoteException {
+            onTransportInit(nodeId, publicKey, success, msg);
         }
     };
 
