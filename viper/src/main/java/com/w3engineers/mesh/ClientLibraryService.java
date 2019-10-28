@@ -22,7 +22,6 @@ import com.w3engineers.meshrnd.ITmCommunicator;
 
 public class ClientLibraryService extends Service {
 
-    private ITmCommunicator mTmCommunicator;
 
     @Override
     public void onCreate() {
@@ -56,26 +55,31 @@ public class ClientLibraryService extends Service {
 
         @Override
         public void onPeerAdd(String peerId) throws RemoteException {
+            Log.e("viper_log","Service Local peer connected ="+peerId);
             DataManager.on().onPeerAdd(peerId);
         }
 
         @Override
         public void onPeerRemoved(String nodeId) throws RemoteException {
+            Log.e("viper_log","Service Local peer onPeerRemoved ="+nodeId);
             DataManager.on().onPeerRemoved(nodeId);
         }
 
         @Override
         public void onRemotePeerAdd(String peerId) throws RemoteException {
+            Log.e("viper_log","Service Local onRemotePeerAdd ="+peerId);
             DataManager.on().onRemotePeerAdd(peerId);
         }
 
         @Override
         public void onDataReceived(String senderId, byte[] frameData) throws RemoteException {
+            Log.e("viper_log","Service Local onDataReceived ="+senderId);
             DataManager.on().onDataReceived(senderId, frameData);
         }
 
         @Override
         public void onAckReceived(String messageId, int status) throws RemoteException {
+            Log.e("viper_log","Service Local onAckReceived ="+messageId);
             DataManager.on().onAckReceived(messageId, status);
         }
 

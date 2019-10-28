@@ -37,7 +37,7 @@ import java.util.List;
 public class DataManager {
 
     private ITmCommunicator mTmCommunicator;
-    private ViperCommunicator viperCommunicator;
+    private ViperCommunicator mViperCommunicator;
     private String mSsid;
     private Context mContext;
 
@@ -77,10 +77,12 @@ public class DataManager {
         checkAndBindService();
     }
 
+
+
     ServiceConnection clientServiceConnection = new ServiceConnection() {
         @Override
         public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
-            viperCommunicator = ViperCommunicator.Stub.asInterface(iBinder);
+            mViperCommunicator = ViperCommunicator.Stub.asInterface(iBinder);
         }
 
         @Override
@@ -157,7 +159,8 @@ public class DataManager {
             mTmCommunicator = ITmCommunicator.Stub.asInterface(binder);
 
             try {
-                mTmCommunicator.startMesh(mContext.getPackageName());
+                //mTmCommunicator.startMesh(mContext.getPackageName());
+                mTmCommunicator.setViperCommunicator(viperCommunicator);
             } catch (RemoteException e) {
                 e.printStackTrace();
             }
@@ -167,6 +170,56 @@ public class DataManager {
         public void onServiceDisconnected(ComponentName name) {
             mTmCommunicator = null;
             Log.e("service_status", "onServiceDisconnected");
+        }
+    };
+
+
+    /**
+     * <h1>Note:
+     * <p>This is client side IPC callback
+     * pass this callback when client lib bind with TelemeshService
+     * We don't need to bind both service each other. this causes some unnecessary
+     * Exception like DeadObject exception. Sometime Server pass data through
+     * IPC but Client side does not receive the message.
+     * So client side Service and client app will perform its own functionality.
+     * Service will keep app data manager alive to receive message </p>
+     * </h1>
+     *
+     */
+    private ViperCommunicator.Stub viperCommunicator = new ViperCommunicator.Stub() {
+        @Override
+        public void onPeerAdd(String peerId) throws RemoteException {
+            DataManager.this.onPeerAdd(peerId);
+        }
+
+        @Override
+        public void onPeerRemoved(String nodeId) throws RemoteException {
+            DataManager.this.onPeerRemoved(nodeId);
+        }
+
+        @Override
+        public void onRemotePeerAdd(String peerId) throws RemoteException {
+
+        }
+
+        @Override
+        public void onDataReceived(String senderId, byte[] frameData) throws RemoteException {
+            DataManager.this.onDataReceived(senderId, frameData);
+        }
+
+        @Override
+        public void onAckReceived(String messageId, int status) throws RemoteException {
+
+        }
+
+        @Override
+        public void onServiceAvailable(int status) throws RemoteException {
+
+        }
+
+        @Override
+        public void setServiceForeground(boolean isForeGround) throws RemoteException {
+
         }
     };
 
