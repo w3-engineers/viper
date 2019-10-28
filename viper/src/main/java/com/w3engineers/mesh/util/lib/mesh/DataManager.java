@@ -31,12 +31,11 @@ import com.w3engineers.mesh.application.data.model.PeerRemoved;
 public class DataManager {
 
     private ITmCommunicator mTmCommunicator;
-    private ViperCommunicator mViperCommunicator;
+    private ViperCommunicator viperCommunicator;
     private String mSsid;
     private Context mContext;
 
     private static DataManager mDataManager;
-    private boolean isFirstAttempt = true;
     private DataManager() {
         //Prevent form the reflection api.
         if (mDataManager != null) {
@@ -68,15 +67,13 @@ public class DataManager {
 
         context.bindService(mIntent, clientServiceConnection, Service.BIND_AUTO_CREATE);
 
-        checkAndBindService();
+        initServiceConnection();
     }
-
-
 
     ServiceConnection clientServiceConnection = new ServiceConnection() {
         @Override
         public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
-            mViperCommunicator = ViperCommunicator.Stub.asInterface(iBinder);
+            viperCommunicator = ViperCommunicator.Stub.asInterface(iBinder);
         }
 
         @Override
@@ -89,45 +86,7 @@ public class DataManager {
         mContext.unbindService(serviceConnection);
     }
 
-
-    /**
-     * <h1>Note:</h1>
-     *
-     * <h1>Author: Azizul Islam</h1>
-     *
-     * <p>Purpose to check service connection with a time interval.
-     * If TeleMeshService is not installed then notify user to install
-     * the service app. In future we will show an alert dialog with play store
-     * link to install the service app</p>
-     *
-     */
-    private void checkAndBindService(){
-       HandlerUtil.postBackground(new Runnable() {
-           @Override
-           public void run() {
-               if(mTmCommunicator == null) {
-                   boolean isSuccess =initServiceConnection();
-
-                   if(isSuccess){
-                       Toast.makeText(mContext,"Bind service successful", Toast.LENGTH_LONG).show();
-                       return;
-                   }
-                   HandlerUtil.postBackground(this, 5000);
-
-                   if(!isFirstAttempt){
-                       Toast.makeText(mContext,"Please install TeleMeshService app", Toast.LENGTH_LONG).show();
-                   }
-                   isFirstAttempt = false;
-               }
-           }
-       });
-    }
-
-
-    /**
-     * Bind to the remote service
-     */
-    public boolean initServiceConnection() {
+    public void initServiceConnection() {
         if (mTmCommunicator == null) {
             Intent intent = new Intent(ITmCommunicator.class.getName());
             /*this is service name that is associated with server end*/
@@ -136,9 +95,7 @@ public class DataManager {
             /*From 5.0 annonymous intent calls are suspended so replacing with server app's package name*/
             intent.setPackage("com.w3engineers.meshrnd");
             // binding to remote service
-            return mContext.bindService(intent, serviceConnection, Service.BIND_AUTO_CREATE);
-        }else {
-            return false;
+            mContext.bindService(intent, serviceConnection, Service.BIND_AUTO_CREATE);
         }
     }
 
@@ -153,8 +110,7 @@ public class DataManager {
             mTmCommunicator = ITmCommunicator.Stub.asInterface(binder);
 
             try {
-                //mTmCommunicator.startMesh(mContext.getPackageName());
-                mTmCommunicator.setViperCommunicator(viperCommunicator);
+                mTmCommunicator.startMesh(mContext.getPackageName());
             } catch (RemoteException e) {
                 e.printStackTrace();
             }
@@ -166,58 +122,6 @@ public class DataManager {
             Log.e("service_status", "onServiceDisconnected");
         }
     };
-
-
-    /**
-     * <h1>Note:
-     * <p>This is client side IPC callback
-     * pass this callback when client lib bind with TelemeshService
-     * We don't need to bind both service each other. this causes some unnecessary
-     * Exception like DeadObject exception. Sometime Server pass data through
-     * IPC but Client side does not receive the message.
-     * So client side Service and client app will perform its own functionality.
-     * Service will keep app data manager alive to receive message </p>
-     * </h1>
-     *
-     */
-    private ViperCommunicator.Stub viperCommunicator = new ViperCommunicator.Stub() {
-        @Override
-        public void onPeerAdd(String peerId) throws RemoteException {
-            DataManager.this.onPeerAdd(peerId);
-        }
-
-        @Override
-        public void onPeerRemoved(String nodeId) throws RemoteException {
-            DataManager.this.onPeerRemoved(nodeId);
-        }
-
-        @Override
-        public void onRemotePeerAdd(String peerId) throws RemoteException {
-
-        }
-
-        @Override
-        public void onDataReceived(String senderId, byte[] frameData) throws RemoteException {
-            DataManager.this.onDataReceived(senderId, frameData);
-        }
-
-        @Override
-        public void onAckReceived(String messageId, int status) throws RemoteException {
-
-        }
-
-        @Override
-        public void onServiceAvailable(int status) throws RemoteException {
-
-        }
-
-        @Override
-        public void setServiceForeground(boolean isForeGround) throws RemoteException {
-
-        }
-    };
-
-
 
 /*    public void stopService() {
         mContext.unbindService(serviceConnection);
