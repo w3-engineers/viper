@@ -49,6 +49,7 @@ public class PurchaseManagerSeller extends PurchaseManager implements PayControl
 
     private PurchaseManagerSeller() {
         super();
+
         setPayControllerListener();
         ethService.setTransactionObserver(this);
         if (preferencesHelperDataplan.getDataPlanRole() == DataPlanConstants.USER_ROLE.DATA_SELLER) {
