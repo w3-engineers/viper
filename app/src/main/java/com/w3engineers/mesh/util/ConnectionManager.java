@@ -176,6 +176,51 @@ public class ConnectionManager {
         AppDataObserver.on().startObserver(ApiEvent.DATA_ACKNOWLEDGEMENT, event -> {
             DataAckEvent dataAckEvent = (DataAckEvent) event;
 
+            HandlerUtil.postForeground(() -> {
+                if (dataAckEvent.status == Constant.MessageStatus.RECEIVED) {
+                    ChatDataProvider.On().updateMessageAck(dataAckEvent.dataId, dataAckEvent.status);
+                    if (messageListener != null) {
+                        messageListener.onMessageDelivered();
+                    }
+                /*    if (bottomMessageListener != null) {
+                        bottomMessageListener.onMessageReceived(dataAckEvent.dataId);
+                    }*/
+                } else if (dataAckEvent.status == Constant.MessageStatus.DELIVERED) {
+                    int messageStatus = ChatDataProvider.On().getMessageStatus(dataAckEvent.dataId);
+                    MeshLog.k("message status from app:: " + messageStatus);
+                    if (messageStatus != Constant.MessageStatus.RECEIVED) {
+                        ChatDataProvider.On().updateMessageAck(dataAckEvent.dataId, dataAckEvent.status);
+                    }
+                    if (messageListener != null) {
+                        messageListener.onMessageDelivered();
+                    }
+                } else if (dataAckEvent.status == Constant.MessageStatus.SEND) {
+                    if (requestUserInfoList.containsKey(dataAckEvent.dataId)) {
+                        String nodeId = requestUserInfoList.get(dataAckEvent.dataId);
+                        UserModel userModel = ChatDataProvider.On().getUserInfoById(nodeId);
+                        if (userModel == null) {
+                            UserModel userModel1 = new UserModel();
+                            userModel1.setUserId(nodeId);
+                            userModel1.setUserName("Anonymous");
+
+                            ChatDataProvider.On().insertUser(userModel1);
+                            requestUserInfoList.remove(dataAckEvent.dataId);
+                        } else {
+                            // userModel = UserModel.buildUserTempData(nodeId);
+                            requestUserInfoList.remove(dataAckEvent.dataId);
+                        }
+                    }
+
+                    int messageStatus = ChatDataProvider.On().getMessageStatus(dataAckEvent.dataId);
+                    if (messageStatus != Constant.MessageStatus.DELIVERED && messageStatus != Constant.MessageStatus.RECEIVED) {
+                        ChatDataProvider.On().updateMessageAck(dataAckEvent.dataId, dataAckEvent.status);
+                    }
+                    if (messageListener != null) {
+                        messageListener.onMessageDelivered();
+                    }
+                }
+            });
+
         });
     }
 
