@@ -15,6 +15,9 @@
             android:label="@string/title_activity_data_plan"
             android:theme="@style/AppTheme.NoActionBar" />
 
+        <activity
+            android:name="com.w3engineers.mesh.application.ui.premission.PermissionActivity" />
+
 <!--        <service
             android:name="com.w3engineers.mesh.application.data.local.service.MeshService"
             android:enabled="true"

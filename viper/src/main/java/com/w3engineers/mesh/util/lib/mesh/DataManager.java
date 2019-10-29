@@ -386,6 +386,7 @@ public class DataManager {
         mTmCommunicator.onBuyerDisconnected(address);
     }
     public void restartMesh(int newRole) throws RemoteException{
+        MeshLog.v("sellerMode dm" + newRole);
         mTmCommunicator.restartMesh(newRole);
     }
 
@@ -422,6 +423,7 @@ public class DataManager {
     }
 
     public void onTransportInit( String nodeId,  String publicKey,  boolean success, String msg){
+
         MeshLog.v("onTransportInit dtm " + nodeId);
         TransportInit transportInit = new TransportInit();
         transportInit.nodeId = nodeId;

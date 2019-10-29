@@ -1,7 +1,10 @@
 package com.w3engineers.mesh.application.ui.dataplan;
 
+import android.app.Application;
 import android.arch.lifecycle.MutableLiveData;
+import android.support.annotation.NonNull;
 
+import com.w3engineers.ext.strom.application.ui.base.BaseRxAndroidViewModel;
 import com.w3engineers.ext.strom.application.ui.base.BaseRxViewModel;
 import com.w3engineers.mesh.application.data.local.DataPlanConstants;
 import com.w3engineers.mesh.application.data.local.dataplan.DataPlanManager;
@@ -13,9 +16,12 @@ import java.util.List;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
 
-class DataPlanViewModel extends BaseRxViewModel {
+class DataPlanViewModel extends BaseRxAndroidViewModel {
 
 
+    public DataPlanViewModel(@NonNull Application application) {
+        super(application);
+    }
 
     void roleSwitch(int newRole) {
         DataPlanManager.getInstance().roleSwitch(newRole);
@@ -64,6 +70,8 @@ class DataPlanViewModel extends BaseRxViewModel {
                     allSellers.postValue(finalList);
 
                 }, Throwable::printStackTrace));
+
+        DataPlanManager.getInstance().processAllSeller(getApplication().getApplicationContext());
     }
 
     private Seller getLabelSeller(int tag) {

@@ -104,17 +104,12 @@ public class UserModel implements Serializable, Comparable<UserModel> {
     }
 
     public static UserModel fromJSON(JSONObject jo) {
-        try {
-            String userName = jo.getString(JsonKeys.KEY_USER_NAME);
-            String userId = jo.has(JsonKeys.KEY_USER_ID) ? jo.getString(JsonKeys.KEY_USER_ID) : "";
-            UserModel user = new UserModel();
-            user.setUserName(userName);
-            user.setUserId(userId);
-            return user;
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-        return null;
+        String userName = jo.optString(JsonKeys.KEY_USER_NAME, "Anonymous");
+        String userId = jo.optString(JsonKeys.KEY_USER_ID, "");
+        UserModel user = new UserModel();
+        user.setUserName(userName);
+        user.setUserId(userId);
+        return user;
     }
 
     public static String getUserJson(String userId) {

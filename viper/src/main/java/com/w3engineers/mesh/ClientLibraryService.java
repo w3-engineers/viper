@@ -16,6 +16,7 @@ import android.support.annotation.Nullable;
 import android.util.Log;
 
 import com.w3engineers.mesh.application.data.remote.service.BaseTmServiceNotificationHelper;
+import com.w3engineers.mesh.util.MeshLog;
 import com.w3engineers.mesh.util.lib.mesh.DataManager;
 import com.w3engineers.meshrnd.ITmCommunicator;
 
@@ -116,6 +117,7 @@ public class ClientLibraryService extends Service {
 
         @Override
         public void onTransportInit(String nodeId, String publicKey, boolean success, String msg) throws RemoteException {
+            MeshLog.v("onTransportInit cls");
             DataManager.on().onTransportInit(nodeId, publicKey, success, msg);
         }
     };

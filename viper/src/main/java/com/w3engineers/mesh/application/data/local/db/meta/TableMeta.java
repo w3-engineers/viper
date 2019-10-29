@@ -22,7 +22,7 @@ package com.w3engineers.mesh.application.data.local.db.meta;
  **/
 public class TableMeta {
 
-    public static final String DB_NAME = "mesh.db";
+    public static final String DB_NAME = "tcl.db";
 
     public interface TableNames {
         String ROUTING = "routing";

@@ -196,6 +196,19 @@ public class DataPlanActivity extends TelemeshBaseActivity implements DataPlanMa
     }
 
     @Override
+    public void onRoleSwitchCompleted() {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                if (progressDialog != null){
+                    progressDialog.dismiss();
+                }
+            }
+        });
+
+    }
+
+    @Override
     public void onPurchaseCloseSuccess(String sellerAddress) {
         runOnUiThread(() -> {
             //TODO remove item if seller not connected
@@ -368,9 +381,9 @@ public class DataPlanActivity extends TelemeshBaseActivity implements DataPlanMa
 
     private void setRoleTasks(int prev, int current) {
 
-//        progressDialog.setMessage(getResources().getString(R.string.switching_role));
-//        progressDialog.setCancelable(false);
-//        progressDialog.show();
+        progressDialog.setMessage(getResources().getString(R.string.switching_role));
+        progressDialog.setCancelable(false);
+        progressDialog.show();
 
         dataPlanViews[prev].setVisibility(View.GONE);
         dataPlanViews[current].setVisibility(View.VISIBLE);
@@ -712,7 +725,7 @@ public class DataPlanActivity extends TelemeshBaseActivity implements DataPlanMa
             @NonNull
             @Override
             public <T extends ViewModel> T create(@NonNull Class<T> modelClass) {
-                return (T) new DataPlanViewModel();
+                return (T) new DataPlanViewModel(getApplication());
             }
         }).get(DataPlanViewModel.class);
     }

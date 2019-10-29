@@ -21,6 +21,7 @@ import com.w3engineers.mesh.application.data.local.purchase.PurchaseManagerBuyer
 import com.w3engineers.mesh.application.data.local.purchase.PurchaseManagerSeller;
 import com.w3engineers.mesh.application.ui.dataplan.DataPlanActivity;
 import com.w3engineers.mesh.util.EthereumServiceUtil;
+import com.w3engineers.mesh.util.MeshLog;
 import com.w3engineers.mesh.util.lib.mesh.DataManager;
 
 import java.util.ArrayList;
@@ -50,6 +51,7 @@ public class DataPlanManager {
         preferencesHelperDataplan = PreferencesHelperDataplan.on();
         payController = PayController.getInstance();
         finalSeller = new ArrayList<>();
+        setDataManagerObserver();
     }
 
     public static DataPlanManager getInstance(){
@@ -91,11 +93,14 @@ public class DataPlanManager {
         void onBalancedFinished(String sellerAddress, int remain);
 
         void onTopUpFailed(String sellerAddress, String msg);
+
+        void onRoleSwitchCompleted();
     }
 
     public void roleSwitch(int newRole) {
 
         try {
+            MeshLog.v("sellerMode dpm " + newRole);
             preferencesHelperDataplan.setDataPlanRole(newRole);
             payController.getDataManager().restartMesh(newRole);
         } catch (RemoteException e) {
@@ -114,6 +119,9 @@ public class DataPlanManager {
 
             PurchaseManagerBuyer.getInstance().setDataPlanListener(null);
             PurchaseManagerBuyer.getInstance().destroyObject();
+        }
+        if (dataPlanListener != null){
+            dataPlanListener.onRoleSwitchCompleted();
         }
     }
 
