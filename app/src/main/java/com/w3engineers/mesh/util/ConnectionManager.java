@@ -35,7 +35,7 @@ import java.util.Map;
 import java.util.UUID;
 
 public class ConnectionManager {
-    private static final String NETWORK_PREFIX = "ifli";
+    private static final String NETWORK_PREFIX = "yers";
     private static ConnectionManager mConnectionManager;
     private ViperClient viperClient;
     private static Context mContext;

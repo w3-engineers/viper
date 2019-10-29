@@ -2,7 +2,6 @@ package com.w3engineers.mesh.util.lib.mesh;
 
 import android.content.Context;
 import android.os.RemoteException;
-import android.widget.Toast;
 
 public class ViperClient {
 

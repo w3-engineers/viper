@@ -55,38 +55,38 @@ public class ClientLibraryService extends Service {
 
         @Override
         public void onPeerAdd(String peerId) throws RemoteException {
-            Log.e("viper_log", "Service Local peer connected =" + peerId);
+            ClientLog.v("Service Local peer connected =" + peerId);
             DataManager.on().onPeerAdd(peerId);
         }
 
         @Override
         public void onPeerRemoved(String nodeId) throws RemoteException {
-            Log.e("viper_log", "Service Local peer onPeerRemoved =" + nodeId);
+            ClientLog.v("Service Local peer onPeerRemoved =" + nodeId);
             DataManager.on().onPeerRemoved(nodeId);
         }
 
         @Override
         public void onRemotePeerAdd(String peerId) throws RemoteException {
-            Log.e("viper_log", "Service Local onRemotePeerAdd =" + peerId);
+            ClientLog.v("Service Local onRemotePeerAdd =" + peerId);
             DataManager.on().onRemotePeerAdd(peerId);
         }
 
         @Override
         public void onDataReceived(String senderId, byte[] frameData) throws RemoteException {
-            Log.e("viper_log", "Service Local onDataReceived =" + senderId);
+            ClientLog.v("Service Local onDataReceived =" + senderId);
             DataManager.on().onDataReceived(senderId, frameData);
         }
 
         @Override
         public void onAckReceived(String messageId, int status) throws RemoteException {
-            Log.e("viper_log", "Service Local onAckReceived =" + messageId);
+            ClientLog.v("Service Local onAckReceived =" + messageId);
             DataManager.on().onAckReceived(messageId, status);
         }
 
         @Override
         public void onServiceAvailable(int status) throws RemoteException {
-            Log.e("peerid", "from server: " + status);
-            DataManager.on().initServiceConnection();
+            ClientLog.v("from server: " + status);
+//            DataManager.on().initSdkServiceConnection();
         }
 
 
@@ -97,6 +97,26 @@ public class ClientLibraryService extends Service {
             } else {
                 stopInForeground();
             }
+        }
+
+        @Override
+        public void onMessagePayReceived(String sender, byte[] paymentData) throws RemoteException {
+
+        }
+
+        @Override
+        public void onPayMessageAckReceived(String sender, String receiver, String messageId) throws RemoteException {
+
+        }
+
+        @Override
+        public void buyerInternetMessageReceived(String sender, String receiver, String messageId, String messageData, long dataLength, boolean isIncoming) throws RemoteException {
+
+        }
+
+        @Override
+        public void onTransportInit(String nodeId, String publicKey, boolean success, String msg) throws RemoteException {
+
         }
     };
 

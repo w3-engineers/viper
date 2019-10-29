@@ -40,7 +40,7 @@ public class MainActivity extends TelemeshBaseActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        DataManager.on().stopService();
+//        DataManager.on().stopService();
     }
 
     @Override

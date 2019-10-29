@@ -15,18 +15,16 @@ import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.IBinder;
 import android.os.RemoteException;
-import android.util.Log;
-import android.widget.Toast;
 
 import com.w3engineers.mesh.ClientLibraryService;
-import com.w3engineers.mesh.util.MeshLog;
-import com.w3engineers.meshrnd.ITmCommunicator;
 import com.w3engineers.mesh.ViperCommunicator;
 import com.w3engineers.mesh.application.data.AppDataObserver;
 import com.w3engineers.mesh.application.data.model.DataAckEvent;
 import com.w3engineers.mesh.application.data.model.DataEvent;
 import com.w3engineers.mesh.application.data.model.PeerAdd;
 import com.w3engineers.mesh.application.data.model.PeerRemoved;
+import com.w3engineers.mesh.util.MeshLog;
+import com.w3engineers.meshrnd.ITmCommunicator;
 
 public class DataManager {
 
@@ -67,10 +65,10 @@ public class DataManager {
 
         context.bindService(mIntent, clientServiceConnection, Service.BIND_AUTO_CREATE);
 
-        initServiceConnection();
+        initSdkServiceConnection();
     }
 
-    ServiceConnection clientServiceConnection = new ServiceConnection() {
+    private ServiceConnection clientServiceConnection = new ServiceConnection() {
         @Override
         public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
             viperCommunicator = ViperCommunicator.Stub.asInterface(iBinder);
@@ -83,19 +81,15 @@ public class DataManager {
     };
 
     public void stopService() {
-        mContext.unbindService(serviceConnection);
+        mContext.unbindService(sdkServiceConnection);
     }
 
-    public void initServiceConnection() {
+    public void initSdkServiceConnection() {
         if (mTmCommunicator == null) {
             Intent intent = new Intent(ITmCommunicator.class.getName());
-            /*this is service name that is associated with server end*/
             intent.setAction("service.viper_server");
-
-            /*From 5.0 annonymous intent calls are suspended so replacing with server app's package name*/
             intent.setPackage("com.w3engineers.meshrnd");
-            // binding to remote service
-            mContext.bindService(intent, serviceConnection, Service.BIND_AUTO_CREATE);
+            mContext.bindService(intent, sdkServiceConnection, Service.BIND_AUTO_CREATE);
         }
     }
 
@@ -103,10 +97,9 @@ public class DataManager {
     /**
      * Initializing with remote connection
      */
-    ServiceConnection serviceConnection = new ServiceConnection() {
+    private ServiceConnection sdkServiceConnection = new ServiceConnection() {
         @Override
         public void onServiceConnected(ComponentName name, IBinder binder) {
-            Log.e("service_status", "onServiceConnected");
             mTmCommunicator = ITmCommunicator.Stub.asInterface(binder);
 
             try {
@@ -119,12 +112,11 @@ public class DataManager {
         @Override
         public void onServiceDisconnected(ComponentName name) {
             mTmCommunicator = null;
-            Log.e("service_status", "onServiceDisconnected");
         }
     };
 
 /*    public void stopService() {
-        mContext.unbindService(serviceConnection);
+        mContext.unbindService(sdkServiceConnection);
     }*/
 
     /**
@@ -138,7 +130,6 @@ public class DataManager {
     public void sendData(String senderId, String receiverId, String messageId, byte[] data) throws RemoteException {
 
         mTmCommunicator.sendData(senderId, receiverId, messageId, data);
-
     }
 
     /**
