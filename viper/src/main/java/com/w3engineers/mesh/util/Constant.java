@@ -63,6 +63,7 @@ public class Constant {
         int FAILED = 4;
     }
 
+
     public interface UserTpe {
         int WIFI = 1;
         int BLUETOOTH = 2;

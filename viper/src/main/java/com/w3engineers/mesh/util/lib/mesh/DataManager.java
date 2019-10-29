@@ -199,7 +199,7 @@ public class DataManager {
 
         @Override
         public void onRemotePeerAdd(String peerId) throws RemoteException {
-            DataManager.this.onPeerAdd(peerId);
+           DataManager.this.onRemotePeerAdd(peerId);
         }
 
         @Override
@@ -209,7 +209,7 @@ public class DataManager {
 
         @Override
         public void onAckReceived(String messageId, int status) throws RemoteException {
-             DataManager.this.onAckReceived(messageId, status);
+           DataManager.this.onAckReceived(messageId, status);
         }
 
         @Override
@@ -258,9 +258,7 @@ public class DataManager {
      * @param data
      */
     public void sendData(String senderId, String receiverId, String messageId, byte[] data) throws RemoteException {
-
         mTmCommunicator.sendData(senderId, receiverId, messageId, data);
-
     }
 
     /**
