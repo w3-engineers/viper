@@ -67,7 +67,7 @@ public class ConnectionManager {
 
         AppDataObserver.on().startObserver(ApiEvent.PEER_ADD, event -> {
             PeerAdd peerAdd = (PeerAdd) event;
-            
+
             boolean isUserExist = ChatDataProvider.On().checkUserExistence(peerAdd.peerId);
             if (isUserExist) {
                 UserModel userModel = ChatDataProvider.On().getUserInfoById(peerAdd.peerId);
@@ -91,6 +91,12 @@ public class ConnectionManager {
 
         AppDataObserver.on().startObserver(ApiEvent.PEER_REMOVED, event -> {
             PeerRemoved peerRemoved = (PeerRemoved) event;
+
+            discoverUserMap.remove(peerRemoved.peerId);
+            if (nearbyCallBack != null) {
+                MeshLog.e("[-] Direct User Removed: " + peerRemoved.peerId.substring(peerRemoved.peerId.length() - 3));
+                nearbyCallBack.onDisconnectUser(peerRemoved.peerId);
+            }
         });
 
 
