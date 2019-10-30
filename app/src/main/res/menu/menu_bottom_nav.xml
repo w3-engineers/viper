@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:id="@+id/menu_msg_sending_status"
+        android:title="0"
+        app:showAsAction="always" />
+    <item
+        android:id="@+id/menu_data_plan_setting"
+        android:title="@string/my_data_plan"
+        app:showAsAction="always" />
+    <item
+        android:id="@+id/menu_ping_self"
+        android:title="Ping self"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/menu_log_history"
+        android:title="Log History"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/menu_connectivity_diagram"
+        android:title="Connectivity Diagram"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/menu_send_all_message"
+        android:title="Send all"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/menu_get_nodeInfo"
+        android:title="Print NodeInfo in Log"
+        app:showAsAction="never" />
+    <!--<item
+        android:id="@+id/menu_wifi_search"
+        android:title="WiFi Search"
+        app:showAsAction="never"/>
+    <item
+        android:id="@+id/menu_ble_search"
+        android:title="Ble Search"
+        app:showAsAction="never"/>
+
+    <item
+        android:id="@+id/menu_ble_discoverable"
+        android:title="Ble discoverable"
+        app:showAsAction="never"/>-->
+
+</menu>

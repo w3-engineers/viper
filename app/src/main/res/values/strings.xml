@@ -1,3 +1,60 @@
-<resources>
+<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
     <string name="app_name">Viper</string>
+    <string name="title_activity_create_user">CreateUser</string>
+
+    <!--Main Activity -->
+    <string name="btn_create_group">Create a group</string>
+    <string name="btn_join_group">Join to group</string>
+    <string name="prgrss_searching_groups">Searching available groups...</string>
+    <string name="prgrss_connecting_to_group">Connecting to the group...</string>
+    <string name="toast_not_found_groups">Sorry, there aren\'t any group nearby</string>
+
+    <!-- Group Creation Dialog -->
+    <string name="label_group_name">Group name:</string>
+    <string name="btn_accept">Accept</string>
+    <string name="btn_cancel">Cancel</string>
+
+    <!-- Group Chat Activiy -->
+    <string name="send_button">Send</string>
+    <string name="device_connected">%s device connected to the group</string>
+    <string name="device_disconnected">%s device disconnected from the group</string>
+    <string name="data_plan">Data Plan </string>
+
+
+    <string name="send">Send</string>
+    <string name="not_connected">You are not connected to a device</string>
+    <string name="bt_not_enabled_leaving">Bluetooth was not enabled. Leaving Bluetooth Chat.</string>
+    <string name="title_connecting">Connecting...</string>
+    <string name="title_connected_to">Connected to <xliff:g id="device_name">%1$s</xliff:g></string>
+    <string name="title_not_connected">Not connected</string>
+
+    <string name="scanning">Scanning for devices...</string>
+    <string name="select_device">Select a device to connect</string>
+    <string name="none_paired">No devices have been paired</string>
+    <string name="none_found">No devices found</string>
+    <string name="title_paired_devices">Paired Devices</string>
+    <string name="title_other_devices">Other Available Devices</string>
+    <string name="button_scan">Scan for devices</string>
+
+    <string name="secure_connect">Connect a device - Secure</string>
+    <string name="insecure_connect">Connect a device - Insecure</string>
+    <string name="discoverable">Make discoverable</string>
+
+    <string name="network">Network</string>
+    <string name="people">People</string>
+    <string name="message">Device Log</string>
+    <string name="Database">History</string>
+
+    <string name="status_online">online</string>
+    <string name="status_offline">offline</string>
+    <string name="large_message">lrg msg</string>
+    <string name="continuous_msg">con msg</string>
+    <string name="diagram">Diagram</string>
+
+    <string name="enabled">Enabled</string>
+    <string name="description">This Activity or Set of Activities will provide control of the
+            Service eventually. Apps will communicate with the service via AIDL, TCP or some other
+        IPC Mechanism
+    </string>
+
 </resources>

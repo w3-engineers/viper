@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:id="@+id/navigation_network"
+        android:icon="@drawable/ic_network_"
+        android:title="@string/network" />
+
+    <item
+        android:id="@+id/navigation_nearby"
+        android:icon="@drawable/ic_user"
+        android:title="@string/people" />
+
+    <item
+        android:id="@+id/navigation_database"
+        android:icon="@drawable/ic_history"
+        android:title="@string/Database" />
+    <item
+        android:id="@+id/navigation_message"
+        android:icon="@drawable/ic_log"
+        android:title="@string/message" />
+
+    <item
+        android:id="@+id/navigation_diagram"
+        android:icon="@drawable/ic_diagram"
+        android:title="@string/diagram" />
+
+</menu>

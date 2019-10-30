@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:id="@+id/menu_send_large_message"
+        android:enabled="false"
+        android:title="@string/large_message"
+        app:showAsAction="always" />
+
+    <item
+        android:id="@+id/menu_send_continuous_msg"
+        android:enabled="false"
+        android:icon="@drawable/ic_action_playback_repeat"
+        android:title="@string/large_message"
+        app:showAsAction="always" />
+
+    <item
+        android:id="@+id/menu_active_state"
+        android:enabled="false"
+        android:title="@string/status_offline"
+        app:showAsAction="always" />
+
+</menu>

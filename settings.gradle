@@ -1,2 +1,2 @@
-include ':app', ':viper'
+include ':app', ':viper', ':paylib'
 rootProject.name='Viper'
