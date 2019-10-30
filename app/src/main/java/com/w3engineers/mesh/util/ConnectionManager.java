@@ -67,17 +67,7 @@ public class ConnectionManager {
 
         AppDataObserver.on().startObserver(ApiEvent.PEER_ADD, event -> {
             PeerAdd peerAdd = (PeerAdd) event;
-
-           /* sendMyInfo(peerAdd.peerId);
-
-            UserModel userModel = new UserModel();
-            userModel.setUserName("Anonymous");
-            userModel.setUserId(peerAdd.peerId);
-            discoverUserMap.put(peerAdd.peerId, userModel);
-            if (nearbyCallBack != null) {
-                nearbyCallBack.onUserFound(userModel);
-            }*/
-
+            
             boolean isUserExist = ChatDataProvider.On().checkUserExistence(peerAdd.peerId);
             if (isUserExist) {
                 UserModel userModel = ChatDataProvider.On().getUserInfoById(peerAdd.peerId);
