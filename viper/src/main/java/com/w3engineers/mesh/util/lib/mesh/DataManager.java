@@ -40,9 +40,11 @@ public class DataManager {
     private ViperCommunicator mViperCommunicator;
     private String mSsid;
     private Context mContext;
+    private String appName;
 
     private static DataManager mDataManager;
     private boolean isFirstAttempt = true;
+
     private DataManager() {
         //Prevent form the reflection api.
         if (mDataManager != null) {
@@ -63,10 +65,12 @@ public class DataManager {
      * Start the ClientLibraryService class
      *
      * @param context
+     * @param appName
      * @param networkPrefix
      */
-    public void doBindService(Context context, String networkPrefix) {
+    public void doBindService(Context context, String appName, String networkPrefix) {
         this.mContext = context;
+        this.appName = appName;
         this.mSsid = networkPrefix;
 
         Intent mIntent = new Intent(context, ClientLibraryService.class);
@@ -76,7 +80,6 @@ public class DataManager {
 
         checkAndBindService();
     }
-
 
 
     ServiceConnection clientServiceConnection = new ServiceConnection() {
@@ -105,28 +108,28 @@ public class DataManager {
      * If TeleMeshService is not installed then notify user to install
      * the service app. In future we will show an alert dialog with play store
      * link to install the service app</p>
-     *
      */
-    private void checkAndBindService(){
-       HandlerUtil.postBackground(new Runnable() {
-           @Override
-           public void run() {
-               if(mTmCommunicator == null) {
-                   boolean isSuccess =initServiceConnection();
+    private void checkAndBindService() {
+        //boolean isAlreadyDerectedtoPlayStore = false;
+        HandlerUtil.postBackground(new Runnable() {
+            @Override
+            public void run() {
+                if (mTmCommunicator == null) {
+                    boolean isSuccess = initServiceConnection();
 
-                   if(isSuccess){
-                       Toast.makeText(mContext,"Bind service successful", Toast.LENGTH_LONG).show();
-                       return;
-                   }
-                   HandlerUtil.postBackground(this, 5000);
+                    if (isSuccess) {
+                        Toast.makeText(mContext, "Bind service successful", Toast.LENGTH_LONG).show();
+                        return;
+                    }
+                    HandlerUtil.postBackground(this, 5000);
 
-                   if(!isFirstAttempt){
-                       Toast.makeText(mContext,"Please install TeleMeshService app", Toast.LENGTH_LONG).show();
-                   }
-                   isFirstAttempt = false;
-               }
-           }
-       });
+                    if (!isFirstAttempt) {
+                        Toast.makeText(mContext, "Please install TeleMeshService app", Toast.LENGTH_LONG).show();
+                    }
+                    isFirstAttempt = false;
+                }
+            }
+        });
     }
 
 
@@ -143,7 +146,7 @@ public class DataManager {
             intent.setPackage("com.w3engineers.meshrnd");
             // binding to remote service
             return mContext.bindService(intent, serviceConnection, Service.BIND_AUTO_CREATE);
-        }else {
+        } else {
             return false;
         }
     }
@@ -159,7 +162,7 @@ public class DataManager {
             mTmCommunicator = ITmCommunicator.Stub.asInterface(binder);
 
             try {
-                //mTmCommunicator.startMesh(mContext.getPackageName());
+                mTmCommunicator.startMesh(appName);
                 mTmCommunicator.setViperCommunicator(viperCommunicator);
             } catch (RemoteException e) {
                 e.printStackTrace();
@@ -184,7 +187,6 @@ public class DataManager {
      * So client side Service and client app will perform its own functionality.
      * Service will keep app data manager alive to receive message </p>
      * </h1>
-     *
      */
     private ViperCommunicator.Stub viperCommunicator = new ViperCommunicator.Stub() {
         @Override
@@ -199,7 +201,7 @@ public class DataManager {
 
         @Override
         public void onRemotePeerAdd(String peerId) throws RemoteException {
-           DataManager.this.onRemotePeerAdd(peerId);
+            DataManager.this.onRemotePeerAdd(peerId);
         }
 
         @Override
@@ -209,7 +211,7 @@ public class DataManager {
 
         @Override
         public void onAckReceived(String messageId, int status) throws RemoteException {
-           DataManager.this.onAckReceived(messageId, status);
+            DataManager.this.onAckReceived(messageId, status);
         }
 
         @Override
@@ -364,41 +366,49 @@ public class DataManager {
         mTmCommunicator.sendPayMessage(receiverId, message, messageId);
     }
 
-    public void onPaymentGotForIncomingMessage( boolean success,  String receiver,  String sender,  String messageId,  String msgData) throws RemoteException {
-        mTmCommunicator.onPaymentGotForIncomingMessage(success,receiver, sender, messageId,msgData);
+    public void onPaymentGotForIncomingMessage(boolean success, String receiver, String sender, String messageId, String msgData) throws RemoteException {
+        mTmCommunicator.onPaymentGotForIncomingMessage(success, receiver, sender, messageId, msgData);
     }
-    public void onPaymentGotForOutgoingMessage( boolean success,  String receiver,  String sender,  String messageId,  String msgData) throws RemoteException {
+
+    public void onPaymentGotForOutgoingMessage(boolean success, String receiver, String sender, String messageId, String msgData) throws RemoteException {
         mTmCommunicator.onPaymentGotForOutgoingMessage(success, receiver, sender, messageId, msgData);
     }
+
     public List<String> getInternetSellers() throws RemoteException {
         return mTmCommunicator.getInternetSellers();
     }
-    public boolean isInternetSeller( String address) throws RemoteException {
+
+    public boolean isInternetSeller(String address) throws RemoteException {
         return mTmCommunicator.isInternetSeller(address);
     }
-    public boolean isUserConnected( String address) throws RemoteException {
+
+    public boolean isUserConnected(String address) throws RemoteException {
         return mTmCommunicator.isUserConnected(address);
     }
-    public void onBuyerConnected( String address) throws RemoteException {
+
+    public void onBuyerConnected(String address) throws RemoteException {
         mTmCommunicator.onBuyerConnected(address);
     }
-    public void onBuyerDisconnected( String address) throws RemoteException {
+
+    public void onBuyerDisconnected(String address) throws RemoteException {
         mTmCommunicator.onBuyerDisconnected(address);
     }
-    public void restartMesh(int newRole) throws RemoteException{
+
+    public void restartMesh(int newRole) throws RemoteException {
         MeshLog.v("sellerMode dm" + newRole);
         mTmCommunicator.restartMesh(newRole);
     }
 
 
-    public void onMessagePayReceived( String sender, byte[] paymentData){
+    public void onMessagePayReceived(String sender, byte[] paymentData) {
         MeshLog.v("onMessagePayReceived dtm " + sender);
         PayMessage payMessage = new PayMessage();
         payMessage.sender = sender;
         payMessage.paymentData = paymentData;
         AppDataObserver.on().sendObserverData(payMessage);
     }
-    public void onPayMessageAckReceived( String sender,  String receiver,  String messageId){
+
+    public void onPayMessageAckReceived(String sender, String receiver, String messageId) {
         MeshLog.v("onPayMessageAckReceived dtm " + sender);
         PayMessageAck payMessageAck = new PayMessageAck();
         payMessageAck.sender = sender;
@@ -422,7 +432,7 @@ public class DataManager {
 
     }
 
-    public void onTransportInit( String nodeId,  String publicKey,  boolean success, String msg){
+    public void onTransportInit(String nodeId, String publicKey, boolean success, String msg) {
 
         MeshLog.v("onTransportInit dtm " + nodeId);
         TransportInit transportInit = new TransportInit();

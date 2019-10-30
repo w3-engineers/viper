@@ -3,7 +3,6 @@ package com.w3engineers.mesh.util;
 import android.content.Context;
 import android.os.RemoteException;
 import android.text.TextUtils;
-import android.util.Log;
 import android.widget.Toast;
 
 import com.w3engineers.ext.strom.util.Text;
@@ -15,7 +14,6 @@ import com.w3engineers.mesh.application.data.model.DataAckEvent;
 import com.w3engineers.mesh.application.data.model.DataEvent;
 import com.w3engineers.mesh.application.data.model.PeerAdd;
 import com.w3engineers.mesh.application.data.model.PeerRemoved;
-import com.w3engineers.mesh.model.Message;
 import com.w3engineers.mesh.model.MessageModel;
 import com.w3engineers.mesh.model.UserModel;
 import com.w3engineers.mesh.ui.Nearby.NearbyCallBack;
@@ -36,12 +34,12 @@ import java.util.UUID;
 
 public class ConnectionManager {
     private static final String NETWORK_PREFIX = "ifli";
+    private static final String APP_NAME = "viper";
     private static ConnectionManager mConnectionManager;
     private ViperClient viperClient;
     private static Context mContext;
     private NearbyCallBack nearbyCallBack;
     private Map<String, UserModel> discoverUserMap;
-
     private Map<String, String> requestUserInfoList;
 
 
@@ -49,18 +47,18 @@ public class ConnectionManager {
         if (mConnectionManager == null) {
             synchronized (ViperClient.class) {
                 if (mConnectionManager == null)
-                    mConnectionManager = new ConnectionManager(context, NETWORK_PREFIX);
+                    mConnectionManager = new ConnectionManager(context, APP_NAME, NETWORK_PREFIX);
             }
         }
         return mConnectionManager;
     }
 
-    private ConnectionManager(Context context, String networkPrefix) {
+    private ConnectionManager(Context context, String appName, String networkPrefix) {
         mContext = context;
         discoverUserMap = Collections.synchronizedMap(new HashMap());
         requestUserInfoList = Collections.synchronizedMap(new HashMap<>());
 
-        viperClient = ViperClient.on(context, networkPrefix);
+        viperClient = ViperClient.on(context, appName, networkPrefix);
 
         startAllObserver();
     }
@@ -69,18 +67,8 @@ public class ConnectionManager {
 
         AppDataObserver.on().startObserver(ApiEvent.PEER_ADD, event -> {
             PeerAdd peerAdd = (PeerAdd) event;
-
-           /* sendMyInfo(peerAdd.peerId);
-
-            UserModel userModel = new UserModel();
-            userModel.setUserName("Anonymous");
-            userModel.setUserId(peerAdd.peerId);
-            discoverUserMap.put(peerAdd.peerId, userModel);
-            if (nearbyCallBack != null) {
-                nearbyCallBack.onUserFound(userModel);
-            }*/
-
-           boolean isUserExist = ChatDataProvider.On().checkUserExistence(peerAdd.peerId);
+            
+            boolean isUserExist = ChatDataProvider.On().checkUserExistence(peerAdd.peerId);
             if (isUserExist) {
                 UserModel userModel = ChatDataProvider.On().getUserInfoById(peerAdd.peerId);
                 discoverUserMap.put(peerAdd.peerId, userModel);
