@@ -1,0 +1,31 @@
+<?xml version="1.0"?>
+<records>
+    <network>
+        <network_type>1</network_type>
+        <network_name>Ropsten</network_name>
+        <network_url>http://3.94.176.109:8545</network_url>
+        <currency_symbol>ETH</currency_symbol>
+        <token_symbol>TMESH</token_symbol>
+        <token_address>0xB545298d77Bc2612d6b5ae3fBEA56B3B84230C47</token_address>
+        <channel_address>0x25485a015f807Ab8621C11f54daa5972f8C61345</channel_address>
+        <gas_price>60000000000</gas_price>
+        <gas_limit>8000000</gas_limit>
+        <token_amount>0</token_amount>
+        <currency_amount>0</currency_amount>
+    </network>
+
+    <network>
+        <network_type>2</network_type>
+        <network_name>Kotti</network_name>
+        <network_url>http://3.228.165.182:8545</network_url>
+        <currency_symbol>ETC</currency_symbol>
+        <token_symbol>TMESH</token_symbol>
+        <token_address>0xC7FEe52440A8206957c8619465845eebC2D777FC</token_address>
+        <channel_address>0x42b1829Ad86a4D44711B6c2372C9e59fFAb28142</channel_address>
+        <gas_price>60000000000</gas_price>
+        <gas_limit>8000000</gas_limit>
+        <token_amount>0</token_amount>
+        <currency_amount>0</currency_amount>
+    </network>
+
+</records>
