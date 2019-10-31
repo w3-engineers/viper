@@ -33,6 +33,7 @@ import io.reactivex.Flowable;
 public class WalletManager {
     private static WalletManager walletManager;
     private PreferencesHelperDataplan preferencesHelperDataplan;
+    private GiftResponseListener giftResponseListener;
     private DataPlanManager dataPlanManager;
 
 
@@ -54,15 +55,31 @@ public class WalletManager {
     }
 
 
-    public boolean giftEther(){
+    public boolean giftEther(GiftResponseListener giftResponseListener) {
+
+        this.giftResponseListener = giftResponseListener;
+
         if (dataPlanManager.getDataPlanRole() == DataPlanConstants.USER_ROLE.DATA_BUYER) {
-            return PurchaseManagerBuyer.getInstance().giftEtherForOtherNetwork();
+
+            return PurchaseManagerBuyer.getInstance().giftEtherForOtherNetwork((success, isGifted, message) -> {
+                if (giftResponseListener != null) {
+                    giftResponseListener.onGiftResponse(success, isGifted, message);
+                }
+            });
+
         } else if (dataPlanManager.getDataPlanRole() == DataPlanConstants.USER_ROLE.DATA_SELLER){
-            return PurchaseManagerSeller.getInstance().requestForGiftForSeller();
+            return PurchaseManagerSeller.getInstance().requestForGiftForSeller((success, isGifted, message) -> {
+                if (giftResponseListener != null) {
+                    giftResponseListener.onGiftResponse(success, isGifted, message);
+                }
+            });
         }
         return false;
     }
 
+    public interface GiftResponseListener {
+        void onGiftResponse(boolean success, boolean isGifted, String message);
+    }
 
     public LiveData<Double> getTotalEarn(String myAddress, int endPoint) {
         return PurchaseManagerSeller.getInstance().getTotalEarn(myAddress, endPoint);

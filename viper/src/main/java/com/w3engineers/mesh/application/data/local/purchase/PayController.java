@@ -504,7 +504,11 @@ public class PayController {
         try {
             msgObject.put(PurchaseConstants.JSON_KEYS.MESSAGE_TYPE, PurchaseConstants.MESSAGE_TYPES.INFO_QUERY);
 
-            sendPayWithTimeoutMessage(receiver, msgObject.toString(), purpose);
+            if (purpose != PurchaseConstants.INFO_PURPOSES.REFRESH_BALANCE) {
+                sendPayWithTimeoutMessage(receiver, msgObject.toString(), purpose);
+            } else {
+                sendPayMessage(receiver, msgObject.toString());
+            }
 
         } catch (Exception e) {
 //            MeshLog.p("Exception" + e.getMessage());
