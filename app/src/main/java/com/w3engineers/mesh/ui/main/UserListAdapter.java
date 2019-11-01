@@ -6,14 +6,12 @@ import android.text.TextUtils;
 import android.view.View;
 import android.view.ViewGroup;
 
-
 import com.w3engineers.ext.viper.R;
 import com.w3engineers.ext.viper.databinding.ItemDiscoveredUserBinding;
 import com.w3engineers.mesh.model.UserModel;
 import com.w3engineers.mesh.ui.base.BaseAdapter;
 import com.w3engineers.mesh.ui.base.BaseViewHolder;
 import com.w3engineers.mesh.util.ConnectionManager;
-
 
 import java.util.List;
 
@@ -88,7 +86,7 @@ public class UserListAdapter extends BaseAdapter<UserModel> {
         public void bind(UserModel item, ViewDataBinding viewDataBinding) {
             ItemDiscoveredUserBinding binding = (ItemDiscoveredUserBinding) viewDataBinding;
             binding.userCard.setOnClickListener(this);
-            setClickListener(binding.textViewSingleMsg);
+
             if (!TextUtils.isEmpty(item.getUserName())) {
                 binding.userName.setText(item.getUserName());
             } else {

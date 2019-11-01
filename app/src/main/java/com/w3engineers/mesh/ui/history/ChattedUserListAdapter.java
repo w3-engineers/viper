@@ -10,6 +10,7 @@ import com.w3engineers.ext.viper.databinding.ItemChattedUserBinding;
 import com.w3engineers.mesh.model.UserModel;
 import com.w3engineers.mesh.ui.base.BaseAdapter;
 import com.w3engineers.mesh.ui.base.BaseViewHolder;
+import com.w3engineers.mesh.util.ConnectionManager;
 
 import java.util.List;
 
@@ -35,16 +36,11 @@ import java.util.List;
  * * ============================================================================
  **/
 public class ChattedUserListAdapter extends BaseAdapter<UserModel> {
-
-
+    
     private Context mContext;
-
-
-  //  private ConnectionManager connectionManager;
 
     public ChattedUserListAdapter(Context context) {
         this.mContext = context;
-      //  connectionManager = ConnectionManager.on();
     }
 
     @Override
@@ -88,7 +84,7 @@ public class ChattedUserListAdapter extends BaseAdapter<UserModel> {
             binding.userName.setText(item.getUserName());
             binding.textViewTime.setText(item.getUserId());
 
-           // binding.userNameSmall.setText(connectionManager.getConnectionType(item.getUserId()));
+            binding.userNameSmall.setText(ConnectionManager.on(mContext).getConnectionType(item.getUserId()));
         }
 
         @Override

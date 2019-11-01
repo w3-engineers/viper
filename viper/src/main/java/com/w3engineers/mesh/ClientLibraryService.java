@@ -18,7 +18,6 @@ import android.util.Log;
 import com.w3engineers.mesh.application.data.remote.service.BaseTmServiceNotificationHelper;
 import com.w3engineers.mesh.util.MeshLog;
 import com.w3engineers.mesh.util.lib.mesh.DataManager;
-import com.w3engineers.meshrnd.ITmCommunicator;
 
 
 public class ClientLibraryService extends Service {
