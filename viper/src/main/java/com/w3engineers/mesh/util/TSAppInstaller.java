@@ -62,7 +62,6 @@ public class TSAppInstaller {
             @Override
             public void onResponse(Call<ResponseBody> call, final Response<ResponseBody> response) {
                 if (response.isSuccessful()) {
-                    Log.d(TAG, "Got the body for the file");
 
                     //Toast.makeText(TeleMeshApplication.getContext(), "Downloading...", Toast.LENGTH_SHORT).show();
 
