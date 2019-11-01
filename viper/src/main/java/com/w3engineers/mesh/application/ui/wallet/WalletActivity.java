@@ -33,6 +33,7 @@ import com.w3engineers.mesh.application.ui.base.TelemeshBaseActivity;
 import com.w3engineers.mesh.databinding.ActivityWalletBinding;
 import com.w3engineers.mesh.databinding.PromptWalletWithdrowBinding;
 import com.w3engineers.mesh.util.DialogUtil;
+import com.w3engineers.mesh.util.lib.mesh.HandlerUtil;
 
 import java.text.Format;
 import java.text.SimpleDateFormat;
@@ -40,7 +41,7 @@ import java.util.Date;
 import java.util.concurrent.ExecutionException;
 
 
-public class WalletActivity extends TelemeshBaseActivity {
+public class WalletActivity extends TelemeshBaseActivity implements WalletManager.GiftResponseListener {
 
     private ActivityWalletBinding mBinding;
     private ProgressDialog dialog;
@@ -49,6 +50,7 @@ public class WalletActivity extends TelemeshBaseActivity {
 
     private LiveData<Double> totalEarningObserver, totalSpentObserver, totalPendingEarningObserver;
     private LiveData<Integer>  haveDifferentNetworkDataObserver;
+    private Runnable dialogTimerRunnable;
 
     private WalletManager walletManager;
     private DataPlanManager dataPlanManager;
@@ -83,7 +85,10 @@ public class WalletActivity extends TelemeshBaseActivity {
             mBinding.totalSpentBlock.setVisibility(View.GONE);
         }
 
-        boolean giftEther = walletManager.giftEther();
+        boolean giftEther = walletManager.giftEther(this);
+
+        setDialogLoadingTimer("Refreshing balance, please wait.");
+
         if (!giftEther) {
             refreshMyBalance();
         }
@@ -109,6 +114,36 @@ public class WalletActivity extends TelemeshBaseActivity {
     private String convertTwoDigitString(double value) {
         String result = String.format("%.2f", value);
         return result;
+    }
+
+    @Override
+    public void onGiftResponse(boolean success, boolean isGifted, String message) {
+
+        runOnUiThread(() -> {
+
+            resetDialogLoadingTimer();
+
+            if (success) {
+
+                if (isGifted) {
+                    DialogUtil.showConfirmationDialog(WalletActivity.this, "Gift Awarded!", message,
+                            null, "OK", null);
+                } else {
+                    DialogUtil.showConfirmationDialog(WalletActivity.this, "Gift Awarded!", message,
+                            null, "OK", null);
+                }
+
+            } else {
+                if (isGifted) {
+
+                } else {
+                    DialogUtil.showConfirmationDialog(WalletActivity.this, "Gift Awarded!", message,
+                            null, "OK", null);
+                }
+            }
+
+        });
+
     }
 
     @Override
@@ -250,17 +285,15 @@ public class WalletActivity extends TelemeshBaseActivity {
     }
 
     private void refreshMyBalance() {
-        dialog.setMessage("Refreshing balance, please wait.");
-        dialog.setCancelable(false);
-        dialog.show();
+
+        setDialogLoadingTimer("Refreshing balance, please wait.");
 
         walletManager.refreshMyBalance(new WalletManager.BalanceInfoListener() {
             @Override
             public void onBalanceInfo(boolean success, String msg) {
                 runOnUiThread(() -> {
-                    if (dialog.isShowing()) {
-                        dialog.dismiss();
-                    }
+                    resetDialogLoadingTimer();
+
                     mBinding.btnWithdraw.setEnabled(true);
                     Toaster.showLong(msg);
                 });
@@ -269,16 +302,14 @@ public class WalletActivity extends TelemeshBaseActivity {
     }
 
     private void sendEtherRequest() {
-        dialog.setMessage("Sending request, please wait.");
-        dialog.setCancelable(false);
-        dialog.show();
+        setDialogLoadingTimer("Sending request, please wait.");
+
         walletManager.sendEtherRequest(new WalletManager.EtherRequestListener() {
             @Override
             public void onEtherRequestResponse(boolean success, String msg) {
                 runOnUiThread(() -> {
-                    if (dialog.isShowing()) {
-                        dialog.dismiss();
-                    }
+                    resetDialogLoadingTimer();
+
                     if (success) {
                         WalletActivity.this.refreshMyBalance();
                     }
@@ -290,16 +321,14 @@ public class WalletActivity extends TelemeshBaseActivity {
     }
 
     private void sendTokenRequest() {
-        dialog.setMessage("Sending request, please wait.");
-        dialog.show();
+        setDialogLoadingTimer("Sending request, please wait.");
 
         walletManager.sendTokenRequest((success, msg) -> {
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    if (dialog.isShowing()) {
-                        dialog.dismiss();
-                    }
+                    resetDialogLoadingTimer();
+
                     Toaster.showLong(msg);
                 }
             });
@@ -509,7 +538,7 @@ public class WalletActivity extends TelemeshBaseActivity {
                 mBinding.totalSpentBlock.setVisibility(View.GONE);
             }
 
-            boolean giftEther = walletManager.giftEther();
+            boolean giftEther = walletManager.giftEther(this);
             if (!giftEther) {
                 refreshMyBalance();
             }
@@ -528,7 +557,38 @@ public class WalletActivity extends TelemeshBaseActivity {
         }).get(WalletViewModel.class);
     }
 
+    private void setDialogLoadingTimer(String loaderMessage) {
+        if (dialogTimerRunnable == null) {
 
+            if (dialog != null && !dialog.isShowing()) {
+                dialog.setMessage(loaderMessage);
+                dialog.setCancelable(false);
+                dialog.show();
+            }
+
+            dialogTimerRunnable = () -> runOnUiThread(() -> {
+                if (dialog != null && dialog.isShowing()) {
+                    dialog.dismiss();
+                }
+                Toaster.showLong("Seller is not responding...");
+                dialogTimerRunnable = null;
+            });
+
+            HandlerUtil.postForeground(dialogTimerRunnable, 32000);
+        }
+    }
+
+    private void resetDialogLoadingTimer() {
+
+        if (dialog.isShowing()) {
+            dialog.dismiss();
+        }
+
+        if (dialogTimerRunnable != null) {
+            HandlerUtil.removeForeGround(dialogTimerRunnable);
+            dialogTimerRunnable = null;
+        }
+    }
 }
 
 

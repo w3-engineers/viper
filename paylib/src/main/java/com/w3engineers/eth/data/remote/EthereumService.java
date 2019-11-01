@@ -10,6 +10,7 @@ import com.w3engineers.eth.data.helper.PreferencesHelperPaylib;
 import com.w3engineers.eth.data.helper.model.EthGift;
 import com.w3engineers.eth.data.helper.model.PayLibNetworkInfo;
 import com.w3engineers.eth.util.data.CellularDataNetworkUtil;
+import com.w3engineers.paylib.BuildConfig;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -42,8 +43,6 @@ public class EthereumService implements BlockRequest.BlockTransactionObserver, E
 
     private String TAG = "EthereumService";
 
-//    private String faucetDonateUrl = "https://faucet.ropsten.be/donate/";
-    private String donationUrl = "http://18.215.251.24:8547/request/";
     private TransactionObserver transactionObserver;
     private Network network;
     private HashMap<Integer, BlockRequest> blockRequests = null;
@@ -147,7 +146,7 @@ public class EthereumService implements BlockRequest.BlockTransactionObserver, E
                 MediaType mediaType = MediaType.parse("application/x-www-form-urlencoded");
                 RequestBody body = RequestBody.create(mediaType, "address="+address+"&endpoint="+endPointType);
                 Request request = new Request.Builder()
-                        .url(donationUrl + "eth")
+                        .url(BuildConfig.GIFT_DONATE_LINK + "eth")
                         .post(body)
                         .addHeader("Content-Type", "application/x-www-form-urlencoded")
                         .addHeader("cache-control", "no-cache")
@@ -203,7 +202,7 @@ public class EthereumService implements BlockRequest.BlockTransactionObserver, E
                             MediaType mediaType = MediaType.parse("application/x-www-form-urlencoded");
                             RequestBody body = RequestBody.create(mediaType, "address="+address+"&endpoint="+endPointType);
                             Request request = new Request.Builder()
-                                    .url(donationUrl + "gift")
+                                    .url(BuildConfig.GIFT_DONATE_LINK + "gift")
                                     .post(body)
                                     .addHeader("Content-Type", "application/x-www-form-urlencoded")
                                     .addHeader("cache-control", "no-cache")
