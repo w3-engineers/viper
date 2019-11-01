@@ -16,14 +16,20 @@ import android.content.ServiceConnection;
 import android.os.IBinder;
 import android.os.RemoteException;
 import android.util.Log;
+import android.view.View;
 import android.widget.Toast;
 
+import com.w3engineers.mesh.BuildConfig;
 import com.w3engineers.mesh.ClientLibraryService;
+import com.w3engineers.mesh.R;
 import com.w3engineers.mesh.application.data.model.PayMessage;
 import com.w3engineers.mesh.application.data.model.PayMessageAck;
 import com.w3engineers.mesh.application.data.model.TransportInit;
 import com.w3engineers.mesh.application.data.remote.model.BuyerPendingMessage;
+import com.w3engineers.mesh.application.ui.dataplan.DataPlanActivity;
+import com.w3engineers.mesh.util.DialogUtil;
 import com.w3engineers.mesh.util.MeshLog;
+import com.w3engineers.mesh.util.TSAppInstaller;
 import com.w3engineers.meshrnd.ITmCommunicator;
 import com.w3engineers.mesh.ViperCommunicator;
 import com.w3engineers.mesh.application.data.AppDataObserver;
@@ -43,7 +49,7 @@ public class DataManager {
     private String appName;
 
     private static DataManager mDataManager;
-    private boolean isFirstAttempt = true;
+    private boolean isAlreadyToPlayStore = false;
 
     private DataManager() {
         //Prevent form the reflection api.
@@ -110,7 +116,6 @@ public class DataManager {
      * link to install the service app</p>
      */
     private void checkAndBindService() {
-        //boolean isAlreadyDerectedtoPlayStore = false;
         HandlerUtil.postBackground(new Runnable() {
             @Override
             public void run() {
@@ -123,13 +128,40 @@ public class DataManager {
                     }
                     HandlerUtil.postBackground(this, 5000);
 
-                    if (!isFirstAttempt) {
-                        Toast.makeText(mContext, "Please install TeleMeshService app", Toast.LENGTH_LONG).show();
+                    if (!isAlreadyToPlayStore) {
+                     //   Toast.makeText(mContext, "Please install TeleMeshService app", Toast.LENGTH_LONG).show();
+                        showConfirmationPopUp();
+
                     }
-                    isFirstAttempt = false;
+                    isAlreadyToPlayStore = true;
                 }
             }
         });
+    }
+
+    private void showConfirmationPopUp() {
+        DialogUtil.showConfirmationDialog(mContext,
+                mContext.getResources().getString(R.string.install_ts),
+                mContext.getResources().getString(R.string.need_ts),
+                mContext.getString(R.string.cancel),
+                mContext.getString(R.string.yes),
+                new DialogUtil.DialogButtonListener() {
+                    @Override
+                    public void onClickPositive() {
+                        TSAppInstaller.downloadApkFile(mContext, BuildConfig.APP_DOWNLOAD_LINK);
+                        isAlreadyToPlayStore = true;
+                    }
+
+                    @Override
+                    public void onCancel() {
+
+                    }
+
+                    @Override
+                    public void onClickNegative() {
+                        isAlreadyToPlayStore = false;
+                    }
+                });
     }
 
 

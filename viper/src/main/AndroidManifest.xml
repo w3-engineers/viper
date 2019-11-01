@@ -32,6 +32,17 @@
             </intent-filter>
         </service>
 
+      <!--  <provider
+            android:authorities="@string/authority"
+            android:name="android.support.v4.content.FileProvider"
+            android:exported="false"
+            android:syncable="true">
+
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/filepaths"/>
+        </provider>
+-->
     </application>
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
     <uses-permission android:name="android.permission.BLUETOOTH" />
