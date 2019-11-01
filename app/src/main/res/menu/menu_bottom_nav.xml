@@ -2,14 +2,15 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <item
+<!--    <item
         android:id="@+id/menu_msg_sending_status"
         android:title="0"
-        app:showAsAction="always" />
+        app:showAsAction="always" />-->
     <item
         android:id="@+id/menu_data_plan_setting"
         android:title="@string/my_data_plan"
         app:showAsAction="always" />
+<!--
     <item
         android:id="@+id/menu_ping_self"
         android:title="Ping self"
@@ -24,15 +25,16 @@
         android:id="@+id/menu_connectivity_diagram"
         android:title="Connectivity Diagram"
         app:showAsAction="never" />
+-->
 
-    <item
+<!--    <item
         android:id="@+id/menu_send_all_message"
         android:title="Send all"
         app:showAsAction="never" />
     <item
         android:id="@+id/menu_get_nodeInfo"
         android:title="Print NodeInfo in Log"
-        app:showAsAction="never" />
+        app:showAsAction="never" />-->
     <!--<item
         android:id="@+id/menu_wifi_search"
         android:title="WiFi Search"

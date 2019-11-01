@@ -19,7 +19,6 @@ import java.util.UUID;
 
 public class CreateUserActivity extends AppCompatActivity implements View.OnClickListener {
 
-
     private ActivityCreateUserBinding mBInding;
 
     @Override
