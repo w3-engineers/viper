@@ -36,7 +36,7 @@ import java.util.List;
  * * ============================================================================
  **/
 public class ChattedUserListAdapter extends BaseAdapter<UserModel> {
-    
+
     private Context mContext;
 
     public ChattedUserListAdapter(Context context) {
