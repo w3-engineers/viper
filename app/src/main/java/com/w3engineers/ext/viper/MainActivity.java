@@ -21,7 +21,7 @@ public class MainActivity extends TelemeshBaseActivity {
     protected void startUI() {
         Button helloBtn = findViewById(R.id.helloBtn);
 
-       DataManager.on().doBindService(this, "jkhlh");
+     //  DataManager.on().doBindService(this, "jkhlh");
 
         helloBtn.setOnClickListener(new View.OnClickListener() {
             @Override
