@@ -22,7 +22,19 @@ android {
         release {
             minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+
+            buildConfigField 'String', 'AUTH_USER_NAME', System.getenv('AUTH_USER_NAME').equals(null) ? AUTH_USER_NAME : System.getenv('AUTH_USER_NAME')
+            buildConfigField 'String', 'AUTH_PASSWORD', System.getenv('AUTH_PASSWORD').equals(null) ? AUTH_PASSWORD : System.getenv('AUTH_PASSWORD')
+            buildConfigField 'String', 'APP_DOWNLOAD_LINK', System.getenv('APP_DOWNLOAD_LINK').equals(null) ? APP_DOWNLOAD_LINK : System.getenv('APP_DOWNLOAD_LINK')
+
         }
+        debug {
+            buildConfigField 'String', 'AUTH_USER_NAME', System.getenv('AUTH_USER_NAME').equals(null) ? AUTH_USER_NAME : System.getenv('AUTH_USER_NAME')
+            buildConfigField 'String', 'AUTH_PASSWORD', System.getenv('AUTH_PASSWORD').equals(null) ? AUTH_PASSWORD : System.getenv('AUTH_PASSWORD')
+            buildConfigField 'String', 'APP_DOWNLOAD_LINK', System.getenv('APP_DOWNLOAD_LINK').equals(null) ? APP_DOWNLOAD_LINK : System.getenv('APP_DOWNLOAD_LINK')
+        }
+
+
     }
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
@@ -63,4 +75,8 @@ dependencies {
     }
     implementation 'org.bouncycastle:bcprov-jdk15on:1.61'
     implementation 'com.snatik:storage:2.1.0'
+
+    // Retrofit & OkHttp
+    implementation 'com.squareup.retrofit2:retrofit:2.5.0'
+    implementation 'com.squareup.retrofit2:converter-gson:2.5.0'
 }
