@@ -734,13 +734,13 @@ public class PurchaseManagerBuyer extends PurchaseManager implements PayControll
 
             sendGiftListener(status, false, toastMessage);
 
-            Activity currentActivity = MeshApp.getCurrentActivity();
+            /*Activity currentActivity = MeshApp.getCurrentActivity();
             if (currentActivity != null) {
                 HandlerUtil.postForeground(() -> DialogUtil.showConfirmationDialog(currentActivity, "Gift Awarded!", toastMessage, null, "OK", null));
 //            HandlerUtil.postForeground(() -> Toast.makeText(mContext, toastMessage, Toast.LENGTH_LONG).show());
             }else {
                 //TODO send notifications
-            }
+            }*/
         } else {
             MeshLog.v("giftEther giftRequestSubmitted " + submitMessage);
             if (failedBy.equals("admin")){
@@ -751,10 +751,10 @@ public class PurchaseManagerBuyer extends PurchaseManager implements PayControll
 
                 sendGiftListener(status, false, submitMessage);
 
-                Activity currentActivity = MeshApp.getCurrentActivity();
+                /*Activity currentActivity = MeshApp.getCurrentActivity();
                 if (currentActivity != null) {
                     HandlerUtil.postForeground(() -> DialogUtil.showConfirmationDialog(currentActivity, "Gift Awarded!", submitMessage, null, "OK", null));
-                }
+                }*/
             }
 
         }
@@ -783,12 +783,12 @@ public class PurchaseManagerBuyer extends PurchaseManager implements PayControll
             sendGiftListener(status, true, "Congratulations!!!\nBalance has been added to your account.");
 
 //            HandlerUtil.postForeground(() -> Toast.makeText(mContext, "Congratulations!!!\nBalance has been added to your account.", Toast.LENGTH_LONG).show());
-            Activity currentActivity = MeshApp.getCurrentActivity();
+            /*Activity currentActivity = MeshApp.getCurrentActivity();
             if (currentActivity != null){
                 HandlerUtil.postForeground(() -> DialogUtil.showConfirmationDialog(currentActivity, "Gift Awarded!", "Congratulations!!!\nBalance has been added to your account.", null, "OK", null));
             }else {
                 //TODO send notifications
-            }
+            }*/
 
 
         } else {
