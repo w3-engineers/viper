@@ -141,7 +141,7 @@ public class DataManager {
                     HandlerUtil.postBackground(this, 5000);
 
                     if (!isAlreadyToPlayStore) {
-                     //   Toast.makeText(mContext, "Please install TeleMeshService app", Toast.LENGTH_LONG).show();
+                        //   Toast.makeText(mContext, "Please install TeleMeshService app", Toast.LENGTH_LONG).show();
                         showConfirmationPopUp();
 
                     }
@@ -328,6 +328,10 @@ public class DataManager {
 
     public String getUserId() throws RemoteException {
         return mTmCommunicator.getUserId();
+    }
+
+    public void saveDiscoveredUserInfo(String userId, String userName) throws RemoteException {
+        mTmCommunicator.saveDiscoveredUserInfo(userId, userName);
     }
 
 

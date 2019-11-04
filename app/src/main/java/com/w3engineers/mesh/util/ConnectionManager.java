@@ -132,6 +132,9 @@ public class ConnectionManager {
                             HandlerUtil.postForeground(() -> Toast.makeText(ViperApp.getContext(), "Discovered ::  " +
                                     "" + userModel.getUserName(), Toast.LENGTH_SHORT).show());
                         }
+
+                        viperClient.saveDiscoveredUserInfo(userModel.getUserId(), userModel.getUserName());
+
                         break;
                     case JsonKeys.TYPE_TEXT_MESSAGE:
                         MessageModel messageModel = MessageModel.getMessage(jo);
