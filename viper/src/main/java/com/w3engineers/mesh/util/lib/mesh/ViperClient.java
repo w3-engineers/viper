@@ -84,4 +84,8 @@ public class ViperClient {
         return DataManager.on().getUserId();
     }
 
+    public void saveDiscoveredUserInfo(String userId, String userName) throws RemoteException {
+        DataManager.on().saveDiscoveredUserInfo(userId, userName);
+    }
+
 }
