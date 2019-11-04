@@ -74,13 +74,6 @@ public class MeshLogFragment extends BaseFragment implements View.OnClickListene
         intentFilter = new IntentFilter();
         intentFilter.addAction("com.w3engineers.meshrnd.DEBUG_MESSAGE");
 
-       /* binding.scrollView.post(new Runnable() {
-            @Override
-            public void run() {
-                binding.scrollView.fullScroll(View.FOCUS_DOWN);
-            }
-        });*/
-
 
         binding.spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
@@ -100,8 +93,7 @@ public class MeshLogFragment extends BaseFragment implements View.OnClickListene
         binding.textViewClear.setOnClickListener(v -> {
             mAdapter.clear();
             logList.clear();
-            // We can remove text file also
-            // MeshLog.clearLog();
+
         });
 
     }
@@ -173,9 +165,7 @@ public class MeshLogFragment extends BaseFragment implements View.OnClickListene
     }
 
     private void readFile(int type) {
-/*        File sdCard = Environment.getExternalStorageDirectory();
-        File directory = new File(sdCard.getAbsolutePath() +
-                "/MeshRnD");*/
+
         String sdCard = Constant.Directory.PARENT_DIRECTORY + Constant.Directory.MESH_LOG;
         File directory = new File(sdCard);
 
@@ -213,8 +203,6 @@ public class MeshLogFragment extends BaseFragment implements View.OnClickListene
             e.printStackTrace();
         }
 
-        //binding.textView.setText(text.toString());
-        //mainText = binding.textView.getText().toString();
     }
 
 
@@ -244,8 +232,6 @@ public class MeshLogFragment extends BaseFragment implements View.OnClickListene
                 }
                 logList.add(0, model);
 
-                // binding.textView.setText(text.toString());
-                // mainText = binding.textView.getText().toString();
             }
         });
     }
@@ -366,11 +352,6 @@ public class MeshLogFragment extends BaseFragment implements View.OnClickListene
 
     private void scrollSmoothly() {
         binding.recyclerViewLog.smoothScrollToPosition(0);
-
-       /* int index = mAdapter.getItemCount() - 1;
-        if (index > 0) {
-            binding.recyclerViewLog.smoothScrollToPosition(index);
-        }*/
     }
 
     private void scrollSmoothlyByPosition(int position) {
@@ -388,7 +369,6 @@ public class MeshLogFragment extends BaseFragment implements View.OnClickListene
     }
 
     private void rightSectionSearch() {
-        // Log.d("AdvanceSearchTest", "totalItem: " + mAdapter.getMatchedPosition().size()+" current position: "+searchPosition);
         if (searchPosition < mAdapter.getMatchedPosition().size() - 1) {
             searchPosition++;
             scrollSmoothlyByPosition(searchPosition);
