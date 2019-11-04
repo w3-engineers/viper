@@ -1,4 +1,3 @@
-// ViperCommunicator.aidl
 package com.w3engineers.mesh;
 
 
@@ -14,6 +13,7 @@ interface ViperCommunicator {
      void onDataReceived(in String senderId, in byte[] frameData);
      void onAckReceived(in String messageId, in int status);
      void onServiceAvailable(in int status);
+     void onReceiveLog(in String text);
 
      void setServiceForeground(boolean isForeGround);
      void onMessagePayReceived(in String sender, in byte[] paymentData);

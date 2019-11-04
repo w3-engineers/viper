@@ -16,6 +16,7 @@ import android.support.annotation.Nullable;
 import android.util.Log;
 
 import com.w3engineers.mesh.application.data.remote.service.BaseTmServiceNotificationHelper;
+import com.w3engineers.mesh.util.MeshApp;
 import com.w3engineers.mesh.util.MeshLog;
 import com.w3engineers.mesh.util.lib.mesh.DataManager;
 
@@ -87,6 +88,14 @@ public class ClientLibraryService extends Service {
         public void onServiceAvailable(int status) throws RemoteException {
             Log.e("peerid", "from server: " + status);
             //  DataManager.on().initServiceConnection();
+        }
+
+        @Override
+        public void onReceiveLog(String text) throws RemoteException {
+
+            Intent intent = new Intent("com.w3engineers.meshrnd.DEBUG_MESSAGE");
+            intent.putExtra("value", text);
+            MeshApp.getContext().sendBroadcast(intent);
         }
 
 
