@@ -11,7 +11,6 @@ import com.w3engineers.eth.contracts.RaidenMicroTransferChannels;
 import com.w3engineers.eth.data.remote.EthereumService;
 import com.w3engineers.eth.util.helper.HandlerUtil;
 import com.w3engineers.eth.util.helper.InternetUtil;
-
 import com.w3engineers.mesh.application.data.local.DataPlanConstants;
 import com.w3engineers.mesh.application.data.local.db.buyerpendingmessage.BuyerPendingMessage;
 import com.w3engineers.mesh.application.data.local.db.datausage.Datausage;
@@ -46,6 +45,8 @@ public class PurchaseManagerSeller extends PurchaseManager implements PayControl
 //    private BuyerPendingMessageListener buyerPendingMessageListener;
     private TokenRequestListener tokenRequestListener;
     private BalanceWithdrawtListener balanceWithdrawtListener;
+
+    private GiftRequestListener giftRequestListener;
 
     private PurchaseManagerSeller() {
         super();
@@ -758,7 +759,9 @@ public class PurchaseManagerSeller extends PurchaseManager implements PayControl
         }
     }
 
-    public boolean requestForGiftForSeller() {
+    public boolean requestForGiftForSeller(GiftRequestListener giftRequestListener) {
+
+        this.giftRequestListener = giftRequestListener;
 
         if (InternetUtil.isNetworkConnected(mContext)) {
 
@@ -789,12 +792,14 @@ public class PurchaseManagerSeller extends PurchaseManager implements PayControl
 
                                 String toastMessage = Util.getCurrencyTypeMessage("Congratulations!!!\nYou have been awarded 1 %s and 50 token.\nBalance will be added within few minutes.");
 
-                                Activity currentActivity = MeshApp.getCurrentActivity();
+                                sendGiftListener(success, false, toastMessage);
+
+                                /*Activity currentActivity = MeshApp.getCurrentActivity();
                                 if (currentActivity != null) {
                                     HandlerUtil.postForeground(() -> DialogUtil.showConfirmationDialog(currentActivity, "Gift Awarded!", toastMessage, null, "OK", null));
                                 } else {
                                     //TODO send notifications
-                                }
+                                }*/
                             } else {
                                 MeshLog.v("giftEther giftRequestSubmitted " + msg);
                                 if (failedBy.equals("admin")) {
@@ -802,10 +807,13 @@ public class PurchaseManagerSeller extends PurchaseManager implements PayControl
                                     getMyBalanceInfo(null);
                                 } else {
                                     preferencesHelperDataplan.setRequestedForEther(PurchaseConstants.GIFT_REQUEST_STATE.NOT_REQUESTED_YET, endpoint);
-                                    Activity currentActivity = MeshApp.getCurrentActivity();
+
+                                    sendGiftListener(success, false, msg);
+
+                                    /*Activity currentActivity = MeshApp.getCurrentActivity();
                                     if (currentActivity != null) {
                                         HandlerUtil.postForeground(() -> DialogUtil.showConfirmationDialog(currentActivity, "Gift Awarded!", msg, null, "OK", null));
-                                    }
+                                    }*/
                                 }
                             }
                         }
@@ -829,6 +837,11 @@ public class PurchaseManagerSeller extends PurchaseManager implements PayControl
     }
 
 
+    private void sendGiftListener(boolean status, boolean isGifted, String message) {
+        if (giftRequestListener != null) {
+            giftRequestListener.onGiftResponse(status, isGifted, message);
+        }
+    }
 
 
     //*********************************************************//
@@ -1907,15 +1920,18 @@ public class PurchaseManagerSeller extends PurchaseManager implements PayControl
                     preferencesHelperDataplan.setGiftTokenHash(null, endpoint);
                     databaseService.updateCurrencyAndToken(endpoint, ethBalance, tknBalance);
 
-                    Activity currentActivity = MeshApp.getCurrentActivity();
+                    sendGiftListener(status, true, "Congratulations!!!\nBalance has been added to your account.");
+
+                    /*Activity currentActivity = MeshApp.getCurrentActivity();
                     if (currentActivity != null){
                         HandlerUtil.postForeground(() -> DialogUtil.showConfirmationDialog(currentActivity, "Gift Awarded!", "Congratulations!!!\nBalance has been added to your account.", null, "OK", null));
                     }else {
                         //TODO send notifications
-                    }
+                    }*/
 
 
                 } else {
+                    sendGiftListener(status, true, "Failed");
                     //TODO detect fail type
                     preferencesHelperDataplan.setRequestedForEther(PurchaseConstants.GIFT_REQUEST_STATE.NOT_REQUESTED_YET, endpoint);
                 }
@@ -1959,6 +1975,11 @@ public class PurchaseManagerSeller extends PurchaseManager implements PayControl
         void onTokenRequestResponseReceived(boolean success, String msg, double tknBalance, double ethBalance);
 
     }
+
+    public interface GiftRequestListener {
+        void onGiftResponse(boolean success, boolean isGifted, String message);
+    }
+
     public LiveData<Integer> getDifferentNetworkData(String myAddress, int endpoint) {
         try {
             return databaseService.getDifferentNetworkData(myAddress, endpoint);

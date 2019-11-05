@@ -42,8 +42,8 @@
 
     <string name="network">Network</string>
     <string name="people">People</string>
-    <string name="message">Device Log</string>
-    <string name="Database">History</string>
+    <string name="device_log">Device Log</string>
+    <string name="history">History</string>
 
     <string name="status_online">online</string>
     <string name="status_offline">offline</string>
@@ -56,5 +56,6 @@
             Service eventually. Apps will communicate with the service via AIDL, TCP or some other
         IPC Mechanism
     </string>
+
 
 </resources>

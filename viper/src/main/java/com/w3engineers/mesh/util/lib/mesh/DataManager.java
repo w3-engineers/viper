@@ -30,7 +30,9 @@ import com.w3engineers.mesh.application.data.model.PayMessageAck;
 import com.w3engineers.mesh.application.data.model.TransportInit;
 import com.w3engineers.mesh.application.data.remote.model.BuyerPendingMessage;
 import com.w3engineers.mesh.application.ui.dataplan.DataPlanActivity;
+import com.w3engineers.mesh.util.Constant;
 import com.w3engineers.mesh.util.DialogUtil;
+import com.w3engineers.mesh.util.MeshApp;
 import com.w3engineers.mesh.util.MeshLog;
 import com.w3engineers.mesh.util.TSAppInstaller;
 import com.w3engineers.meshrnd.ITmCommunicator;
@@ -41,7 +43,15 @@ import com.w3engineers.mesh.application.data.model.DataEvent;
 import com.w3engineers.mesh.application.data.model.PeerAdd;
 import com.w3engineers.mesh.application.data.model.PeerRemoved;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 public class DataManager {
 
@@ -81,6 +91,8 @@ public class DataManager {
         this.mContext = context;
         this.appName = appName;
         this.mSsid = networkPrefix;
+
+        MeshLog.v("Data manager has been called");
 
         Intent mIntent = new Intent(context, ClientLibraryService.class);
         context.startService(mIntent);
@@ -132,7 +144,7 @@ public class DataManager {
                     HandlerUtil.postBackground(this, 5000);
 
                     if (!isAlreadyToPlayStore) {
-                     //   Toast.makeText(mContext, "Please install TeleMeshService app", Toast.LENGTH_LONG).show();
+                        //   Toast.makeText(mContext, "Please install TeleMeshService app", Toast.LENGTH_LONG).show();
                         showConfirmationPopUp();
 
                     }
@@ -255,6 +267,15 @@ public class DataManager {
         }
 
         @Override
+        public void onReceiveLog(String text) throws RemoteException {
+            Intent intent = new Intent("com.w3engineers.meshrnd.DEBUG_MESSAGE");
+            intent.putExtra("value", text);
+            MeshApp.getContext().sendBroadcast(intent);
+
+            DataManager.this.writeLogIntoTxtFile(text, true);
+        }
+
+        @Override
         public void setServiceForeground(boolean isForeGround) throws RemoteException {
 
         }
@@ -315,6 +336,10 @@ public class DataManager {
 
     public String getUserId() throws RemoteException {
         return mTmCommunicator.getUserId();
+    }
+
+    public void saveDiscoveredUserInfo(String userId, String userName) throws RemoteException {
+        mTmCommunicator.saveDiscoveredUserInfo(userId, userName);
     }
 
 
@@ -506,6 +531,41 @@ public class DataManager {
 
     public void onUserPublicKeyReceived(String address, String publicKey){
         MeshLog.v("onUserPublicKeyReceived dtm " + address +"  " + publicKey);
+    }
+
+
+    public void writeLogIntoTxtFile(String text, boolean isAppend) {
+
+        try {
+
+            String sdCard = Constant.Directory.PARENT_DIRECTORY + Constant.Directory.MESH_LOG;
+            File directory = new File(sdCard);
+            if (!directory.exists()) {
+                directory.mkdirs();
+            }
+            if (Constant.CURRENT_LOG_FILE_NAME == null) {
+                Constant.CURRENT_LOG_FILE_NAME = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss", Locale.getDefault()).format(new Date()) + ".txt";
+            }
+            File file = new File(directory, Constant.CURRENT_LOG_FILE_NAME);
+            if (!file.exists()) {
+                file.createNewFile();
+            }
+            FileOutputStream fOut = new FileOutputStream(file, isAppend);
+
+            OutputStreamWriter osw = new
+                    OutputStreamWriter(fOut);
+
+
+            osw.write("\n" + text);
+            //  osw.append(text)
+            osw.flush();
+            osw.close();
+
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException ioe) {
+            ioe.printStackTrace();
+        }
     }
 
 }

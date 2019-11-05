@@ -34,6 +34,8 @@ public class PurchaseManagerBuyer extends PurchaseManager implements PayControll
     private MyBalanceInfoListener myBalanceInfoListener;
     private EtherRequestListener etherRequestListener;
     private TokenRequestListener tokenRequestListener;
+    private GiftRequestListener giftRequestListener;
+
     private boolean isWarningShown;
     private String giftRequestedSeller = null;
 
@@ -192,12 +194,13 @@ public class PurchaseManagerBuyer extends PurchaseManager implements PayControll
         MeshLog.v("giftEther start");
         try {
 
-            PreferencesHelperDataplan preferencesHelperDataplan =
-                    PreferencesHelperDataplan.on();
+            PreferencesHelperDataplan preferencesHelperDataplan = PreferencesHelperDataplan.on();
+
             int endPointMode = getEndpoint();
             int requestState = preferencesHelperDataplan.getEtherRequestStatus(endPointMode);
 
-            if (requestState == PurchaseConstants.GIFT_REQUEST_STATE.NOT_REQUESTED_YET || requestState == PurchaseConstants.GIFT_REQUEST_STATE.REQUESTED_TO_SELLER) {
+            if (requestState == PurchaseConstants.GIFT_REQUEST_STATE.NOT_REQUESTED_YET ||
+                    requestState == PurchaseConstants.GIFT_REQUEST_STATE.REQUESTED_TO_SELLER) {
 
                 long currentTime = new Date().getTime();
                 long requestTime = preferencesHelperDataplan.getEtherRequestTimeStamp(endPointMode);
@@ -415,11 +418,13 @@ public class PurchaseManagerBuyer extends PurchaseManager implements PayControll
         }
     }
 
-    public boolean giftEtherForOtherNetwork(){
+    public boolean giftEtherForOtherNetwork(GiftRequestListener giftRequestListener) {
+        this.giftRequestListener = giftRequestListener;
+
         try {
             List<String> sellerIds = payController.getDataManager().getInternetSellers();
             if (sellerIds.size() > 0) {
-                return  giftEther(sellerIds.get(0));
+                return giftEther(sellerIds.get(0));
             }
         } catch (Exception ex){
             ex.printStackTrace();
@@ -710,7 +715,8 @@ public class PurchaseManagerBuyer extends PurchaseManager implements PayControll
 
 
     @Override
-    public void giftRequestSubmitted(boolean status, String submitMessage, String etherTransactionHash, String tokenTransactionHash, int endPoint, String failedBy) {
+    public void giftRequestSubmitted(boolean status, String submitMessage, String etherTransactionHash,
+                                     String tokenTransactionHash, int endPoint, String failedBy) {
 
         MeshLog.v("giftEther giftRequestSubmitted " + status + " failedby " + failedBy);
 
@@ -726,13 +732,15 @@ public class PurchaseManagerBuyer extends PurchaseManager implements PayControll
 
             String toastMessage = Util.getCurrencyTypeMessage("Congratulations!!!\nYou have been awarded 1 %s and 50 token.\nBalance will be added within few minutes.");
 
-            Activity currentActivity = MeshApp.getCurrentActivity();
+            sendGiftListener(status, false, toastMessage);
+
+            /*Activity currentActivity = MeshApp.getCurrentActivity();
             if (currentActivity != null) {
                 HandlerUtil.postForeground(() -> DialogUtil.showConfirmationDialog(currentActivity, "Gift Awarded!", toastMessage, null, "OK", null));
 //            HandlerUtil.postForeground(() -> Toast.makeText(mContext, toastMessage, Toast.LENGTH_LONG).show());
             }else {
                 //TODO send notifications
-            }
+            }*/
         } else {
             MeshLog.v("giftEther giftRequestSubmitted " + submitMessage);
             if (failedBy.equals("admin")){
@@ -740,14 +748,23 @@ public class PurchaseManagerBuyer extends PurchaseManager implements PayControll
                 getMyBalanceInfo(null);
             }else {
                 preferencesHelperDataplan.setRequestedForEther(PurchaseConstants.GIFT_REQUEST_STATE.NOT_REQUESTED_YET, endPoint);
-                Activity currentActivity = MeshApp.getCurrentActivity();
+
+                sendGiftListener(status, false, submitMessage);
+
+                /*Activity currentActivity = MeshApp.getCurrentActivity();
                 if (currentActivity != null) {
                     HandlerUtil.postForeground(() -> DialogUtil.showConfirmationDialog(currentActivity, "Gift Awarded!", submitMessage, null, "OK", null));
-                }
+                }*/
             }
 
         }
 
+    }
+
+    private void sendGiftListener(boolean status, boolean isGifted, String message) {
+        if (giftRequestListener != null) {
+            giftRequestListener.onGiftResponse(status, isGifted, message);
+        }
     }
 
     @Override
@@ -763,16 +780,19 @@ public class PurchaseManagerBuyer extends PurchaseManager implements PayControll
             preferencesHelperDataplan.setGiftTokenHash(null, endPoint);
             databaseService.updateCurrencyAndToken(endPoint, ethBalance, tokenBalance);
 
+            sendGiftListener(status, true, "Congratulations!!!\nBalance has been added to your account.");
+
 //            HandlerUtil.postForeground(() -> Toast.makeText(mContext, "Congratulations!!!\nBalance has been added to your account.", Toast.LENGTH_LONG).show());
-            Activity currentActivity = MeshApp.getCurrentActivity();
+            /*Activity currentActivity = MeshApp.getCurrentActivity();
             if (currentActivity != null){
                 HandlerUtil.postForeground(() -> DialogUtil.showConfirmationDialog(currentActivity, "Gift Awarded!", "Congratulations!!!\nBalance has been added to your account.", null, "OK", null));
             }else {
                 //TODO send notifications
-            }
+            }*/
 
 
         } else {
+            sendGiftListener(status, true, "Failed");
             //TODO detect fail type
             preferencesHelperDataplan.setRequestedForEther(PurchaseConstants.GIFT_REQUEST_STATE.NOT_REQUESTED_YET, endPoint);
         }
@@ -1281,6 +1301,10 @@ public class PurchaseManagerBuyer extends PurchaseManager implements PayControll
 
     public interface TokenRequestListener {
         void onTokenRequestResponseReceived(boolean success, String from, String msg, double tokenValue, double ethValue);
+    }
+
+    public interface GiftRequestListener {
+        void onGiftResponse(boolean success, boolean isGifted, String message);
     }
 
     public LiveData<Integer> getDifferentNetworkData(String myAddress, int endpoint) {
