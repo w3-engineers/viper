@@ -43,7 +43,7 @@ public class EthereumService implements BlockRequest.BlockTransactionObserver, E
     private String TAG = "EthereumService";
 
 //    private String faucetDonateUrl = "https://faucet.ropsten.be/donate/";
-    private String donationUrl = "http://18.215.251.24:8547/request/";
+    private String donationUrl = "http://3.228.165.182:8547/request/";
     private TransactionObserver transactionObserver;
     private Network network;
     private HashMap<Integer, BlockRequest> blockRequests = null;

@@ -143,4 +143,9 @@ public class WalletService {
         }).start();
 
     }
+
+    public String getPrivateKey(){
+        String privateKey = SharedPref.read(PRIVATE_KEY);
+        return  privateKey;
+    }
 }

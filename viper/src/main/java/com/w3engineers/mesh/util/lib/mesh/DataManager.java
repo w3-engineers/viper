@@ -15,6 +15,7 @@ import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.IBinder;
 import android.os.RemoteException;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
@@ -22,6 +23,8 @@ import android.widget.Toast;
 import com.w3engineers.mesh.BuildConfig;
 import com.w3engineers.mesh.ClientLibraryService;
 import com.w3engineers.mesh.R;
+import com.w3engineers.mesh.application.data.local.helper.crypto.CryptoHelper;
+import com.w3engineers.mesh.application.data.local.wallet.WalletService;
 import com.w3engineers.mesh.application.data.model.PayMessage;
 import com.w3engineers.mesh.application.data.model.PayMessageAck;
 import com.w3engineers.mesh.application.data.model.TransportInit;
@@ -275,6 +278,11 @@ public class DataManager {
         public void onTransportInit(String nodeId, String publicKey, boolean success, String msg) throws RemoteException {
             DataManager.this.onTransportInit(nodeId, publicKey, success, msg);
         }
+
+        @Override
+        public void onUserPublicKeyReceived(String address, String publicKey) throws RemoteException {
+
+        }
     };
 
 
@@ -358,12 +366,27 @@ public class DataManager {
      * @param frameData
      */
     public void onDataReceived(String senderId, byte[] frameData) {
-        DataEvent dataEvent = new DataEvent();
+        try {
+            DataEvent dataEvent = new DataEvent();
 
-        dataEvent.peerId = senderId;
-        dataEvent.data = frameData;
+            String msgText = new String(frameData);
+            MeshLog.v("Before decryption " + msgText);
 
-        AppDataObserver.on().sendObserverData(dataEvent);
+            String userPublicKey = getUserPublicKey(senderId);
+            if (!TextUtils.isEmpty(userPublicKey)){
+                String decryptedMessage = CryptoHelper.decryptMessage(WalletService.getInstance(mContext).getPrivateKey(), userPublicKey, msgText);
+                MeshLog.v("Decrypted message " + decryptedMessage);
+
+                dataEvent.peerId = senderId;
+                dataEvent.data = decryptedMessage.getBytes();
+
+                AppDataObserver.on().sendObserverData(dataEvent);
+            } else {
+                MeshLog.v("User public not found");
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+        }
     }
 
 
@@ -391,6 +414,11 @@ public class DataManager {
         } catch (RemoteException e) {
             e.printStackTrace();
         }
+    }
+
+    public String getUserPublicKey(String address) throws RemoteException {
+        MeshLog.v("getUserPublicKey dtm " + address);
+        return mTmCommunicator.getUserPublicKey(address);
     }
 
     public void sendPayMessage(String receiverId, String message, String messageId) throws RemoteException {
@@ -474,6 +502,10 @@ public class DataManager {
         transportInit.msg = msg;
 
         AppDataObserver.on().sendObserverData(transportInit);
+    }
+
+    public void onUserPublicKeyReceived(String address, String publicKey){
+        MeshLog.v("onUserPublicKeyReceived dtm " + address +"  " + publicKey);
     }
 
 }

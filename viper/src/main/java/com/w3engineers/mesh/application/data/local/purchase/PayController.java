@@ -12,6 +12,7 @@ import com.w3engineers.mesh.application.data.ApiEvent;
 import com.w3engineers.mesh.application.data.AppDataObserver;
 import com.w3engineers.mesh.application.data.local.DataPlanConstants;
 import com.w3engineers.mesh.application.data.local.helper.PreferencesHelperDataplan;
+import com.w3engineers.mesh.application.data.local.helper.crypto.CryptoHelper;
 import com.w3engineers.mesh.application.data.local.wallet.WalletService;
 import com.w3engineers.mesh.application.data.model.PayMessage;
 import com.w3engineers.mesh.application.data.model.PayMessageAck;
@@ -36,6 +37,7 @@ public class PayController {
     private static PayControllerListenerForSeller payControllerListenerForSeller;
     private static PayControllerListenerForBuyer payControllerListenerForBuyer;
     private DataManager dataManager;
+    WalletService walletService;
 
     private Handler handler;
     private long delayTime = 30 * 1000;
@@ -45,6 +47,7 @@ public class PayController {
 //        transportManager = DemoTransport.getInstance();
         dataManager = DataManager.on();
         setDataManagerObserver();
+        walletService = WalletService.getInstance(MeshApp.getContext());
     }
 
     public static PayController getInstance() {
@@ -104,331 +107,335 @@ public class PayController {
     private void onMessageReceived(String sender, byte[] paymentData) {
         String receiveMsg = new String(paymentData);
 
-
-        //String receiveMsg = new String(paymentData);
-        //String mainMessage = CryptoHelper.decryptMessage(transportManager.getContext(), sender, receiveMsg);
-
-        MeshLog.p("Received pay message (payController) =" + receiveMsg);
         try {
+            String userPublicKey = dataManager.getUserPublicKey(sender);
+            if (!TextUtils.isEmpty(userPublicKey)){
+                String mainMessage = CryptoHelper.decryptMessage(walletService.getPrivateKey(), userPublicKey, receiveMsg);
+                MeshLog.p("Received pay message (payController) =" + mainMessage);
+                JSONObject jsonObject = new JSONObject(mainMessage);
 
-            JSONObject jsonObject = new JSONObject(receiveMsg);
-            int type = jsonObject.getInt(PurchaseConstants.JSON_KEYS.MESSAGE_TYPE), nonce, purpose;
-            String fromAddress = jsonObject.getString(PurchaseConstants.JSON_KEYS.MESSAME_FROM), msg, sellerAddress;
-            String msg_id;
-            double balance, ethValue = 0, deposit;
-            long open_block;
-            int endPointType = jsonObject.optInt(PurchaseConstants.JSON_KEYS.END_POINT_TYPE);
-            switch (type) {
+                int type = jsonObject.getInt(PurchaseConstants.JSON_KEYS.MESSAGE_TYPE), nonce, purpose;
+                String fromAddress = jsonObject.getString(PurchaseConstants.JSON_KEYS.MESSAME_FROM), msg, sellerAddress;
+                String msg_id;
+                double balance, ethValue = 0, deposit;
+                long open_block;
+                int endPointType = jsonObject.optInt(PurchaseConstants.JSON_KEYS.END_POINT_TYPE);
+                switch (type) {
 
-                case PurchaseConstants.MESSAGE_TYPES.INIT_PURCHASE:
-                    payControllerListenerForSeller.onPurchaseInitRequested(fromAddress, endPointType);
-                    break;
+                    case PurchaseConstants.MESSAGE_TYPES.INIT_PURCHASE:
+                        payControllerListenerForSeller.onPurchaseInitRequested(fromAddress, endPointType);
+                        break;
 
-                case PurchaseConstants.MESSAGE_TYPES.INIT_PURCHASE_OK:
-                    double ethB = ((Number) jsonObject.get("eth")).doubleValue();
-                    double tknB = ((Number) jsonObject.get("tkn")).doubleValue();
-                    double allowance = ((Number) jsonObject.get("allowance")).doubleValue();
-                    nonce = jsonObject.getInt("nonce");
+                    case PurchaseConstants.MESSAGE_TYPES.INIT_PURCHASE_OK:
+                        double ethB = ((Number) jsonObject.get("eth")).doubleValue();
+                        double tknB = ((Number) jsonObject.get("tkn")).doubleValue();
+                        double allowance = ((Number) jsonObject.get("allowance")).doubleValue();
+                        nonce = jsonObject.getInt("nonce");
 
-                    if (payControllerListenerForBuyer != null) {
-                        payControllerListenerForBuyer.onInitPurchaseOkReceived(fromAddress, ethB, tknB, nonce, allowance, endPointType);
-                    } else {
-                        MeshLog.v("INIT_PURCHASE_OK Listener not found");
-                    }
-                    break;
+                        if (payControllerListenerForBuyer != null) {
+                            payControllerListenerForBuyer.onInitPurchaseOkReceived(fromAddress, ethB, tknB, nonce, allowance, endPointType);
+                        } else {
+                            MeshLog.v("INIT_PURCHASE_OK Listener not found");
+                        }
+                        break;
 
-                case PurchaseConstants.MESSAGE_TYPES.INIT_PURCHASE_ERROR:
-                    msg = jsonObject.getString("msg");
-                    if (payControllerListenerForBuyer != null) {
-                        payControllerListenerForBuyer.onInitPurchaseErrorReceived(fromAddress, msg);
-                    } else {
-                        MeshLog.v("INIT_PURCHASE_ERROR Listener not found");
-                    }
-                    break;
+                    case PurchaseConstants.MESSAGE_TYPES.INIT_PURCHASE_ERROR:
+                        msg = jsonObject.getString("msg");
+                        if (payControllerListenerForBuyer != null) {
+                            payControllerListenerForBuyer.onInitPurchaseErrorReceived(fromAddress, msg);
+                        } else {
+                            MeshLog.v("INIT_PURCHASE_ERROR Listener not found");
+                        }
+                        break;
 
-                case PurchaseConstants.MESSAGE_TYPES.CREATE_CHANNEL:
-                    JSONArray jArray = null;
-                    if (jsonObject.has(PurchaseConstants.JSON_KEYS.REQUEST_LIST)) {
-                        jArray = jsonObject.getJSONArray(PurchaseConstants.JSON_KEYS.REQUEST_LIST);
-                    }
+                    case PurchaseConstants.MESSAGE_TYPES.CREATE_CHANNEL:
+                        JSONArray jArray = null;
+                        if (jsonObject.has(PurchaseConstants.JSON_KEYS.REQUEST_LIST)) {
+                            jArray = jsonObject.getJSONArray(PurchaseConstants.JSON_KEYS.REQUEST_LIST);
+                        }
 
-                    if (payControllerListenerForSeller != null) {
-                        payControllerListenerForSeller.onCreateChannelRequested(fromAddress, jArray, endPointType);
-                    } else {
-                        MeshLog.v("INIT_PURCHASE_ERROR Listener not found");
-                    }
-                    break;
-                case PurchaseConstants.MESSAGE_TYPES.BUY_TOKEN:
-                    JSONArray array = null;
-                    if (jsonObject.has(PurchaseConstants.JSON_KEYS.REQUEST_LIST)) {
-                        array = jsonObject.getJSONArray(PurchaseConstants.JSON_KEYS.REQUEST_LIST);
-                    }
-                    if (payControllerListenerForSeller != null) {
-                        payControllerListenerForSeller.onBuyTokenRequested(fromAddress, array, endPointType);
-                    } else {
-                        MeshLog.v("BUY_TOKEN Listener not found");
-                    }
-                    break;
+                        if (payControllerListenerForSeller != null) {
+                            payControllerListenerForSeller.onCreateChannelRequested(fromAddress, jArray, endPointType);
+                        } else {
+                            MeshLog.v("INIT_PURCHASE_ERROR Listener not found");
+                        }
+                        break;
+                    case PurchaseConstants.MESSAGE_TYPES.BUY_TOKEN:
+                        JSONArray array = null;
+                        if (jsonObject.has(PurchaseConstants.JSON_KEYS.REQUEST_LIST)) {
+                            array = jsonObject.getJSONArray(PurchaseConstants.JSON_KEYS.REQUEST_LIST);
+                        }
+                        if (payControllerListenerForSeller != null) {
+                            payControllerListenerForSeller.onBuyTokenRequested(fromAddress, array, endPointType);
+                        } else {
+                            MeshLog.v("BUY_TOKEN Listener not found");
+                        }
+                        break;
 
-                case PurchaseConstants.MESSAGE_TYPES.BUY_TOKEN_RESPONSE:
+                    case PurchaseConstants.MESSAGE_TYPES.BUY_TOKEN_RESPONSE:
 
-                    double tokenValue = jsonObject.getDouble(PurchaseConstants.INFO_KEYS.TKN_BALANCE);
-                    if (jsonObject.has(PurchaseConstants.INFO_KEYS.ETH_BALANCE)){
-                        ethValue = jsonObject.getDouble(PurchaseConstants.INFO_KEYS.ETH_BALANCE);
-                    }
-                    if (payControllerListenerForBuyer != null) {
-                        payControllerListenerForBuyer.onBuyTokenResponseReceived(fromAddress, tokenValue, ethValue, endPointType);
-                    } else {
-                        MeshLog.v("BUY_TOKEN_RESPONSE Listener not found");
-                    }
-                    break;
-                case PurchaseConstants.MESSAGE_TYPES.CREATE_CHANNEL_OK:
+                        double tokenValue = jsonObject.getDouble(PurchaseConstants.INFO_KEYS.TKN_BALANCE);
+                        if (jsonObject.has(PurchaseConstants.INFO_KEYS.ETH_BALANCE)){
+                            ethValue = jsonObject.getDouble(PurchaseConstants.INFO_KEYS.ETH_BALANCE);
+                        }
+                        if (payControllerListenerForBuyer != null) {
+                            payControllerListenerForBuyer.onBuyTokenResponseReceived(fromAddress, tokenValue, ethValue, endPointType);
+                        } else {
+                            MeshLog.v("BUY_TOKEN_RESPONSE Listener not found");
+                        }
+                        break;
+                    case PurchaseConstants.MESSAGE_TYPES.CREATE_CHANNEL_OK:
 
-                    long openBlock = jsonObject.getLong(PurchaseConstants.JSON_KEYS.OPEN_BLOCK);
-                    deposit = jsonObject.getLong(PurchaseConstants.JSON_KEYS.DEPOSIT);
+                        long openBlock = jsonObject.getLong(PurchaseConstants.JSON_KEYS.OPEN_BLOCK);
+                        deposit = jsonObject.getLong(PurchaseConstants.JSON_KEYS.DEPOSIT);
 
-                    if (payControllerListenerForBuyer != null) {
-                        payControllerListenerForBuyer.onChannelCreateOkayReceived(fromAddress, openBlock, deposit, endPointType);
-                    } else {
-                        MeshLog.v("CREATE_CHANNEL_OK Listener not found");
-                    }
-                    break;
-                case PurchaseConstants.MESSAGE_TYPES.CREATE_CHANNEL_ERROR:
-                    msg = jsonObject.getString(PurchaseConstants.JSON_KEYS.MESSAGE_TEXT);
-                    if (payControllerListenerForBuyer != null) {
-                        payControllerListenerForBuyer.onChannelCreateErrorReceived(fromAddress, msg);
-                    } else {
-                        MeshLog.v("CREATE_CHANNEL_ERROR Listener not found");
-                    }
-                    break;
-                case PurchaseConstants.MESSAGE_TYPES.INFO_QUERY:
-                    String query = jsonObject.getString(PurchaseConstants.JSON_KEYS.INFO_KEYS);
-                    purpose = jsonObject.getInt(PurchaseConstants.JSON_KEYS.INFO_PURPOSE);
+                        if (payControllerListenerForBuyer != null) {
+                            payControllerListenerForBuyer.onChannelCreateOkayReceived(fromAddress, openBlock, deposit, endPointType);
+                        } else {
+                            MeshLog.v("CREATE_CHANNEL_OK Listener not found");
+                        }
+                        break;
+                    case PurchaseConstants.MESSAGE_TYPES.CREATE_CHANNEL_ERROR:
+                        msg = jsonObject.getString(PurchaseConstants.JSON_KEYS.MESSAGE_TEXT);
+                        if (payControllerListenerForBuyer != null) {
+                            payControllerListenerForBuyer.onChannelCreateErrorReceived(fromAddress, msg);
+                        } else {
+                            MeshLog.v("CREATE_CHANNEL_ERROR Listener not found");
+                        }
+                        break;
+                    case PurchaseConstants.MESSAGE_TYPES.INFO_QUERY:
+                        String query = jsonObject.getString(PurchaseConstants.JSON_KEYS.INFO_KEYS);
+                        purpose = jsonObject.getInt(PurchaseConstants.JSON_KEYS.INFO_PURPOSE);
 
-                    if (payControllerListenerForSeller != null) {
-                        payControllerListenerForSeller.onInfoQueryReceived(fromAddress, query, purpose, endPointType);
-                    } else {
-                        MeshLog.v("INFO_QUERY Listener not found");
-                    }
-                    break;
-                case PurchaseConstants.MESSAGE_TYPES.INFO_OK:
-                    JSONObject infoJson = jsonObject.has(PurchaseConstants.JSON_KEYS.INFO_JSON)? jsonObject.getJSONObject(PurchaseConstants.JSON_KEYS.INFO_JSON): null;
-                    purpose = jsonObject.getInt(PurchaseConstants.JSON_KEYS.INFO_PURPOSE);
+                        if (payControllerListenerForSeller != null) {
+                            payControllerListenerForSeller.onInfoQueryReceived(fromAddress, query, purpose, endPointType);
+                        } else {
+                            MeshLog.v("INFO_QUERY Listener not found");
+                        }
+                        break;
+                    case PurchaseConstants.MESSAGE_TYPES.INFO_OK:
+                        JSONObject infoJson = jsonObject.has(PurchaseConstants.JSON_KEYS.INFO_JSON)? jsonObject.getJSONObject(PurchaseConstants.JSON_KEYS.INFO_JSON): null;
+                        purpose = jsonObject.getInt(PurchaseConstants.JSON_KEYS.INFO_PURPOSE);
 
-                    if (payControllerListenerForBuyer != null) {
-                        payControllerListenerForBuyer.onInfoOkayReceived(fromAddress, purpose, infoJson, endPointType);
-                    } else {
-                        MeshLog.v("INFO_OK Listener not found");
-                    }
-                    break;
-                case PurchaseConstants.MESSAGE_TYPES.INFO_ERROR:
-                    msg = jsonObject.getString(PurchaseConstants.JSON_KEYS.MESSAGE_TEXT);
-                    purpose = jsonObject.getInt(PurchaseConstants.JSON_KEYS.INFO_PURPOSE);
-                    if (payControllerListenerForBuyer != null) {
-                        payControllerListenerForBuyer.onInfoErrorReceived(fromAddress, purpose, msg);
-                    } else {
-                        MeshLog.v("INFO_ERROR Listener not found");
-                    }
-                    break;
-                case PurchaseConstants.MESSAGE_TYPES.GOT_MESSAGE:
-                    long dataSize = jsonObject.getLong(PurchaseConstants.JSON_KEYS.DATA_SIZE);
-                    msg_id = jsonObject.getString(PurchaseConstants.JSON_KEYS.MESSAGE_ID);
-                    if (payControllerListenerForBuyer != null) {
-                        payControllerListenerForBuyer.onPendingMessageInfo(fromAddress, dataSize, msg_id);
-                    } else {
-                        MeshLog.v("GOT_MESSAGE Listener not found");
-                    }
-                    break;
-                case PurchaseConstants.MESSAGE_TYPES.BUYER_UPDATE_NOTIFYER:
-                    MeshLog.v("Message Queuing 22");
-                    String msg_Id = jsonObject.getString(PurchaseConstants.JSON_KEYS.MESSAGE_ID);
-                    MeshLog.o("********** buyer update callback recieved ************");
-                    payControllerListenerForSeller.onBuyerUpdateNotified(msg_Id, fromAddress);
-                    break;
-                case PurchaseConstants.MESSAGE_TYPES.PAY_FOR_MESSAGE_OK:
-                    MeshLog.o("Payment ok");
-                    MeshLog.v("Message Queuing 9");
-                    balance = jsonObject.getDouble(PurchaseConstants.JSON_KEYS.BPS_BALANCE);
-                    open_block = jsonObject.getLong(PurchaseConstants.JSON_KEYS.OPEN_BLOCK);
-                    String bps = jsonObject.getString(PurchaseConstants.JSON_KEYS.MESSAGE_BPS);
-                    msg_id = jsonObject.getString(PurchaseConstants.JSON_KEYS.MESSAGE_ID);
-                    if (payControllerListenerForSeller != null) {
-                        payControllerListenerForSeller.onPayForMessageOkReceived(fromAddress, msg_id, bps, balance, open_block);
-                    } else {
-                        MeshLog.v("PAY_FOR_MESSAGE_OK Listener not found");
-                    }
-                    break;
-
-                case PurchaseConstants.MESSAGE_TYPES.PAY_FOR_MESSAGE_ERROR:
-                    MeshLog.o("Payment error");
-                    String errorText = jsonObject.getString(PurchaseConstants.JSON_KEYS.MESSAGE_TEXT);
-                    msg_id = jsonObject.getString(PurchaseConstants.JSON_KEYS.MESSAGE_ID);
-                    if (payControllerListenerForSeller != null) {
-                        payControllerListenerForSeller.onPayForMessageErrorReceived(fromAddress, msg_id, errorText);
-                    } else {
-                        MeshLog.v("PAY_FOR_MESSAGE_ERROR Listener not found");
-                    }
-                    break;
-
-                case PurchaseConstants.MESSAGE_TYPES.PAY_FOR_MESSAGE_RESPONSE:
-                    bps = jsonObject.getString(PurchaseConstants.JSON_KEYS.MESSAGE_BPS);
-                    double bps_balance = jsonObject.getDouble(PurchaseConstants.JSON_KEYS.BPS_BALANCE);
-                    String chs = jsonObject.getString(PurchaseConstants.JSON_KEYS.MESSAGE_CHS);
-                    openBlock = jsonObject.getLong(PurchaseConstants.JSON_KEYS.OPEN_BLOCK);
-                    long byeSize = jsonObject.getLong(PurchaseConstants.JSON_KEYS.DATA_SIZE);
-                    String messageId = jsonObject.getString(PurchaseConstants.JSON_KEYS.MESSAGE_ID);
-
-                    if (payControllerListenerForBuyer != null) {
-                        payControllerListenerForBuyer.onInternetMessageResponseSuccess(fromAddress, bps, bps_balance, chs, openBlock, byeSize, messageId);
-                    } else {
-//                        MeshLog.p("PAY_FOR_MESSAGE_RESPONSE listener not found");
-                    }
-                    break;
-                case PurchaseConstants.MESSAGE_TYPES.SYNC_BUYER:
-                    sellerAddress = jsonObject.getString(PurchaseConstants.JSON_KEYS.SELLER_ADDRESS);
-                    if (payControllerListenerForSeller != null) {
-                       // payControllerListenerForSeller.onSyncMessageReceived(fromAddress, sellerAddress);
-                    }
-                    break;
-
-                case PurchaseConstants.MESSAGE_TYPES.SYNC_SELLER_OK:
-                    String buyerAddress = jsonObject.getString(PurchaseConstants.JSON_KEYS.BUYER_ADDRESS);
-                    balance = 0.0;
-                    String BPS = "";
-                    String CHS = "";
-                    open_block = 0;
-                    double usedDataAmount = 0, totalDataAmount = 0;
-                    if (jsonObject.has(PurchaseConstants.JSON_KEYS.OPEN_BLOCK)) {
-                        open_block = jsonObject.getLong(PurchaseConstants.JSON_KEYS.OPEN_BLOCK);
+                        if (payControllerListenerForBuyer != null) {
+                            payControllerListenerForBuyer.onInfoOkayReceived(fromAddress, purpose, infoJson, endPointType);
+                        } else {
+                            MeshLog.v("INFO_OK Listener not found");
+                        }
+                        break;
+                    case PurchaseConstants.MESSAGE_TYPES.INFO_ERROR:
+                        msg = jsonObject.getString(PurchaseConstants.JSON_KEYS.MESSAGE_TEXT);
+                        purpose = jsonObject.getInt(PurchaseConstants.JSON_KEYS.INFO_PURPOSE);
+                        if (payControllerListenerForBuyer != null) {
+                            payControllerListenerForBuyer.onInfoErrorReceived(fromAddress, purpose, msg);
+                        } else {
+                            MeshLog.v("INFO_ERROR Listener not found");
+                        }
+                        break;
+                    case PurchaseConstants.MESSAGE_TYPES.GOT_MESSAGE:
+                        long dataSize = jsonObject.getLong(PurchaseConstants.JSON_KEYS.DATA_SIZE);
+                        msg_id = jsonObject.getString(PurchaseConstants.JSON_KEYS.MESSAGE_ID);
+                        if (payControllerListenerForBuyer != null) {
+                            payControllerListenerForBuyer.onPendingMessageInfo(fromAddress, dataSize, msg_id);
+                        } else {
+                            MeshLog.v("GOT_MESSAGE Listener not found");
+                        }
+                        break;
+                    case PurchaseConstants.MESSAGE_TYPES.BUYER_UPDATE_NOTIFYER:
+                        MeshLog.v("Message Queuing 22");
+                        String msg_Id = jsonObject.getString(PurchaseConstants.JSON_KEYS.MESSAGE_ID);
+                        MeshLog.o("********** buyer update callback recieved ************");
+                        payControllerListenerForSeller.onBuyerUpdateNotified(msg_Id, fromAddress);
+                        break;
+                    case PurchaseConstants.MESSAGE_TYPES.PAY_FOR_MESSAGE_OK:
+                        MeshLog.o("Payment ok");
+                        MeshLog.v("Message Queuing 9");
                         balance = jsonObject.getDouble(PurchaseConstants.JSON_KEYS.BPS_BALANCE);
-                        usedDataAmount = jsonObject.getDouble(PurchaseConstants.JSON_KEYS.USED_DATA);
-                        totalDataAmount = jsonObject.getDouble(PurchaseConstants.JSON_KEYS.TOTAL_DATA);
-                        BPS = jsonObject.getString(PurchaseConstants.JSON_KEYS.MESSAGE_BPS);
-                        CHS = jsonObject.getString(PurchaseConstants.JSON_KEYS.MESSAGE_CHS);
-                    }
-                    if (payControllerListenerForBuyer != null) {
-                        payControllerListenerForBuyer.onSyncMessageOKReceived(buyerAddress, fromAddress,
-                                open_block, usedDataAmount, totalDataAmount, balance, BPS, CHS, endPointType);
-                    }
-                    break;
+                        open_block = jsonObject.getLong(PurchaseConstants.JSON_KEYS.OPEN_BLOCK);
+                        String bps = jsonObject.getString(PurchaseConstants.JSON_KEYS.MESSAGE_BPS);
+                        msg_id = jsonObject.getString(PurchaseConstants.JSON_KEYS.MESSAGE_ID);
+                        if (payControllerListenerForSeller != null) {
+                            payControllerListenerForSeller.onPayForMessageOkReceived(fromAddress, msg_id, bps, balance, open_block);
+                        } else {
+                            MeshLog.v("PAY_FOR_MESSAGE_OK Listener not found");
+                        }
+                        break;
 
-                case PurchaseConstants.MESSAGE_TYPES.SYNC_BUYER_OK:
-                    sellerAddress = jsonObject.getString(PurchaseConstants.JSON_KEYS.SELLER_ADDRESS);
-                    if (payControllerListenerForSeller != null) {
-                        payControllerListenerForSeller.onSynBuyerOKReceive(fromAddress, sellerAddress);
-                    }
-                    break;
+                    case PurchaseConstants.MESSAGE_TYPES.PAY_FOR_MESSAGE_ERROR:
+                        MeshLog.o("Payment error");
+                        String errorText = jsonObject.getString(PurchaseConstants.JSON_KEYS.MESSAGE_TEXT);
+                        msg_id = jsonObject.getString(PurchaseConstants.JSON_KEYS.MESSAGE_ID);
+                        if (payControllerListenerForSeller != null) {
+                            payControllerListenerForSeller.onPayForMessageErrorReceived(fromAddress, msg_id, errorText);
+                        } else {
+                            MeshLog.v("PAY_FOR_MESSAGE_ERROR Listener not found");
+                        }
+                        break;
 
-                case PurchaseConstants.MESSAGE_TYPES.ETHER_REQUEST:
-                    endPointType = jsonObject.getInt(PurchaseConstants.JSON_KEYS.END_POINT_TYPE);
-                    if (payControllerListenerForSeller != null) {
-                        payControllerListenerForSeller.onReceivedEtherRequest(fromAddress, endPointType);
-                    }
-                    break;
-                case PurchaseConstants.MESSAGE_TYPES.ETHER_REQUEST_RESPONSE:
-                    int responseCode = jsonObject.getInt(PurchaseConstants.JSON_KEYS.RESPONSE_CODE);
-                    if (payControllerListenerForBuyer != null) {
-                        payControllerListenerForBuyer.onReceivedEtherRequestResponse(fromAddress, responseCode);
-                    }
-                    break;
+                    case PurchaseConstants.MESSAGE_TYPES.PAY_FOR_MESSAGE_RESPONSE:
+                        bps = jsonObject.getString(PurchaseConstants.JSON_KEYS.MESSAGE_BPS);
+                        double bps_balance = jsonObject.getDouble(PurchaseConstants.JSON_KEYS.BPS_BALANCE);
+                        String chs = jsonObject.getString(PurchaseConstants.JSON_KEYS.MESSAGE_CHS);
+                        openBlock = jsonObject.getLong(PurchaseConstants.JSON_KEYS.OPEN_BLOCK);
+                        long byeSize = jsonObject.getLong(PurchaseConstants.JSON_KEYS.DATA_SIZE);
+                        String messageId = jsonObject.getString(PurchaseConstants.JSON_KEYS.MESSAGE_ID);
 
-                case PurchaseConstants.MESSAGE_TYPES.RECEIVED_ETHER:
-                    ethValue = jsonObject.getDouble(PurchaseConstants.JSON_KEYS.ETHER);
-                    if (payControllerListenerForBuyer != null) {
-                        payControllerListenerForBuyer.onReceivedEther(fromAddress, ethValue);
-                    }
-                    break;
-                case PurchaseConstants.MESSAGE_TYPES.BLOCKCHAIN_REQUEST:
-                    JSONArray requestArray = null;
-                    if (jsonObject.has(PurchaseConstants.JSON_KEYS.REQUEST_LIST)) {
-                        requestArray = jsonObject.getJSONArray(PurchaseConstants.JSON_KEYS.REQUEST_LIST);
-                    }
-                    if (payControllerListenerForSeller != null) {
-                        payControllerListenerForSeller.onBlockchainRequestReceived(fromAddress, requestArray, endPointType);
-                    } else {
-                        MeshLog.v("BLOCKCHAIN_REQUEST Listener not found");
-                    }
-                    break;
-                case PurchaseConstants.MESSAGE_TYPES.CHANNEL_CLOSED:
-                    open_block = jsonObject.getLong(PurchaseConstants.JSON_KEYS.OPEN_BLOCK);
-                    sellerAddress = jsonObject.getString(PurchaseConstants.JSON_KEYS.SELLER_ADDRESS);
-                    if (payControllerListenerForBuyer != null) {
-                        payControllerListenerForBuyer.onChannelCloseReceived(fromAddress, sellerAddress, open_block, endPointType);
-                    } else {
-                        MeshLog.v("CHANNEL_CLOSED Listener not found");
-                    }
-                    break;
+                        if (payControllerListenerForBuyer != null) {
+                            payControllerListenerForBuyer.onInternetMessageResponseSuccess(fromAddress, bps, bps_balance, chs, openBlock, byeSize, messageId);
+                        } else {
+//                        MeshLog.p("PAY_FOR_MESSAGE_RESPONSE listener not found");
+                        }
+                        break;
+                    case PurchaseConstants.MESSAGE_TYPES.SYNC_BUYER:
+                        sellerAddress = jsonObject.getString(PurchaseConstants.JSON_KEYS.SELLER_ADDRESS);
+                        if (payControllerListenerForSeller != null) {
+                            // payControllerListenerForSeller.onSyncMessageReceived(fromAddress, sellerAddress);
+                        }
+                        break;
 
-                case PurchaseConstants.MESSAGE_TYPES.CHANNEL_TOPUP:
-                    open_block = jsonObject.getLong(PurchaseConstants.JSON_KEYS.OPEN_BLOCK);
-                    deposit = jsonObject.getDouble(PurchaseConstants.JSON_KEYS.DEPOSIT);
+                    case PurchaseConstants.MESSAGE_TYPES.SYNC_SELLER_OK:
+                        String buyerAddress = jsonObject.getString(PurchaseConstants.JSON_KEYS.BUYER_ADDRESS);
+                        balance = 0.0;
+                        String BPS = "";
+                        String CHS = "";
+                        open_block = 0;
+                        double usedDataAmount = 0, totalDataAmount = 0;
+                        if (jsonObject.has(PurchaseConstants.JSON_KEYS.OPEN_BLOCK)) {
+                            open_block = jsonObject.getLong(PurchaseConstants.JSON_KEYS.OPEN_BLOCK);
+                            balance = jsonObject.getDouble(PurchaseConstants.JSON_KEYS.BPS_BALANCE);
+                            usedDataAmount = jsonObject.getDouble(PurchaseConstants.JSON_KEYS.USED_DATA);
+                            totalDataAmount = jsonObject.getDouble(PurchaseConstants.JSON_KEYS.TOTAL_DATA);
+                            BPS = jsonObject.getString(PurchaseConstants.JSON_KEYS.MESSAGE_BPS);
+                            CHS = jsonObject.getString(PurchaseConstants.JSON_KEYS.MESSAGE_CHS);
+                        }
+                        if (payControllerListenerForBuyer != null) {
+                            payControllerListenerForBuyer.onSyncMessageOKReceived(buyerAddress, fromAddress,
+                                    open_block, usedDataAmount, totalDataAmount, balance, BPS, CHS, endPointType);
+                        }
+                        break;
 
-                    if (payControllerListenerForBuyer != null) {
-                        payControllerListenerForBuyer.onChannelTopupReceived(fromAddress, open_block, deposit, endPointType);
-                    } else {
-                        MeshLog.v("CHANNEL_TOPUP Listener not found");
-                    }
-                    break;
+                    case PurchaseConstants.MESSAGE_TYPES.SYNC_BUYER_OK:
+                        sellerAddress = jsonObject.getString(PurchaseConstants.JSON_KEYS.SELLER_ADDRESS);
+                        if (payControllerListenerForSeller != null) {
+                            payControllerListenerForSeller.onSynBuyerOKReceive(fromAddress, sellerAddress);
+                        }
+                        break;
 
-                case PurchaseConstants.MESSAGE_TYPES.BLOCKCHAIN_RESPONSE:
-                    boolean success = jsonObject.getBoolean(PurchaseConstants.JSON_KEYS.REQUEST_SUCCESS);
-                    msg = jsonObject.getString(PurchaseConstants.JSON_KEYS.MESSAGE_TEXT);
-                    int requestType = jsonObject.getInt(PurchaseConstants.JSON_KEYS.REQUEST_TYPE);
+                    case PurchaseConstants.MESSAGE_TYPES.ETHER_REQUEST:
+                        endPointType = jsonObject.getInt(PurchaseConstants.JSON_KEYS.END_POINT_TYPE);
+                        if (payControllerListenerForSeller != null) {
+                            payControllerListenerForSeller.onReceivedEtherRequest(fromAddress, endPointType);
+                        }
+                        break;
+                    case PurchaseConstants.MESSAGE_TYPES.ETHER_REQUEST_RESPONSE:
+                        int responseCode = jsonObject.getInt(PurchaseConstants.JSON_KEYS.RESPONSE_CODE);
+                        if (payControllerListenerForBuyer != null) {
+                            payControllerListenerForBuyer.onReceivedEtherRequestResponse(fromAddress, responseCode);
+                        }
+                        break;
+
+                    case PurchaseConstants.MESSAGE_TYPES.RECEIVED_ETHER:
+                        ethValue = jsonObject.getDouble(PurchaseConstants.JSON_KEYS.ETHER);
+                        if (payControllerListenerForBuyer != null) {
+                            payControllerListenerForBuyer.onReceivedEther(fromAddress, ethValue);
+                        }
+                        break;
+                    case PurchaseConstants.MESSAGE_TYPES.BLOCKCHAIN_REQUEST:
+                        JSONArray requestArray = null;
+                        if (jsonObject.has(PurchaseConstants.JSON_KEYS.REQUEST_LIST)) {
+                            requestArray = jsonObject.getJSONArray(PurchaseConstants.JSON_KEYS.REQUEST_LIST);
+                        }
+                        if (payControllerListenerForSeller != null) {
+                            payControllerListenerForSeller.onBlockchainRequestReceived(fromAddress, requestArray, endPointType);
+                        } else {
+                            MeshLog.v("BLOCKCHAIN_REQUEST Listener not found");
+                        }
+                        break;
+                    case PurchaseConstants.MESSAGE_TYPES.CHANNEL_CLOSED:
+                        open_block = jsonObject.getLong(PurchaseConstants.JSON_KEYS.OPEN_BLOCK);
+                        sellerAddress = jsonObject.getString(PurchaseConstants.JSON_KEYS.SELLER_ADDRESS);
+                        if (payControllerListenerForBuyer != null) {
+                            payControllerListenerForBuyer.onChannelCloseReceived(fromAddress, sellerAddress, open_block, endPointType);
+                        } else {
+                            MeshLog.v("CHANNEL_CLOSED Listener not found");
+                        }
+                        break;
+
+                    case PurchaseConstants.MESSAGE_TYPES.CHANNEL_TOPUP:
+                        open_block = jsonObject.getLong(PurchaseConstants.JSON_KEYS.OPEN_BLOCK);
+                        deposit = jsonObject.getDouble(PurchaseConstants.JSON_KEYS.DEPOSIT);
+
+                        if (payControllerListenerForBuyer != null) {
+                            payControllerListenerForBuyer.onChannelTopupReceived(fromAddress, open_block, deposit, endPointType);
+                        } else {
+                            MeshLog.v("CHANNEL_TOPUP Listener not found");
+                        }
+                        break;
+
+                    case PurchaseConstants.MESSAGE_TYPES.BLOCKCHAIN_RESPONSE:
+                        boolean success = jsonObject.getBoolean(PurchaseConstants.JSON_KEYS.REQUEST_SUCCESS);
+                        msg = jsonObject.getString(PurchaseConstants.JSON_KEYS.MESSAGE_TEXT);
+                        int requestType = jsonObject.getInt(PurchaseConstants.JSON_KEYS.REQUEST_TYPE);
 
 
-                    if (payControllerListenerForBuyer != null) {
-                        payControllerListenerForBuyer.onBlockChainResponseReceived(fromAddress, success, requestType, msg);
-                    } else {
-                        MeshLog.v("BLOCKCHAIN_RESPONSE Listener not found");
-                    }
-                    break;
+                        if (payControllerListenerForBuyer != null) {
+                            payControllerListenerForBuyer.onBlockChainResponseReceived(fromAddress, success, requestType, msg);
+                        } else {
+                            MeshLog.v("BLOCKCHAIN_RESPONSE Listener not found");
+                        }
+                        break;
 
-                case PurchaseConstants.MESSAGE_TYPES.GIFT_ETHER_REQUEST:
-                    if (payControllerListenerForSeller != null) {
-                        payControllerListenerForSeller.requestForGiftEther(fromAddress, endPointType);
-                    }
-                    break;
+                    case PurchaseConstants.MESSAGE_TYPES.GIFT_ETHER_REQUEST:
+                        if (payControllerListenerForSeller != null) {
+                            payControllerListenerForSeller.requestForGiftEther(fromAddress, endPointType);
+                        }
+                        break;
 
-                case PurchaseConstants.MESSAGE_TYPES.GIFT_ETHER_REQUEST_SUBMITTED:
+                    case PurchaseConstants.MESSAGE_TYPES.GIFT_ETHER_REQUEST_SUBMITTED:
 
-                    boolean isSuccess = jsonObject.optBoolean(PurchaseConstants.JSON_KEYS.GIFT_REQUEST_IS_SUBMITTED);
-                    String message = jsonObject.optString(PurchaseConstants.JSON_KEYS.GIFT_REQUEST_SUBMIT_MESSAGE);
-                    String ethReqHash = jsonObject.optString(PurchaseConstants.JSON_KEYS.GIFT_ETH_HASH_REQUEST_SUBMIT);
-                    String tknReqHash = jsonObject.optString(PurchaseConstants.JSON_KEYS.GIFT_TKN_HASH_REQUEST_SUBMIT);
-                    String failedBy = jsonObject.optString(PurchaseConstants.JSON_KEYS.GIFT_TKN_FAILED_BY);
-
-
-                    if (payControllerListenerForBuyer != null) {
-                        payControllerListenerForBuyer.giftRequestSubmitted(isSuccess, message, ethReqHash, tknReqHash, endPointType, failedBy);
-                    }
-                    break;
-
-                case PurchaseConstants.MESSAGE_TYPES.GIFT_ETHER_REQUEST_WITH_HASH:
-                    String ethtranxHash = jsonObject.optString(PurchaseConstants.JSON_KEYS.GIFT_ETH_HASH_REQUEST_SUBMIT);
-                    String tkntranxHash = jsonObject.optString(PurchaseConstants.JSON_KEYS.GIFT_TKN_HASH_REQUEST_SUBMIT);
-
-                    if (payControllerListenerForSeller != null) {
-                        payControllerListenerForSeller.requestForGiftEtherWithHash(fromAddress, ethtranxHash, tkntranxHash, endPointType);
-                    }
-                    break;
-
-                case PurchaseConstants.MESSAGE_TYPES.GIFT_RESPONSE:
-                    boolean isSuccessForGift = jsonObject.optBoolean(PurchaseConstants.JSON_KEYS.GIFT_REQUEST_IS_SUBMITTED);
-                    double ethBalance = jsonObject.optDouble(PurchaseConstants.JSON_KEYS.GIFT_ETH_BALANCE);
-                    double tknBalance = jsonObject.optDouble(PurchaseConstants.JSON_KEYS.GIFT_TKN_BALANCE);
-
-                    if (payControllerListenerForBuyer != null) {
-                        payControllerListenerForBuyer.giftResponse(isSuccessForGift, ethBalance, tknBalance, endPointType);
-                    }
-                    break;
-
-                default:
-                    break;
+                        boolean isSuccess = jsonObject.optBoolean(PurchaseConstants.JSON_KEYS.GIFT_REQUEST_IS_SUBMITTED);
+                        String message = jsonObject.optString(PurchaseConstants.JSON_KEYS.GIFT_REQUEST_SUBMIT_MESSAGE);
+                        String ethReqHash = jsonObject.optString(PurchaseConstants.JSON_KEYS.GIFT_ETH_HASH_REQUEST_SUBMIT);
+                        String tknReqHash = jsonObject.optString(PurchaseConstants.JSON_KEYS.GIFT_TKN_HASH_REQUEST_SUBMIT);
+                        String failedBy = jsonObject.optString(PurchaseConstants.JSON_KEYS.GIFT_TKN_FAILED_BY);
 
 
+                        if (payControllerListenerForBuyer != null) {
+                            payControllerListenerForBuyer.giftRequestSubmitted(isSuccess, message, ethReqHash, tknReqHash, endPointType, failedBy);
+                        }
+                        break;
+
+                    case PurchaseConstants.MESSAGE_TYPES.GIFT_ETHER_REQUEST_WITH_HASH:
+                        String ethtranxHash = jsonObject.optString(PurchaseConstants.JSON_KEYS.GIFT_ETH_HASH_REQUEST_SUBMIT);
+                        String tkntranxHash = jsonObject.optString(PurchaseConstants.JSON_KEYS.GIFT_TKN_HASH_REQUEST_SUBMIT);
+
+                        if (payControllerListenerForSeller != null) {
+                            payControllerListenerForSeller.requestForGiftEtherWithHash(fromAddress, ethtranxHash, tkntranxHash, endPointType);
+                        }
+                        break;
+
+                    case PurchaseConstants.MESSAGE_TYPES.GIFT_RESPONSE:
+                        boolean isSuccessForGift = jsonObject.optBoolean(PurchaseConstants.JSON_KEYS.GIFT_REQUEST_IS_SUBMITTED);
+                        double ethBalance = jsonObject.optDouble(PurchaseConstants.JSON_KEYS.GIFT_ETH_BALANCE);
+                        double tknBalance = jsonObject.optDouble(PurchaseConstants.JSON_KEYS.GIFT_TKN_BALANCE);
+
+                        if (payControllerListenerForBuyer != null) {
+                            payControllerListenerForBuyer.giftResponse(isSuccessForGift, ethBalance, tknBalance, endPointType);
+                        }
+                        break;
+
+                    default:
+                        break;
+
+
+                }
+            } else {
+                MeshLog.v("User public not found");
             }
 
         } catch (JSONException e) {
+            e.printStackTrace();
+        } catch (RemoteException e) {
             e.printStackTrace();
         }
 
@@ -461,42 +468,6 @@ public class PayController {
         }
     }
 
-   /* @Override
-    public void onInternetMessageResponseReceived(String sender, String message) {
-//        MeshLog.p("onInternetMessageResponseReceived" + message);
-        try {
-            JSONObject jsonObject = new JSONObject(message);
-            boolean success = jsonObject.getBoolean(PurchaseConstants.JSON_KEYS.MESSAGE_SENT_SUCCESS);
-
-            if (success) {
-
-                JSONObject successJson = jsonObject.getJSONObject(PurchaseConstants.JSON_KEYS.MESSAGE_BODY);
-
-
-                String bps = successJson.getString(PurchaseConstants.JSON_KEYS.MESSAGE_BPS);
-                double bps_balance = successJson.getDouble(PurchaseConstants.JSON_KEYS.BPS_BALANCE);
-                String chs = successJson.getString(PurchaseConstants.JSON_KEYS.MESSAGE_CHS);
-                long openBlock = successJson.getLong(PurchaseConstants.JSON_KEYS.OPEN_BLOCK);
-                long byeSize = successJson.getLong(PurchaseConstants.JSON_KEYS.DATA_SIZE);
-
-                if (payControllerListenerForBuyer != null) {
-                    payControllerListenerForBuyer.onInternetMessageResponseSuccess(sender, bps, bps_balance, chs, openBlock, byeSize, "");
-                } else {
-//                    MeshLog.p("onInternetMessageResponseReceived listener not found");
-                }
-            } else {
-                String errorMessage = jsonObject.getJSONObject(PurchaseConstants.JSON_KEYS.MESSAGE_BODY).getString(PurchaseConstants.JSON_KEYS.MESSAGE_TEXT);
-
-                if (payControllerListenerForBuyer != null) {
-                    payControllerListenerForBuyer.onInternetMessageResponseFailed(sender, errorMessage);
-                } else {
-//                    MeshLog.p("onInternetMessageResponseReceived  listener not found");
-                }
-            }
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-    }*/
 
     public void sendInfoQueryMessage(JSONObject msgObject, String receiver, int purpose) {
         MeshLog.p("sendInfoQueryMessage" + msgObject.toString());
@@ -913,10 +884,7 @@ public class PayController {
     }
 
     private void sendPayMessage(String receiver, String message) {
-        //  long messageId = 0l;//System.currentTimeMillis();
         String messageId = "";
-        //TODO encrypt message
-        //transportManager.sendPayMessage(receiver, message, messageId);
         sendPayMessageToTransport(receiver, message, messageId.toString());
     }
 
@@ -928,16 +896,21 @@ public class PayController {
     }
 
     private void sendPayMessageWithMessageId(String receiver, String message, String messageId) {
-        //TODO encrypt message
-        //transportManager.sendPayMessage(receiver, message, messageId);
         sendPayMessageToTransport(receiver, message, messageId);
     }
 
     private void sendPayMessageToTransport(String address, String message, String messageId) {
-        //String encryptedMessage = CryptoHelper.encryptMessage(transportManager.getContext(), address, message.getBytes());
+
         MeshLog.v("sendPayMessageToTransport " + address + "   " + message + "  " + messageId);
         try {
-            dataManager.sendPayMessage(address, message, messageId);
+            String userPublicKey = dataManager.getUserPublicKey(address);
+            if (!TextUtils.isEmpty(userPublicKey)){
+                String encryptedMessage = CryptoHelper.encryptMessage(walletService.getPrivateKey(), userPublicKey, message);
+                dataManager.sendPayMessage(address, encryptedMessage, messageId);
+            } else {
+                MeshLog.v("User public not found");
+            }
+
         } catch (RemoteException e) {
             e.printStackTrace();
         }

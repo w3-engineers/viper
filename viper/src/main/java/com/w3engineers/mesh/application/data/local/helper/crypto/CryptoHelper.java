@@ -2,6 +2,8 @@ package com.w3engineers.mesh.application.data.local.helper.crypto;
 
 
 
+import android.content.Context;
+
 import com.w3engineers.mesh.application.data.local.db.SharedPref;
 import com.w3engineers.mesh.util.MeshLog;
 
@@ -19,7 +21,8 @@ import javax.crypto.SecretKey;
 
 public class CryptoHelper {
 
-    public static void setupBouncyCastle() {
+
+   /* public static void setupBouncyCastle() {
         final Provider provider = Security.getProvider(BouncyCastleProvider.PROVIDER_NAME);
         if (provider == null) {
             // Web3j will set up the provider lazily when it's first used.
@@ -108,5 +111,32 @@ public class CryptoHelper {
         // Decrypt the message using 'secretKeyB'
         String decryptedPlainText = AES.decryptString(Numeric.toHexStringNoPrefix(sharedSecretB), cipherText);
         System.out.println("Decrypted cipher text: " + decryptedPlainText);
+    }*/
+
+    public static String encrypt(String privateKey, String otherPartyPoint, byte[] plainText) {
+        BigInteger sharedSecret = ECDSA.generateBasicSharedSecret(privateKey, otherPartyPoint);
+        String secretKey = sharedSecret.toString(16);
+        MeshLog.v("sendPayMessage: secretKey: " + secretKey);
+
+        String encoded = EncryptUtil.encrypt(secretKey, plainText);
+        return encoded;
+    }
+
+    public static String decrypt(String privateKey, String otherPartyPoint, String cipherText) {
+        BigInteger sharedSecret = ECDSA.generateBasicSharedSecret(privateKey, otherPartyPoint);
+
+        String secretKey = sharedSecret.toString(16);
+        MeshLog.v("onMessageReceived: secretKey: " + secretKey);
+
+        String decrypted = EncryptUtil.decrypt(secretKey, cipherText);
+        return decrypted;
+    }
+
+    public static String decryptMessage(String myPrivateKey, String othersPublicKey, String message) {
+        return CryptoHelper.decrypt(myPrivateKey, othersPublicKey, message);
+    }
+
+    public static String encryptMessage(String myPrivateKey, String othersPublicKey, String message) {
+        return CryptoHelper.encrypt(myPrivateKey, othersPublicKey, message.getBytes());
     }
 }

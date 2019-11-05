@@ -17,4 +17,5 @@ interface ITmCommunicator {
    void onBuyerConnected(in String address);
    void onBuyerDisconnected(in String address);
    void restartMesh(in int newRole);
+   String getUserPublicKey(in String address);
 }

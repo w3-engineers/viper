@@ -120,6 +120,12 @@ public class ClientLibraryService extends Service {
             MeshLog.v("onTransportInit cls");
             DataManager.on().onTransportInit(nodeId, publicKey, success, msg);
         }
+
+        @Override
+        public void onUserPublicKeyReceived(String address, String publicKey) throws RemoteException {
+            MeshLog.v("onUserPublicKeyReceived cls");
+            DataManager.on().onUserPublicKeyReceived(address, publicKey);
+        }
     };
 
     private void startInForeground() {
