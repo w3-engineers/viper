@@ -77,7 +77,7 @@ public class ConnectionManager {
                     nearbyCallBack.onUserFound(userModel);
                 }
             } else {
-              //  reqUserInfo(peerAdd.peerId);
+                //  reqUserInfo(peerAdd.peerId);
 
                 UserModel userModel = new UserModel();
                 userModel.setUserName("Anonymous");
@@ -151,7 +151,7 @@ public class ConnectionManager {
                                     "" + userModel.getUserName(), Toast.LENGTH_SHORT).show());
                         }
 
-                   //     viperClient.saveDiscoveredUserInfo(userModel.getUserId(), userModel.getUserName());
+                        //     viperClient.saveDiscoveredUserInfo(userModel.getUserId(), userModel.getUserName());
 
                         break;
                     case JsonKeys.TYPE_TEXT_MESSAGE:
