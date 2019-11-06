@@ -19,6 +19,12 @@ public class ViperClient {
     private Context mContext;
     public static String networkPrefix;
     public static String appName;
+
+    public static String usersName;
+    public static int avatar;
+    public static long regTime;
+    public static boolean isSync;
+
     private static ViperClient mViperClient;
 
     private ViperClient() {
@@ -28,10 +34,15 @@ public class ViperClient {
         }
     }
 
-    protected ViperClient(Context context, String appName, String networkPrefix) {
+    protected ViperClient(Context context, String appName, String networkPrefix, String userName, int avatar, long regTime, boolean isSync) {
         this.mContext = context;
         this.appName = appName;
         this.networkPrefix = networkPrefix;
+        this.usersName = userName;
+        this.avatar = avatar;
+        this.regTime = regTime;
+        this.isSync = isSync;
+
 
         if (PermissionUtil.on(context).isAllowed(Manifest.permission.READ_EXTERNAL_STORAGE)) {
             startClient();
@@ -40,16 +51,15 @@ public class ViperClient {
         }
     }
 
-    public static ViperClient on(Context context, String appName, String networkPrefix) {
+    public static ViperClient on(Context context, String appName, String networkPrefix, String userName, int avatar, long regTime, boolean isSync) {
         if (mViperClient == null) {
             synchronized (ViperClient.class) {
                 if (mViperClient == null)
-                    mViperClient = new ViperClient(context, appName, networkPrefix);
+                    mViperClient = new ViperClient(context, appName, networkPrefix, userName, avatar, regTime, isSync);
             }
         }
         return mViperClient;
     }
-
 
     public void startClient() {
 
@@ -68,7 +78,6 @@ public class ViperClient {
         Intent permissionIntent = new Intent(context, PermissionActivity.class);
         permissionIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         context.startActivity(permissionIntent);
-
     }
 
 
@@ -89,7 +98,7 @@ public class ViperClient {
         DataManager.on().saveDiscoveredUserInfo(userId, userName);
     }
 
-    public void sendUserInfo(UserInfo userInfo) throws RemoteException {
+    private void sendUserInfo(UserInfo userInfo) throws RemoteException {
         DataManager.on().sendUserInfo(userInfo);
     }
 
