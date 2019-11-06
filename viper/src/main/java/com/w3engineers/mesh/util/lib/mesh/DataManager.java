@@ -22,6 +22,7 @@ import android.widget.Toast;
 import com.w3engineers.mesh.BuildConfig;
 import com.w3engineers.mesh.ClientLibraryService;
 import com.w3engineers.mesh.R;
+import com.w3engineers.mesh.application.data.local.db.SharedPref;
 import com.w3engineers.mesh.application.data.model.PayMessage;
 import com.w3engineers.mesh.application.data.model.PayMessageAck;
 import com.w3engineers.mesh.application.data.model.TransportInit;
@@ -160,7 +161,7 @@ public class DataManager {
                 new DialogUtil.DialogButtonListener() {
                     @Override
                     public void onClickPositive() {
-                        TSAppInstaller.downloadApkFile(mContext, BuildConfig.APP_DOWNLOAD_LINK);
+                        TSAppInstaller.downloadApkFile(mContext, SharedPref.read(Constant.PreferenceKeys.APP_DOWNLOAD_LINK));
                         isAlreadyToPlayStore = true;
                     }
 

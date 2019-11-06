@@ -47,10 +47,12 @@ public class EthereumService implements BlockRequest.BlockTransactionObserver, E
     private Network network;
     private HashMap<Integer, BlockRequest> blockRequests = null;
     EthGift ethGift;
+    private String giftDonateUrl;
 
-    private EthereumService(Context context, NetworkInfoCallback networkInfoCallback) {
+    private EthereumService(Context context, NetworkInfoCallback networkInfoCallback, String giftDonateUrl) {
         mContext = context.getApplicationContext();
         executor = Executors.newSingleThreadExecutor();
+        this.giftDonateUrl = giftDonateUrl;
 
         if (networkInfoCallback == null) {
             throw new NullPointerException("NetworkInfoCallback shouldn't null");
@@ -103,11 +105,11 @@ public class EthereumService implements BlockRequest.BlockTransactionObserver, E
         List<PayLibNetworkInfo> getNetworkInfo();
     }
 
-    synchronized public static EthereumService getInstance(Context context, NetworkInfoCallback networkInfoCallback) {
+    synchronized public static EthereumService getInstance(Context context, NetworkInfoCallback networkInfoCallback, String giftDonateUrl) {
         if (instance == null) {
             synchronized (EthereumService.class) {
                 if (instance == null) {
-                    instance = new EthereumService(context, networkInfoCallback);
+                    instance = new EthereumService(context, networkInfoCallback, giftDonateUrl);
                 }
             }
         }
@@ -146,7 +148,7 @@ public class EthereumService implements BlockRequest.BlockTransactionObserver, E
                 MediaType mediaType = MediaType.parse("application/x-www-form-urlencoded");
                 RequestBody body = RequestBody.create(mediaType, "address="+address+"&endpoint="+endPointType);
                 Request request = new Request.Builder()
-                        .url(BuildConfig.GIFT_DONATE_LINK + "eth")
+                        .url(giftDonateUrl + "eth")
                         .post(body)
                         .addHeader("Content-Type", "application/x-www-form-urlencoded")
                         .addHeader("cache-control", "no-cache")
@@ -202,7 +204,7 @@ public class EthereumService implements BlockRequest.BlockTransactionObserver, E
                             MediaType mediaType = MediaType.parse("application/x-www-form-urlencoded");
                             RequestBody body = RequestBody.create(mediaType, "address="+address+"&endpoint="+endPointType);
                             Request request = new Request.Builder()
-                                    .url(BuildConfig.GIFT_DONATE_LINK + "gift")
+                                    .url(giftDonateUrl + "gift")
                                     .post(body)
                                     .addHeader("Content-Type", "application/x-www-form-urlencoded")
                                     .addHeader("cache-control", "no-cache")
