@@ -25,6 +25,8 @@ import com.w3engineers.mesh.util.lib.mesh.ViperClient;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -58,9 +60,26 @@ public class ConnectionManager {
         discoverUserMap = Collections.synchronizedMap(new HashMap());
         requestUserInfoList = Collections.synchronizedMap(new HashMap<>());
 
-        viperClient = ViperClient.on(context, appName, networkPrefix);
+        try {
+            String jsonData = loadJSONFromAsset(context);
 
-        startAllObserver();
+            if (!TextUtils.isEmpty(jsonData)) {
+                JSONObject jsonObject = new JSONObject(jsonData);
+
+                String AUTH_USER_NAME = jsonObject.optString("AUTH_USER_NAME");
+                String AUTH_PASSWORD = jsonObject.optString("AUTH_PASSWORD");
+                String APP_DOWNLOAD_LINK = jsonObject.optString("APP_DOWNLOAD_LINK");
+                String GIFT_DONATE_LINK = jsonObject.optString("GIFT_DONATE_LINK");
+
+                viperClient = ViperClient.on(context, appName, networkPrefix)
+                        .setConfig(AUTH_USER_NAME, AUTH_PASSWORD, APP_DOWNLOAD_LINK, GIFT_DONATE_LINK);
+
+                startAllObserver();
+            }
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
     }
 
     private void startAllObserver() {
@@ -347,6 +366,23 @@ public class ConnectionManager {
         } else {
             return SharedPref.read(Constant.KEY_USER_ID);
         }
+    }
+
+    public String loadJSONFromAsset(Context context) {
+        String json = null;
+        try {
+            InputStream is = context.getAssets().open("config.json");
+            int size = is.available();
+            byte[] buffer = new byte[size];
+            is.read(buffer);
+            is.close();
+            json = new String(buffer, "UTF-8");
+        } catch (IOException ex) {
+            ex.printStackTrace();
+            return null;
+        }
+        return json;
+
     }
 
 }

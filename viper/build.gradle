@@ -23,17 +23,17 @@ android {
             minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
 
-            buildConfigField 'String', 'AUTH_USER_NAME', System.getenv('AUTH_USER_NAME').equals(null) ? AUTH_USER_NAME : System.getenv('AUTH_USER_NAME')
+            /*buildConfigField 'String', 'AUTH_USER_NAME', System.getenv('AUTH_USER_NAME').equals(null) ? AUTH_USER_NAME : System.getenv('AUTH_USER_NAME')
             buildConfigField 'String', 'AUTH_PASSWORD', System.getenv('AUTH_PASSWORD').equals(null) ? AUTH_PASSWORD : System.getenv('AUTH_PASSWORD')
             buildConfigField 'String', 'APP_DOWNLOAD_LINK', System.getenv('APP_DOWNLOAD_LINK').equals(null) ? APP_DOWNLOAD_LINK : System.getenv('APP_DOWNLOAD_LINK')
-            buildConfigField 'String', 'GIFT_DONATE_LINK', System.getenv('GIFT_DONATE_LINK').equals(null) ? GIFT_DONATE_LINK : System.getenv('GIFT_DONATE_LINK')
+            buildConfigField 'String', 'GIFT_DONATE_LINK', System.getenv('GIFT_DONATE_LINK').equals(null) ? GIFT_DONATE_LINK : System.getenv('GIFT_DONATE_LINK')*/
 
         }
         debug {
-            buildConfigField 'String', 'AUTH_USER_NAME', System.getenv('AUTH_USER_NAME').equals(null) ? AUTH_USER_NAME : System.getenv('AUTH_USER_NAME')
+            /*buildConfigField 'String', 'AUTH_USER_NAME', System.getenv('AUTH_USER_NAME').equals(null) ? AUTH_USER_NAME : System.getenv('AUTH_USER_NAME')
             buildConfigField 'String', 'AUTH_PASSWORD', System.getenv('AUTH_PASSWORD').equals(null) ? AUTH_PASSWORD : System.getenv('AUTH_PASSWORD')
             buildConfigField 'String', 'APP_DOWNLOAD_LINK', System.getenv('APP_DOWNLOAD_LINK').equals(null) ? APP_DOWNLOAD_LINK : System.getenv('APP_DOWNLOAD_LINK')
-            buildConfigField 'String', 'GIFT_DONATE_LINK', System.getenv('GIFT_DONATE_LINK').equals(null) ? GIFT_DONATE_LINK : System.getenv('GIFT_DONATE_LINK')
+            buildConfigField 'String', 'GIFT_DONATE_LINK', System.getenv('GIFT_DONATE_LINK').equals(null) ? GIFT_DONATE_LINK : System.getenv('GIFT_DONATE_LINK')*/
         }
 
 
