@@ -12,6 +12,7 @@ import android.content.Context;
 
 import com.w3engineers.eth.data.helper.model.PayLibNetworkInfo;
 import com.w3engineers.eth.data.remote.EthereumService;
+import com.w3engineers.mesh.BuildConfig;
 import com.w3engineers.mesh.application.data.local.db.DatabaseService;
 import com.w3engineers.mesh.application.data.local.db.networkinfo.NetworkInfo;
 
@@ -38,7 +39,7 @@ public class EthereumServiceUtil implements EthereumService.NetworkInfoCallback 
     private EthereumServiceUtil(Context context) {
         databaseService = DatabaseService.getInstance(context);
         populateDb(context);
-        ethereumService = EthereumService.getInstance(context, this);
+        ethereumService = EthereumService.getInstance(context, this, BuildConfig.GIFT_DONATE_LINK);
     }
 
     public static EthereumServiceUtil getInstance(Context context) {
