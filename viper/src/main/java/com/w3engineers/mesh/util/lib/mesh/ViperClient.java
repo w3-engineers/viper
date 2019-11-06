@@ -62,7 +62,6 @@ public class ViperClient {
     }
 
     public void startClient() {
-
         DataManager.on().doBindService(mContext, appName, this.networkPrefix);
         WalletManager.getInstance().readWallet(mContext);
         if (PreferencesHelperDataplan.on().getDataPlanRole() == DataPlanConstants.USER_ROLE.DATA_SELLER) {
