@@ -12,6 +12,7 @@ import com.w3engineers.mesh.application.data.local.purchase.PurchaseManagerBuyer
 import com.w3engineers.mesh.application.data.local.purchase.PurchaseManagerSeller;
 import com.w3engineers.mesh.application.data.local.wallet.WalletManager;
 import com.w3engineers.mesh.application.ui.premission.PermissionActivity;
+import com.w3engineers.models.UserInfo;
 
 public class ViperClient {
 
@@ -86,6 +87,10 @@ public class ViperClient {
 
     public void saveDiscoveredUserInfo(String userId, String userName) throws RemoteException {
         DataManager.on().saveDiscoveredUserInfo(userId, userName);
+    }
+
+    public void sendUserInfo(UserInfo userInfo) throws RemoteException {
+        DataManager.on().sendUserInfo(userInfo);
     }
 
 }

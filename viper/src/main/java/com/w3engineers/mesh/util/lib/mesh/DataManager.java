@@ -25,6 +25,7 @@ import com.w3engineers.mesh.R;
 import com.w3engineers.mesh.application.data.model.PayMessage;
 import com.w3engineers.mesh.application.data.model.PayMessageAck;
 import com.w3engineers.mesh.application.data.model.TransportInit;
+import com.w3engineers.mesh.application.data.model.UserInfoEvent;
 import com.w3engineers.mesh.application.data.remote.model.BuyerPendingMessage;
 import com.w3engineers.mesh.application.ui.dataplan.DataPlanActivity;
 import com.w3engineers.mesh.util.Constant;
@@ -39,6 +40,7 @@ import com.w3engineers.mesh.application.data.model.DataAckEvent;
 import com.w3engineers.mesh.application.data.model.DataEvent;
 import com.w3engineers.mesh.application.data.model.PeerAdd;
 import com.w3engineers.mesh.application.data.model.PeerRemoved;
+import com.w3engineers.models.UserInfo;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -273,6 +275,11 @@ public class DataManager {
         }
 
         @Override
+        public void onUserInfoReceive(UserInfo userInfo) throws RemoteException {
+          DataManager.this.onGetUserInfo(userInfo);
+        }
+
+        @Override
         public void setServiceForeground(boolean isForeGround) throws RemoteException {
 
         }
@@ -332,6 +339,10 @@ public class DataManager {
 
     public void saveDiscoveredUserInfo(String userId, String userName) throws RemoteException {
         mTmCommunicator.saveDiscoveredUserInfo(userId, userName);
+    }
+
+    public void sendUserInfo(UserInfo userInfo) throws RemoteException {
+        mTmCommunicator.sendUserInfo(userInfo);
     }
 
 
@@ -407,6 +418,17 @@ public class DataManager {
         AppDataObserver.on().sendObserverData(dataAckEvent);
     }
 
+    public void onGetUserInfo(UserInfo userInfo){
+        UserInfoEvent userInfoEvent = new UserInfoEvent();
+        userInfoEvent.setAddress(userInfo.getAddress());
+        userInfoEvent.setAvatar(userInfo.getAvatar());
+        userInfoEvent.setUserName(userInfo.getUserName());
+        userInfoEvent.setRegTime(userInfo.getRegTime());
+        userInfoEvent.setSync(userInfo.isSync());
+
+        AppDataObserver.on().sendObserverData(userInfoEvent);
+
+    }
     public void setServiceForeground(boolean isForeground) {
         try {
             if (viperCommunicator != null) {

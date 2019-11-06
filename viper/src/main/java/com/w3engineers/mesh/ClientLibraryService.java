@@ -19,6 +19,7 @@ import com.w3engineers.mesh.application.data.remote.service.BaseTmServiceNotific
 import com.w3engineers.mesh.util.MeshApp;
 import com.w3engineers.mesh.util.MeshLog;
 import com.w3engineers.mesh.util.lib.mesh.DataManager;
+import com.w3engineers.models.UserInfo;
 
 
 public class ClientLibraryService extends Service {
@@ -96,6 +97,11 @@ public class ClientLibraryService extends Service {
             Intent intent = new Intent("com.w3engineers.meshrnd.DEBUG_MESSAGE");
             intent.putExtra("value", text);
             MeshApp.getContext().sendBroadcast(intent);
+        }
+
+        @Override
+        public void onUserInfoReceive(UserInfo userInfo) throws RemoteException {
+
         }
 
 

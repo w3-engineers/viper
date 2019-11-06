@@ -14,6 +14,7 @@ import com.w3engineers.mesh.application.data.model.DataAckEvent;
 import com.w3engineers.mesh.application.data.model.DataEvent;
 import com.w3engineers.mesh.application.data.model.PeerAdd;
 import com.w3engineers.mesh.application.data.model.PeerRemoved;
+import com.w3engineers.mesh.application.data.model.UserInfoEvent;
 import com.w3engineers.mesh.model.MessageModel;
 import com.w3engineers.mesh.model.UserModel;
 import com.w3engineers.mesh.ui.Nearby.NearbyCallBack;
@@ -76,7 +77,7 @@ public class ConnectionManager {
                     nearbyCallBack.onUserFound(userModel);
                 }
             } else {
-                reqUserInfo(peerAdd.peerId);
+              //  reqUserInfo(peerAdd.peerId);
 
                 UserModel userModel = new UserModel();
                 userModel.setUserName("Anonymous");
@@ -97,6 +98,23 @@ public class ConnectionManager {
                 MeshLog.e("[-] Direct User Removed: " + peerRemoved.peerId.substring(peerRemoved.peerId.length() - 3));
                 nearbyCallBack.onDisconnectUser(peerRemoved.peerId);
             }
+        });
+
+        AppDataObserver.on().startObserver(ApiEvent.USER_INFO, event -> {
+            UserInfoEvent userInfoEvent = (UserInfoEvent) event;
+
+            UserModel userModel = new UserModel();
+            userModel.setUserId(userInfoEvent.getAddress());
+            userInfoEvent.setUserName(userInfoEvent.getUserName());
+
+
+            discoverUserMap.put(userModel.getUserId(), userModel);
+            ChatDataProvider.On().upSertUser(userModel);
+            if (nearbyCallBack != null) {
+                MeshLog.e("[+] User Added");
+                nearbyCallBack.onUserFound(userModel);
+            }
+
         });
 
 
@@ -133,7 +151,7 @@ public class ConnectionManager {
                                     "" + userModel.getUserName(), Toast.LENGTH_SHORT).show());
                         }
 
-                        viperClient.saveDiscoveredUserInfo(userModel.getUserId(), userModel.getUserName());
+                   //     viperClient.saveDiscoveredUserInfo(userModel.getUserId(), userModel.getUserName());
 
                         break;
                     case JsonKeys.TYPE_TEXT_MESSAGE:
