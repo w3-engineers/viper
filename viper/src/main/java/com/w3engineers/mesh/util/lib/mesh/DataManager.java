@@ -211,7 +211,7 @@ public class DataManager {
             mTmCommunicator = ITmCommunicator.Stub.asInterface(binder);
 
             try {
-                mTmCommunicator.sendUserInfo(userInfo);
+                mTmCommunicator.saveUserInfo(userInfo);
                 mTmCommunicator.startMesh(appName);
                 mTmCommunicator.setViperCommunicator(viperCommunicator);
             } catch (RemoteException e) {
@@ -345,8 +345,8 @@ public class DataManager {
         mTmCommunicator.saveDiscoveredUserInfo(userId, userName);
     }
 
-    public void sendUserInfo(UserInfo userInfo) throws RemoteException {
-        mTmCommunicator.sendUserInfo(userInfo);
+    public void saveUserInfo(UserInfo userInfo) throws RemoteException {
+        mTmCommunicator.saveUserInfo(userInfo);
     }
 
 

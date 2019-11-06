@@ -25,6 +25,7 @@ public class ViperClient {
     public static int avatar;
     public static long regTime;
     public static boolean isSync;
+    public static String packageName;
 
     private static ViperClient mViperClient;
 
@@ -35,9 +36,10 @@ public class ViperClient {
         }
     }
 
-    protected ViperClient(Context context, String appName, String networkPrefix, String userName, int avatar, long regTime, boolean isSync) {
+    protected ViperClient(Context context, String appName, String packageName, String networkPrefix, String userName, int avatar, long regTime, boolean isSync) {
         this.mContext = context;
         this.appName = appName;
+        this.packageName = packageName;
         this.networkPrefix = networkPrefix;
         this.usersName = userName;
         this.avatar = avatar;
@@ -52,11 +54,11 @@ public class ViperClient {
         }
     }
 
-    public static ViperClient on(Context context, String appName, String networkPrefix, String userName, int avatar, long regTime, boolean isSync) {
+    public static ViperClient on(Context context, String appName, String packageName, String networkPrefix, String userName, int avatar, long regTime, boolean isSync) {
         if (mViperClient == null) {
             synchronized (ViperClient.class) {
                 if (mViperClient == null)
-                    mViperClient = new ViperClient(context, appName, networkPrefix, userName, avatar, regTime, isSync);
+                    mViperClient = new ViperClient(context, appName, packageName, networkPrefix, userName, avatar, regTime, isSync);
             }
         }
         return mViperClient;
@@ -77,6 +79,7 @@ public class ViperClient {
                 userInfo.setSync(isSync);
                 userInfo.setUserName(usersName);
                 userInfo.setPublicKey(publicKey);
+                userInfo.setPackageName(packageName);
 
                 DataManager.on().doBindService(mContext, appName, networkPrefix, userInfo);
 
@@ -118,10 +121,6 @@ public class ViperClient {
 
     public void saveDiscoveredUserInfo(String userId, String userName) throws RemoteException {
         DataManager.on().saveDiscoveredUserInfo(userId, userName);
-    }
-
-    private void sendUserInfo(UserInfo userInfo) throws RemoteException {
-        DataManager.on().sendUserInfo(userInfo);
     }
 
 }

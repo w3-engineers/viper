@@ -59,7 +59,7 @@ public class ConnectionManager {
         discoverUserMap = Collections.synchronizedMap(new HashMap());
         requestUserInfoList = Collections.synchronizedMap(new HashMap<>());
 
-        viperClient = ViperClient.on(context, appName, networkPrefix, SharedPref.read(Constant.KEY_USER_NAME), 1, System.currentTimeMillis(), true);
+        viperClient = ViperClient.on(context, appName, "com.w3engineers.ext.viper", networkPrefix, SharedPref.read(Constant.KEY_USER_NAME), 1, System.currentTimeMillis(), true);
 
         startAllObserver();
     }

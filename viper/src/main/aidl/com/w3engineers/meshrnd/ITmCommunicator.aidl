@@ -10,7 +10,7 @@ interface ITmCommunicator {
    void startMesh(in String ssid);
    String getUserId();
    void saveDiscoveredUserInfo(String userId, String userName);
-   void sendUserInfo(in UserInfo userInfo);
+   void saveUserInfo(in UserInfo userInfo);
 
    void sendPayMessage(in String receiverId, in String message, in String messageId);
    void onPaymentGotForIncomingMessage(in boolean success, in String receiver, in String sender, in String messageId, in String msgData);
