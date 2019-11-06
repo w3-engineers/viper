@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">FrameWork</string>
+    <string name="app_name">Viper</string>
     <string name="ok">OK</string>
     <string name="cancel">CANCEL</string>
     <string name="drawable_exception">Drawable not found</string>
@@ -11,6 +11,137 @@
 
     <!--service description-->
     <string name="app_local_service_description">To retain RM library workable with high priority</string>
+    <string name="title_activity_data_plan">DataPlanActivity</string>
+    <string name="title_activity_wallet">WalletActivity</string>
+    <string name="mesh_user_info"><b>Mesh User</b> is the default settings. You are able to see and communicate with other <b>Nearby</b> users without any internet.\n\n<b>Data Seller</b><b>Nearby</b> Use <b>Data Buyer</b> to share your internet connection to other <b>Nearby</b> users.\n\n<br /><br />Use <br /> to use internet shared by other <br /> users.</string>
+    <string name="internet_user_info"><b>Internet User</b> is the only Internet using settings . You are able to see and communicate with other <b>Internet</b> users \directly.\n\n<b>Data Seller</b><b>Nearby</b> Use <b>Data Buyer</b> to share your internet connection to other <b>Nearby</b> users.\n\n<br /><br />Use <br /> to use internet shared by other <br /> users.</string>
 
-    <!--service broadcast upon task clear-->
+    <string name="active">Active</string>
+    <string name="in_use">In Use</string>
+    <string name="switch_role">Switch your role?</string>
+    <string name="mesh_user_to_buyer">You are trying to switch from MESH USER to DATA BUYER role. You will be able to purchase data from nearby sellers. Are you sure to proceed?</string>
+    <string name="mesh_user_to_seller">You are trying to switch from MESH USER to DATA SELLER role. You will be able sell your mobile data to nearby users. Are you sure to proceed?</string>
+    <string name="mesh_user_to_internet_user">You are trying to switch from MESH USER to INTERNET USER role. You will be able to use internet to get internet users. Are you sure to proceed?</string>
+
+    <string name="data_buyer_to_seller">You are trying to switch from DATA BUYER to DATA SELLER role. You can not use your purchased data in this mode, rather you can sell your mobile data to nearby users. Are you sure to proceed?</string>
+    <string name="data_buyer_to_mesh_user">You are trying to switch from DATA BUYER to MESH USER role. You can not use your purchased data in this mode, rather you can only use the mesh network. Are you sure to proceed?</string>
+    <string name="data_buyer_to_internet_user">You are trying to switch from DATA BUYER to INTERNET USER role. You will be able to use internet to get internet users. Are you sure to proceed?</string>
+
+    <string name="data_seller_to_buyer">You are trying to switch from DATA SELLER to DATA BUYER role. Your customers can not use purchased data from you in this mode, rather you can purchase data from nearby sellers. Are you sure to proceed?</string>
+    <string name="data_seller_to_mesh_user">You are trying to switch from DATA SELLER to MESH USER role. Your customers can not use purchased data from you in this mode, rather you can only use the mesh network. Are you sure to proceed?</string>
+    <string name="data_seller_to_internet_user">You are trying to switch from DATA SELLER to INTERNET USER role. You will be able to use internet to get internet users. Are you sure to proceed?</string>
+
+
+    <string name="internet_user_to_buyer">You are trying to switch from INTERNET USER to DATA BUYER role. You will be able to purchase data from nearby sellers. Are you sure to proceed?</string>
+    <string name="internet_user_to_seller">You are trying to switch from INTERNET USER to DATA SELLER role. You will be able sell your mobile data to nearby users. Are you sure to proceed?</string>
+    <string name="internet_user_to_internet_user">You are trying to switch from INTERNET USER to MESH USER role. You can not use your purchased data in this mode, rather you can only use the mesh network. Are you sure to proceed?</string>
+
+    <string name="yes">YES</string>
+    <string name="no">NO</string>
+
+    <string name="set_data_limit_properly">*set data limit properly</string>
+    <string name="switching_role">Switching your role, please be patient.</string>
+    <string name="my_wallet">My Wallet</string>
+    <string name="data_lomit_larger_needed">Data limit must be larger than used data</string>
+    <string name="date_expired">*date expired</string>
+    <string name="data_limit_must_be_larger_than_used_data">*data limit must be larger than used data</string>
+
+    <string name="txt_data_use_statistics">Data Uses Statistics</string>
+    <string name="txt_description_back">back</string>
+    <string name="txt_balance">Balance</string>
+    <string name="txt_eth">ETH</string>
+    <string name="txt_tmesh">TMESH</string>
+    <string name="txt_mb">MB</string>
+    <string name="txt_buying_prize">Buying Price: %s </string>
+    <string name="txt_selling_prize">Selling Price: %s </string>
+    <string name="txt_description_eth">digital currency</string>
+    <string name="total_earned">TOTAL EARNED</string>
+    <string name="total_spent">TOTAL SPENT</string>
+    <string name="txt_payable_deposit">PAYABLE DEPOSIT</string>
+    <string name="txt_withdraw_amount">Withdraw Amount : </string>
+    <string name="txt_withdraw_fee">Withdraw Fee</string>
+    <string name="txt_slow">SLOW</string>
+    <string name="txt_average">AVERAGE</string>
+    <string name="txt_fast">FAST</string>
+    <string name="txt_last_updated">Last Updated on </string>
+    <string name="txt_pull_down_refresh">Pull down refresh </string>
+    <string name="log_details">Log Details</string>
+    <string name="log_history">Log History</string>
+    <string name="my_node">My node</string>
+    <string name="eth">ETH</string>
+    <string name="etc">ETC</string>
+
+    <string name="different_network_data_for_seller">You have earning in different network.</string>
+    <string name="different_network_data_for_buyer">You have purchase in different network.</string>
+
+    <string name="mesh_user">Mesh User - (No Internet)</string>
+    <string name="data_seller">Data Seller - (Share Internet)</string>
+    <string name="data_buyer">Data Buyer - (Buy Internet)</string>
+    <string name="internet_user">Internet User - (Internet Only)</string>
+    <string name="data_plan">My Data Plan</string>
+    <string name="share_internet_settings">Internet sharing settings</string>
+    <string name="fixed_by_the_network">(Fixed by the network)</string>
+    <string name="msg_permission_required">Read, Write and Location Services Permission required for this app</string>
+    <string name="permission_setting_title">Required Permissions</string>
+    <string name="permission_setting_des">This app require permission to use awesome feature. Grant them in app settings.</string>
+    <string name="text_positive_button">Take Me To SETTINGS</string>
+    <string name="title_ok">OK</string>
+    <string name="title_msg_system_setting_modification">This app require system setting to use awesome feature.Please allow modification.</string>
+    <string name="title_location_permission">Location Permission Required</string>
+    <string name="description_location_permission">The app needs GPS permissions. Please grant this permission to continue using the features of the app.</string>
+    <string name="text_okay_button">Okay</string>
+    <string name="network_role">Network Role</string>
+    <string name="net_share_role_sharer">Sharer</string>
+    <string name="net_share_role_consumer">Consumer</string>
+    <string name="net_share_role_not_interested">Not Interested</string>
+    <string name="sharer_connect_button">connect</string>
+    <string name="no_sharer">No Sharer</string>
+    <string name="warning_turn_on_ap_settings">Please turn on hotspot</string>
+    <string name="connect">Connect</string>
+    <string name="history">History</string>
+    <string name="close">Close</string>
+    <string name="withdraw">Withdraw</string>
+    <string name="mesh_view_text">Mesh User in the default settings. You are able to communicate with your local peers without any internet connection.\n\nTo share your internet data to local network, choose Data Seller.\n\nTo view available shared internet options, choose Data Buyer.</string>
+    <string name="unlimited">Unlimited</string>
+    <string name="limited">Limit to</string>
+    <string name="data_limit">Data Limit</string>
+    <string name="from_date">From Date</string>
+    <string name="to_date">To Date</string>
+    <string name="my_data_plan_data_used_of">%s used of %s</string>
+    <string name="my_data_plan_data_used">%s used in last %s days</string>
+    <string name="my_purchases">See My Purchases</string>
+
+    <string name="create_hotspot">Create Hotspot</string>
+    <string name="hotspot_hint_1">1. Please open Hotspot settings and Change security settings to WPA2 PSK</string>
+    <string name="hotspot_hint_2">2. Copy and paste respective fields below</string>
+    <string name="hotspot_hint_3">3. Back to the App Screen</string>
+    <string name="title_hotspot">Hotspot settings</string>
+    <string name="title_network">Network : </string>
+    <string name="title_ssid">SSID : </string>
+    <string name="title_password">Password :</string>
+    <string name="title_copy">Copy</string>
+    <string name="open_hotspot_hint_first_part">You need to create hotspot manually for your OS version -  </string>
+    <string name="open_hotspot_hint_second_part">to sell  internet data.  </string>
+    <string name="open_hotspot_click_here">Click here</string>
+    <string name="open_hotspot_hint_third_part">Click here to proceed.</string>
+
+    <string name="title_click_here_to_proceed">Click here to proceed</string>
+
+    <string name="data_share_off">Data Share is OFF</string>
+    <string name="data_share_on">Data Share is ON</string>
+    <string name="limit_to">Limit to</string>
+    <string name="transferred_total"><![CDATA[<b>%sMB</b> transferred total <b>%sMB</b>]]></string>
+    <string name="date_range">Date Range</string>
+    <string name="from">From</string>
+    <string name="to">to</string>
+    <string name="used_s">Used: %sMB</string>
+    <string name="total_mb">of %sMB</string>
+
+    <string name="install_ts">Install Telemesh Service</string>
+    <string name="need_ts">You need to install Telemesh service for user discovery</string>
+
+    <string name="authority">com.w3engineers.mesh.provider</string>
+
+
+
 </resources>
