@@ -105,7 +105,7 @@ public class ConnectionManager {
 
             UserModel userModel = new UserModel();
             userModel.setUserId(userInfoEvent.getAddress());
-            userInfoEvent.setUserName(userInfoEvent.getUserName());
+            userModel.setUserName(userInfoEvent.getUserName());
 
 
             discoverUserMap.put(userModel.getUserId(), userModel);

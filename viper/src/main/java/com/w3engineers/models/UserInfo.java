@@ -9,7 +9,15 @@ public class UserInfo implements Parcelable {
     private String userName;
     private long regTime;
     private boolean isSync;
+    private String publicKey;
 
+    public String getPublicKey() {
+        return publicKey;
+    }
+
+    public void setPublicKey(String publicKey) {
+        this.publicKey = publicKey;
+    }
 
     public String getAddress() {
         return address;
@@ -62,6 +70,7 @@ public class UserInfo implements Parcelable {
         userName = in.readString();
         regTime = in.readLong();
         isSync = in.readByte() != 0;
+        publicKey = in.readString();
     }
 
     public static final Creator<UserInfo> CREATOR = new Creator<UserInfo>() {
@@ -88,5 +97,6 @@ public class UserInfo implements Parcelable {
         dest.writeString(userName);
         dest.writeLong(regTime);
         dest.writeByte((byte) (isSync ? 1 : 0));
+        dest.writeString(publicKey);
     }
 }

@@ -76,6 +76,7 @@ public class ViperClient {
                 userInfo.setRegTime(regTime);
                 userInfo.setSync(isSync);
                 userInfo.setUserName(usersName);
+                userInfo.setPublicKey(publicKey);
 
                 DataManager.on().doBindService(mContext, appName, networkPrefix, userInfo);
 
@@ -93,9 +94,6 @@ public class ViperClient {
                 MeshLog.v("ViperClient loading failed " + message);
             }
         });
-
-
-
     }
 
     private void startPermissionActivity(Context context) {
