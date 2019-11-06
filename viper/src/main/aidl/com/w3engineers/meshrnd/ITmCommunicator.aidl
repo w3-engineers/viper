@@ -1,5 +1,6 @@
 package com.w3engineers.meshrnd;
 import com.w3engineers.mesh.ViperCommunicator;
+import com.w3engineers.models.UserInfo;
 
 interface ITmCommunicator {
    void setViperCommunicator(in ViperCommunicator viperCommunicator);
@@ -9,6 +10,7 @@ interface ITmCommunicator {
    void startMesh(in String ssid);
    String getUserId();
    void saveDiscoveredUserInfo(String userId, String userName);
+   void saveUserInfo(in UserInfo userInfo);
 
    void sendPayMessage(in String receiverId, in String message, in String messageId);
    void onPaymentGotForIncomingMessage(in boolean success, in String receiver, in String sender, in String messageId, in String msgData);

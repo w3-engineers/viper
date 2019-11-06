@@ -25,6 +25,7 @@ import com.w3engineers.mesh.R;
 import com.w3engineers.mesh.application.data.model.PayMessage;
 import com.w3engineers.mesh.application.data.model.PayMessageAck;
 import com.w3engineers.mesh.application.data.model.TransportInit;
+import com.w3engineers.mesh.application.data.model.UserInfoEvent;
 import com.w3engineers.mesh.application.data.remote.model.BuyerPendingMessage;
 import com.w3engineers.mesh.application.ui.dataplan.DataPlanActivity;
 import com.w3engineers.mesh.util.Constant;
@@ -39,6 +40,7 @@ import com.w3engineers.mesh.application.data.model.DataAckEvent;
 import com.w3engineers.mesh.application.data.model.DataEvent;
 import com.w3engineers.mesh.application.data.model.PeerAdd;
 import com.w3engineers.mesh.application.data.model.PeerRemoved;
+import com.w3engineers.models.UserInfo;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -57,6 +59,7 @@ public class DataManager {
     private String mSsid;
     private Context mContext;
     private String appName;
+    private UserInfo userInfo;
 
     private static DataManager mDataManager;
     private boolean isAlreadyToPlayStore = false;
@@ -84,10 +87,12 @@ public class DataManager {
      * @param appName
      * @param networkPrefix
      */
-    public void doBindService(Context context, String appName, String networkPrefix) {
+    public void doBindService(Context context, String appName, String networkPrefix, UserInfo userInfo) {
         this.mContext = context;
         this.appName = appName;
         this.mSsid = networkPrefix;
+        this.userInfo = userInfo;
+
 
         MeshLog.v("Data manager has been called");
 
@@ -206,6 +211,7 @@ public class DataManager {
             mTmCommunicator = ITmCommunicator.Stub.asInterface(binder);
 
             try {
+                mTmCommunicator.saveUserInfo(userInfo);
                 mTmCommunicator.startMesh(appName);
                 mTmCommunicator.setViperCommunicator(viperCommunicator);
             } catch (RemoteException e) {
@@ -273,6 +279,11 @@ public class DataManager {
         }
 
         @Override
+        public void onUserInfoReceive(UserInfo userInfo) throws RemoteException {
+          DataManager.this.onGetUserInfo(userInfo);
+        }
+
+        @Override
         public void setServiceForeground(boolean isForeGround) throws RemoteException {
 
         }
@@ -332,6 +343,10 @@ public class DataManager {
 
     public void saveDiscoveredUserInfo(String userId, String userName) throws RemoteException {
         mTmCommunicator.saveDiscoveredUserInfo(userId, userName);
+    }
+
+    public void saveUserInfo(UserInfo userInfo) throws RemoteException {
+        mTmCommunicator.saveUserInfo(userInfo);
     }
 
 
@@ -407,6 +422,17 @@ public class DataManager {
         AppDataObserver.on().sendObserverData(dataAckEvent);
     }
 
+    public void onGetUserInfo(UserInfo userInfo){
+        UserInfoEvent userInfoEvent = new UserInfoEvent();
+        userInfoEvent.setAddress(userInfo.getAddress());
+        userInfoEvent.setAvatar(userInfo.getAvatar());
+        userInfoEvent.setUserName(userInfo.getUserName());
+        userInfoEvent.setRegTime(userInfo.getRegTime());
+        userInfoEvent.setSync(userInfo.isSync());
+
+        AppDataObserver.on().sendObserverData(userInfoEvent);
+
+    }
     public void setServiceForeground(boolean isForeground) {
         try {
             if (viperCommunicator != null) {

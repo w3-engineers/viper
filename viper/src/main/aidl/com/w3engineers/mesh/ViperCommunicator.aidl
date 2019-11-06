@@ -1,4 +1,5 @@
 package com.w3engineers.mesh;
+import com.w3engineers.models.UserInfo;
 
 
 /**
@@ -14,6 +15,7 @@ interface ViperCommunicator {
      void onAckReceived(in String messageId, in int status);
      void onServiceAvailable(in int status);
      void onReceiveLog(in String text);
+     void onUserInfoReceive(in UserInfo userInfo);
 
      void setServiceForeground(boolean isForeGround);
      void onMessagePayReceived(in String sender, in byte[] paymentData);
