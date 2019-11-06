@@ -59,6 +59,7 @@ public class DataManager {
     private String mSsid;
     private Context mContext;
     private String appName;
+    private UserInfo userInfo;
 
     private static DataManager mDataManager;
     private boolean isAlreadyToPlayStore = false;
@@ -86,10 +87,12 @@ public class DataManager {
      * @param appName
      * @param networkPrefix
      */
-    public void doBindService(Context context, String appName, String networkPrefix) {
+    public void doBindService(Context context, String appName, String networkPrefix, UserInfo userInfo) {
         this.mContext = context;
         this.appName = appName;
         this.mSsid = networkPrefix;
+        this.userInfo = userInfo;
+
 
         MeshLog.v("Data manager has been called");
 
@@ -208,6 +211,7 @@ public class DataManager {
             mTmCommunicator = ITmCommunicator.Stub.asInterface(binder);
 
             try {
+                mTmCommunicator.sendUserInfo(userInfo);
                 mTmCommunicator.startMesh(appName);
                 mTmCommunicator.setViperCommunicator(viperCommunicator);
             } catch (RemoteException e) {

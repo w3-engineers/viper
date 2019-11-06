@@ -51,6 +51,11 @@ public class UserInfo implements Parcelable {
         isSync = sync;
     }
 
+
+    public UserInfo(){
+
+    }
+
     protected UserInfo(Parcel in) {
         address = in.readString();
         avatar = in.readInt();

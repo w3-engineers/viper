@@ -12,6 +12,7 @@ import com.w3engineers.mesh.application.data.local.purchase.PurchaseManagerBuyer
 import com.w3engineers.mesh.application.data.local.purchase.PurchaseManagerSeller;
 import com.w3engineers.mesh.application.data.local.wallet.WalletManager;
 import com.w3engineers.mesh.application.ui.premission.PermissionActivity;
+import com.w3engineers.mesh.util.MeshLog;
 import com.w3engineers.models.UserInfo;
 
 public class ViperClient {
@@ -62,15 +63,39 @@ public class ViperClient {
     }
 
     public void startClient() {
-        DataManager.on().doBindService(mContext, appName, this.networkPrefix);
-        WalletManager.getInstance().readWallet(mContext);
-        if (PreferencesHelperDataplan.on().getDataPlanRole() == DataPlanConstants.USER_ROLE.DATA_SELLER) {
-            PurchaseManagerSeller.getInstance().setPayControllerListener();
-        }
 
-        if (PreferencesHelperDataplan.on().getDataPlanRole() == DataPlanConstants.USER_ROLE.DATA_BUYER) {
-            PurchaseManagerBuyer.getInstance().setPayControllerListener();
-        }
+        WalletManager.getInstance().readWallet(mContext, new WalletManager.WaletListener() {
+            @Override
+            public void onWalletLoaded(String walletAddress, String publicKey) {
+                MeshLog.i(" ViperClient loaded succesful " + walletAddress);
+
+                UserInfo userInfo = new UserInfo();
+
+                userInfo.setAddress(walletAddress);
+                userInfo.setAvatar(avatar);
+                userInfo.setRegTime(regTime);
+                userInfo.setSync(isSync);
+                userInfo.setUserName(usersName);
+
+                DataManager.on().doBindService(mContext, appName, networkPrefix, userInfo);
+
+                if (PreferencesHelperDataplan.on().getDataPlanRole() == DataPlanConstants.USER_ROLE.DATA_SELLER) {
+                    PurchaseManagerSeller.getInstance().setPayControllerListener();
+                }
+
+                if (PreferencesHelperDataplan.on().getDataPlanRole() == DataPlanConstants.USER_ROLE.DATA_BUYER) {
+                    PurchaseManagerBuyer.getInstance().setPayControllerListener();
+                }
+            }
+
+            @Override
+            public void onErrorOccurred(String message) {
+                MeshLog.v("ViperClient loading failed " + message);
+            }
+        });
+
+
+
     }
 
     private void startPermissionActivity(Context context) {
