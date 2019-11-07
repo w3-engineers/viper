@@ -103,7 +103,7 @@ public class DataPlanManager {
             MeshLog.v("sellerMode dpm " + newRole);
             preferencesHelperDataplan.setDataPlanRole(newRole);
             payController.getDataManager().restartMesh(newRole);
-        } catch (RemoteException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }

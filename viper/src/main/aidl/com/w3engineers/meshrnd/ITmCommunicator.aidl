@@ -11,6 +11,8 @@ interface ITmCommunicator {
    String getUserId();
    void saveDiscoveredUserInfo(String userId, String userName);
    void saveUserInfo(in UserInfo userInfo);
+   void stopMesh();
+
 
    void sendPayMessage(in String receiverId, in String message, in String messageId);
    void onPaymentGotForIncomingMessage(in boolean success, in String receiver, in String sender, in String messageId, in String msgData);

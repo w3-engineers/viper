@@ -21,9 +21,10 @@ import com.w3engineers.mesh.util.MeshLog;
 import com.w3engineers.mesh.util.lib.mesh.DataManager;
 import com.w3engineers.models.UserInfo;
 
+import java.util.List;
+
 
 public class ClientLibraryService extends Service {
-
 
     @Override
     public void onCreate() {
@@ -100,7 +101,7 @@ public class ClientLibraryService extends Service {
         }
 
         @Override
-        public void onUserInfoReceive(UserInfo userInfo) throws RemoteException {
+        public void onUserInfoReceive(List<UserInfo> userInfoList) throws RemoteException {
 
         }
 
