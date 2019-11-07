@@ -15,7 +15,8 @@ interface ViperCommunicator {
      void onAckReceived(in String messageId, in int status);
      void onServiceAvailable(in int status);
      void onReceiveLog(in String text);
-     void onUserInfoReceive(in UserInfo userInfo);
+     void onUserInfoReceive(in List<UserInfo> userInfoList);
+
 
      void setServiceForeground(boolean isForeGround);
      void onMessagePayReceived(in String sender, in byte[] paymentData);

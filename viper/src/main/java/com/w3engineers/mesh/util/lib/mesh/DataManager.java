@@ -96,10 +96,10 @@ public class DataManager {
 
         MeshLog.v("Data manager has been called");
 
-        Intent mIntent = new Intent(context, ClientLibraryService.class);
+/*        Intent mIntent = new Intent(context, ClientLibraryService.class);
         context.startService(mIntent);
 
-        context.bindService(mIntent, clientServiceConnection, Service.BIND_AUTO_CREATE);
+        context.bindService(mIntent, clientServiceConnection, Service.BIND_AUTO_CREATE);*/
 
         checkAndBindService();
     }
@@ -279,8 +279,8 @@ public class DataManager {
         }
 
         @Override
-        public void onUserInfoReceive(UserInfo userInfo) throws RemoteException {
-          DataManager.this.onGetUserInfo(userInfo);
+        public void onUserInfoReceive(List<UserInfo> userInfoList) throws RemoteException {
+          DataManager.this.onGetUserInfo(userInfoList);
         }
 
         @Override
@@ -422,16 +422,22 @@ public class DataManager {
         AppDataObserver.on().sendObserverData(dataAckEvent);
     }
 
-    public void onGetUserInfo(UserInfo userInfo){
-        UserInfoEvent userInfoEvent = new UserInfoEvent();
-        userInfoEvent.setAddress(userInfo.getAddress());
-        userInfoEvent.setAvatar(userInfo.getAvatar());
-        userInfoEvent.setUserName(userInfo.getUserName());
-        userInfoEvent.setRegTime(userInfo.getRegTime());
-        userInfoEvent.setSync(userInfo.isSync());
+    public void onGetUserInfo(List<UserInfo> userInfoList){
 
-        AppDataObserver.on().sendObserverData(userInfoEvent);
+        MeshLog.e("user info list receive in data manager");
 
+        for (UserInfo userInfo : userInfoList){
+            UserInfoEvent userInfoEvent = new UserInfoEvent();
+            userInfoEvent.setAddress(userInfo.getAddress());
+            userInfoEvent.setAvatar(userInfo.getAvatar());
+            userInfoEvent.setUserName(userInfo.getUserName());
+            userInfoEvent.setRegTime(userInfo.getRegTime());
+            userInfoEvent.setSync(userInfo.isSync());
+
+            AppDataObserver.on().sendObserverData(userInfoEvent);
+
+            MeshLog.e("user info send to app level");
+        }
     }
     public void setServiceForeground(boolean isForeground) {
         try {
@@ -477,9 +483,22 @@ public class DataManager {
         mTmCommunicator.onBuyerDisconnected(address);
     }
 
-    public void restartMesh(int newRole) throws RemoteException {
+    public void stopMesh() {
+        MeshLog.v("stop mesh is called");
+        try {
+            mTmCommunicator.stopMesh();
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void restartMesh(int newRole) {
         MeshLog.v("sellerMode dm" + newRole);
-        mTmCommunicator.restartMesh(newRole);
+        try {
+            mTmCommunicator.restartMesh(newRole);
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        }
     }
 
 
