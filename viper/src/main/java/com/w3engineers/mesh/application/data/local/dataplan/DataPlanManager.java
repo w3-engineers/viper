@@ -159,7 +159,6 @@ public class DataPlanManager {
         return preferencesHelperDataplan.getSellDataAmount();
     }
 
-
     public void setSellFromDate(long fromDate) {
         preferencesHelperDataplan.setSellFromDate(fromDate);
     }
@@ -331,7 +330,6 @@ public class DataPlanManager {
                 .setLabel(label)
                 .setBtnText(PurchaseConstants.SELLERS_BTN_TEXT.PURCHASE);
     }
-
 
     private void setDataManagerObserver(){
         AppDataObserver.on().startObserver(ApiEvent.TRANSPORT_INIT, event -> {

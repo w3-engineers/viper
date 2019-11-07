@@ -16,6 +16,8 @@ import com.w3engineers.mesh.application.data.model.PayMessageAck;
 import com.w3engineers.mesh.application.data.model.PeerAdd;
 import com.w3engineers.mesh.application.data.model.PeerRemoved;
 import com.w3engineers.mesh.application.data.model.TransportInit;
+import com.w3engineers.mesh.application.data.model.UserInfoEvent;
+import com.w3engineers.mesh.application.data.model.WalletLoaded;
 import com.w3engineers.mesh.application.data.remote.model.BuyerPendingMessage;
 
 import io.reactivex.disposables.Disposable;
@@ -33,6 +35,9 @@ public interface ApiEvent {
     Class PAY_MESSAGE_ACK = PayMessageAck.class;
     Class BUYER_PENDING_MESSAGE = BuyerPendingMessage.class;
     Class TRANSPORT_INIT = TransportInit.class;
+    Class WALLET_LOADED = WalletLoaded.class;
+
+    Class USER_INFO = UserInfoEvent.class;
 
     Disposable startObserver(Class event, Consumer<? extends Event> next);
 

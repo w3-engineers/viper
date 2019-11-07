@@ -28,6 +28,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.web3j.crypto.Credentials;
 
+import java.util.IllegalFormatCodePointException;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -123,7 +124,12 @@ public class PayController {
                 switch (type) {
 
                     case PurchaseConstants.MESSAGE_TYPES.INIT_PURCHASE:
-                        payControllerListenerForSeller.onPurchaseInitRequested(fromAddress, endPointType);
+                        if (payControllerListenerForSeller != null){
+                            payControllerListenerForSeller.onPurchaseInitRequested(fromAddress, endPointType);
+                        } else {
+                            MeshLog.v("INIT_PURCHASE Listener not found");
+                        }
+
                         break;
 
                     case PurchaseConstants.MESSAGE_TYPES.INIT_PURCHASE_OK:

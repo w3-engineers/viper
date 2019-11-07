@@ -14,6 +14,7 @@ import com.w3engineers.mesh.application.data.model.DataAckEvent;
 import com.w3engineers.mesh.application.data.model.DataEvent;
 import com.w3engineers.mesh.application.data.model.PeerAdd;
 import com.w3engineers.mesh.application.data.model.PeerRemoved;
+import com.w3engineers.mesh.application.data.model.UserInfoEvent;
 import com.w3engineers.mesh.model.MessageModel;
 import com.w3engineers.mesh.model.UserModel;
 import com.w3engineers.mesh.ui.Nearby.NearbyCallBack;
@@ -42,7 +43,6 @@ public class ConnectionManager {
     private Map<String, UserModel> discoverUserMap;
     private Map<String, String> requestUserInfoList;
 
-
     public static ConnectionManager on(Context context) {
         if (mConnectionManager == null) {
             synchronized (ViperClient.class) {
@@ -58,7 +58,7 @@ public class ConnectionManager {
         discoverUserMap = Collections.synchronizedMap(new HashMap());
         requestUserInfoList = Collections.synchronizedMap(new HashMap<>());
 
-        viperClient = ViperClient.on(context, appName, networkPrefix);
+        viperClient = ViperClient.on(context, appName, "com.w3engineers.ext.viper", networkPrefix, SharedPref.read(Constant.KEY_USER_NAME), 1, System.currentTimeMillis(), true);
 
         startAllObserver();
     }
@@ -76,7 +76,7 @@ public class ConnectionManager {
                     nearbyCallBack.onUserFound(userModel);
                 }
             } else {
-                reqUserInfo(peerAdd.peerId);
+                //  reqUserInfo(peerAdd.peerId);
 
                 UserModel userModel = new UserModel();
                 userModel.setUserName("Anonymous");
@@ -97,6 +97,23 @@ public class ConnectionManager {
                 MeshLog.e("[-] Direct User Removed: " + peerRemoved.peerId.substring(peerRemoved.peerId.length() - 3));
                 nearbyCallBack.onDisconnectUser(peerRemoved.peerId);
             }
+        });
+
+        AppDataObserver.on().startObserver(ApiEvent.USER_INFO, event -> {
+            UserInfoEvent userInfoEvent = (UserInfoEvent) event;
+
+            UserModel userModel = new UserModel();
+            userModel.setUserId(userInfoEvent.getAddress());
+            userModel.setUserName(userInfoEvent.getUserName());
+
+
+            discoverUserMap.put(userModel.getUserId(), userModel);
+            ChatDataProvider.On().upSertUser(userModel);
+            if (nearbyCallBack != null) {
+                MeshLog.e("[+] User Added");
+                nearbyCallBack.onUserFound(userModel);
+            }
+
         });
 
 
@@ -133,7 +150,7 @@ public class ConnectionManager {
                                     "" + userModel.getUserName(), Toast.LENGTH_SHORT).show());
                         }
 
-                        viperClient.saveDiscoveredUserInfo(userModel.getUserId(), userModel.getUserName());
+                        //     viperClient.saveDiscoveredUserInfo(userModel.getUserId(), userModel.getUserName());
 
                         break;
                     case JsonKeys.TYPE_TEXT_MESSAGE:
@@ -248,7 +265,6 @@ public class ConnectionManager {
     public void initNearByCallBackForChatActivity(NearbyCallBack nearbyCallBack) {
         this.mNearbyCallBack = nearbyCallBack;
     }
-
 
     private void reqUserInfo(String nodeId) {
         //TODO check whether it is okay or not send message only bl link or all

@@ -10,10 +10,15 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.widget.TextView;
 
+import com.w3engineers.ext.strom.util.helper.Toaster;
 import com.w3engineers.ext.viper.R;
 import com.w3engineers.ext.viper.databinding.ActivityCreateGroupBinding;
+import com.w3engineers.mesh.application.data.ApiEvent;
+import com.w3engineers.mesh.application.data.AppDataObserver;
 import com.w3engineers.mesh.application.data.local.dataplan.DataPlanManager;
 import com.w3engineers.mesh.application.data.local.db.SharedPref;
+import com.w3engineers.mesh.application.data.model.TransportInit;
+import com.w3engineers.mesh.application.data.model.WalletLoaded;
 import com.w3engineers.mesh.model.UserModel;
 import com.w3engineers.mesh.ui.Nearby.NearbyFragment;
 import com.w3engineers.mesh.ui.Nearby.UserConnectionCallBack;
@@ -63,6 +68,22 @@ public class BottomNavActivity extends AppCompatActivity implements UserConnecti
 
         getSupportActionBar().setTitle("Me" + " : " + SharedPref.read(Constant.KEY_USER_NAME));
         getSupportActionBar().setBackgroundDrawable(getResources().getDrawable(R.drawable.drawable_reg_page_shape));
+
+
+
+        AppDataObserver.on().startObserver(ApiEvent.WALLET_LOADED, event -> {
+
+            WalletLoaded walletLoaded = (WalletLoaded) event;
+            if (walletLoaded.success && myDataPlanMenuItem != null) {
+                runOnUiThread(() -> {
+                    myDataPlanMenuItem.setEnabled(true);
+                });
+            }else {
+                runOnUiThread(() -> {
+                    Toaster.showLong("Error occurred.");
+                });
+            }
+        });
 
     }
 
@@ -157,6 +178,7 @@ public class BottomNavActivity extends AppCompatActivity implements UserConnecti
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.menu_bottom_nav, menu);
+        myDataPlanMenuItem = menu.getItem(0);
 
 /*        msgSendingStatusMenuItem = menu.findItem(R.id.menu_msg_sending_status);
         myDataPlanMenuItem = menu.getItem(1);*/
@@ -217,4 +239,7 @@ public class BottomNavActivity extends AppCompatActivity implements UserConnecti
         }
 
     }
+
+
+
 }
