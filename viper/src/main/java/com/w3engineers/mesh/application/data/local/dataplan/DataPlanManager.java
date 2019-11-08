@@ -1,7 +1,6 @@
 package com.w3engineers.mesh.application.data.local.dataplan;
 
 import android.arch.lifecycle.LiveData;
-import android.arch.lifecycle.LiveDataReactiveStreams;
 import android.content.Context;
 import android.content.Intent;
 import android.os.RemoteException;
@@ -22,7 +21,6 @@ import com.w3engineers.mesh.application.data.local.purchase.PurchaseManagerSelle
 import com.w3engineers.mesh.application.ui.dataplan.DataPlanActivity;
 import com.w3engineers.mesh.util.EthereumServiceUtil;
 import com.w3engineers.mesh.util.MeshLog;
-import com.w3engineers.mesh.util.lib.mesh.DataManager;
 
 import java.util.ArrayList;
 import java.util.List;
