@@ -142,8 +142,9 @@
 
     <string name="authority">com.w3engineers.mesh.provider</string>
 
+    <string name="allow">Allow Now</string>
+    <string name="later">Later</string>
     <string name="permission">Permission needed</string>
-
     <string name="permission_message">Need to allow permission on Telemesh service app to work properly. You can open the Telemesh service app clicking on launcher icon or can give permission manually from setting</string>
 
 

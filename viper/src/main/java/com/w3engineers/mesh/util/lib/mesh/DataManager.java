@@ -188,8 +188,8 @@ public class DataManager {
         DialogUtil.showConfirmationDialog(mContext,
                 mContext.getResources().getString(R.string.permission),
                 mContext.getResources().getString(R.string.permission_message),
-                null,
-                mContext.getString(R.string.ok),
+                mContext.getString(R.string.later),
+                mContext.getString(R.string.allow),
                 new DialogUtil.DialogButtonListener() {
                     @Override
                     public void onClickPositive() {
@@ -374,19 +374,30 @@ public class DataManager {
      * @return
      */
     public int getLinkTypeById(String nodeID) throws RemoteException {
-        return mTmCommunicator.getLinkTypeById(nodeID);
+        if (mTmCommunicator !=null){
+            return mTmCommunicator.getLinkTypeById(nodeID);
+        }
+        return 0;
     }
 
     public String getUserId() throws RemoteException {
-        return mTmCommunicator.getUserId();
+        if (mTmCommunicator !=null){
+            return mTmCommunicator.getUserId();
+        }
+       return "";
     }
 
     public void saveDiscoveredUserInfo(String userId, String userName) throws RemoteException {
-        mTmCommunicator.saveDiscoveredUserInfo(userId, userName);
+        if (mTmCommunicator !=null){
+            mTmCommunicator.saveDiscoveredUserInfo(userId, userName);
+        }
+
     }
 
     public void saveUserInfo(UserInfo userInfo) throws RemoteException {
-        mTmCommunicator.saveUserInfo(userInfo);
+        if (mTmCommunicator !=null){
+            mTmCommunicator.saveUserInfo(userInfo);
+        }
     }
 
 

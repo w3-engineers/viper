@@ -25,6 +25,7 @@ import com.w3engineers.mesh.ui.Nearby.UserConnectionCallBack;
 import com.w3engineers.mesh.ui.base.BaseFragment;
 import com.w3engineers.mesh.ui.history.HistoryFragment;
 import com.w3engineers.mesh.ui.meshlog.MeshLogFragment;
+import com.w3engineers.mesh.util.ConnectionManager;
 import com.w3engineers.mesh.util.Constant;
 import com.w3engineers.mesh.util.MeshLog;
 
@@ -99,6 +100,8 @@ public class BottomNavActivity extends AppCompatActivity implements UserConnecti
     @Override
     protected void onResume() {
         super.onResume();
+
+        ConnectionManager.on(this);
     }
 
 

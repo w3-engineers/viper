@@ -96,10 +96,8 @@ public class NearbyFragment extends BaseFragment implements ItemClickListener<Us
                 bundle.putSerializable(UserModel.class.getName(), item);
                 intent.putExtras(bundle);
                 startActivity(intent);
-            } else if (view.getId() == R.id.text_view_single_msg) {
-                sendHelloMessage(item);
             }
-        } else {
+        }else {
             Toast.makeText(getActivity(), "User model is null", Toast.LENGTH_SHORT).show();
         }
     }
