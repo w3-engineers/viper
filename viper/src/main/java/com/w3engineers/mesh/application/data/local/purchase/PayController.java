@@ -893,6 +893,16 @@ public class PayController {
         }
     }
 
+//    public void sendDisconnectBuyer(JSONObject jsonObject, String receiver) {
+////        MeshLog.v("sendChannelClosed " + jsonObject.toString());
+////        try {
+////            jsonObject.put(PurchaseConstants.JSON_KEYS.MESSAGE_TYPE, PurchaseConstants.MESSAGE_TYPES.DISCONNECT_BUYER);
+////        } catch (JSONException e) {
+////            e.printStackTrace();
+////        }
+////        sendPayMessage(receiver, jsonObject.toString());
+////    }
+
     private void sendPayMessage(String receiver, String message) {
         String messageId = "";
         sendPayMessageToTransport(receiver, message, messageId.toString());

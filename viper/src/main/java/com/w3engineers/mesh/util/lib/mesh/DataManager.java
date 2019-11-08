@@ -529,6 +529,13 @@ public class DataManager {
         mTmCommunicator.onBuyerDisconnected(address);
     }
 
+    public void disconnectFromInternet() throws RemoteException {
+        if (mTmCommunicator == null){
+            MeshLog.v("mTmCommunicator null");
+        }
+        mTmCommunicator.disconnectFromInternet();
+    }
+
     public void stopMesh() {
         MeshLog.v("stop mesh is called");
         try {

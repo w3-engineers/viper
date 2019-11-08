@@ -262,9 +262,6 @@ public class PurchaseManagerBuyer extends PurchaseManager implements PayControll
         payController.sendInitPurchase(jsonObject, sellerAddress);
     }
 
-
-
-
     //***************************************************//
     //******************Public Medthods******************//
     //***************************************************//
@@ -1124,6 +1121,8 @@ public class PurchaseManagerBuyer extends PurchaseManager implements PayControll
             if (dataPlanListener != null) {
                 dataPlanListener.onPurchaseCloseSuccess(closingPurchase.sellerAddress);
             }
+
+            payController.getDataManager().disconnectFromInternet();
 
         } catch (Exception e) {
             e.printStackTrace();

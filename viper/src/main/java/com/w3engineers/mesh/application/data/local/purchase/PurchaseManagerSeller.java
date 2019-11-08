@@ -1735,6 +1735,8 @@ public class PurchaseManagerSeller extends PurchaseManager implements PayControl
                     databaseService.updatePurchase(purchase);
                 }
 
+                payController.getDataManager().onBuyerDisconnected(buyerAddress);
+
                 pickAndSubmitRequest(purchaseRequests.requesterAddress);
 
             } else {
@@ -1742,6 +1744,8 @@ public class PurchaseManagerSeller extends PurchaseManager implements PayControl
             }
 
         } catch (ExecutionException | InterruptedException | JSONException e) {
+            e.printStackTrace();
+        } catch (RemoteException e) {
             e.printStackTrace();
         }
 //        }

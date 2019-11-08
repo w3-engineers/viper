@@ -62,21 +62,27 @@ public class NearbyFragment extends BaseFragment implements ItemClickListener<Us
     @Override
     public void onResume() {
         super.onResume();
-        List<UserModel> list = ConnectionManager.on(getActivity()).getUserList();
-        Collections.sort(list);
-        nearbyAdapter.clear();
-        nearbyAdapter.addItem(list);
-        if (nearbyAdapter.getItemCount() > 0) {
-            binding.progressBar.setVisibility(View.GONE);
-        } else {
-            binding.progressBar.setVisibility(View.VISIBLE);
-        }
 
-        if (list.size() > 0) {
-            BottomMenuHelper.showBadge(getActivity(), Objects.requireNonNull(getActivity()).findViewById(R.id.navigation), R.id.navigation_nearby, String.valueOf(list.size()));
-        } else {
-            BottomMenuHelper.removeBadge(Objects.requireNonNull(getActivity()).findViewById(R.id.navigation), R.id.navigation_nearby);
-        }
+        getActivity().runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                List<UserModel> list = ConnectionManager.on(getActivity()).getUserList();
+                Collections.sort(list);
+                nearbyAdapter.clear();
+                nearbyAdapter.addItem(list);
+                if (nearbyAdapter.getItemCount() > 0) {
+                    binding.progressBar.setVisibility(View.GONE);
+                } else {
+                    binding.progressBar.setVisibility(View.VISIBLE);
+                }
+
+                if (list.size() > 0) {
+                    BottomMenuHelper.showBadge(getActivity(), Objects.requireNonNull(getActivity()).findViewById(R.id.navigation), R.id.navigation_nearby, String.valueOf(list.size()));
+                } else {
+                    BottomMenuHelper.removeBadge(Objects.requireNonNull(getActivity()).findViewById(R.id.navigation), R.id.navigation_nearby);
+                }
+            }
+        });
 
         ConnectionManager.on(getActivity()).initListener(this);
     }

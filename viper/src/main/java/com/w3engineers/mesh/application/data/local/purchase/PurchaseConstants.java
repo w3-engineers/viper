@@ -47,6 +47,8 @@ public interface PurchaseConstants {
         int GIFT_ETHER_REQUEST_SUBMITTED = 32;
         int GIFT_ETHER_REQUEST_WITH_HASH = 33;
         int GIFT_RESPONSE = 34;
+
+        int DISCONNECT_BUYER = 35;
     }
 
     interface INTERNAL_MESSAGE_TYPES {
