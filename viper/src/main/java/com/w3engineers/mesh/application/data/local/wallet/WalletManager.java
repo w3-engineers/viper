@@ -33,8 +33,8 @@ import io.reactivex.Flowable;
 public class WalletManager {
     private static WalletManager walletManager;
     private PreferencesHelperDataplan preferencesHelperDataplan;
-    private GiftResponseListener giftResponseListener;
     private DataPlanManager dataPlanManager;
+    private WalletListener walletListener;
 
 
     public static void openActivity(Context context){
@@ -49,36 +49,43 @@ public class WalletManager {
         return walletManager;
     }
 
+    public void setWalletListener(WalletListener walletListener) {
+        this.walletListener = walletListener;
+        PurchaseManagerBuyer.getInstance().setWalletListener(walletListener);
+        PurchaseManagerSeller.getInstance().setWalletListener(walletListener);
+    }
+
     private WalletManager(){
         preferencesHelperDataplan = PreferencesHelperDataplan.on();
         dataPlanManager = DataPlanManager.getInstance();
     }
 
 
-    public boolean giftEther(GiftResponseListener giftResponseListener) {
-
-        this.giftResponseListener = giftResponseListener;
+    public boolean giftEther() {
 
         if (dataPlanManager.getDataPlanRole() == DataPlanConstants.USER_ROLE.DATA_BUYER) {
 
-            return PurchaseManagerBuyer.getInstance().giftEtherForOtherNetwork((success, isGifted, message) -> {
-                if (giftResponseListener != null) {
-                    giftResponseListener.onGiftResponse(success, isGifted, message);
-                }
-            });
+            return PurchaseManagerBuyer.getInstance().giftEtherForOtherNetwork();
 
         } else if (dataPlanManager.getDataPlanRole() == DataPlanConstants.USER_ROLE.DATA_SELLER){
-            return PurchaseManagerSeller.getInstance().requestForGiftForSeller((success, isGifted, message) -> {
-                if (giftResponseListener != null) {
-                    giftResponseListener.onGiftResponse(success, isGifted, message);
-                }
-            });
+            return PurchaseManagerSeller.getInstance().requestForGiftForSeller();
         }
         return false;
     }
 
-    public interface GiftResponseListener {
+    public interface WalletListener {
+
         void onGiftResponse(boolean success, boolean isGifted, String message);
+
+        void onBalanceInfo(boolean success, String msg);
+
+        void onEtherRequestResponse(boolean success, String msg);
+
+        void onTokenRequestResponse(boolean success, String msg);
+
+        void onRequestSubmitted(boolean success, String msg);
+
+        void onRequestCompleted(boolean success, String msg);
     }
 
     public LiveData<Double> getTotalEarn(String myAddress, int endPoint) {
@@ -103,85 +110,60 @@ public class WalletManager {
         PurchaseManager.getInstance().setEndpoint(endpoint);
     }
 
-    public void refreshMyBalance(BalanceInfoListener listener) {
+    public void refreshMyBalance() {
 
         if (dataPlanManager.getDataPlanRole() == DataPlanConstants.USER_ROLE.MESH_USER) {
-            listener.onBalanceInfo(false, "This feature is available only for data seller and data buyer and internet user.");
+
+            if (walletListener != null) {
+                walletListener.onBalanceInfo(false, "This feature is available only for data seller and data buyer and internet user.");
+            }
+
         } else if (dataPlanManager.getDataPlanRole() == DataPlanConstants.USER_ROLE.DATA_SELLER || dataPlanManager.getDataPlanRole() == DataPlanConstants.USER_ROLE.INTERNET_USER) {
 
-            PurchaseManagerSeller.getInstance().getMyBalanceInfo(new PurchaseManagerSeller.MyBalanceInfoListener() {
-                @Override
-                public void onBalanceInfoReceived(double ethBalance, double tknBalance) {
-                    listener.onBalanceInfo(true, "Balance will be update soon.");
-                }
+            PurchaseManagerSeller.getInstance().getMyBalanceInfo();
 
-                @Override
-                public void onBalanceErrorReceived(String msg) {
-                    listener.onBalanceInfo(false, msg);
-                }
-            });
         } else if (dataPlanManager.getDataPlanRole() == DataPlanConstants.USER_ROLE.DATA_BUYER){
-            PurchaseManagerBuyer.getInstance().getMyBalanceInfo(new PurchaseManagerBuyer.MyBalanceInfoListener() {
-                @Override
-                public void onBalanceInfoReceived(double ethBalance, double tknBalance) {
-                    listener.onBalanceInfo(true, "Balance will be update soon.");
-                }
-
-                @Override
-                public void onBalanceErrorReceived(String msg) {
-                    listener.onBalanceInfo(false, msg);
-                }
-            });
+            PurchaseManagerBuyer.getInstance().getMyBalanceInfo();
         } else {
-            listener.onBalanceInfo(false, "This feature is not available for you.");
+
+            if (walletListener != null) {
+                walletListener.onBalanceInfo(false, "This feature is not available for you.");
+            }
         }
     }
 
-    public interface BalanceInfoListener{
-        void onBalanceInfo(boolean success, String msg);
-    }
-
-    public void sendEtherRequest(EtherRequestListener etherRequestListener) {
+    public void sendEtherRequest() {
         PreferencesHelperDataplan preferencesHelperDataplan = PreferencesHelperDataplan.on();
 
         if (dataPlanManager.getDataPlanRole() == DataPlanConstants.USER_ROLE.DATA_SELLER) {
 
-            PurchaseManagerSeller.getInstance().sendEtherRequest((success, msg) ->{
-              etherRequestListener.onEtherRequestResponse(success, msg);
-            });
+            PurchaseManagerSeller.getInstance().sendEtherRequest();
         } else if (dataPlanManager.getDataPlanRole() == DataPlanConstants.USER_ROLE.DATA_BUYER){
 
-            PurchaseManagerBuyer.getInstance().sendEtherRequest((success, from, msg) -> {
-                etherRequestListener.onEtherRequestResponse(success, msg);
-            });
+            PurchaseManagerBuyer.getInstance().sendEtherRequest();
         }else {
-            etherRequestListener.onEtherRequestResponse(false, "This feature is available only for data seller and data buyer.");
+
+            if (walletListener != null) {
+                walletListener.onEtherRequestResponse(false, "This feature is available only for data seller and data buyer.");
+            }
         }
     }
-    public interface EtherRequestListener{
-        void onEtherRequestResponse(boolean success, String msg);
-    }
 
-    public void sendTokenRequest(TokenRequestListener tokenRequestListener) {
+    public void sendTokenRequest() {
 
         if (dataPlanManager.getDataPlanRole() == DataPlanConstants.USER_ROLE.DATA_SELLER) {
-            PurchaseManagerSeller.getInstance().sendTokenRequest((success, msg, tokenValue, etherValue) ->{
-                tokenRequestListener.onTokenRequestResponse(success, msg);
-            });
-        } else if (dataPlanManager.getDataPlanRole() == DataPlanConstants.USER_ROLE.DATA_BUYER){
-            PurchaseManagerBuyer.getInstance().sendTokenRequest(new PurchaseManagerBuyer.TokenRequestListener() {
-                @Override
-                public void onTokenRequestResponseReceived(boolean success, String from, String msg, double tokenValue, double ethValue) {
-                    tokenRequestListener.onTokenRequestResponse(success, msg);
-                }
-            });
-        }else {
-            tokenRequestListener.onTokenRequestResponse(false, "This feature is available only for data seller and data buyer.");
-        }
-    }
 
-    public interface TokenRequestListener{
-        void onTokenRequestResponse(boolean success, String msg);
+            PurchaseManagerSeller.getInstance().sendTokenRequest();
+
+        } else if (dataPlanManager.getDataPlanRole() == DataPlanConstants.USER_ROLE.DATA_BUYER){
+
+            PurchaseManagerBuyer.getInstance().sendTokenRequest();
+        }else {
+
+            if (walletListener != null) {
+                walletListener.onTokenRequestResponse(false, "This feature is available only for data seller and data buyer.");
+            }
+        }
     }
 
 
@@ -198,24 +180,10 @@ public class WalletManager {
         return null;
     }
 
-    public void getAllOpenDrawableBlock(BalanceWithdrawtListener balanceWithdrawtListener) throws ExecutionException, InterruptedException {
+    public void getAllOpenDrawableBlock() throws ExecutionException, InterruptedException {
         //TODO there is a problem in the callback, for every request a callback is fired, but it should be at the end when all process are completed.
 
-            PurchaseManagerSeller.getInstance().getAllOpenDrawableBlock(new PurchaseManagerSeller.BalanceWithdrawtListener() {
-                @Override
-                public void onRequestSubmitted(boolean success, String msg) {
-                    balanceWithdrawtListener.onRequestSubmitted(success, msg);
-                }
-
-                @Override
-                public void onRequestCompleted(boolean success, String msg) {
-                    balanceWithdrawtListener.onRequestCompleted(success, msg);
-                }
-            });
-    }
-    public interface BalanceWithdrawtListener {
-        void onRequestSubmitted(boolean success, String msg);
-        void onRequestCompleted(boolean success, String msg);
+        PurchaseManagerSeller.getInstance().getAllOpenDrawableBlock();
     }
 
     public Flowable<List<NetworkInfo>> getNetworkInfoByNetworkType() {
