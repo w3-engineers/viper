@@ -54,6 +54,7 @@ public class ConnectionManager {
     }
 
     private ConnectionManager(Context context, String appName, String networkPrefix) {
+        MeshLog.e("Connection Manager is called");
         mContext = context;
         discoverUserMap = Collections.synchronizedMap(new HashMap());
         requestUserInfoList = Collections.synchronizedMap(new HashMap<>());

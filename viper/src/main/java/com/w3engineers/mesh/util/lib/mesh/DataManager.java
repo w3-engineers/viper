@@ -188,12 +188,15 @@ public class DataManager {
         DialogUtil.showConfirmationDialog(mContext,
                 mContext.getResources().getString(R.string.permission),
                 mContext.getResources().getString(R.string.permission_message),
-                mContext.getString(R.string.cancel),
+                null,
                 mContext.getString(R.string.ok),
                 new DialogUtil.DialogButtonListener() {
                     @Override
                     public void onClickPositive() {
+
                         launchServiceApp();
+
+                        android.os.Process.killProcess(android.os.Process.myPid());
                     }
 
                     @Override
@@ -245,8 +248,9 @@ public class DataManager {
 
             try {
                 mTmCommunicator.saveUserInfo(userInfo);
+                Log.e("service_status", "onServiceConnected");
                 boolean status = mTmCommunicator.startMesh(appName);
-                if (!status){
+                if (!status) {
                     showPermissionPopUp();
                 }
                 mTmCommunicator.setViperCommunicator(viperCommunicator);
