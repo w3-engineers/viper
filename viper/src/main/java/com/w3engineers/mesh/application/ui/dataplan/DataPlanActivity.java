@@ -86,8 +86,9 @@ public class DataPlanActivity extends TelemeshBaseActivity implements DataPlanMa
     @Override
     protected void onResume() {
         super.onResume();
-
-        prepareSellerData();
+        if (DataPlanManager.getInstance().getDataPlanRole() == DataPlanConstants.USER_ROLE.DATA_BUYER) {
+            prepareSellerData();
+        }
     }
 
     @Override

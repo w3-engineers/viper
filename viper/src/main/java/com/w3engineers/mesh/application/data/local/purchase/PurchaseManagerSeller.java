@@ -535,10 +535,6 @@ public class PurchaseManagerSeller extends PurchaseManager implements PayControl
     public void destroyObject() {
         payController.setSellerListener(null);
         purchaseManagerSeller = null;
-        payController = null;
-        ethService = null;
-        databaseService = null;
-        preferencesHelperDataplan = null;
         walletListener = null;
     }
 

@@ -444,10 +444,6 @@ public class PurchaseManagerBuyer extends PurchaseManager implements PayControll
         payController.setBuyerListener(null);
 
         purchaseManagerBuyer = null;
-        payController = null;
-        ethService = null;
-        dataPlanListener = null;
-        databaseService = null;
         walletListener = null;
     }
 
