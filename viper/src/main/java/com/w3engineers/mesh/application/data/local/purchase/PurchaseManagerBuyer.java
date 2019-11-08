@@ -448,6 +448,7 @@ public class PurchaseManagerBuyer extends PurchaseManager implements PayControll
         ethService = null;
         dataPlanListener = null;
         databaseService = null;
+        walletListener = null;
     }
 
     public void setPayControllerListener() {
@@ -504,7 +505,7 @@ public class PurchaseManagerBuyer extends PurchaseManager implements PayControll
                     EthereumServiceUtil.getInstance(mContext).updateCurrencyAndToken(endPointType, ethBalance, tknBalance);
 
                     if (walletListener != null) {
-                        walletListener.onBalanceInfo(true, "Balance will be update soon.");
+                        walletListener.onBalanceInfo(true, "Balance updated");
                     }
 
                 } catch (Exception e) {

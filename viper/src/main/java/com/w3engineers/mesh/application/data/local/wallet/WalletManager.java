@@ -51,8 +51,12 @@ public class WalletManager {
 
     public void setWalletListener(WalletListener walletListener) {
         this.walletListener = walletListener;
-        PurchaseManagerBuyer.getInstance().setWalletListener(walletListener);
-        PurchaseManagerSeller.getInstance().setWalletListener(walletListener);
+
+        if (dataPlanManager.getDataPlanRole() == DataPlanConstants.USER_ROLE.DATA_BUYER) {
+            PurchaseManagerBuyer.getInstance().setWalletListener(walletListener);
+        } else if (dataPlanManager.getDataPlanRole() == DataPlanConstants.USER_ROLE.DATA_SELLER) {
+            PurchaseManagerSeller.getInstance().setWalletListener(walletListener);
+        }
     }
 
     private WalletManager(){

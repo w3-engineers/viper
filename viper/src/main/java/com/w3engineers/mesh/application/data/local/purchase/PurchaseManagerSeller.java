@@ -224,11 +224,26 @@ public class PurchaseManagerSeller extends PurchaseManager implements PayControl
 
                         TransactionReceipt transactionReceipt = ethService.getTransactionReceipt(transactionHash, endPointType);
 
-                        if (transactionReceipt.getStatus().equals("0x1")) {
-                            // No need any operation
-                        } else if(transactionReceipt.getStatus().equals("0x0")) {
-                            databaseService.deletePurchaseRequest(purchaseRequest);
+                        if (transactionReceipt != null) {
+
+                            String transactionStatus = transactionReceipt.getStatus();
+
+                            if (!TextUtils.isEmpty(transactionStatus)) {
+
+                                if (transactionStatus.equals("0x1")) {
+                                    // No need any operation
+                                } else if (transactionStatus.equals("0x0")) {
+                                    databaseService.deletePurchaseRequest(purchaseRequest);
+                                } else {
+                                    pendingStatus = true;
+                                }
+
+                            } else {
+                                pendingStatus = true;
+                            }
+
                         } else {
+                            // If transaction is in pending mode
                             pendingStatus = true;
                         }
 
@@ -524,6 +539,7 @@ public class PurchaseManagerSeller extends PurchaseManager implements PayControl
         ethService = null;
         databaseService = null;
         preferencesHelperDataplan = null;
+        walletListener = null;
     }
 
     @Override
@@ -598,7 +614,7 @@ public class PurchaseManagerSeller extends PurchaseManager implements PayControl
                 } else {
 
                     if(walletListener != null) {
-                        walletListener.onBalanceInfo(true, "Balance will be update soon.");
+                        walletListener.onBalanceInfo(true, "Balance updated");
                     }
                 }
             } catch (Exception e) {
