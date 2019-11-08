@@ -113,10 +113,14 @@ public class DataPlanManager {
             PurchaseManagerBuyer.getInstance().setDataPlanListener(dataPlanListener);
             PurchaseManagerSeller.getInstance().destroyObject();
 
+            PurchaseManagerBuyer.getInstance().setPayControllerListener();
+
         } else if (getDataPlanRole() == DataPlanConstants.USER_ROLE.DATA_SELLER) {
 
             PurchaseManagerBuyer.getInstance().setDataPlanListener(null);
             PurchaseManagerBuyer.getInstance().destroyObject();
+
+            PurchaseManagerSeller.getInstance().setPayControllerListener();
         }
         if (dataPlanListener != null){
             dataPlanListener.onRoleSwitchCompleted();

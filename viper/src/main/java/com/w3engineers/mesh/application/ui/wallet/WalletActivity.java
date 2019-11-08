@@ -41,7 +41,7 @@ import java.util.Date;
 import java.util.concurrent.ExecutionException;
 
 
-public class WalletActivity extends TelemeshBaseActivity implements WalletManager.GiftResponseListener {
+public class WalletActivity extends TelemeshBaseActivity implements WalletManager.WalletListener {
 
     private ActivityWalletBinding mBinding;
     private ProgressDialog dialog;
@@ -74,6 +74,7 @@ public class WalletActivity extends TelemeshBaseActivity implements WalletManage
         walletManager = WalletManager.getInstance();
         dataPlanManager = DataPlanManager.getInstance();
 
+        walletManager.setWalletListener(this);
 
         setClickListener(mBinding.opBack, mBinding.imgMyAddress, mBinding.btnWithdraw, mBinding.ethBlock, mBinding.tmeshBlock);
 
@@ -85,7 +86,7 @@ public class WalletActivity extends TelemeshBaseActivity implements WalletManage
             mBinding.totalSpentBlock.setVisibility(View.GONE);
         }
 
-        boolean giftEther = walletManager.giftEther(this);
+        boolean giftEther = walletManager.giftEther();
 
         setDialogLoadingTimer("Refreshing balance, please wait.");
 
@@ -144,6 +145,59 @@ public class WalletActivity extends TelemeshBaseActivity implements WalletManage
 
         });
 
+    }
+
+    @Override
+    public void onBalanceInfo(boolean success, String msg) {
+        runOnUiThread(() -> {
+            resetDialogLoadingTimer();
+
+            mBinding.btnWithdraw.setEnabled(true);
+            Toaster.showLong(msg);
+        });
+    }
+
+    @Override
+    public void onEtherRequestResponse(boolean success, String msg) {
+        runOnUiThread(() -> {
+            resetDialogLoadingTimer();
+
+            if (success) {
+                WalletActivity.this.refreshMyBalance();
+            }
+            Toaster.showLong(msg);
+
+        });
+    }
+
+    @Override
+    public void onTokenRequestResponse(boolean success, String msg) {
+        runOnUiThread(() -> {
+            resetDialogLoadingTimer();
+
+            Toaster.showLong(msg);
+        });
+    }
+
+    @Override
+    public void onRequestSubmitted(boolean success, String msg) {
+        runOnUiThread(() -> {
+            if (!success) {
+                mBinding.btnWithdraw.setEnabled(true);
+            }
+            Toaster.showLong(msg);
+        });
+    }
+
+    @Override
+    public void onRequestCompleted(boolean success, String msg) {
+        runOnUiThread(() -> {
+            if (!success) {
+                mBinding.btnWithdraw.setEnabled(true);
+            }
+            Toaster.showLong(msg);
+            refreshMyBalance();
+        });
     }
 
     @Override
@@ -288,51 +342,19 @@ public class WalletActivity extends TelemeshBaseActivity implements WalletManage
 
         setDialogLoadingTimer("Refreshing balance, please wait.");
 
-        walletManager.refreshMyBalance(new WalletManager.BalanceInfoListener() {
-            @Override
-            public void onBalanceInfo(boolean success, String msg) {
-                runOnUiThread(() -> {
-                    resetDialogLoadingTimer();
-
-                    mBinding.btnWithdraw.setEnabled(true);
-                    Toaster.showLong(msg);
-                });
-            }
-        });
+        walletManager.refreshMyBalance();
     }
 
     private void sendEtherRequest() {
         setDialogLoadingTimer("Sending request, please wait.");
 
-        walletManager.sendEtherRequest(new WalletManager.EtherRequestListener() {
-            @Override
-            public void onEtherRequestResponse(boolean success, String msg) {
-                runOnUiThread(() -> {
-                    resetDialogLoadingTimer();
-
-                    if (success) {
-                        WalletActivity.this.refreshMyBalance();
-                    }
-                    Toaster.showLong(msg);
-
-                });
-            }
-        });
+        walletManager.sendEtherRequest();
     }
 
     private void sendTokenRequest() {
         setDialogLoadingTimer("Sending request, please wait.");
 
-        walletManager.sendTokenRequest((success, msg) -> {
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    resetDialogLoadingTimer();
-
-                    Toaster.showLong(msg);
-                }
-            });
-        });
+        walletManager.sendTokenRequest();
     }
 
     private void setTotalEarn() {
@@ -424,34 +446,7 @@ public class WalletActivity extends TelemeshBaseActivity implements WalletManage
 
     public void performWithdrawBalance() {
         try {
-            walletManager.getAllOpenDrawableBlock(new WalletManager.BalanceWithdrawtListener() {
-                @Override
-                public void onRequestSubmitted(boolean success, String msg) {
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            if (!success) {
-                                mBinding.btnWithdraw.setEnabled(true);
-                            }
-                            Toaster.showLong(msg);
-                        }
-                    });
-                }
-
-                @Override
-                public void onRequestCompleted(boolean success, String msg) {
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            if (!success) {
-                                mBinding.btnWithdraw.setEnabled(true);
-                            }
-                            Toaster.showLong(msg);
-                            refreshMyBalance();
-                        }
-                    });
-                }
-            });
+            walletManager.getAllOpenDrawableBlock();
         } catch (ExecutionException e) {
             e.printStackTrace();
         } catch (InterruptedException e) {
@@ -538,7 +533,7 @@ public class WalletActivity extends TelemeshBaseActivity implements WalletManage
                 mBinding.totalSpentBlock.setVisibility(View.GONE);
             }
 
-            boolean giftEther = walletManager.giftEther(this);
+            boolean giftEther = walletManager.giftEther();
             if (!giftEther) {
                 refreshMyBalance();
             }
