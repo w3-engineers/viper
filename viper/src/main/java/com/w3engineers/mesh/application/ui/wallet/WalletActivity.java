@@ -565,7 +565,8 @@ public class WalletActivity extends TelemeshBaseActivity implements WalletManage
                 if (dialog != null && dialog.isShowing()) {
                     dialog.dismiss();
                 }
-                Toaster.showLong("Seller is not responding...");
+
+                Toaster.showLong("Request timeout.");
                 dialogTimerRunnable = null;
             });
 

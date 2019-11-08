@@ -103,7 +103,7 @@ public class DataPlanManager {
             MeshLog.v("sellerMode dpm " + newRole);
             preferencesHelperDataplan.setDataPlanRole(newRole);
             payController.getDataManager().restartMesh(newRole);
-        } catch (RemoteException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
@@ -158,7 +158,6 @@ public class DataPlanManager {
     public long getSellDataAmount() {
         return preferencesHelperDataplan.getSellDataAmount();
     }
-
 
     public void setSellFromDate(long fromDate) {
         preferencesHelperDataplan.setSellFromDate(fromDate);
@@ -331,7 +330,6 @@ public class DataPlanManager {
                 .setLabel(label)
                 .setBtnText(PurchaseConstants.SELLERS_BTN_TEXT.PURCHASE);
     }
-
 
     private void setDataManagerObserver(){
         AppDataObserver.on().startObserver(ApiEvent.TRANSPORT_INIT, event -> {

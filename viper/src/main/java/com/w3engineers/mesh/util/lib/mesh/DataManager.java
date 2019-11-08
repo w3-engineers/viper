@@ -28,6 +28,7 @@ import com.w3engineers.mesh.application.data.local.wallet.WalletService;
 import com.w3engineers.mesh.application.data.model.PayMessage;
 import com.w3engineers.mesh.application.data.model.PayMessageAck;
 import com.w3engineers.mesh.application.data.model.TransportInit;
+import com.w3engineers.mesh.application.data.model.UserInfoEvent;
 import com.w3engineers.mesh.application.data.remote.model.BuyerPendingMessage;
 import com.w3engineers.mesh.application.ui.dataplan.DataPlanActivity;
 import com.w3engineers.mesh.util.Constant;
@@ -42,6 +43,7 @@ import com.w3engineers.mesh.application.data.model.DataAckEvent;
 import com.w3engineers.mesh.application.data.model.DataEvent;
 import com.w3engineers.mesh.application.data.model.PeerAdd;
 import com.w3engineers.mesh.application.data.model.PeerRemoved;
+import com.w3engineers.models.UserInfo;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -60,6 +62,7 @@ public class DataManager {
     private String mSsid;
     private Context mContext;
     private String appName;
+    private UserInfo userInfo;
 
     private static DataManager mDataManager;
     private boolean isAlreadyToPlayStore = false;
@@ -87,17 +90,19 @@ public class DataManager {
      * @param appName
      * @param networkPrefix
      */
-    public void doBindService(Context context, String appName, String networkPrefix) {
+    public void doBindService(Context context, String appName, String networkPrefix, UserInfo userInfo) {
         this.mContext = context;
         this.appName = appName;
         this.mSsid = networkPrefix;
+        this.userInfo = userInfo;
+
 
         MeshLog.v("Data manager has been called");
 
-        Intent mIntent = new Intent(context, ClientLibraryService.class);
+/*        Intent mIntent = new Intent(context, ClientLibraryService.class);
         context.startService(mIntent);
 
-        context.bindService(mIntent, clientServiceConnection, Service.BIND_AUTO_CREATE);
+        context.bindService(mIntent, clientServiceConnection, Service.BIND_AUTO_CREATE);*/
 
         checkAndBindService();
     }
@@ -209,6 +214,7 @@ public class DataManager {
             mTmCommunicator = ITmCommunicator.Stub.asInterface(binder);
 
             try {
+                mTmCommunicator.saveUserInfo(userInfo);
                 mTmCommunicator.startMesh(appName);
                 mTmCommunicator.setViperCommunicator(viperCommunicator);
             } catch (RemoteException e) {
@@ -276,6 +282,11 @@ public class DataManager {
         }
 
         @Override
+        public void onUserInfoReceive(List<UserInfo> userInfoList) throws RemoteException {
+          DataManager.this.onGetUserInfo(userInfoList);
+        }
+
+        @Override
         public void setServiceForeground(boolean isForeGround) throws RemoteException {
 
         }
@@ -298,11 +309,6 @@ public class DataManager {
         @Override
         public void onTransportInit(String nodeId, String publicKey, boolean success, String msg) throws RemoteException {
             DataManager.this.onTransportInit(nodeId, publicKey, success, msg);
-        }
-
-        @Override
-        public void onUserPublicKeyReceived(String address, String publicKey) throws RemoteException {
-
         }
     };
 
@@ -340,6 +346,10 @@ public class DataManager {
 
     public void saveDiscoveredUserInfo(String userId, String userName) throws RemoteException {
         mTmCommunicator.saveDiscoveredUserInfo(userId, userName);
+    }
+
+    public void saveUserInfo(UserInfo userInfo) throws RemoteException {
+        mTmCommunicator.saveUserInfo(userInfo);
     }
 
 
@@ -430,6 +440,23 @@ public class DataManager {
         AppDataObserver.on().sendObserverData(dataAckEvent);
     }
 
+    public void onGetUserInfo(List<UserInfo> userInfoList){
+
+        MeshLog.e("user info list receive in data manager");
+
+        for (UserInfo userInfo : userInfoList){
+            UserInfoEvent userInfoEvent = new UserInfoEvent();
+            userInfoEvent.setAddress(userInfo.getAddress());
+            userInfoEvent.setAvatar(userInfo.getAvatar());
+            userInfoEvent.setUserName(userInfo.getUserName());
+            userInfoEvent.setRegTime(userInfo.getRegTime());
+            userInfoEvent.setSync(userInfo.isSync());
+
+            AppDataObserver.on().sendObserverData(userInfoEvent);
+
+            MeshLog.e("user info send to app level");
+        }
+    }
     public void setServiceForeground(boolean isForeground) {
         try {
             if (viperCommunicator != null) {
@@ -443,6 +470,10 @@ public class DataManager {
 
     public String getUserPublicKey(String address) throws RemoteException {
         MeshLog.v("getUserPublicKey dtm " + address);
+
+        if (mTmCommunicator == null){
+            MeshLog.v("mTmCommunicator null");
+        }
         return mTmCommunicator.getUserPublicKey(address);
     }
 
@@ -460,28 +491,64 @@ public class DataManager {
     }
 
     public List<String> getInternetSellers() throws RemoteException {
+        if (mTmCommunicator == null){
+            MeshLog.v("mTmCommunicator null");
+        }
         return mTmCommunicator.getInternetSellers();
     }
 
     public boolean isInternetSeller(String address) throws RemoteException {
+        if (mTmCommunicator == null){
+            MeshLog.v("mTmCommunicator null");
+        }
         return mTmCommunicator.isInternetSeller(address);
     }
 
     public boolean isUserConnected(String address) throws RemoteException {
+        if (mTmCommunicator == null){
+            MeshLog.v("mTmCommunicator null");
+        }
         return mTmCommunicator.isUserConnected(address);
     }
 
     public void onBuyerConnected(String address) throws RemoteException {
+        if (mTmCommunicator == null){
+            MeshLog.v("mTmCommunicator null");
+        }
+        if (TextUtils.isEmpty(address)){
+            MeshLog.v("address dtm null");
+        }
+
         mTmCommunicator.onBuyerConnected(address);
     }
 
     public void onBuyerDisconnected(String address) throws RemoteException {
+        if (mTmCommunicator == null){
+            MeshLog.v("mTmCommunicator null");
+        }
         mTmCommunicator.onBuyerDisconnected(address);
     }
 
-    public void restartMesh(int newRole) throws RemoteException {
+    public void stopMesh() {
+        MeshLog.v("stop mesh is called");
+        try {
+            mTmCommunicator.stopMesh();
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void restartMesh(int newRole) {
         MeshLog.v("sellerMode dm" + newRole);
-        mTmCommunicator.restartMesh(newRole);
+        if (mTmCommunicator == null){
+            MeshLog.v("mTmCommunicator null");
+        }
+
+        try {
+            mTmCommunicator.restartMesh(newRole);
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        }
     }
 
 
@@ -527,10 +594,6 @@ public class DataManager {
         transportInit.msg = msg;
 
         AppDataObserver.on().sendObserverData(transportInit);
-    }
-
-    public void onUserPublicKeyReceived(String address, String publicKey){
-        MeshLog.v("onUserPublicKeyReceived dtm " + address +"  " + publicKey);
     }
 
 

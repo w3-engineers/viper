@@ -24,16 +24,16 @@ import android.preference.PreferenceManager;
 
 public class SharedPref {
 
-    private final static String PREFERENCE_NAME = "mesh_rnd";
+    private final static String PREFERENCE_NAME = "viper_lib";
     private static SharedPreferences preferences;
     private static SharedPref sharedPref;
 
     private SharedPref() {
     }
 
-    public SharedPref(Context mContext) {
-        preferences = PreferenceManager.getDefaultSharedPreferences(mContext);
-    }
+//    public SharedPref(Context mContext) {
+////        preferences = PreferenceManager.getDefaultSharedPreferences(mContext);
+//    }
 
     public static SharedPref on(Context context) {
         preferences = context.getSharedPreferences(PREFERENCE_NAME, Context.MODE_PRIVATE | Context.MODE_MULTI_PROCESS);

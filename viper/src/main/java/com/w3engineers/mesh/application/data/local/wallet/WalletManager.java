@@ -190,15 +190,20 @@ public class WalletManager {
         return PurchaseManager.getInstance().getNetworkInfoByNetworkType();
     }
 
-    public void readWallet(Context context) {
+    public interface WaletListener {
+        void onWalletLoaded(String walletAddress, String publicKey);
+        void onErrorOccurred(String message);
+    }
+
+    public void readWallet(Context context, WaletListener listener) {
         WalletService mWalletService =  WalletService.getInstance(context);
-
-
 
         mWalletService.createOrLoadWallet(WalletService.PASSWORD, new WalletService.Listener() {
             @Override
             public void onWalletLoaded(String walletAddress, String publicKey) {
                 MeshLog.i(" WalletManager loaded succesful");
+
+                listener.onWalletLoaded(walletAddress, publicKey);
 
                 if (!walletAddress.equalsIgnoreCase(SharedPref.read(Constant.PreferenceKeys.ADDRESS))){
 
@@ -225,6 +230,7 @@ public class WalletManager {
 
             @Override
             public void onErrorOccurred(String message) {
+                listener.onErrorOccurred(message);
                 MeshLog.v("walletManager loading failed");
             }
         });

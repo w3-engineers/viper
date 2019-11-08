@@ -168,6 +168,7 @@ public class EthereumService implements BlockRequest.BlockTransactionObserver, E
                     }
                 } catch (IOException e) {
                     e.printStackTrace();
+                    listener.onEtherRequested(400);
                 }
             }
         });
@@ -232,8 +233,10 @@ public class EthereumService implements BlockRequest.BlockTransactionObserver, E
                         }
                     } catch (IOException e) {
                         e.printStackTrace();
+                        listener.onEtherGiftRequested(false, e.getMessage(), null, null, "system");
                     } catch (JSONException e) {
                         e.printStackTrace();
+                        listener.onEtherGiftRequested(false, e.getMessage(), null, null, "system");
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                         listener.onEtherGiftRequested(false, e.getMessage(), null, null, "system");
