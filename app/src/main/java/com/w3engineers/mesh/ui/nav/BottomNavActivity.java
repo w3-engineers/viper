@@ -46,6 +46,8 @@ public class BottomNavActivity extends AppCompatActivity implements UserConnecti
     private int userCount;
     private HashMap<String, UserModel> messageMap;
 
+    private boolean walletLoadedSuccess;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -70,17 +72,23 @@ public class BottomNavActivity extends AppCompatActivity implements UserConnecti
         getSupportActionBar().setBackgroundDrawable(getResources().getDrawable(R.drawable.drawable_reg_page_shape));
 
 
-
+        MeshLog.v("BottomNavActivity");
         AppDataObserver.on().startObserver(ApiEvent.WALLET_LOADED, event -> {
 
             WalletLoaded walletLoaded = (WalletLoaded) event;
-            if (walletLoaded.success && myDataPlanMenuItem != null) {
-                runOnUiThread(() -> {
-                    myDataPlanMenuItem.setEnabled(true);
-                });
+
+            MeshLog.v("BottomNavActivity " + walletLoaded.success);
+            walletLoadedSuccess = walletLoaded.success;
+
+            if (walletLoaded.success){
+                if(myDataPlanMenuItem != null) {
+                    runOnUiThread(() -> {
+                        myDataPlanMenuItem.setEnabled(true);
+                    });
+                }
             }else {
                 runOnUiThread(() -> {
-                    Toaster.showLong("Error occurred.");
+                    Toaster.showLong("Wallet loading error.");
                 });
             }
         });
@@ -176,9 +184,12 @@ public class BottomNavActivity extends AppCompatActivity implements UserConnecti
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
+
+        MeshLog.v("option menu created ");
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.menu_bottom_nav, menu);
         myDataPlanMenuItem = menu.getItem(0);
+        myDataPlanMenuItem.setEnabled(walletLoadedSuccess);
 
 /*        msgSendingStatusMenuItem = menu.findItem(R.id.menu_msg_sending_status);
         myDataPlanMenuItem = menu.getItem(1);*/
