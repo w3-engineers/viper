@@ -1032,6 +1032,7 @@ public class PurchaseManagerSeller extends PurchaseManager implements PayControl
                     syncWithBuyer(address);
                 }
             } else {
+                syncWithBuyer(address);
                 MeshLog.v("no pending request");
             }
         } catch (Exception e) {
