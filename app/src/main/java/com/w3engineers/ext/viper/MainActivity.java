@@ -1,3 +1,4 @@
+/*
 package com.w3engineers.ext.viper;
 
 import android.os.RemoteException;
@@ -45,3 +46,4 @@ public class MainActivity extends TelemeshBaseActivity {
 
 
 }
+*/

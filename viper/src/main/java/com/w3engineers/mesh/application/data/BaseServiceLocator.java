@@ -12,6 +12,6 @@ import com.w3engineers.mesh.application.data.local.BaseMeshDataSource;
  */
 public abstract class BaseServiceLocator {
 
-    public abstract BaseMeshDataSource getTmDataSource();
+    public abstract void initViper();
 
 }

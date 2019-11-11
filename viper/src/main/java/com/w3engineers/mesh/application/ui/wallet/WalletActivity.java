@@ -24,6 +24,7 @@ import android.view.WindowManager;
 import android.widget.PopupMenu;
 
 import com.w3engineers.ext.strom.util.helper.Toaster;
+import com.w3engineers.mesh.application.data.BaseServiceLocator;
 import com.w3engineers.mesh.application.data.local.dataplan.DataPlanManager;
 import com.w3engineers.ext.strom.application.ui.base.BaseActivity;
 import com.w3engineers.mesh.R;
@@ -64,6 +65,11 @@ public class WalletActivity extends TelemeshBaseActivity implements WalletManage
     @Override
     protected int getLayoutId() {
         return R.layout.activity_wallet;
+    }
+
+    @Override
+    protected BaseServiceLocator getBaseServiceLocator() {
+        return null;
     }
 
     @Override
