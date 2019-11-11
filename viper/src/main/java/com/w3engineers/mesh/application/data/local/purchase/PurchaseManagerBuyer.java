@@ -470,11 +470,7 @@ public class PurchaseManagerBuyer extends PurchaseManager implements PayControll
     @Override
     public void onUserDisconnected(String address) {
 
-        PreferencesHelperDataplan preferencesHelperDataplan =
-                PreferencesHelperDataplan.on();
-
-        if (!TextUtils.isEmpty(giftRequestedSeller)
-                && giftRequestedSeller.equals(address)){
+        if (!TextUtils.isEmpty(giftRequestedSeller) && giftRequestedSeller.equals(address)){
             if (preferencesHelperDataplan.getEtherRequestStatus(1) == PurchaseConstants.GIFT_REQUEST_STATE.REQUESTED_TO_SELLER){
                 preferencesHelperDataplan.setRequestedForEther(PurchaseConstants.GIFT_REQUEST_STATE.NOT_REQUESTED_YET, 1);
             }
@@ -482,8 +478,21 @@ public class PurchaseManagerBuyer extends PurchaseManager implements PayControll
                 preferencesHelperDataplan.setRequestedForEther(PurchaseConstants.GIFT_REQUEST_STATE.NOT_REQUESTED_YET, 2);
             }
         }
-
         DataPlanManager.getInstance().precessDisconnectedSeller(mContext, address);
+
+        try {
+            List<Purchase> myOpenPurcheses  = databaseService.getMyPurchasesWithState(ethService.getAddress(), PurchaseConstants.CHANNEL_STATE.OPEN);
+            for (Purchase p : myOpenPurcheses){
+                if (payController.getDataManager().isUserConnected(p.sellerAddress)){
+                    JSONObject jsonObject = new JSONObject();
+                    jsonObject.put(PurchaseConstants.JSON_KEYS.MESSAME_FROM, ethService.getAddress());
+                    payController.sendConnectBuyer(jsonObject,p.sellerAddress);
+                    break;
+                }
+            }
+        } catch (Exception e){
+            e.printStackTrace();
+        }
     }
 
     @Override

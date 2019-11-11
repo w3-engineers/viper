@@ -430,6 +430,12 @@ public class PayController {
                         }
                         break;
 
+                    case PurchaseConstants.MESSAGE_TYPES.CONNECT_BUYER:
+                        if (payControllerListenerForSeller != null) {
+                            payControllerListenerForSeller.onUserConnected(fromAddress);
+                        }
+                        break;
+
                     default:
                         break;
 
@@ -970,6 +976,16 @@ public class PayController {
         MeshLog.p("sendEtherRequestMessageOk " + jo.toString());
         try {
             jo.put(PurchaseConstants.JSON_KEYS.MESSAGE_TYPE, PurchaseConstants.MESSAGE_TYPES.ETHER_REQUEST_RESPONSE);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        sendPayMessage(receiver, jo.toString());
+    }
+
+    public void sendConnectBuyer(JSONObject jo, String receiver) {
+        MeshLog.p("sendConnectBuyer " + jo.toString());
+        try {
+            jo.put(PurchaseConstants.JSON_KEYS.MESSAGE_TYPE, PurchaseConstants.MESSAGE_TYPES.CONNECT_BUYER);
         } catch (JSONException e) {
             e.printStackTrace();
         }
