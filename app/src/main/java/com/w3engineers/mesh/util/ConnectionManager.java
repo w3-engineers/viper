@@ -43,7 +43,6 @@ public class ConnectionManager {
     private Map<String, UserModel> discoverUserMap;
     private Map<String, String> requestUserInfoList;
 
-
     public static ConnectionManager on(Context context) {
         if (mConnectionManager == null) {
             synchronized (ViperClient.class) {
@@ -55,6 +54,7 @@ public class ConnectionManager {
     }
 
     private ConnectionManager(Context context, String appName, String networkPrefix) {
+        MeshLog.e("Connection Manager is called");
         mContext = context;
         discoverUserMap = Collections.synchronizedMap(new HashMap());
         requestUserInfoList = Collections.synchronizedMap(new HashMap<>());
@@ -102,6 +102,8 @@ public class ConnectionManager {
 
         AppDataObserver.on().startObserver(ApiEvent.USER_INFO, event -> {
             UserInfoEvent userInfoEvent = (UserInfoEvent) event;
+
+            MeshLog.e("user info found in app level");
 
             UserModel userModel = new UserModel();
             userModel.setUserId(userInfoEvent.getAddress());
@@ -266,7 +268,6 @@ public class ConnectionManager {
     public void initNearByCallBackForChatActivity(NearbyCallBack nearbyCallBack) {
         this.mNearbyCallBack = nearbyCallBack;
     }
-
 
     private void reqUserInfo(String nodeId) {
         //TODO check whether it is okay or not send message only bl link or all

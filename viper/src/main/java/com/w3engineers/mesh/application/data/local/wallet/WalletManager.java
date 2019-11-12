@@ -112,7 +112,7 @@ public class WalletManager {
             PurchaseManagerSeller.getInstance().getMyBalanceInfo(new PurchaseManagerSeller.MyBalanceInfoListener() {
                 @Override
                 public void onBalanceInfoReceived(double ethBalance, double tknBalance) {
-                    listener.onBalanceInfo(true, "Balance will be update soon.");
+                    listener.onBalanceInfo(true, "Balance updated.");
                 }
 
                 @Override
@@ -124,7 +124,7 @@ public class WalletManager {
             PurchaseManagerBuyer.getInstance().getMyBalanceInfo(new PurchaseManagerBuyer.MyBalanceInfoListener() {
                 @Override
                 public void onBalanceInfoReceived(double ethBalance, double tknBalance) {
-                    listener.onBalanceInfo(true, "Balance will be update soon.");
+                    listener.onBalanceInfo(true, "Balance updated.");
                 }
 
                 @Override

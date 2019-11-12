@@ -41,7 +41,8 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:replace="android:name">
-        <activity android:name="com.w3engineers.mesh.ui.createuser.CreateUserActivity">
+        <activity android:name="com.w3engineers.mesh.ui.createuser.CreateUserActivity"
+            android:windowSoftInputMode="adjustResize">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

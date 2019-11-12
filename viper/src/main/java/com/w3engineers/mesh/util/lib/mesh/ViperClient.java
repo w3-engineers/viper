@@ -4,13 +4,18 @@ import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
 import android.os.RemoteException;
+import android.text.TextUtils;
 
 import com.w3engineers.ext.strom.util.helper.PermissionUtil;
+import com.w3engineers.mesh.application.data.AppDataObserver;
 import com.w3engineers.mesh.application.data.local.DataPlanConstants;
 import com.w3engineers.mesh.application.data.local.helper.PreferencesHelperDataplan;
+import com.w3engineers.mesh.application.data.local.helper.crypto.CryptoHelper;
 import com.w3engineers.mesh.application.data.local.purchase.PurchaseManagerBuyer;
 import com.w3engineers.mesh.application.data.local.purchase.PurchaseManagerSeller;
 import com.w3engineers.mesh.application.data.local.wallet.WalletManager;
+import com.w3engineers.mesh.application.data.local.wallet.WalletService;
+import com.w3engineers.mesh.application.data.model.WalletLoaded;
 import com.w3engineers.mesh.application.ui.premission.PermissionActivity;
 import com.w3engineers.mesh.util.MeshLog;
 import com.w3engineers.models.UserInfo;
@@ -90,11 +95,21 @@ public class ViperClient {
                 if (PreferencesHelperDataplan.on().getDataPlanRole() == DataPlanConstants.USER_ROLE.DATA_BUYER) {
                     PurchaseManagerBuyer.getInstance().setPayControllerListener();
                 }
+
+                WalletLoaded walletLoaded = new WalletLoaded();
+                walletLoaded.walletAddress = walletAddress;
+                walletLoaded.publicKey = publicKey;
+                walletLoaded.success = true;
+                AppDataObserver.on().sendObserverData(walletLoaded);
             }
 
             @Override
             public void onErrorOccurred(String message) {
                 MeshLog.v("ViperClient loading failed " + message);
+                WalletLoaded walletLoaded = new WalletLoaded();
+                walletLoaded.message = message;
+                walletLoaded.success = false;
+                AppDataObserver.on().sendObserverData(walletLoaded);
             }
         });
     }
@@ -105,11 +120,19 @@ public class ViperClient {
         context.startActivity(permissionIntent);
     }
 
-
     public void sendMessage(String senderId, String receiverId, String messageId, byte[] data) throws RemoteException {
-        DataManager.on().sendData(senderId, receiverId, messageId, data);
-    }
+        String plainString = new String(data);
+        String userPublicKey = DataManager.on().getUserPublicKey(receiverId);
 
+        if (!TextUtils.isEmpty(userPublicKey)){
+            MeshLog.v("Before encryption " + plainString);
+            String encryptedMessage = CryptoHelper.encryptMessage(WalletService.getInstance(mContext).getPrivateKey(), userPublicKey , plainString);
+            MeshLog.v("Encrypted message " + encryptedMessage);
+            DataManager.on().sendData(senderId, receiverId, messageId, encryptedMessage.getBytes());
+        } else {
+            MeshLog.v("User public key not found " + senderId);
+        }
+    }
 
     public int getLinkTypeById(String nodeID) throws RemoteException {
         return DataManager.on().getLinkTypeById(nodeID);
@@ -117,6 +140,14 @@ public class ViperClient {
 
     public String getUserId() throws RemoteException {
         return DataManager.on().getUserId();
+    }
+
+    public void stopMesh(){
+        DataManager.on().stopMesh();
+    }
+
+    public void restartMesh(int currentRole){
+        DataManager.on().restartMesh(currentRole);
     }
 
     public void saveDiscoveredUserInfo(String userId, String userName) throws RemoteException {
