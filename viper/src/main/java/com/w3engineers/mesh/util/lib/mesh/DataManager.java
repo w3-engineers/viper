@@ -249,9 +249,9 @@ public class DataManager {
             mTmCommunicator = ITmCommunicator.Stub.asInterface(binder);
 
             try {
-                mTmCommunicator.saveUserInfo(userInfo);
+//                mTmCommunicator.saveUserInfo(userInfo);
                 Log.e("service_status", "onServiceConnected");
-                boolean status = mTmCommunicator.startMesh(appName);
+                boolean status = mTmCommunicator.startMesh(appName, userInfo);
                 if (!status) {
                     showPermissionPopUp();
                 }
