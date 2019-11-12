@@ -143,7 +143,9 @@ public class EthereumServiceUtil implements EthereumService.NetworkInfoCallback 
                 }
             }
 
-        } catch (Exception e) {e.printStackTrace();}
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
     private static String getValue(String tag, Element element) {
         NodeList nodeList = element.getElementsByTagName(tag).item(0).getChildNodes();
