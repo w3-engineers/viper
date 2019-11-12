@@ -300,7 +300,7 @@ public class PayController {
 //                        MeshLog.p("PAY_FOR_MESSAGE_RESPONSE listener not found");
                         }
                         break;
-                    case PurchaseConstants.MESSAGE_TYPES.SYNC_BUYER:--
+                    case PurchaseConstants.MESSAGE_TYPES.SYNC_BUYER:
                         sellerAddress = jsonObject.getString(PurchaseConstants.JSON_KEYS.SELLER_ADDRESS);
                         if (payControllerListenerForSeller != null) {
                             // payControllerListenerForSeller.onSyncMessageReceived(fromAddress, sellerAddress);
@@ -328,7 +328,7 @@ public class PayController {
                         }
                         break;
 
-                    case PurchaseConstants.MESSAGE_TYPES.SYNC_BUYER_OK:--
+                    case PurchaseConstants.MESSAGE_TYPES.SYNC_BUYER_OK:
                         sellerAddress = jsonObject.getString(PurchaseConstants.JSON_KEYS.SELLER_ADDRESS);
                         if (payControllerListenerForSeller != null) {
                             payControllerListenerForSeller.onSynBuyerOKReceive(fromAddress, sellerAddress);
@@ -953,7 +953,7 @@ public class PayController {
     }
 
     public void sendSyncOkMessage(JSONObject object, String receiver) {
-        try {--
+        try {
             object.put(PurchaseConstants.JSON_KEYS.MESSAGE_TYPE, PurchaseConstants.MESSAGE_TYPES.SYNC_BUYER_OK);
         } catch (JSONException e) {
             e.printStackTrace();
