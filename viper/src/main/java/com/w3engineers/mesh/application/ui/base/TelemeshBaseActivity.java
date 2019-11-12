@@ -22,6 +22,13 @@ import com.w3engineers.mesh.util.lib.mesh.DataManager;
  */
 public abstract class TelemeshBaseActivity extends BaseActivity {
 
+    protected abstract BaseServiceLocator getBaseServiceLocator();
+
+    @Override
+    protected void startUI() {
+        startMeshService();
+    }
+
     @Override
     protected void onPause() {
         super.onPause();
@@ -42,5 +49,14 @@ public abstract class TelemeshBaseActivity extends BaseActivity {
 
         DataManager.on().setServiceForeground(isForeground);
 
+    }
+
+    private void startMeshService() {
+
+        BaseServiceLocator baseServiceLocator = getBaseServiceLocator();
+
+        if (baseServiceLocator != null) {
+            baseServiceLocator.initViper();
+        }
     }
 }

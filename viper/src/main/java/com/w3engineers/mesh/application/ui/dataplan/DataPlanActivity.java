@@ -26,6 +26,7 @@ import android.widget.Toast;
 
 import com.w3engineers.ext.strom.util.helper.Toaster;
 import com.w3engineers.mesh.R;
+import com.w3engineers.mesh.application.data.BaseServiceLocator;
 import com.w3engineers.mesh.application.data.local.DataPlanConstants;
 import com.w3engineers.mesh.application.data.local.dataplan.DataPlanManager;
 import com.w3engineers.mesh.application.data.local.model.Seller;
@@ -65,6 +66,11 @@ public class DataPlanActivity extends TelemeshBaseActivity implements DataPlanMa
     }
 
     @Override
+    protected BaseServiceLocator getBaseServiceLocator() {
+        return null;
+    }
+
+    @Override
     protected void startUI() {
         initAll();
 
@@ -86,8 +92,9 @@ public class DataPlanActivity extends TelemeshBaseActivity implements DataPlanMa
     @Override
     protected void onResume() {
         super.onResume();
-
-        prepareSellerData();
+        if (DataPlanManager.getInstance().getDataPlanRole() == DataPlanConstants.USER_ROLE.DATA_BUYER) {
+            prepareSellerData();
+        }
     }
 
     @Override

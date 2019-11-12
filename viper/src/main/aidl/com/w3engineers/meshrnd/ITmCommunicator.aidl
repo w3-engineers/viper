@@ -24,4 +24,5 @@ interface ITmCommunicator {
    void onBuyerDisconnected(in String address);
    void restartMesh(in int newRole);
    String getUserPublicKey(in String address);
+   void disconnectFromInternet();
 }

@@ -15,6 +15,7 @@ import com.w3engineers.mesh.application.data.model.PayMessage;
 import com.w3engineers.mesh.application.data.model.PayMessageAck;
 import com.w3engineers.mesh.application.data.model.PeerAdd;
 import com.w3engineers.mesh.application.data.model.PeerRemoved;
+import com.w3engineers.mesh.application.data.model.SellerRemoved;
 import com.w3engineers.mesh.application.data.model.TransportInit;
 import com.w3engineers.mesh.application.data.model.UserInfoEvent;
 import com.w3engineers.mesh.application.data.model.WalletLoaded;
@@ -30,6 +31,7 @@ public interface ApiEvent {
 
     Class PEER_ADD = PeerAdd.class;
     Class PEER_REMOVED = PeerRemoved.class;
+    Class SELLER_REMOVED = SellerRemoved.class;
 
     Class PAY_MESSAGE = PayMessage.class;
     Class PAY_MESSAGE_ACK = PayMessageAck.class;
