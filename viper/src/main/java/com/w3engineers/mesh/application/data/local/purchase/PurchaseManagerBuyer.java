@@ -479,20 +479,6 @@ public class PurchaseManagerBuyer extends PurchaseManager implements PayControll
             }
         }
         DataPlanManager.getInstance().precessDisconnectedSeller(mContext, address);
-
-        try {
-            List<Purchase> myOpenPurcheses  = databaseService.getMyPurchasesWithState(ethService.getAddress(), PurchaseConstants.CHANNEL_STATE.OPEN);
-            for (Purchase p : myOpenPurcheses){
-                if (payController.getDataManager().isUserConnected(p.sellerAddress)){
-                    JSONObject jsonObject = new JSONObject();
-                    jsonObject.put(PurchaseConstants.JSON_KEYS.MESSAME_FROM, ethService.getAddress());
-                    payController.sendConnectBuyer(jsonObject,p.sellerAddress);
-                    break;
-                }
-            }
-        } catch (Exception e){
-            e.printStackTrace();
-        }
     }
 
     @Override
@@ -803,6 +789,24 @@ public class PurchaseManagerBuyer extends PurchaseManager implements PayControll
             preferencesHelperDataplan.setRequestedForEther(PurchaseConstants.GIFT_REQUEST_STATE.NOT_REQUESTED_YET, endPoint);
         }
 
+    }
+
+    @Override
+    public void onProbableSellerDisconnected(String sellerId) {
+        MeshLog.v("onProbableSellerDisconnected " + sellerId);
+        try {
+            List<Purchase> myOpenPurcheses  = databaseService.getMyPurchasesWithState(ethService.getAddress(), PurchaseConstants.CHANNEL_STATE.OPEN);
+            for (Purchase p : myOpenPurcheses){
+                if (payController.getDataManager().isUserConnected(p.sellerAddress)){
+                    JSONObject jsonObject = new JSONObject();
+                    jsonObject.put(PurchaseConstants.JSON_KEYS.MESSAME_FROM, ethService.getAddress());
+                    payController.sendConnectBuyer(jsonObject,p.sellerAddress);
+                    break;
+                }
+            }
+        } catch (Exception e){
+            e.printStackTrace();
+        }
     }
 
     @Override

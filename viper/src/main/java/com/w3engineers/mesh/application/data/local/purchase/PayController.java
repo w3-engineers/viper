@@ -18,6 +18,7 @@ import com.w3engineers.mesh.application.data.model.PayMessage;
 import com.w3engineers.mesh.application.data.model.PayMessageAck;
 import com.w3engineers.mesh.application.data.model.PeerAdd;
 import com.w3engineers.mesh.application.data.model.PeerRemoved;
+import com.w3engineers.mesh.application.data.model.SellerRemoved;
 import com.w3engineers.mesh.application.data.remote.model.BuyerPendingMessage;
 import com.w3engineers.mesh.util.MeshApp;
 import com.w3engineers.mesh.util.MeshLog;
@@ -103,6 +104,13 @@ public class PayController {
         });
 
 
+        AppDataObserver.on().startObserver(ApiEvent.SELLER_REMOVED,event -> {
+            MeshLog.v("SELLER_REMOVED received " );
+            SellerRemoved sellerRemoved = (SellerRemoved) event;
+            if (payControllerListenerForBuyer != null){
+                payControllerListenerForBuyer.onProbableSellerDisconnected(sellerRemoved.sellerId);
+            }
+        });
     }
 
     private void onMessageReceived(String sender, byte[] paymentData) {
@@ -292,7 +300,7 @@ public class PayController {
 //                        MeshLog.p("PAY_FOR_MESSAGE_RESPONSE listener not found");
                         }
                         break;
-                    case PurchaseConstants.MESSAGE_TYPES.SYNC_BUYER:
+                    case PurchaseConstants.MESSAGE_TYPES.SYNC_BUYER:--
                         sellerAddress = jsonObject.getString(PurchaseConstants.JSON_KEYS.SELLER_ADDRESS);
                         if (payControllerListenerForSeller != null) {
                             // payControllerListenerForSeller.onSyncMessageReceived(fromAddress, sellerAddress);
@@ -320,7 +328,7 @@ public class PayController {
                         }
                         break;
 
-                    case PurchaseConstants.MESSAGE_TYPES.SYNC_BUYER_OK:
+                    case PurchaseConstants.MESSAGE_TYPES.SYNC_BUYER_OK:--
                         sellerAddress = jsonObject.getString(PurchaseConstants.JSON_KEYS.SELLER_ADDRESS);
                         if (payControllerListenerForSeller != null) {
                             payControllerListenerForSeller.onSynBuyerOKReceive(fromAddress, sellerAddress);
@@ -667,6 +675,8 @@ public class PayController {
 
         void giftResponse(boolean status, double ethBalance,
                           double tokenBalance, int endPoint);
+        void onProbableSellerDisconnected(String sellerId);
+
     }
 
     public void setBuyerListener(PayControllerListenerForBuyer listener1) {
@@ -943,7 +953,7 @@ public class PayController {
     }
 
     public void sendSyncOkMessage(JSONObject object, String receiver) {
-        try {
+        try {--
             object.put(PurchaseConstants.JSON_KEYS.MESSAGE_TYPE, PurchaseConstants.MESSAGE_TYPES.SYNC_BUYER_OK);
         } catch (JSONException e) {
             e.printStackTrace();

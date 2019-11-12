@@ -135,6 +135,11 @@ public class ClientLibraryService extends Service {
             MeshLog.v("onTransportInit cls");
             DataManager.on().onTransportInit(nodeId, publicKey, success, msg);
         }
+
+        @Override
+        public void onProbableSellerDisconnected(String sellerId) throws RemoteException {
+
+        }
     };
 
     private void startInForeground() {

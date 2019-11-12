@@ -27,6 +27,7 @@ import com.w3engineers.mesh.application.data.local.helper.crypto.CryptoHelper;
 import com.w3engineers.mesh.application.data.local.wallet.WalletService;
 import com.w3engineers.mesh.application.data.model.PayMessage;
 import com.w3engineers.mesh.application.data.model.PayMessageAck;
+import com.w3engineers.mesh.application.data.model.SellerRemoved;
 import com.w3engineers.mesh.application.data.model.TransportInit;
 import com.w3engineers.mesh.application.data.model.UserInfoEvent;
 import com.w3engineers.mesh.application.data.remote.model.BuyerPendingMessage;
@@ -347,6 +348,11 @@ public class DataManager {
         public void onTransportInit(String nodeId, String publicKey, boolean success, String msg) throws RemoteException {
             DataManager.this.onTransportInit(nodeId, publicKey, success, msg);
         }
+
+        @Override
+        public void onProbableSellerDisconnected(String sellerId) throws RemoteException {
+
+        }
     };
 
 
@@ -650,6 +656,16 @@ public class DataManager {
         transportInit.msg = msg;
 
         AppDataObserver.on().sendObserverData(transportInit);
+    }
+
+
+    public void onProbableSellerDisconnected(String sellerId) {
+
+        MeshLog.v("onProbableSellerDisconnected dtm " + sellerId);
+        SellerRemoved sellerRemoved = new SellerRemoved();
+        sellerRemoved.sellerId = sellerId;
+
+        AppDataObserver.on().sendObserverData(sellerRemoved);
     }
 
 
