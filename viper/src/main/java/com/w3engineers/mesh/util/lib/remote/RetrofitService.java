@@ -3,6 +3,8 @@ package com.w3engineers.mesh.util.lib.remote;
 
 
 import com.w3engineers.mesh.BuildConfig;
+import com.w3engineers.mesh.application.data.local.db.SharedPref;
+import com.w3engineers.mesh.util.Constant;
 
 import java.io.IOException;
 
@@ -31,7 +33,8 @@ public class RetrofitService {
                 Request request = chain.request();
                 request = request
                         .newBuilder()
-                        .addHeader("Authorization", Credentials.basic(BuildConfig.AUTH_USER_NAME, BuildConfig.AUTH_PASSWORD))
+                        .addHeader("Authorization", Credentials.basic(SharedPref.read(Constant.PreferenceKeys.AUTH_USER_NAME),
+                                SharedPref.read(Constant.PreferenceKeys.AUTH_PASSWORD)))
                         .build();
                 return chain.proceed(request);
             }
