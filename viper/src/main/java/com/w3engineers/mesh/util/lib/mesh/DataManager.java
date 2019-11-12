@@ -15,6 +15,7 @@ import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.IBinder;
 import android.os.RemoteException;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
@@ -22,10 +23,14 @@ import android.widget.Toast;
 import com.w3engineers.mesh.BuildConfig;
 import com.w3engineers.mesh.ClientLibraryService;
 import com.w3engineers.mesh.R;
+import com.w3engineers.mesh.application.data.local.helper.crypto.CryptoHelper;
+import com.w3engineers.mesh.application.data.local.wallet.WalletService;
 import com.w3engineers.mesh.application.data.local.db.SharedPref;
 import com.w3engineers.mesh.application.data.model.PayMessage;
 import com.w3engineers.mesh.application.data.model.PayMessageAck;
+import com.w3engineers.mesh.application.data.model.SellerRemoved;
 import com.w3engineers.mesh.application.data.model.TransportInit;
+import com.w3engineers.mesh.application.data.model.UserInfoEvent;
 import com.w3engineers.mesh.application.data.remote.model.BuyerPendingMessage;
 import com.w3engineers.mesh.application.ui.dataplan.DataPlanActivity;
 import com.w3engineers.mesh.util.Constant;
@@ -40,6 +45,7 @@ import com.w3engineers.mesh.application.data.model.DataAckEvent;
 import com.w3engineers.mesh.application.data.model.DataEvent;
 import com.w3engineers.mesh.application.data.model.PeerAdd;
 import com.w3engineers.mesh.application.data.model.PeerRemoved;
+import com.w3engineers.models.UserInfo;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -58,6 +64,7 @@ public class DataManager {
     private String mSsid;
     private Context mContext;
     private String appName;
+    private UserInfo userInfo;
 
     private static DataManager mDataManager;
     private boolean isAlreadyToPlayStore = false;
@@ -85,17 +92,19 @@ public class DataManager {
      * @param appName
      * @param networkPrefix
      */
-    public void doBindService(Context context, String appName, String networkPrefix) {
+    public void doBindService(Context context, String appName, String networkPrefix, UserInfo userInfo) {
         this.mContext = context;
         this.appName = appName;
         this.mSsid = networkPrefix;
+        this.userInfo = userInfo;
+
 
         MeshLog.v("Data manager has been called");
 
-        Intent mIntent = new Intent(context, ClientLibraryService.class);
+/*        Intent mIntent = new Intent(context, ClientLibraryService.class);
         context.startService(mIntent);
 
-        context.bindService(mIntent, clientServiceConnection, Service.BIND_AUTO_CREATE);
+        context.bindService(mIntent, clientServiceConnection, Service.BIND_AUTO_CREATE);*/
 
         checkAndBindService();
     }
@@ -177,6 +186,39 @@ public class DataManager {
                 });
     }
 
+    private void showPermissionPopUp() {
+        DialogUtil.showConfirmationDialog(mContext,
+                mContext.getResources().getString(R.string.permission),
+                mContext.getResources().getString(R.string.permission_message),
+                mContext.getString(R.string.later),
+                mContext.getString(R.string.allow),
+                new DialogUtil.DialogButtonListener() {
+                    @Override
+                    public void onClickPositive() {
+
+                        launchServiceApp();
+
+                        android.os.Process.killProcess(android.os.Process.myPid());
+                    }
+
+                    @Override
+                    public void onCancel() {
+
+                    }
+
+                    @Override
+                    public void onClickNegative() {
+
+                    }
+                });
+    }
+
+    private void launchServiceApp() {
+        Intent intent = mContext.getPackageManager().getLaunchIntentForPackage("com.w3engineers.meshrnd");
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        mContext.startActivity(intent);
+    }
+
 
     /**
      * Bind to the remote service
@@ -207,7 +249,12 @@ public class DataManager {
             mTmCommunicator = ITmCommunicator.Stub.asInterface(binder);
 
             try {
-                mTmCommunicator.startMesh(appName);
+                mTmCommunicator.saveUserInfo(userInfo);
+                Log.e("service_status", "onServiceConnected");
+                boolean status = mTmCommunicator.startMesh(appName);
+                if (!status) {
+                    showPermissionPopUp();
+                }
                 mTmCommunicator.setViperCommunicator(viperCommunicator);
             } catch (RemoteException e) {
                 e.printStackTrace();
@@ -274,6 +321,11 @@ public class DataManager {
         }
 
         @Override
+        public void onUserInfoReceive(List<UserInfo> userInfoList) throws RemoteException {
+            DataManager.this.onGetUserInfo(userInfoList);
+        }
+
+        @Override
         public void setServiceForeground(boolean isForeGround) throws RemoteException {
 
         }
@@ -296,6 +348,11 @@ public class DataManager {
         @Override
         public void onTransportInit(String nodeId, String publicKey, boolean success, String msg) throws RemoteException {
             DataManager.this.onTransportInit(nodeId, publicKey, success, msg);
+        }
+
+        @Override
+        public void onProbableSellerDisconnected(String sellerId) throws RemoteException {
+
         }
     };
 
@@ -324,15 +381,30 @@ public class DataManager {
      * @return
      */
     public int getLinkTypeById(String nodeID) throws RemoteException {
-        return mTmCommunicator.getLinkTypeById(nodeID);
+        if (mTmCommunicator !=null){
+            return mTmCommunicator.getLinkTypeById(nodeID);
+        }
+        return 0;
     }
 
     public String getUserId() throws RemoteException {
-        return mTmCommunicator.getUserId();
+        if (mTmCommunicator !=null){
+            return mTmCommunicator.getUserId();
+        }
+       return "";
     }
 
     public void saveDiscoveredUserInfo(String userId, String userName) throws RemoteException {
-        mTmCommunicator.saveDiscoveredUserInfo(userId, userName);
+        if (mTmCommunicator !=null){
+            mTmCommunicator.saveDiscoveredUserInfo(userId, userName);
+        }
+
+    }
+
+    public void saveUserInfo(UserInfo userInfo) throws RemoteException {
+        if (mTmCommunicator !=null){
+            mTmCommunicator.saveUserInfo(userInfo);
+        }
     }
 
 
@@ -384,12 +456,27 @@ public class DataManager {
      * @param frameData
      */
     public void onDataReceived(String senderId, byte[] frameData) {
-        DataEvent dataEvent = new DataEvent();
+        try {
+            DataEvent dataEvent = new DataEvent();
 
-        dataEvent.peerId = senderId;
-        dataEvent.data = frameData;
+            String msgText = new String(frameData);
+            MeshLog.v("Before decryption " + msgText);
 
-        AppDataObserver.on().sendObserverData(dataEvent);
+            String userPublicKey = getUserPublicKey(senderId);
+            if (!TextUtils.isEmpty(userPublicKey)) {
+                String decryptedMessage = CryptoHelper.decryptMessage(WalletService.getInstance(mContext).getPrivateKey(), userPublicKey, msgText);
+                MeshLog.v("Decrypted message " + decryptedMessage);
+
+                dataEvent.peerId = senderId;
+                dataEvent.data = decryptedMessage.getBytes();
+
+                AppDataObserver.on().sendObserverData(dataEvent);
+            } else {
+                MeshLog.v("User public not found");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
 
@@ -408,6 +495,24 @@ public class DataManager {
         AppDataObserver.on().sendObserverData(dataAckEvent);
     }
 
+    public void onGetUserInfo(List<UserInfo> userInfoList) {
+
+        MeshLog.e("user info list receive in data manager");
+
+        for (UserInfo userInfo : userInfoList) {
+            UserInfoEvent userInfoEvent = new UserInfoEvent();
+            userInfoEvent.setAddress(userInfo.getAddress());
+            userInfoEvent.setAvatar(userInfo.getAvatar());
+            userInfoEvent.setUserName(userInfo.getUserName());
+            userInfoEvent.setRegTime(userInfo.getRegTime());
+            userInfoEvent.setSync(userInfo.isSync());
+
+            AppDataObserver.on().sendObserverData(userInfoEvent);
+
+            MeshLog.e("user info send to app level");
+        }
+    }
+
     public void setServiceForeground(boolean isForeground) {
         try {
             if (viperCommunicator != null) {
@@ -417,6 +522,15 @@ public class DataManager {
         } catch (RemoteException e) {
             e.printStackTrace();
         }
+    }
+
+    public String getUserPublicKey(String address) throws RemoteException {
+        MeshLog.v("getUserPublicKey dtm " + address);
+
+        if (mTmCommunicator == null) {
+            MeshLog.v("mTmCommunicator null");
+        }
+        return mTmCommunicator.getUserPublicKey(address);
     }
 
     public void sendPayMessage(String receiverId, String message, String messageId) throws RemoteException {
@@ -433,28 +547,71 @@ public class DataManager {
     }
 
     public List<String> getInternetSellers() throws RemoteException {
+        if (mTmCommunicator == null) {
+            MeshLog.v("mTmCommunicator null");
+        }
         return mTmCommunicator.getInternetSellers();
     }
 
     public boolean isInternetSeller(String address) throws RemoteException {
+        if (mTmCommunicator == null) {
+            MeshLog.v("mTmCommunicator null");
+        }
         return mTmCommunicator.isInternetSeller(address);
     }
 
     public boolean isUserConnected(String address) throws RemoteException {
+        if (mTmCommunicator == null) {
+            MeshLog.v("mTmCommunicator null");
+        }
         return mTmCommunicator.isUserConnected(address);
     }
 
     public void onBuyerConnected(String address) throws RemoteException {
+        if (mTmCommunicator == null) {
+            MeshLog.v("mTmCommunicator null");
+        }
+        if (TextUtils.isEmpty(address)) {
+            MeshLog.v("address dtm null");
+        }
+
         mTmCommunicator.onBuyerConnected(address);
     }
 
     public void onBuyerDisconnected(String address) throws RemoteException {
+        if (mTmCommunicator == null) {
+            MeshLog.v("mTmCommunicator null");
+        }
         mTmCommunicator.onBuyerDisconnected(address);
     }
 
-    public void restartMesh(int newRole) throws RemoteException {
+    public void disconnectFromInternet() throws RemoteException {
+        if (mTmCommunicator == null){
+            MeshLog.v("mTmCommunicator null");
+        }
+        mTmCommunicator.disconnectFromInternet();
+    }
+
+    public void stopMesh() {
+        MeshLog.v("stop mesh is called");
+        try {
+            mTmCommunicator.stopMesh();
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void restartMesh(int newRole) {
         MeshLog.v("sellerMode dm" + newRole);
-        mTmCommunicator.restartMesh(newRole);
+        if (mTmCommunicator == null) {
+            MeshLog.v("mTmCommunicator null");
+        }
+
+        try {
+            mTmCommunicator.restartMesh(newRole);
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        }
     }
 
 
@@ -503,6 +660,16 @@ public class DataManager {
     }
 
 
+    public void onProbableSellerDisconnected(String sellerId) {
+
+        MeshLog.v("onProbableSellerDisconnected dtm " + sellerId);
+        SellerRemoved sellerRemoved = new SellerRemoved();
+        sellerRemoved.sellerId = sellerId;
+
+        AppDataObserver.on().sendObserverData(sellerRemoved);
+    }
+
+
     public void writeLogIntoTxtFile(String text, boolean isAppend) {
 
         try {
@@ -536,5 +703,4 @@ public class DataManager {
             ioe.printStackTrace();
         }
     }
-
 }

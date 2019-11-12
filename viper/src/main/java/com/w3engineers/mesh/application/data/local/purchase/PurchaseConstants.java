@@ -22,9 +22,6 @@ public interface PurchaseConstants {
         int PAY_FOR_MESSAGE_ERROR = 12;
         int PAY_FOR_MESSAGE_RESPONSE = 13;
         int BUYER_UPDATE_NOTIFYER = 101;
-//          int BUY_TOKEN_INIT = 14;
-//          int BUY_TOKEN_INIT_OK = 15;
-//          int BUY_TOKEN_INIT_ERROR = 16;
 
         int BUY_TOKEN = 17;
         int BUY_TOKEN_RESPONSE = 18;
@@ -47,6 +44,8 @@ public interface PurchaseConstants {
         int GIFT_ETHER_REQUEST_SUBMITTED = 32;
         int GIFT_ETHER_REQUEST_WITH_HASH = 33;
         int GIFT_RESPONSE = 34;
+
+        int CONNECT_BUYER = 35;
     }
 
     interface INTERNAL_MESSAGE_TYPES {

@@ -34,37 +34,6 @@ public class ECDSA {
     public static ECDomainParameters CURVE = new ECDomainParameters(
             Sign.CURVE_PARAMS.getCurve(), Sign.CURVE_PARAMS.getG(), Sign.CURVE_PARAMS.getN(), Sign.CURVE_PARAMS.getH());
 
-    public static KeyPair generateECKeys() {
-        try {
-            ECGenParameterSpec ecGenParameterSpec = new ECGenParameterSpec("secp256k1");
-            KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance(
-                    "ECDH", "BC");
-
-            keyPairGenerator.initialize(ecGenParameterSpec);
-            KeyPair keyPair = keyPairGenerator.generateKeyPair();
-
-            return keyPair;
-        } catch (NoSuchAlgorithmException | InvalidAlgorithmParameterException
-                | NoSuchProviderException e) {
-            e.printStackTrace();
-            return null;
-        }
-    }
-
-    public static PublicKey getPublicKey(byte[] pk) throws NoSuchAlgorithmException, InvalidKeySpecException {
-        EncodedKeySpec publicKeySpec = new X509EncodedKeySpec(pk);
-        KeyFactory kf = KeyFactory.getInstance("EC");
-        PublicKey publicKey = kf.generatePublic(publicKeySpec);
-        return publicKey;
-    }
-
-    public static PrivateKey getPrivateKey(byte[] privk) throws NoSuchAlgorithmException, InvalidKeySpecException {
-        EncodedKeySpec privateKeySpec = new PKCS8EncodedKeySpec(privk);
-        KeyFactory kf = KeyFactory.getInstance("EC");
-        PrivateKey privateKey = kf.generatePrivate(privateKeySpec);
-        return privateKey;
-    }
-
     public static ECPoint getECPointFromPrivateKey(BigInteger privateKey) {
         return Sign.publicPointFromPrivate(privateKey);
     }
@@ -95,36 +64,11 @@ public class ECDSA {
         return getHexEncodedPoint(ecPoint);
     }
 
-    public static BigInteger getPublicKeyFromECPoint(ECPoint ecPoint) {
-        return Sign.publicFromPoint(ecPoint.getEncoded(false));
-    }
 
-    public static BigInteger getPublicKeyFromHexEncodedPoint(ECCurve curve, String hexEncodedPoint) {
-        ECPoint myPoint = getECPointFromEncoded(curve, hexEncodedPoint);
-        return getPublicKeyFromECPoint(myPoint);
-    }
-
-    public static SecretKey generateSharedSecret(PrivateKey privateKey,
-                                                 PublicKey publicKey) {
-        try {
-            KeyAgreement keyAgreement = KeyAgreement.getInstance("ECDH", "BC");
-            keyAgreement.init(privateKey);
-            keyAgreement.doPhase(publicKey, true);
-
-            SecretKey key = keyAgreement.generateSecret("AES");
-            return key;
-        } catch (InvalidKeyException | NoSuchAlgorithmException
-                | NoSuchProviderException e) {
-            e.printStackTrace();
-            return null;
-        }
-    }
 
     public static BigInteger generateBasicSharedSecret(String hexPrivateKey, String hexOtherPartyEncodedPoint) {
         ECPoint myPoint = getECPointFromPrivateKey(hexPrivateKey);
         ECPoint otherPoint = getECPointFromEncoded(myPoint.getCurve(), hexOtherPartyEncodedPoint);
-
-        Log.d("GAMIRUDDIN", "BigInteger generateBasicSharedSecret otherpoint is generated ");
 
         ECDHBasicAgreement agreement = new ECDHBasicAgreement();
         agreement.init(new ECPrivateKeyParameters(Numeric.toBigInt(hexPrivateKey), CURVE));
