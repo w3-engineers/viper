@@ -20,6 +20,8 @@ import com.w3engineers.mesh.application.ui.premission.PermissionActivity;
 import com.w3engineers.mesh.util.MeshLog;
 import com.w3engineers.models.UserInfo;
 
+import java.util.List;
+
 public class ViperClient {
 
     private Context mContext;
@@ -154,4 +156,7 @@ public class ViperClient {
         DataManager.on().saveDiscoveredUserInfo(userId, userName);
     }
 
+    public List<String> getInternetSellers() throws RemoteException {
+        return DataManager.on().getInternetSellers();
+    }
 }
