@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:gravity="bottom"
+    android:background="@android:color/transparent">
+
+    <LinearLayout
+        android:id="@+id/imageLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="bottom|center_horizontal"
+        android:background="@android:color/transparent">
+
+        <de.hdodenhof.circleimageview.CircleImageView
+            android:id="@+id/infoCIV"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            tools:src="@mipmap/ic_profile_user"
+            app:civ_border_color="@color/colorPrimary"
+            app:civ_border_width="1dp"/>
+
+    </LinearLayout>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/colorPrimary"
+        android:layout_below="@+id/imageLayout"
+        android:layout_marginTop="1dp">
+
+        <android.support.design.widget.TabLayout
+            android:id="@+id/playerTabs"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:minHeight="?android:attr/actionBarSize"
+            app:tabTextAppearance="@android:style/TextAppearance.Widget.TabWidget"
+            app:tabIndicatorHeight="3dp"
+            app:tabIndicatorColor="@color/colorPrimary"
+
+            app:tabSelectedTextColor="@color/colorPrimary" />
+
+        <android.support.v4.view.ViewPager
+            android:id="@+id/playerVP"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:minHeight="100dp"
+            android:layout_below="@+id/playerTabs"/>
+
+    </RelativeLayout>
+
+</RelativeLayout>

@@ -214,8 +214,12 @@ public class WalletActivity extends TelemeshBaseActivity implements WalletManage
         if (v.getId() == R.id.op_back) {
             finish();
         } else if (v.getId() == R.id.img_my_address) {
-            AddressLayout cdd = new AddressLayout(WalletActivity.this, walletManager.getMyAddress());
-            cdd.show();
+/*            AddressLayout cdd = new AddressLayout(WalletActivity.this, walletManager.getMyAddress());
+            cdd.show();*/
+
+            BottomSheetFragment bottomSheetFragment = new BottomSheetFragment();
+            bottomSheetFragment.show(getSupportFragmentManager(), bottomSheetFragment.getTag());
+
         } else if (v.getId() == R.id.btn_withdraw) {
             if (payableDeposit <= 0) {
                 DialogUtil.showConfirmationDialog(this, "No payable deposit", "You don't have any payable deposit", null, "OK", null);
