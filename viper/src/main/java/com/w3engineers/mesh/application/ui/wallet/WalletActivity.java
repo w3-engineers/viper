@@ -17,18 +17,15 @@ import android.text.TextUtils;
 import android.text.method.LinkMovementMethod;
 import android.text.style.ForegroundColorSpan;
 import android.view.LayoutInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
-import android.widget.PopupMenu;
 
 import com.w3engineers.ext.strom.util.helper.Toaster;
-import com.w3engineers.mesh.application.data.BaseServiceLocator;
-import com.w3engineers.mesh.application.data.local.dataplan.DataPlanManager;
-import com.w3engineers.ext.strom.application.ui.base.BaseActivity;
 import com.w3engineers.mesh.R;
+import com.w3engineers.mesh.application.data.BaseServiceLocator;
 import com.w3engineers.mesh.application.data.local.DataPlanConstants;
+import com.w3engineers.mesh.application.data.local.dataplan.DataPlanManager;
 import com.w3engineers.mesh.application.data.local.wallet.WalletManager;
 import com.w3engineers.mesh.application.ui.base.TelemeshBaseActivity;
 import com.w3engineers.mesh.databinding.ActivityWalletBinding;
@@ -82,14 +79,14 @@ public class WalletActivity extends TelemeshBaseActivity implements WalletManage
 
         walletManager.setWalletListener(this);
 
-        setClickListener(mBinding.opBack, mBinding.imgMyAddress, mBinding.btnWithdraw, mBinding.ethBlock, mBinding.tmeshBlock);
+        setClickListener(mBinding.opBack, mBinding.imgMyAddress, mBinding.tmeshBlock);
 
         setCurrencyAndTokenObserver();
 
         dialog = new ProgressDialog(this);
 
         if (dataPlanManager.getDataPlanRole() == DataPlanConstants.USER_ROLE.DATA_BUYER) {
-            mBinding.totalSpentBlock.setVisibility(View.GONE);
+          //  mBinding.totalSpentBlock.setVisibility(View.GONE);
         }
 
         boolean giftEther = walletManager.giftEther();
@@ -115,7 +112,7 @@ public class WalletActivity extends TelemeshBaseActivity implements WalletManage
             });
         });
 
-        mBinding.currency.setOnClickListener(this);
+      //  mBinding.currency.setOnClickListener(this);
     }
 
     private String convertTwoDigitString(double value) {
@@ -158,7 +155,7 @@ public class WalletActivity extends TelemeshBaseActivity implements WalletManage
         runOnUiThread(() -> {
             resetDialogLoadingTimer();
 
-            mBinding.btnWithdraw.setEnabled(true);
+        //    mBinding.btnWithdraw.setEnabled(true);
             Toaster.showLong(msg);
         });
     }
@@ -189,7 +186,7 @@ public class WalletActivity extends TelemeshBaseActivity implements WalletManage
     public void onRequestSubmitted(boolean success, String msg) {
         runOnUiThread(() -> {
             if (!success) {
-                mBinding.btnWithdraw.setEnabled(true);
+             //   mBinding.btnWithdraw.setEnabled(true);
             }
             Toaster.showLong(msg);
         });
@@ -199,7 +196,7 @@ public class WalletActivity extends TelemeshBaseActivity implements WalletManage
     public void onRequestCompleted(boolean success, String msg) {
         runOnUiThread(() -> {
             if (!success) {
-                mBinding.btnWithdraw.setEnabled(true);
+               // mBinding.btnWithdraw.setEnabled(true);
             }
             Toaster.showLong(msg);
             refreshMyBalance();
@@ -225,12 +222,12 @@ public class WalletActivity extends TelemeshBaseActivity implements WalletManage
             } else {
                 showAlertWithdraw();
             }
-        } else if (v.getId() == R.id.eth_block) {
+        }/* else if (v.getId() == R.id.eth_block) {
             showRequestAlert(walletManager.getCurrencyTypeMessage("%s Request"), walletManager.getCurrencyTypeMessage("Do you want to send a request for %s?"), REQUEST_TYPE.ETHER);
-        } else if (v.getId() == R.id.tmesh_block) {
+        }*/ else if (v.getId() == R.id.tmesh_block) {
             showRequestAlert("Purchase Token", "Do you want to send a request for token?", REQUEST_TYPE.TOKEN);
         } else if (v.getId() == R.id.currency) {
-            openCurrencyPopup(v);
+            //openCurrencyPopup(v);
         }
     }
 
@@ -293,12 +290,12 @@ public class WalletActivity extends TelemeshBaseActivity implements WalletManage
                 promptBinding.layoutAvg, promptBinding.layoutFast);
 
         promptBinding.btnCancel.setOnClickListener(v -> {
-            mBinding.btnWithdraw.setEnabled(true);
+       //     mBinding.btnWithdraw.setEnabled(true);
             alertDialog.cancel();
         });
 
         promptBinding.btnWithdraw.setOnClickListener(v -> {
-            mBinding.btnWithdraw.setEnabled(false);
+         //   mBinding.btnWithdraw.setEnabled(false);
             performWithdrawBalance();
             alertDialog.cancel();
         });
@@ -367,7 +364,7 @@ public class WalletActivity extends TelemeshBaseActivity implements WalletManage
 
         String dateTime = WalletPreference.on().read(WalletPreference.LATEST_UPDATE);
         if (!TextUtils.isEmpty(dateTime)) {
-            mBinding.tvLastUpdated.setText(getString(R.string.txt_last_updated) + dateTime);
+          //  mBinding.tvLastUpdated.setText(getString(R.string.txt_last_updated) + dateTime);
         }
 
         if (totalEarningObserver != null) {
@@ -378,7 +375,7 @@ public class WalletActivity extends TelemeshBaseActivity implements WalletManage
 
         if (totalEarningObserver != null) {
             totalEarningObserver.observe(this, aDouble -> {
-                mBinding.tvEarned.setText(aDouble == null ? "0" : aDouble.toString());
+              //  mBinding.tvEarned.setText(aDouble == null ? "0" : aDouble.toString());
             });
         }
     }
@@ -387,7 +384,7 @@ public class WalletActivity extends TelemeshBaseActivity implements WalletManage
 
         String dateTime = WalletPreference.on().read(WalletPreference.LATEST_UPDATE);
         if (!TextUtils.isEmpty(dateTime)) {
-            mBinding.tvLastUpdated.setText(getString(R.string.txt_last_updated) + dateTime);
+          //  mBinding.tvLastUpdated.setText(getString(R.string.txt_last_updated) + dateTime);
         }
 
         if (totalSpentObserver != null) {
@@ -398,7 +395,7 @@ public class WalletActivity extends TelemeshBaseActivity implements WalletManage
 
         if (totalSpentObserver != null) {
             totalSpentObserver.observe(this, totalSpent -> {
-                mBinding.tvSpent.setText(totalSpent == null ? "0" : totalSpent.toString());
+              //  mBinding.tvSpent.setText(totalSpent == null ? "0" : totalSpent.toString());
             });
         }
     }
@@ -418,7 +415,7 @@ public class WalletActivity extends TelemeshBaseActivity implements WalletManage
                 } else {
                     payableDeposit = 0;
                 }
-                mBinding.tvPendingPayableDeposit.setText(totalPendingEarn == null ? "0" : totalPendingEarn.toString());
+              //  mBinding.tvPendingPayableDeposit.setText(totalPendingEarn == null ? "0" : totalPendingEarn.toString());
             });
         }
     }
@@ -435,16 +432,16 @@ public class WalletActivity extends TelemeshBaseActivity implements WalletManage
             haveDifferentNetworkDataObserver.observe(this, integer -> {
 
                 if (integer != null && integer > 0) {
-                    mBinding.anotherDeposit.setVisibility(View.VISIBLE);
+         /*           mBinding.anotherDeposit.setVisibility(View.VISIBLE);
 
                     if (dataPlanManager.getDataPlanRole() == DataPlanConstants.USER_ROLE.DATA_SELLER) {
                         mBinding.anotherDeposit.setText(getString(R.string.different_network_data_for_seller));
                     } else if (dataPlanManager.getDataPlanRole() == DataPlanConstants.USER_ROLE.DATA_BUYER) {
                         mBinding.anotherDeposit.setText(getString(R.string.different_network_data_for_buyer));
-                    }
+                    }*/
 
                 } else {
-                    mBinding.anotherDeposit.setVisibility(View.GONE);
+                  //  mBinding.anotherDeposit.setVisibility(View.GONE);
                 }
             });
         }
@@ -466,30 +463,30 @@ public class WalletActivity extends TelemeshBaseActivity implements WalletManage
         date = new Date(timeMilli);
         Format format = new SimpleDateFormat("yyyy-MM-dd hh:mm aaa");
         String dateTime = format.format(date);
-        mBinding.tvLastUpdated.setText(getString(R.string.txt_last_updated) + " " + dateTime);
+     //   mBinding.tvLastUpdated.setText(getString(R.string.txt_last_updated) + " " + dateTime);
         WalletPreference.on().write(WalletPreference.LATEST_UPDATE, dateTime);
     }
 
     private void setCurrencyAndTokenObserver() {
         walletViewModel.networkMutableLiveData.observe(this, walletInfo -> {
             if (walletInfo != null) {
-                mBinding.tvEthBalance.setText(convertTwoDigitString(walletInfo.currencyAmount));
-                mBinding.tvRmeshBalance.setText(convertTwoDigitString(walletInfo.tokenAmount));
+/*                mBinding.tvEthBalance.setText(convertTwoDigitString(walletInfo.currencyAmount));
+                mBinding.tvRmeshBalance.setText(convertTwoDigitString(walletInfo.tokenAmount));*/
 
                 int dataShareMode = dataPlanManager.getDataPlanRole();
 
                 if (dataShareMode == DataPlanConstants.USER_ROLE.DATA_SELLER || dataShareMode == DataPlanConstants.USER_ROLE.DATA_BUYER) {
 
-                    mBinding.currency.setText(walletInfo.currencySymbol);
-                    mBinding.currency.setVisibility(View.VISIBLE);
+                 //    mBinding.currency.setText(walletInfo.currencySymbol);
+                  //  mBinding.currency.setVisibility(View.VISIBLE);
                 } else {
-                    mBinding.currency.setVisibility(View.GONE);
+                  //  mBinding.currency.setVisibility(View.GONE);
                 }
 
-                mBinding.titleEthCurrency.setText(walletInfo.currencySymbol);
-                mBinding.titleRmeshCurrency.setText(walletInfo.tokenSymbol);
+      /*          mBinding.titleEthCurrency.setText(walletInfo.currencySymbol);
+                mBinding.titleRmeshCurrency.setText(walletInfo.tokenSymbol);*/
 
-                mBinding.currency.setText(walletInfo.currencySymbol);
+              //  mBinding.currency.setText(walletInfo.currencySymbol);
             }
         });
 
@@ -497,7 +494,7 @@ public class WalletActivity extends TelemeshBaseActivity implements WalletManage
     }
 
 
-    private void openCurrencyPopup(View view) {
+/*    private void openCurrencyPopup(View view) {
         PopupMenu popup = new PopupMenu(this, view);
         popup.inflate(R.menu.menu_currency);
 
@@ -546,7 +543,7 @@ public class WalletActivity extends TelemeshBaseActivity implements WalletManage
             return false;
         });
         popup.show();
-    }
+    }*/
 
     private WalletViewModel getWalletViewModel() {
         return ViewModelProviders.of(this, new ViewModelProvider.Factory() {

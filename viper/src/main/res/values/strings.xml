@@ -48,7 +48,7 @@
 
     <string name="txt_data_use_statistics">Data Uses Statistics</string>
     <string name="txt_description_back">back</string>
-    <string name="txt_balance">Balance</string>
+    <string name="txt_balance">Current balance</string>
     <string name="txt_eth">ETH</string>
     <string name="txt_tmesh">TMESH</string>
     <string name="txt_mb">MB</string>
@@ -101,6 +101,7 @@
     <string name="history">History</string>
     <string name="close">Close</string>
     <string name="withdraw">Withdraw</string>
+    <string name="refresh">Refresh</string>
     <string name="mesh_view_text">Mesh User in the default settings. You are able to communicate with your local peers without any internet connection.\n\nTo share your internet data to local network, choose Data Seller.\n\nTo view available shared internet options, choose Data Buyer.</string>
     <string name="unlimited">Unlimited</string>
     <string name="limited">Limit to</string>
@@ -146,7 +147,10 @@
     <string name="later">Later</string>
     <string name="permission">Permission needed</string>
     <string name="permission_message">Need to allow permission on Telemesh service app to work properly. You can open the Telemesh service app clicking on launcher icon or can give permission manually from setting</string>
-
+    <string name="pending_balance">Pending balance will be deposited to main balance after crossing <b>10</b> coins.</string>
+    <string name="points">Points</string>
+    <string name="pending_balance_point">Pending balance 8.8 point</string>
+    <string name="view_transactions">View Transactions</string>
 
 
 </resources>

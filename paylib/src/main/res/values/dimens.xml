@@ -84,6 +84,7 @@
     <dimen name="height_205">205dp</dimen>
     <dimen name="height_46">46dp</dimen>
 
+    <dimen name="margin_0">0dp</dimen>
     <dimen name="margin_1">1dp</dimen>
     <dimen name="margin_2">2dp</dimen>
     <dimen name="margin_3">3dp</dimen>
