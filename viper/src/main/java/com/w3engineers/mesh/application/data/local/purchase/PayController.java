@@ -29,13 +29,11 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.web3j.crypto.Credentials;
 
-import java.util.IllegalFormatCodePointException;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class PayController {
     private static PayController payController;
-//    public DemoTransport transportManager;
     private static PayControllerListenerForSeller payControllerListenerForSeller;
     private static PayControllerListenerForBuyer payControllerListenerForBuyer;
     private DataManager dataManager;
@@ -46,7 +44,6 @@ public class PayController {
     private ConcurrentHashMap<String, TimeoutModel> timeoutMap = new ConcurrentHashMap<>();
 
     PayController() {
-//        transportManager = DemoTransport.getInstance();
         dataManager = DataManager.on();
         setDataManagerObserver();
         walletService = WalletService.getInstance(MeshApp.getContext());
@@ -57,6 +54,104 @@ public class PayController {
             payController = new PayController();
         }
         return payController;
+    }
+
+    public interface PayControllerListenerForBuyer {
+        void onInitPurchaseOkReceived(String sellerAddress, double ethBalance, double tokenBallance, int nonce, double allowance, int endPointType);
+
+        void onInitPurchaseErrorReceived(String sellerAddress, String msg);
+
+        void onBuyTokenResponseReceived(String from, double tokenValue, double ethValue, int endPointType);
+
+        void onChannelCreateOkayReceived(String from, long openBlock, double deposit, int endPointType);
+
+        void onChannelCreateErrorReceived(String from, String msg);
+
+        void onUserConnected(String address);
+
+        void onUserDisconnected(String address);
+
+        void onInternetMessageResponseSuccess(String sender, String bps, double bps_balance, String chs, long open_block, long byteSize, String messageId);
+
+        void onInternetMessageResponseFailed(String sender, String message);
+
+        void onPendingMessageInfo(String fromAddress, long dataSize, String msg_id);
+
+        void onSyncSellerToBuyerReceived(String buyerAddress, String sellerAddress, long blockNumner,
+                                         double usedDataAmount, double totalDataAmount, double balance,
+                                         String bps, String chs, int endPointType);
+
+        void onInfoOkayReceived(String from, int purpose, JSONObject infoJson, int endPointType);
+
+        void onInfoErrorReceived(String from, int purpose, String msg);
+
+        void onReceivedEtherRequestResponse(String from, int responseCode);
+
+        void onReceivedEther(String from, double balance);
+
+        void onChannelCloseReceived(String fromAddress, String sellerAddress, long open_block, int endPointType);
+
+        void onChannelTopupReceived(String fromAddress, long openBlock, double deposit, int endPointType);
+
+        void onBlockChainResponseReceived(String fromAddress, boolean success, int requestType, String msg);
+
+        void timeoutCallback(TimeoutModel timeoutModel);
+
+        void giftRequestSubmitted(boolean status, String submitMessage, String etherTransactionHash,
+                                  String tokenTransactionHash, int endPoint, String failedBy);
+
+        void giftResponse(boolean status, double ethBalance,
+                          double tokenBalance, int endPoint);
+        void onProbableSellerDisconnected(String sellerId);
+
+    }
+
+    public void setBuyerListener(PayControllerListenerForBuyer listener1) {
+        payControllerListenerForBuyer = listener1;
+    }
+
+    public interface PayControllerListenerForSeller {
+        void onPurchaseInitRequested(String from, int endPointType);
+
+        void onCreateChannelRequested(String from, JSONArray reqList, int endPointType);
+
+        void onBuyTokenRequested(String from, JSONArray jArray, int endPointType);
+
+        void onBlockchainRequestReceived(String from, JSONArray jArray, int endPointType);
+
+        void onUserConnected(String address);
+
+        void onUserDisconnected(String address);
+
+        void onMessageAcknowledgmentReceived(String from, String messageId);
+
+        void onInfoQueryReceived(String fromAddress, String query, int purpose, int endPointType);
+
+        void onPayForMessageOkReceived(String from, String msg_id, String bps, double bps_balance, long open_block);
+
+        void onPayForMessageErrorReceived(String from, String msg_id, String errorText);
+
+        void onSynBuyerOKReceive(String from, String sellerAddress);
+
+        void onReceivedEtherRequest(String from, int endpointType);
+
+        void onBuyerUpdateNotified(String msg_Id, String fromAddress);
+
+        void requestForGiftEther(String fromAddress, int endPointType);
+
+        void requestForGiftEtherWithHash(String fromAddress, String ethTranxHash, String tknTranxHash, int endPointType);
+
+        void timeoutCallback(TimeoutModel timeoutModel);
+
+        void buyerInternetMessageReceived(String sender, String owner, String msg_id, String msgData, long dataSize, boolean isIncomming);
+
+        void onSyncBuyerToSellerReceived(String buyerAddress, String sellerAddress, long blockNumber,
+                                         double usedDataAmount, double totalDataAmount, double balance,
+                                         String bps, String chs, int endPointType);
+    }
+
+    public void setSellerListener(PayControllerListenerForSeller listener2) {
+        this.payControllerListenerForSeller = listener2;
     }
 
     public Credentials getCredentials() {
@@ -102,7 +197,6 @@ public class PayController {
                 payControllerListenerForSeller.buyerInternetMessageReceived(pendingMessage.sender, pendingMessage.receiver, pendingMessage.messageId, pendingMessage.messageData, pendingMessage.dataLength, pendingMessage.isIncoming);
             }
         });
-
 
         AppDataObserver.on().startObserver(ApiEvent.SELLER_REMOVED,event -> {
             MeshLog.v("SELLER_REMOVED received " );
@@ -300,15 +394,15 @@ public class PayController {
 //                        MeshLog.p("PAY_FOR_MESSAGE_RESPONSE listener not found");
                         }
                         break;
-                    case PurchaseConstants.MESSAGE_TYPES.SYNC_BUYER:
-                        sellerAddress = jsonObject.getString(PurchaseConstants.JSON_KEYS.SELLER_ADDRESS);
-                        if (payControllerListenerForSeller != null) {
-                            // payControllerListenerForSeller.onSyncMessageReceived(fromAddress, sellerAddress);
-                        }
-                        break;
+//                    case PurchaseConstants.MESSAGE_TYPES.SYNC_BUYER:
+//                        sellerAddress = jsonObject.getString(PurchaseConstants.JSON_KEYS.SELLER_ADDRESS);
+//                        if (payControllerListenerForSeller != null) {
+//                            // payControllerListenerForSeller.onSyncMessageReceived(fromAddress, sellerAddress);
+//                        }
+//                        break;
+                    case PurchaseConstants.MESSAGE_TYPES.SYNC_BUYER_TO_SELLER:
 
-                    case PurchaseConstants.MESSAGE_TYPES.SYNC_SELLER_OK:
-                        String buyerAddress = jsonObject.getString(PurchaseConstants.JSON_KEYS.BUYER_ADDRESS);
+                        sellerAddress = jsonObject.getString(PurchaseConstants.JSON_KEYS.SELLER_ADDRESS);
                         balance = 0.0;
                         String BPS = "";
                         String CHS = "";
@@ -322,13 +416,35 @@ public class PayController {
                             BPS = jsonObject.getString(PurchaseConstants.JSON_KEYS.MESSAGE_BPS);
                             CHS = jsonObject.getString(PurchaseConstants.JSON_KEYS.MESSAGE_CHS);
                         }
-                        if (payControllerListenerForBuyer != null) {
-                            payControllerListenerForBuyer.onSyncMessageOKReceived(buyerAddress, fromAddress,
+                        if (payControllerListenerForSeller != null) {
+                            payControllerListenerForSeller.onSyncBuyerToSellerReceived(fromAddress, sellerAddress,
                                     open_block, usedDataAmount, totalDataAmount, balance, BPS, CHS, endPointType);
                         }
                         break;
 
-                    case PurchaseConstants.MESSAGE_TYPES.SYNC_BUYER_OK:
+                    case PurchaseConstants.MESSAGE_TYPES.SYNC_SELLER_TO_BUYER:
+                        String buyerAddress = jsonObject.getString(PurchaseConstants.JSON_KEYS.BUYER_ADDRESS);
+                        sellerAddress = jsonObject.getString(PurchaseConstants.JSON_KEYS.SELLER_ADDRESS);
+                        balance = 0.0;
+                        String BPS1 = "";
+                        String CHS1 = "";
+                        open_block = 0;
+                        double usedDataAmount1 = 0, totalDataAmount1 = 0;
+                        if (jsonObject.has(PurchaseConstants.JSON_KEYS.OPEN_BLOCK)) {
+                            open_block = jsonObject.getLong(PurchaseConstants.JSON_KEYS.OPEN_BLOCK);
+                            balance = jsonObject.getDouble(PurchaseConstants.JSON_KEYS.BPS_BALANCE);
+                            usedDataAmount1 = jsonObject.getDouble(PurchaseConstants.JSON_KEYS.USED_DATA);
+                            totalDataAmount1 = jsonObject.getDouble(PurchaseConstants.JSON_KEYS.TOTAL_DATA);
+                            BPS1 = jsonObject.getString(PurchaseConstants.JSON_KEYS.MESSAGE_BPS);
+                            CHS1 = jsonObject.getString(PurchaseConstants.JSON_KEYS.MESSAGE_CHS);
+                        }
+                        if (payControllerListenerForBuyer != null) {
+                            payControllerListenerForBuyer.onSyncSellerToBuyerReceived(buyerAddress, sellerAddress,
+                                    open_block, usedDataAmount1, totalDataAmount1, balance, BPS1, CHS1, endPointType);
+                        }
+                        break;
+
+                    case PurchaseConstants.MESSAGE_TYPES.SYNC_SELLER_TO_BUYER_OK:
                         sellerAddress = jsonObject.getString(PurchaseConstants.JSON_KEYS.SELLER_ADDRESS);
                         if (payControllerListenerForSeller != null) {
                             payControllerListenerForSeller.onSynBuyerOKReceive(fromAddress, sellerAddress);
@@ -488,6 +604,86 @@ public class PayController {
         }
     }
 
+    private void removeSellerTimer(String address){
+        for (ConcurrentHashMap.Entry<String, TimeoutModel> entry : timeoutMap.entrySet()) {
+            TimeoutModel timeoutModel = entry.getValue();
+            String key = entry.getKey();
+            if (timeoutModel.getReceiverId().equalsIgnoreCase(address)){
+
+                int timeOutTrackingPoint = timeoutModel.getTimeoutPointer();
+                if (handler != null && handler.hasMessages(timeOutTrackingPoint)) {
+
+                    MeshLog.v("SellerTimer buyer disconnected " + key + " purpose " + timeoutModel.getPurpose());
+
+                    handler.removeMessages(timeOutTrackingPoint);
+                    timeoutMap.remove(key);
+                }
+            }
+        }
+
+    }
+
+    private void sendUserConnected(String address, boolean isConnected) {
+        int userMode = PreferencesHelperDataplan.on().getDataPlanRole();
+
+        if (userMode == DataPlanConstants.USER_ROLE.DATA_SELLER) {
+            if (payControllerListenerForSeller != null) {
+                if (isConnected) {
+                    payControllerListenerForSeller.onUserConnected(address);
+                } else {
+                    removeSellerTimer(address);
+                    payControllerListenerForSeller.onUserDisconnected(address);
+                }
+
+            } else {
+                MeshLog.v("listener not found");
+            }
+        } else if (userMode == DataPlanConstants.USER_ROLE.DATA_BUYER) {
+            if (payControllerListenerForBuyer != null) {
+                if (isConnected) {
+                    payControllerListenerForBuyer.onUserConnected(address);
+                } else {
+                    payControllerListenerForBuyer.onUserDisconnected(address);
+                }
+            } else {
+                MeshLog.v("listener not found");
+            }
+        }
+    }
+
+    private void sendPayMessage(String receiver, String message) {
+        String messageId = "";
+        sendPayMessageToTransport(receiver, message, messageId.toString());
+    }
+
+    private void sendPayWithTimeoutMessage(String receiver, String message, int purpose) {
+        MeshLog.p("sendPayWithTimeoutMessage");
+        String requestId = UUID.randomUUID().toString();
+        setRequestTimeout(requestId, receiver, purpose);
+        sendPayMessageWithMessageId(receiver, message, requestId);
+    }
+
+    private void sendPayMessageWithMessageId(String receiver, String message, String messageId) {
+        sendPayMessageToTransport(receiver, message, messageId);
+    }
+
+    private void sendPayMessageToTransport(String address, String message, String messageId) {
+
+        MeshLog.v("sendPayMessageToTransport " + address + "   " + message + "  " + messageId);
+        try {
+            String userPublicKey = dataManager.getUserPublicKey(address);
+            if (!TextUtils.isEmpty(userPublicKey)){
+                String encryptedMessage = CryptoHelper.encryptMessage(walletService.getPrivateKey(), userPublicKey, message);
+                dataManager.sendPayMessage(address, encryptedMessage, messageId);
+            } else {
+                MeshLog.v("User public not found");
+            }
+
+        } catch (RemoteException e)  {
+            e.printStackTrace();
+        }
+    }
+
 
     public void sendInfoQueryMessage(JSONObject msgObject, String receiver, int purpose) {
         MeshLog.p("sendInfoQueryMessage" + msgObject.toString());
@@ -629,111 +825,6 @@ public class PayController {
         }
     }
 
-    public interface PayControllerListenerForBuyer {
-        void onInitPurchaseOkReceived(String sellerAddress, double ethBalance, double tokenBallance, int nonce, double allowance, int endPointType);
-
-        void onInitPurchaseErrorReceived(String sellerAddress, String msg);
-
-        void onBuyTokenResponseReceived(String from, double tokenValue, double ethValue, int endPointType);
-
-        void onChannelCreateOkayReceived(String from, long openBlock, double deposit, int endPointType);
-
-        void onChannelCreateErrorReceived(String from, String msg);
-
-        void onUserConnected(String address);
-
-        void onUserDisconnected(String address);
-
-        void onInternetMessageResponseSuccess(String sender, String bps, double bps_balance, String chs, long open_block, long byteSize, String messageId);
-
-        void onInternetMessageResponseFailed(String sender, String message);
-
-        void onPendingMessageInfo(String fromAddress, long dataSize, String msg_id);
-
-        void onSyncMessageOKReceived(String buyerAddress, String sellerAddress, long blockNumner,
-                                     double usedDataAmount, double totalDataAmount, double balance,
-                                     String bps, String chs, int endPointType);
-
-        void onInfoOkayReceived(String from, int purpose, JSONObject infoJson, int endPointType);
-
-        void onInfoErrorReceived(String from, int purpose, String msg);
-
-        void onReceivedEtherRequestResponse(String from, int responseCode);
-
-        void onReceivedEther(String from, double balance);
-
-        void onChannelCloseReceived(String fromAddress, String sellerAddress, long open_block, int endPointType);
-
-        void onChannelTopupReceived(String fromAddress, long openBlock, double deposit, int endPointType);
-
-        void onBlockChainResponseReceived(String fromAddress, boolean success, int requestType, String msg);
-
-        void timeoutCallback(TimeoutModel timeoutModel);
-
-        void giftRequestSubmitted(boolean status, String submitMessage, String etherTransactionHash,
-                                  String tokenTransactionHash, int endPoint, String failedBy);
-
-        void giftResponse(boolean status, double ethBalance,
-                          double tokenBalance, int endPoint);
-        void onProbableSellerDisconnected(String sellerId);
-
-    }
-
-    public void setBuyerListener(PayControllerListenerForBuyer listener1) {
-      //  MeshLog.v("set listener" + listener1.toString());
-        payControllerListenerForBuyer = listener1;
-//        if (transportManager != null) {
-//            transportManager.initPayListener(this);
-//        }
-    }
-
-    public interface PayControllerListenerForSeller {
-        void onPurchaseInitRequested(String from, int endPointType);
-
-        void onCreateChannelRequested(String from, JSONArray reqList, int endPointType);
-
-        //        void onBuyTokenInitRequested(String from, double etherValue);
-        void onBuyTokenRequested(String from, JSONArray jArray, int endPointType);
-
-        void onBlockchainRequestReceived(String from, JSONArray jArray, int endPointType);
-
-        void onUserConnected(String address);
-
-        void onUserDisconnected(String address);
-
-        void onMessageAcknowledgmentReceived(String from, String messageId);
-
-        void onInfoQueryReceived(String fromAddress, String query, int purpose, int endPointType);
-//        void onPayForMessageOkReceived(String from, long msg_id, String bps, double bps_balance, long open_block);
-//        void onPayForMessageErrorReceived(String from, long msg_id, String errorText);
-
-        void onPayForMessageOkReceived(String from, String msg_id, String bps, double bps_balance, long open_block);
-
-        void onPayForMessageErrorReceived(String from, String msg_id, String errorText);
-
-      //  void onSyncMessageReceived(String from, String sellerAddress);
-
-        void onSynBuyerOKReceive(String from, String sellerAddress);
-
-        void onReceivedEtherRequest(String from, int endpointType);
-
-        void onBuyerUpdateNotified(String msg_Id, String fromAddress);
-
-        void requestForGiftEther(String fromAddress, int endPointType);
-
-        void requestForGiftEtherWithHash(String fromAddress, String ethTranxHash, String tknTranxHash, int endPointType);
-        void timeoutCallback(TimeoutModel timeoutModel);
-
-        void buyerInternetMessageReceived(String sender, String owner, String msg_id, String msgData, long dataSize, boolean isIncomming);
-    }
-
-    public void setSellerListener(PayControllerListenerForSeller listener2) {
-        this.payControllerListenerForSeller = listener2;
-//        if (transportManager != null) {
-//            transportManager.initPayListener(this);
-//        }
-    }
-
     public void sendInitPurchase(JSONObject object, String receiver) {
         MeshLog.p("sendInitPurchase " + object.toString());
         try {
@@ -805,16 +896,6 @@ public class PayController {
         sendPayMessageWithMessageId(receiver, jsonObject.toString(), messageId);
     }
 
-    public void sendCreateChannelError(JSONObject jsonObject, String receiver) {
-        MeshLog.v("sendCreateChannelError " + jsonObject.toString());
-        try {
-            jsonObject.put(PurchaseConstants.JSON_KEYS.MESSAGE_TYPE, PurchaseConstants.MESSAGE_TYPES.CREATE_CHANNEL_ERROR);
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-        sendPayMessage(receiver, jsonObject.toString());
-    }
-
     public void sendBlockChainRequest(JSONObject jsonObject, String receiver, int purpose) {
 
         MeshLog.v("sendBlockChainRequest " + jsonObject.toString());
@@ -862,99 +943,9 @@ public class PayController {
 
     }
 
-    private void removeSellerTimer(String address){
-        for (ConcurrentHashMap.Entry<String, TimeoutModel> entry : timeoutMap.entrySet()) {
-            TimeoutModel timeoutModel = entry.getValue();
-            String key = entry.getKey();
-            if (timeoutModel.getReceiverId().equalsIgnoreCase(address)){
-
-                int timeOutTrackingPoint = timeoutModel.getTimeoutPointer();
-                if (handler != null && handler.hasMessages(timeOutTrackingPoint)) {
-
-                    MeshLog.v("SellerTimer buyer disconnected " + key + " purpose " + timeoutModel.getPurpose());
-
-                    handler.removeMessages(timeOutTrackingPoint);
-                    timeoutMap.remove(key);
-                }
-            }
-        }
-
-    }
-
-    private void sendUserConnected(String address, boolean isConnected) {
-        int userMode = PreferencesHelperDataplan.on().getDataPlanRole();
-
-        if (userMode == DataPlanConstants.USER_ROLE.DATA_SELLER) {
-            if (payControllerListenerForSeller != null) {
-                if (isConnected) {
-                    payControllerListenerForSeller.onUserConnected(address);
-                } else {
-                    removeSellerTimer(address);
-                    payControllerListenerForSeller.onUserDisconnected(address);
-                }
-
-            } else {
-                MeshLog.v("listener not found");
-            }
-        } else if (userMode == DataPlanConstants.USER_ROLE.DATA_BUYER) {
-            if (payControllerListenerForBuyer != null) {
-                if (isConnected) {
-                    payControllerListenerForBuyer.onUserConnected(address);
-                } else {
-                    payControllerListenerForBuyer.onUserDisconnected(address);
-                }
-            } else {
-                MeshLog.v("listener not found");
-            }
-        }
-    }
-
-//    public void sendDisconnectBuyer(JSONObject jsonObject, String receiver) {
-////        MeshLog.v("sendChannelClosed " + jsonObject.toString());
-////        try {
-////            jsonObject.put(PurchaseConstants.JSON_KEYS.MESSAGE_TYPE, PurchaseConstants.MESSAGE_TYPES.DISCONNECT_BUYER);
-////        } catch (JSONException e) {
-////            e.printStackTrace();
-////        }
-////        sendPayMessage(receiver, jsonObject.toString());
-////    }
-
-    private void sendPayMessage(String receiver, String message) {
-        String messageId = "";
-        sendPayMessageToTransport(receiver, message, messageId.toString());
-    }
-
-    private void sendPayWithTimeoutMessage(String receiver, String message, int purpose) {
-        MeshLog.p("sendPayWithTimeoutMessage");
-        String requestId = UUID.randomUUID().toString();
-        setRequestTimeout(requestId, receiver, purpose);
-        sendPayMessageWithMessageId(receiver, message, requestId);
-    }
-
-    private void sendPayMessageWithMessageId(String receiver, String message, String messageId) {
-        sendPayMessageToTransport(receiver, message, messageId);
-    }
-
-    private void sendPayMessageToTransport(String address, String message, String messageId) {
-
-        MeshLog.v("sendPayMessageToTransport " + address + "   " + message + "  " + messageId);
+    public void sendSyncOkMessageToSeller(JSONObject object, String receiver) {
         try {
-            String userPublicKey = dataManager.getUserPublicKey(address);
-            if (!TextUtils.isEmpty(userPublicKey)){
-                String encryptedMessage = CryptoHelper.encryptMessage(walletService.getPrivateKey(), userPublicKey, message);
-                dataManager.sendPayMessage(address, encryptedMessage, messageId);
-            } else {
-                MeshLog.v("User public not found");
-            }
-
-        } catch (RemoteException e) {
-            e.printStackTrace();
-        }
-    }
-
-    public void sendSyncOkMessage(JSONObject object, String receiver) {
-        try {
-            object.put(PurchaseConstants.JSON_KEYS.MESSAGE_TYPE, PurchaseConstants.MESSAGE_TYPES.SYNC_BUYER_OK);
+            object.put(PurchaseConstants.JSON_KEYS.MESSAGE_TYPE, PurchaseConstants.MESSAGE_TYPES.SYNC_SELLER_TO_BUYER_OK);
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -962,10 +953,20 @@ public class PayController {
         sendPayMessage(receiver, object.toString());
     }
 
-    public void sendSyncMessageOK(JSONObject object, String receiver) {
+    public void sendSyncMessageToBuyer(JSONObject object, String receiver) {
         MeshLog.v("sendSyncMessageOK"+object.toString());
         try {
-            object.put(PurchaseConstants.JSON_KEYS.MESSAGE_TYPE, PurchaseConstants.MESSAGE_TYPES.SYNC_SELLER_OK);
+            object.put(PurchaseConstants.JSON_KEYS.MESSAGE_TYPE, PurchaseConstants.MESSAGE_TYPES.SYNC_SELLER_TO_BUYER);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        sendPayMessage(receiver, object.toString());
+    }
+
+    public void sendSyncMessageToSeller(JSONObject object, String receiver) {
+        MeshLog.v("sendSyncMessageOK"+object.toString());
+        try {
+            object.put(PurchaseConstants.JSON_KEYS.MESSAGE_TYPE, PurchaseConstants.MESSAGE_TYPES.SYNC_BUYER_TO_SELLER);
         } catch (JSONException e) {
             e.printStackTrace();
         }

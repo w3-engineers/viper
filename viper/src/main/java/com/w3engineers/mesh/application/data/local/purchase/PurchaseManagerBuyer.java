@@ -154,32 +154,6 @@ public class PurchaseManagerBuyer extends PurchaseManager implements PayControll
         }
     }
 
-    /*    private void syncWithSeller(String sellerAddress) {
-        JSONObject jsonObject = new JSONObject();
-        try {
-
-            jsonObject.put(PurchaseConstants.JSON_KEYS.MESSAME_FROM, ethService.getAddress());
-            jsonObject.put(PurchaseConstants.JSON_KEYS.SELLER_ADDRESS, sellerAddress);
-
-        } catch (JSONException e) {
-        }
-
-        payController.saySyncSeller(jsonObject, sellerAddress);
-    }*/
-
-    private void sendSyncOkMessage(String sellerAddress) {
-        JSONObject jsonObject = new JSONObject();
-        try {
-
-            jsonObject.put(PurchaseConstants.JSON_KEYS.MESSAME_FROM, ethService.getAddress());
-            jsonObject.put(PurchaseConstants.JSON_KEYS.SELLER_ADDRESS, sellerAddress);
-
-        } catch (JSONException e) {
-        }
-
-        payController.sendSyncOkMessage(jsonObject, sellerAddress);
-    }
-
     private void purchaseCloseFailed(String sellerId, String s) {
         setCurrentSellerWithStatus(sellerId, PurchaseConstants.SELLERS_BTN_TEXT.CLOSE);
 
@@ -291,11 +265,6 @@ public class PurchaseManagerBuyer extends PurchaseManager implements PayControll
             dataPlanListener.onConnectingWithSeller(sellerAddress);
         }
     }
-
-    /*public void setPurchaseManagerBuyerListener(PurchaseManagerBuyerListener listener) {
-        this.purchaseManagerBuyerListener = listener;
-    }*/
-    
 
     public void getMyBalanceInfo() {
         MeshLog.p("getMyBalanceInfo");
@@ -451,8 +420,6 @@ public class PurchaseManagerBuyer extends PurchaseManager implements PayControll
     }
 
 
-
-
     //*********************************************************//
     //******************PayControllerListener******************//
     //*********************************************************//
@@ -462,6 +429,37 @@ public class PurchaseManagerBuyer extends PurchaseManager implements PayControll
             if (payController.getDataManager().isInternetSeller(address)) {
                 DataPlanManager.getInstance().processAllSeller(mContext);
             }
+            if (TextUtils.isEmpty(payController.getDataManager().getCurrentSellerId())){
+                List<Purchase> myOpenPurcheses  = databaseService.getMyPurchasesWithState(ethService.getAddress(), PurchaseConstants.CHANNEL_STATE.OPEN);
+                for (Purchase p : myOpenPurcheses){
+                    if (payController.getDataManager().isUserConnected(p.sellerAddress) && p.totalDataAmount > p.usedDataAmount){
+
+                        JSONObject jsonObject = new JSONObject();
+                        jsonObject.put(PurchaseConstants.JSON_KEYS.MESSAME_FROM, ethService.getAddress());
+                        jsonObject.put(PurchaseConstants.JSON_KEYS.BUYER_ADDRESS, p.sellerAddress);
+
+                        jsonObject.put(PurchaseConstants.JSON_KEYS.SELLER_ADDRESS, p.sellerAddress);
+                        jsonObject.put(PurchaseConstants.JSON_KEYS.OPEN_BLOCK, p.openBlockNumber);
+                        jsonObject.put(PurchaseConstants.JSON_KEYS.USED_DATA, p.usedDataAmount);
+                        jsonObject.put(PurchaseConstants.JSON_KEYS.TOTAL_DATA, p.totalDataAmount);
+                        jsonObject.put(PurchaseConstants.JSON_KEYS.BPS_BALANCE, p.balance);
+                        jsonObject.put(PurchaseConstants.JSON_KEYS.MESSAGE_BPS, p.balanceProof);
+                        jsonObject.put(PurchaseConstants.JSON_KEYS.MESSAGE_CHS, p.closingHash);
+
+                        setEndPointInfoInJson(jsonObject, p.blockChainEndpoint);
+
+                        payController.sendSyncMessageToSeller(jsonObject, p.sellerAddress);
+
+
+                        break;
+                    }
+                }
+
+
+            }
+
+
+
         } catch (Exception e){
             e.printStackTrace();
         }
@@ -926,6 +924,8 @@ public class PurchaseManagerBuyer extends PurchaseManager implements PayControll
                     dataPlanListener.onPurchaseSuccess(from, totalDta, openBlock);
                 }
             }
+
+            sendSyncOkMessageToSeller(from);
         } catch (Exception e) {
             MeshLog.v("Exception " + e.getMessage());
         }
@@ -1056,8 +1056,6 @@ public class PurchaseManagerBuyer extends PurchaseManager implements PayControll
         }
     }
 
-
-
     @Override
     public void onInternetMessageResponseFailed(String sender, String message) {
 
@@ -1066,7 +1064,7 @@ public class PurchaseManagerBuyer extends PurchaseManager implements PayControll
     }
 
     @Override
-    public void onSyncMessageOKReceived(String buyerAddress, String sellerAddress, long blockNumber, double usedDataAmount, double totalDataAmount, double balance, String bps, String chs, int endPointType) {
+    public void onSyncSellerToBuyerReceived(String buyerAddress, String sellerAddress, long blockNumber, double usedDataAmount, double totalDataAmount, double balance, String bps, String chs, int endPointType) {
 //        MeshLog.p( "onSyncMessageOKReceived: " + sellerAddress);
 //
         if (blockNumber == 0) {
@@ -1116,11 +1114,24 @@ public class PurchaseManagerBuyer extends PurchaseManager implements PayControll
 
             }
 
-            sendSyncOkMessage(sellerAddress);
-
+           sendSyncOkMessageToSeller(sellerAddress);
         }
     }
 
+    private void sendSyncOkMessageToSeller(String sellerAddress){
+        JSONObject jsonObject = new JSONObject();
+        try {
+
+            jsonObject.put(PurchaseConstants.JSON_KEYS.MESSAME_FROM, ethService.getAddress());
+            jsonObject.put(PurchaseConstants.JSON_KEYS.SELLER_ADDRESS, sellerAddress);
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        payController.sendSyncOkMessageToSeller(jsonObject, sellerAddress);
+
+    }
 
     @Override
     public void onChannelCloseReceived(String fromAddress, String sellerAddress, long open_block, int endPointType) {
@@ -1162,6 +1173,8 @@ public class PurchaseManagerBuyer extends PurchaseManager implements PayControll
             if (dataPlanListener != null) {
                 dataPlanListener.onPurchaseSuccess(fromAddress, totalData, openBlock);
             }
+
+            sendSyncOkMessageToSeller(fromAddress);
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -1275,8 +1288,6 @@ public class PurchaseManagerBuyer extends PurchaseManager implements PayControll
     }
 
 
-
-
     //*********************************************************//
     //************************interface************************//
     //*********************************************************//
@@ -1299,22 +1310,6 @@ public class PurchaseManagerBuyer extends PurchaseManager implements PayControll
         void onBalancedFinished(String sellerAddress, int remain);
 
         void onTopUpFailed(String sellerAddress, String msg);
-    }
-
-    /*public interface SellerSearchListener {
-        void onSellerFoundSuccess(String sellerId);
-
-        void onSellerFoundError(String msg);
-    }
-
-    public interface MyBalanceInfoListener {
-        void onBalanceInfoReceived(double ethBalance, double tknBalance);
-
-        void onBalanceErrorReceived(String msg);
-    }*/
-
-    public interface EtherRequestListener {
-        void onResponseReceived(boolean success, String from, String msg);
     }
 
     public LiveData<Integer> getDifferentNetworkData(String myAddress, int endpoint) {

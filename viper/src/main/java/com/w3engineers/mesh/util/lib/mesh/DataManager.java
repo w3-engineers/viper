@@ -351,7 +351,7 @@ public class DataManager {
 
         @Override
         public void onProbableSellerDisconnected(String sellerId) throws RemoteException {
-
+            DataManager.this.onProbableSellerDisconnected(sellerId);
         }
     };
 
@@ -564,6 +564,15 @@ public class DataManager {
             MeshLog.v("mTmCommunicator null");
         }
         return mTmCommunicator.isUserConnected(address);
+    }
+
+    public String getCurrentSellerId() throws RemoteException {
+        if (mTmCommunicator == null) {
+            MeshLog.v("mTmCommunicator null");
+        } else {
+            return mTmCommunicator.getCurrentSellerId();
+        }
+        return null;
     }
 
     public void onBuyerConnected(String address) throws RemoteException {

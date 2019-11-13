@@ -1,7 +1,5 @@
 package com.w3engineers.mesh.application.data.local.helper.crypto;
 
-import android.util.Log;
-
 import org.bouncycastle.crypto.agreement.ECDHBasicAgreement;
 import org.bouncycastle.crypto.params.ECDomainParameters;
 import org.bouncycastle.crypto.params.ECPrivateKeyParameters;
@@ -12,23 +10,6 @@ import org.web3j.crypto.Sign;
 import org.web3j.utils.Numeric;
 
 import java.math.BigInteger;
-import java.security.InvalidAlgorithmParameterException;
-import java.security.InvalidKeyException;
-import java.security.KeyFactory;
-import java.security.KeyPair;
-import java.security.KeyPairGenerator;
-import java.security.NoSuchAlgorithmException;
-import java.security.NoSuchProviderException;
-import java.security.PrivateKey;
-import java.security.PublicKey;
-import java.security.spec.ECGenParameterSpec;
-import java.security.spec.EncodedKeySpec;
-import java.security.spec.InvalidKeySpecException;
-import java.security.spec.PKCS8EncodedKeySpec;
-import java.security.spec.X509EncodedKeySpec;
-
-import javax.crypto.KeyAgreement;
-import javax.crypto.SecretKey;
 
 public class ECDSA {
     public static ECDomainParameters CURVE = new ECDomainParameters(
@@ -43,15 +24,8 @@ public class ECDSA {
     }
 
     public static ECPoint getECPointFromEncoded(ECCurve curve, String hexEncodedPoint) {
-        Log.d("GAMIRUDDIN", "getECPointFromEncoded " + hexEncodedPoint);
         byte[] arr = Numeric.hexStringToByteArray(hexEncodedPoint);
-        Log.d("GAMIRUDDIN", "arr " + arr.toString());
-
         ECPoint p = curve.decodePoint(arr);
-
-        Log.d("GAMIRUDDIN", "p " + p);
-
-
         return p;
     }
 
