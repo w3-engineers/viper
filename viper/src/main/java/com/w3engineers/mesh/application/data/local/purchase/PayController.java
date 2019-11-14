@@ -19,10 +19,12 @@ import com.w3engineers.mesh.application.data.model.PayMessageAck;
 import com.w3engineers.mesh.application.data.model.PeerAdd;
 import com.w3engineers.mesh.application.data.model.PeerRemoved;
 import com.w3engineers.mesh.application.data.model.SellerRemoved;
+import com.w3engineers.mesh.application.data.model.UserInfoEvent;
 import com.w3engineers.mesh.application.data.remote.model.BuyerPendingMessage;
 import com.w3engineers.mesh.util.MeshApp;
 import com.w3engineers.mesh.util.MeshLog;
 import com.w3engineers.mesh.util.lib.mesh.DataManager;
+import com.w3engineers.models.UserInfo;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -166,8 +168,9 @@ public class PayController {
     }
 
     private void setDataManagerObserver(){
-        AppDataObserver.on().startObserver(ApiEvent.PEER_ADD,event -> {
-            String nodeId = ((PeerAdd) event).peerId;
+
+        AppDataObserver.on().startObserver(ApiEvent.USER_INFO,event -> {
+            String nodeId = ((UserInfoEvent) event).getAddress();
             sendUserConnected(nodeId, true);
         });
 
@@ -402,6 +405,9 @@ public class PayController {
 //                        break;
                     case PurchaseConstants.MESSAGE_TYPES.SYNC_BUYER_TO_SELLER:
 
+                        String buyerAddress = jsonObject.getString(PurchaseConstants.JSON_KEYS.BUYER_ADDRESS);
+
+                        MeshLog.v("MESSAGE_TYPES.SYNC_BUYER_TO_SELLER " + fromAddress +" " + buyerAddress);
                         sellerAddress = jsonObject.getString(PurchaseConstants.JSON_KEYS.SELLER_ADDRESS);
                         balance = 0.0;
                         String BPS = "";
@@ -417,14 +423,13 @@ public class PayController {
                             CHS = jsonObject.getString(PurchaseConstants.JSON_KEYS.MESSAGE_CHS);
                         }
                         if (payControllerListenerForSeller != null) {
-                            payControllerListenerForSeller.onSyncBuyerToSellerReceived(fromAddress, sellerAddress,
+                            payControllerListenerForSeller.onSyncBuyerToSellerReceived(buyerAddress, sellerAddress,
                                     open_block, usedDataAmount, totalDataAmount, balance, BPS, CHS, endPointType);
                         }
                         break;
 
                     case PurchaseConstants.MESSAGE_TYPES.SYNC_SELLER_TO_BUYER:
-                        String buyerAddress = jsonObject.getString(PurchaseConstants.JSON_KEYS.BUYER_ADDRESS);
-                        sellerAddress = jsonObject.getString(PurchaseConstants.JSON_KEYS.SELLER_ADDRESS);
+                        String buyerAddress1 = jsonObject.getString(PurchaseConstants.JSON_KEYS.BUYER_ADDRESS);
                         balance = 0.0;
                         String BPS1 = "";
                         String CHS1 = "";
@@ -439,7 +444,7 @@ public class PayController {
                             CHS1 = jsonObject.getString(PurchaseConstants.JSON_KEYS.MESSAGE_CHS);
                         }
                         if (payControllerListenerForBuyer != null) {
-                            payControllerListenerForBuyer.onSyncSellerToBuyerReceived(buyerAddress, sellerAddress,
+                            payControllerListenerForBuyer.onSyncSellerToBuyerReceived(buyerAddress1, fromAddress,
                                     open_block, usedDataAmount1, totalDataAmount1, balance, BPS1, CHS1, endPointType);
                         }
                         break;
@@ -954,7 +959,7 @@ public class PayController {
     }
 
     public void sendSyncMessageToBuyer(JSONObject object, String receiver) {
-        MeshLog.v("sendSyncMessageOK"+object.toString());
+        MeshLog.v("sendSyncMessageToBuyer"+object.toString());
         try {
             object.put(PurchaseConstants.JSON_KEYS.MESSAGE_TYPE, PurchaseConstants.MESSAGE_TYPES.SYNC_SELLER_TO_BUYER);
         } catch (JSONException e) {
@@ -964,7 +969,7 @@ public class PayController {
     }
 
     public void sendSyncMessageToSeller(JSONObject object, String receiver) {
-        MeshLog.v("sendSyncMessageOK"+object.toString());
+        MeshLog.v("sendSyncMessageToSeller"+object.toString());
         try {
             object.put(PurchaseConstants.JSON_KEYS.MESSAGE_TYPE, PurchaseConstants.MESSAGE_TYPES.SYNC_BUYER_TO_SELLER);
         } catch (JSONException e) {

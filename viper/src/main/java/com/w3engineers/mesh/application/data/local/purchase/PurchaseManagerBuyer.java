@@ -2,6 +2,7 @@ package com.w3engineers.mesh.application.data.local.purchase;
 
 import android.app.Activity;
 import android.arch.lifecycle.LiveData;
+import android.os.RemoteException;
 import android.text.TextUtils;
 import android.widget.Toast;
 
@@ -38,6 +39,7 @@ public class PurchaseManagerBuyer extends PurchaseManager implements PayControll
 
     private DataPlanManager.DataPlanListener dataPlanListener;
     private WalletManager.WalletListener walletListener;
+    private String probableSellerId = null;
 
     private PurchaseManagerBuyer() {
         super();
@@ -242,9 +244,15 @@ public class PurchaseManagerBuyer extends PurchaseManager implements PayControll
     //******************Public Medthods******************//
     //***************************************************//
     public void buyData(double amount, String sellerAddress) {
+
+
+
+
+
         totalDataAmount = amount;
 
         try {
+            String currentSellerId = payController.getDataManager().getCurrentSellerId();
 
             int currentEndPoint = getEndpoint();
 
@@ -253,17 +261,21 @@ public class PurchaseManagerBuyer extends PurchaseManager implements PayControll
 
             prepareChannel(sellerAddress, purchase);
 
+            setCurrentSellerWithStatus(sellerAddress, PurchaseConstants.SELLERS_BTN_TEXT.PURCHASING);
+
+            if (dataPlanListener != null) {
+                dataPlanListener.onConnectingWithSeller(sellerAddress);
+            }
+
         } catch (ExecutionException e) {
             e.printStackTrace();
         } catch (InterruptedException e) {
             e.printStackTrace();
+        } catch (RemoteException e) {
+            e.printStackTrace();
         }
 
-        setCurrentSellerWithStatus(sellerAddress, PurchaseConstants.SELLERS_BTN_TEXT.PURCHASING);
 
-        if (dataPlanListener != null) {
-            dataPlanListener.onConnectingWithSeller(sellerAddress);
-        }
     }
 
     public void getMyBalanceInfo() {
@@ -429,14 +441,16 @@ public class PurchaseManagerBuyer extends PurchaseManager implements PayControll
             if (payController.getDataManager().isInternetSeller(address)) {
                 DataPlanManager.getInstance().processAllSeller(mContext);
             }
-            if (TextUtils.isEmpty(payController.getDataManager().getCurrentSellerId())){
+
+            if (TextUtils.isEmpty(payController.getDataManager().getCurrentSellerId()) && TextUtils.isEmpty(probableSellerId)){
                 List<Purchase> myOpenPurcheses  = databaseService.getMyPurchasesWithState(ethService.getAddress(), PurchaseConstants.CHANNEL_STATE.OPEN);
                 for (Purchase p : myOpenPurcheses){
                     if (payController.getDataManager().isUserConnected(p.sellerAddress) && p.totalDataAmount > p.usedDataAmount){
+                        probableSellerId = p.sellerAddress;
 
                         JSONObject jsonObject = new JSONObject();
                         jsonObject.put(PurchaseConstants.JSON_KEYS.MESSAME_FROM, ethService.getAddress());
-                        jsonObject.put(PurchaseConstants.JSON_KEYS.BUYER_ADDRESS, p.sellerAddress);
+                        jsonObject.put(PurchaseConstants.JSON_KEYS.BUYER_ADDRESS, p.buyerAddress);
 
                         jsonObject.put(PurchaseConstants.JSON_KEYS.SELLER_ADDRESS, p.sellerAddress);
                         jsonObject.put(PurchaseConstants.JSON_KEYS.OPEN_BLOCK, p.openBlockNumber);
@@ -467,6 +481,10 @@ public class PurchaseManagerBuyer extends PurchaseManager implements PayControll
 
     @Override
     public void onUserDisconnected(String address) {
+
+        if (probableSellerId.equalsIgnoreCase(address)){
+            probableSellerId = null;
+        }
 
         if (!TextUtils.isEmpty(giftRequestedSeller) && giftRequestedSeller.equals(address)){
             if (preferencesHelperDataplan.getEtherRequestStatus(1) == PurchaseConstants.GIFT_REQUEST_STATE.REQUESTED_TO_SELLER){

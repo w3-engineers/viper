@@ -259,9 +259,28 @@ public class PurchaseManagerSeller extends PurchaseManager implements PayControl
 
     private void syncWithBuyer(String buyerAddress) {
 
-        Purchase purchase = null;
         try {
-            purchase = databaseService.getPurchaseByState(PurchaseConstants.CHANNEL_STATE.OPEN, buyerAddress, ethService.getAddress());
+            Purchase purchase = databaseService.getPurchaseByState(PurchaseConstants.CHANNEL_STATE.OPEN, buyerAddress, ethService.getAddress());
+            if (purchase != null) {
+                try {
+                    JSONObject jsonObject = new JSONObject();
+                    jsonObject.put(PurchaseConstants.JSON_KEYS.MESSAME_FROM, ethService.getAddress());
+                    jsonObject.put(PurchaseConstants.JSON_KEYS.BUYER_ADDRESS, buyerAddress);
+
+                    jsonObject.put(PurchaseConstants.JSON_KEYS.OPEN_BLOCK, purchase.openBlockNumber);
+                    jsonObject.put(PurchaseConstants.JSON_KEYS.USED_DATA, purchase.usedDataAmount);
+                    jsonObject.put(PurchaseConstants.JSON_KEYS.TOTAL_DATA, purchase.totalDataAmount);
+                    jsonObject.put(PurchaseConstants.JSON_KEYS.BPS_BALANCE, purchase.balance);
+                    jsonObject.put(PurchaseConstants.JSON_KEYS.MESSAGE_BPS, purchase.balanceProof);
+                    jsonObject.put(PurchaseConstants.JSON_KEYS.MESSAGE_CHS, purchase.closingHash);
+
+                    setEndPointInfoInJson(jsonObject, purchase.blockChainEndpoint);
+
+                    payController.sendSyncMessageToBuyer(jsonObject, buyerAddress);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
         } catch (ExecutionException e) {
             e.printStackTrace();
         } catch (InterruptedException e) {
@@ -269,26 +288,7 @@ public class PurchaseManagerSeller extends PurchaseManager implements PayControl
         }
 
 
-        if (purchase != null) {
-            try {
-                JSONObject jsonObject = new JSONObject();
-                jsonObject.put(PurchaseConstants.JSON_KEYS.MESSAME_FROM, ethService.getAddress());
-                jsonObject.put(PurchaseConstants.JSON_KEYS.BUYER_ADDRESS, buyerAddress);
 
-                jsonObject.put(PurchaseConstants.JSON_KEYS.OPEN_BLOCK, purchase.openBlockNumber);
-                jsonObject.put(PurchaseConstants.JSON_KEYS.USED_DATA, purchase.usedDataAmount);
-                jsonObject.put(PurchaseConstants.JSON_KEYS.TOTAL_DATA, purchase.totalDataAmount);
-                jsonObject.put(PurchaseConstants.JSON_KEYS.BPS_BALANCE, purchase.balance);
-                jsonObject.put(PurchaseConstants.JSON_KEYS.MESSAGE_BPS, purchase.balanceProof);
-                jsonObject.put(PurchaseConstants.JSON_KEYS.MESSAGE_CHS, purchase.closingHash);
-
-                setEndPointInfoInJson(jsonObject, purchase.blockChainEndpoint);
-
-                payController.sendSyncMessageToBuyer(jsonObject, buyerAddress);
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-        }
     }
 
     private void giftEtherRequestSubmitted(boolean isSuccess, String message, String ethTrnxHash,
