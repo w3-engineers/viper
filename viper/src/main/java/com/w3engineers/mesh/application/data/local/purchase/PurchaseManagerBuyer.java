@@ -438,30 +438,31 @@ public class PurchaseManagerBuyer extends PurchaseManager implements PayControll
         try {
             if (payController.getDataManager().isInternetSeller(address)) {
                 DataPlanManager.getInstance().processAllSeller(mContext);
-            }
+                if (TextUtils.isEmpty(payController.getDataManager().getCurrentSellerId()) && TextUtils.isEmpty(probableSellerId)){
+                    Purchase purchase = databaseService.getPurchaseByState(PurchaseConstants.CHANNEL_STATE.OPEN, ethService.getAddress(), address);
+                    if (purchase != null && purchase.totalDataAmount > purchase.usedDataAmount){
+                        probableSellerId = purchase.sellerAddress;
 
-            if (TextUtils.isEmpty(payController.getDataManager().getCurrentSellerId()) && TextUtils.isEmpty(probableSellerId)){
-                Purchase purchase = databaseService.getPurchaseByState(PurchaseConstants.CHANNEL_STATE.OPEN, ethService.getAddress(), address);
-                if (purchase != null && purchase.totalDataAmount > purchase.usedDataAmount){
-                    probableSellerId = purchase.sellerAddress;
+                        JSONObject jsonObject = new JSONObject();
+                        jsonObject.put(PurchaseConstants.JSON_KEYS.MESSAME_FROM, ethService.getAddress());
+                        jsonObject.put(PurchaseConstants.JSON_KEYS.BUYER_ADDRESS, purchase.buyerAddress);
 
-                    JSONObject jsonObject = new JSONObject();
-                    jsonObject.put(PurchaseConstants.JSON_KEYS.MESSAME_FROM, ethService.getAddress());
-                    jsonObject.put(PurchaseConstants.JSON_KEYS.BUYER_ADDRESS, purchase.buyerAddress);
+                        jsonObject.put(PurchaseConstants.JSON_KEYS.SELLER_ADDRESS, purchase.sellerAddress);
+                        jsonObject.put(PurchaseConstants.JSON_KEYS.OPEN_BLOCK, purchase.openBlockNumber);
+                        jsonObject.put(PurchaseConstants.JSON_KEYS.USED_DATA, purchase.usedDataAmount);
+                        jsonObject.put(PurchaseConstants.JSON_KEYS.TOTAL_DATA, purchase.totalDataAmount);
+                        jsonObject.put(PurchaseConstants.JSON_KEYS.BPS_BALANCE, purchase.balance);
+                        jsonObject.put(PurchaseConstants.JSON_KEYS.MESSAGE_BPS, purchase.balanceProof);
+                        jsonObject.put(PurchaseConstants.JSON_KEYS.MESSAGE_CHS, purchase.closingHash);
 
-                    jsonObject.put(PurchaseConstants.JSON_KEYS.SELLER_ADDRESS, purchase.sellerAddress);
-                    jsonObject.put(PurchaseConstants.JSON_KEYS.OPEN_BLOCK, purchase.openBlockNumber);
-                    jsonObject.put(PurchaseConstants.JSON_KEYS.USED_DATA, purchase.usedDataAmount);
-                    jsonObject.put(PurchaseConstants.JSON_KEYS.TOTAL_DATA, purchase.totalDataAmount);
-                    jsonObject.put(PurchaseConstants.JSON_KEYS.BPS_BALANCE, purchase.balance);
-                    jsonObject.put(PurchaseConstants.JSON_KEYS.MESSAGE_BPS, purchase.balanceProof);
-                    jsonObject.put(PurchaseConstants.JSON_KEYS.MESSAGE_CHS, purchase.closingHash);
+                        setEndPointInfoInJson(jsonObject, purchase.blockChainEndpoint);
 
-                    setEndPointInfoInJson(jsonObject, purchase.blockChainEndpoint);
-
-                    payController.sendSyncMessageToSeller(jsonObject, purchase.sellerAddress);
+                        payController.sendSyncMessageToSeller(jsonObject, purchase.sellerAddress);
+                    }
                 }
             }
+
+
         } catch (Exception e){
             e.printStackTrace();
         }
@@ -470,7 +471,7 @@ public class PurchaseManagerBuyer extends PurchaseManager implements PayControll
     @Override
     public void onUserDisconnected(String address) {
 
-        if (probableSellerId.equalsIgnoreCase(address)){
+        if (probableSellerId != null && probableSellerId.equalsIgnoreCase(address)){
             probableSellerId = null;
         }
 
