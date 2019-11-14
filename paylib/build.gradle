@@ -1,4 +1,7 @@
 apply plugin: 'com.android.library'
+apply plugin: 'com.github.dcendents.android-maven'
+
+group = 'com.github.w3-engineers'
 
 android {
     compileSdkVersion 28
@@ -17,10 +20,10 @@ android {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
-            buildConfigField 'String', 'GIFT_DONATE_LINK', System.getenv('GIFT_DONATE_LINK').equals(null) ? GIFT_DONATE_LINK : System.getenv('GIFT_DONATE_LINK')
+//            buildConfigField 'String', 'GIFT_DONATE_LINK', System.getenv('GIFT_DONATE_LINK').equals(null) ? GIFT_DONATE_LINK : System.getenv('GIFT_DONATE_LINK')
         }
         debug {
-            buildConfigField 'String', 'GIFT_DONATE_LINK', System.getenv('GIFT_DONATE_LINK').equals(null) ? GIFT_DONATE_LINK : System.getenv('GIFT_DONATE_LINK')
+//            buildConfigField 'String', 'GIFT_DONATE_LINK', System.getenv('GIFT_DONATE_LINK').equals(null) ? GIFT_DONATE_LINK : System.getenv('GIFT_DONATE_LINK')
         }
     }
 
