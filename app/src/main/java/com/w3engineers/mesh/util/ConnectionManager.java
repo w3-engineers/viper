@@ -268,7 +268,7 @@ public class ConnectionManager {
             try {
                 String userId = getUserId();
                 String userJson = UserModel.getUserJson(userId);
-                viperClient.sendMessage(userId, nodeId, uniqueId.toString(), userJson.getBytes());
+                viperClient.sendMessage(userId, nodeId, uniqueId.toString(), userJson.getBytes(), false);
             } catch (RemoteException e) {
                 e.printStackTrace();
             }
@@ -304,7 +304,7 @@ public class ConnectionManager {
 
             try {
                 String userId = getUserId();
-                viperClient.sendMessage(userId, nodeId, messageId, userJson.getBytes());
+                viperClient.sendMessage(userId, nodeId, messageId, userJson.getBytes(), true);
             } catch (RemoteException e) {
                 e.printStackTrace();
             }
@@ -315,7 +315,7 @@ public class ConnectionManager {
         try {
             String userId = getUserId();
             String msgJson = MessageModel.buildMessage(messageModel, userId);
-            viperClient.sendMessage(userId, receiverId, messageModel.messageId, msgJson.getBytes());
+            viperClient.sendMessage(userId, receiverId, messageModel.messageId, msgJson.getBytes(), true);
         } catch (RemoteException e) {
             e.printStackTrace();
         }
