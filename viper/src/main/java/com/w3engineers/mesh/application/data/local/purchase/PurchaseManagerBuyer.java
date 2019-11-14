@@ -244,29 +244,28 @@ public class PurchaseManagerBuyer extends PurchaseManager implements PayControll
     //******************Public Medthods******************//
     //***************************************************//
     public void buyData(double amount, String sellerAddress) {
-
-
-
-
-
-        totalDataAmount = amount;
-
         try {
-            String currentSellerId = payController.getDataManager().getCurrentSellerId();
 
-            int currentEndPoint = getEndpoint();
+            if (!TextUtils.isEmpty(probableSellerId) || !TextUtils.isEmpty(payController.getDataManager().getCurrentSellerId())){
+                if (dataPlanListener != null) {
+                    dataPlanListener.onPurchaseFailed(sellerAddress, "You already have an active purchase in the same network.");
+                }
+            } else {
+                totalDataAmount = amount;
 
-            Purchase purchase = databaseService.getPurchaseByState(PurchaseConstants.CHANNEL_STATE.OPEN,
-                    ethService.getAddress(), sellerAddress, currentEndPoint);
+                int currentEndPoint = getEndpoint();
 
-            prepareChannel(sellerAddress, purchase);
+                Purchase purchase = databaseService.getPurchaseByState(PurchaseConstants.CHANNEL_STATE.OPEN,
+                        ethService.getAddress(), sellerAddress, currentEndPoint);
 
-            setCurrentSellerWithStatus(sellerAddress, PurchaseConstants.SELLERS_BTN_TEXT.PURCHASING);
+                prepareChannel(sellerAddress, purchase);
 
-            if (dataPlanListener != null) {
-                dataPlanListener.onConnectingWithSeller(sellerAddress);
+                setCurrentSellerWithStatus(sellerAddress, PurchaseConstants.SELLERS_BTN_TEXT.PURCHASING);
+
+                if (dataPlanListener != null) {
+                    dataPlanListener.onConnectingWithSeller(sellerAddress);
+                }
             }
-
         } catch (ExecutionException e) {
             e.printStackTrace();
         } catch (InterruptedException e) {
@@ -382,7 +381,6 @@ public class PurchaseManagerBuyer extends PurchaseManager implements PayControll
 
                     purchase.state = PurchaseConstants.CHANNEL_STATE.CLOSING;
                     databaseService.updatePurchase(purchase);
-
                     setCurrentSellerWithStatus(sellerId, PurchaseConstants.SELLERS_BTN_TEXT.CLOSING);
 
                     if (dataPlanListener != null) {
@@ -443,37 +441,27 @@ public class PurchaseManagerBuyer extends PurchaseManager implements PayControll
             }
 
             if (TextUtils.isEmpty(payController.getDataManager().getCurrentSellerId()) && TextUtils.isEmpty(probableSellerId)){
-                List<Purchase> myOpenPurcheses  = databaseService.getMyPurchasesWithState(ethService.getAddress(), PurchaseConstants.CHANNEL_STATE.OPEN);
-                for (Purchase p : myOpenPurcheses){
-                    if (payController.getDataManager().isUserConnected(p.sellerAddress) && p.totalDataAmount > p.usedDataAmount){
-                        probableSellerId = p.sellerAddress;
+                Purchase purchase = databaseService.getPurchaseByState(PurchaseConstants.CHANNEL_STATE.OPEN, ethService.getAddress(), address);
+                if (purchase != null && purchase.totalDataAmount > purchase.usedDataAmount){
+                    probableSellerId = purchase.sellerAddress;
 
-                        JSONObject jsonObject = new JSONObject();
-                        jsonObject.put(PurchaseConstants.JSON_KEYS.MESSAME_FROM, ethService.getAddress());
-                        jsonObject.put(PurchaseConstants.JSON_KEYS.BUYER_ADDRESS, p.buyerAddress);
+                    JSONObject jsonObject = new JSONObject();
+                    jsonObject.put(PurchaseConstants.JSON_KEYS.MESSAME_FROM, ethService.getAddress());
+                    jsonObject.put(PurchaseConstants.JSON_KEYS.BUYER_ADDRESS, purchase.buyerAddress);
 
-                        jsonObject.put(PurchaseConstants.JSON_KEYS.SELLER_ADDRESS, p.sellerAddress);
-                        jsonObject.put(PurchaseConstants.JSON_KEYS.OPEN_BLOCK, p.openBlockNumber);
-                        jsonObject.put(PurchaseConstants.JSON_KEYS.USED_DATA, p.usedDataAmount);
-                        jsonObject.put(PurchaseConstants.JSON_KEYS.TOTAL_DATA, p.totalDataAmount);
-                        jsonObject.put(PurchaseConstants.JSON_KEYS.BPS_BALANCE, p.balance);
-                        jsonObject.put(PurchaseConstants.JSON_KEYS.MESSAGE_BPS, p.balanceProof);
-                        jsonObject.put(PurchaseConstants.JSON_KEYS.MESSAGE_CHS, p.closingHash);
+                    jsonObject.put(PurchaseConstants.JSON_KEYS.SELLER_ADDRESS, purchase.sellerAddress);
+                    jsonObject.put(PurchaseConstants.JSON_KEYS.OPEN_BLOCK, purchase.openBlockNumber);
+                    jsonObject.put(PurchaseConstants.JSON_KEYS.USED_DATA, purchase.usedDataAmount);
+                    jsonObject.put(PurchaseConstants.JSON_KEYS.TOTAL_DATA, purchase.totalDataAmount);
+                    jsonObject.put(PurchaseConstants.JSON_KEYS.BPS_BALANCE, purchase.balance);
+                    jsonObject.put(PurchaseConstants.JSON_KEYS.MESSAGE_BPS, purchase.balanceProof);
+                    jsonObject.put(PurchaseConstants.JSON_KEYS.MESSAGE_CHS, purchase.closingHash);
 
-                        setEndPointInfoInJson(jsonObject, p.blockChainEndpoint);
+                    setEndPointInfoInJson(jsonObject, purchase.blockChainEndpoint);
 
-                        payController.sendSyncMessageToSeller(jsonObject, p.sellerAddress);
-
-
-                        break;
-                    }
+                    payController.sendSyncMessageToSeller(jsonObject, purchase.sellerAddress);
                 }
-
-
             }
-
-
-
         } catch (Exception e){
             e.printStackTrace();
         }
@@ -810,13 +798,30 @@ public class PurchaseManagerBuyer extends PurchaseManager implements PayControll
     @Override
     public void onProbableSellerDisconnected(String sellerId) {
         MeshLog.v("onProbableSellerDisconnected " + sellerId);
+
         try {
             List<Purchase> myOpenPurcheses  = databaseService.getMyPurchasesWithState(ethService.getAddress(), PurchaseConstants.CHANNEL_STATE.OPEN);
             for (Purchase p : myOpenPurcheses){
-                if (payController.getDataManager().isUserConnected(p.sellerAddress)){
+                if (payController.getDataManager().isUserConnected(p.sellerAddress) && p.totalDataAmount > p.usedDataAmount){
+                    probableSellerId = p.sellerAddress;
+
                     JSONObject jsonObject = new JSONObject();
                     jsonObject.put(PurchaseConstants.JSON_KEYS.MESSAME_FROM, ethService.getAddress());
-                    payController.sendConnectBuyer(jsonObject,p.sellerAddress);
+                    jsonObject.put(PurchaseConstants.JSON_KEYS.BUYER_ADDRESS, p.buyerAddress);
+
+                    jsonObject.put(PurchaseConstants.JSON_KEYS.SELLER_ADDRESS, p.sellerAddress);
+                    jsonObject.put(PurchaseConstants.JSON_KEYS.OPEN_BLOCK, p.openBlockNumber);
+                    jsonObject.put(PurchaseConstants.JSON_KEYS.USED_DATA, p.usedDataAmount);
+                    jsonObject.put(PurchaseConstants.JSON_KEYS.TOTAL_DATA, p.totalDataAmount);
+                    jsonObject.put(PurchaseConstants.JSON_KEYS.BPS_BALANCE, p.balance);
+                    jsonObject.put(PurchaseConstants.JSON_KEYS.MESSAGE_BPS, p.balanceProof);
+                    jsonObject.put(PurchaseConstants.JSON_KEYS.MESSAGE_CHS, p.closingHash);
+
+                    setEndPointInfoInJson(jsonObject, p.blockChainEndpoint);
+
+                    payController.sendSyncMessageToSeller(jsonObject, p.sellerAddress);
+
+
                     break;
                 }
             }
