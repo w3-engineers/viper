@@ -29,7 +29,7 @@
             android:paddingRight="@dimen/padding_10"
             android:paddingBottom="@dimen/padding_10"
             android:text="@{message.message}"
-            android:textColor="@color/White"
+            android:textColor="@color/white"
             android:textSize="@dimen/text_small_body_14"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />

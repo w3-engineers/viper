@@ -1,54 +1,80 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:gravity="bottom"
-    android:background="@android:color/transparent">
+    android:background="@android:color/transparent"
+    android:gravity="bottom">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_alignParentTop="true"
+        android:layout_marginTop="50dp"
+        android:orientation="vertical"
+        android:background="@color/white">
+
+       <TextView
+           android:layout_width="wrap_content"
+           android:layout_height="wrap_content"
+           android:layout_marginTop="@dimen/margin_60"
+           android:layout_gravity="center_horizontal"
+           android:layout_marginStart="@dimen/margin_20"
+           android:layout_marginEnd="@dimen/margin_20"
+           android:gravity="center"
+           android:textSize="@dimen/text_size_20"
+           android:textColor="@color/black"
+           android:text="My Wallet Address" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/margin_20"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginStart="@dimen/margin_40"
+            android:layout_marginEnd="@dimen/margin_40"
+            android:gravity="center"
+            android:textSize="@dimen/text_size_14"
+            android:textColor="@color/ninety_black"
+            android:text="jhgdagdgsa3546576asdjahsjkdshad47586a7sadasdsalkdjasoiudsajdlskaj546768adjasg"/>
+
+
+        <ImageView
+            android:id="@+id/qrImage"
+            android:layout_marginTop="@dimen/margin_20"
+            android:layout_width="@dimen/height_150"
+            android:layout_height="@dimen/height_150"
+            android:layout_gravity="center"
+            android:src="@mipmap/qr_code" />
+
+        <Button
+            android:id="@+id/button_book_token"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/margin_20"
+            android:layout_marginLeft="@dimen/margin_40"
+            android:layout_marginRight="@dimen/margin_40"
+            android:background="@drawable/rectangle_button_shape"
+            android:text="@string/copy_address"
+            android:textAllCaps="true"
+            android:textColor="@color/white"
+            android:textSize="@dimen/text_size_16"/>
+
+
+    </LinearLayout>
 
     <LinearLayout
         android:id="@+id/imageLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:gravity="bottom|center_horizontal"
-        android:background="@android:color/transparent">
+        android:background="@android:color/transparent"
+        android:gravity="bottom|center_horizontal">
 
         <de.hdodenhof.circleimageview.CircleImageView
-            android:id="@+id/infoCIV"
-            android:layout_width="100dp"
-            android:layout_height="100dp"
-            tools:src="@mipmap/ic_profile_user"
-            app:civ_border_color="@color/colorPrimary"
-            app:civ_border_width="1dp"/>
+            android:layout_width="@dimen/height_100"
+            android:layout_height="@dimen/width_100"
+            android:src="@mipmap/ic_profile_user" />
 
     </LinearLayout>
-
-    <RelativeLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@color/colorPrimary"
-        android:layout_below="@+id/imageLayout"
-        android:layout_marginTop="1dp">
-
-        <android.support.design.widget.TabLayout
-            android:id="@+id/playerTabs"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:minHeight="?android:attr/actionBarSize"
-            app:tabTextAppearance="@android:style/TextAppearance.Widget.TabWidget"
-            app:tabIndicatorHeight="3dp"
-            app:tabIndicatorColor="@color/colorPrimary"
-
-            app:tabSelectedTextColor="@color/colorPrimary" />
-
-        <android.support.v4.view.ViewPager
-            android:id="@+id/playerVP"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:minHeight="100dp"
-            android:layout_below="@+id/playerTabs"/>
-
-    </RelativeLayout>
 
 </RelativeLayout>

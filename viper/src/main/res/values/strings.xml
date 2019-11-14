@@ -152,5 +152,7 @@
     <string name="pending_balance_point">Pending balance 8.8 point</string>
     <string name="view_transactions">View Transactions</string>
 
+    <string name="copy_address">Copy address</string>
+
 
 </resources>

@@ -229,7 +229,7 @@ public class WalletActivity extends TelemeshBaseActivity implements WalletManage
         }/* else if (v.getId() == R.id.eth_block) {
             showRequestAlert(walletManager.getCurrencyTypeMessage("%s Request"), walletManager.getCurrencyTypeMessage("Do you want to send a request for %s?"), REQUEST_TYPE.ETHER);
         }*/ else if (v.getId() == R.id.tmesh_block) {
-            showRequestAlert("Purchase Token", "Do you want to send a request for token?", REQUEST_TYPE.TOKEN);
+          //  showRequestAlert("Purchase Token", "Do you want to send a request for token?", REQUEST_TYPE.TOKEN);
         } else if (v.getId() == R.id.currency) {
             //openCurrencyPopup(v);
         }
