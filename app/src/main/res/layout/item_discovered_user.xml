@@ -41,9 +41,10 @@
                     android:text="User Name"
                     android:singleLine="true"
                     android:maxLines="1"
+                    android:gravity="start"
                     android:ellipsize="end"
-                    app:layout_constraintRight_toLeftOf="@+id/text_view_single_msg"
-                    app:layout_constraintLeft_toRightOf="@id/image_view"
+                    app:layout_constraintEnd_toStartOf="@+id/user_link_type"
+                    app:layout_constraintStart_toEndOf="@id/image_view"
                     app:layout_constraintTop_toTopOf="parent" />
 
                 <TextView

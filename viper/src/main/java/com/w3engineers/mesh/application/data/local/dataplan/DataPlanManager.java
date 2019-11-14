@@ -1,7 +1,6 @@
 package com.w3engineers.mesh.application.data.local.dataplan;
 
 import android.arch.lifecycle.LiveData;
-import android.arch.lifecycle.LiveDataReactiveStreams;
 import android.content.Context;
 import android.content.Intent;
 import android.os.RemoteException;
@@ -22,7 +21,6 @@ import com.w3engineers.mesh.application.data.local.purchase.PurchaseManagerSelle
 import com.w3engineers.mesh.application.ui.dataplan.DataPlanActivity;
 import com.w3engineers.mesh.util.EthereumServiceUtil;
 import com.w3engineers.mesh.util.MeshLog;
-import com.w3engineers.mesh.util.lib.mesh.DataManager;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -103,7 +101,7 @@ public class DataPlanManager {
             MeshLog.v("sellerMode dpm " + newRole);
             preferencesHelperDataplan.setDataPlanRole(newRole);
             payController.getDataManager().restartMesh(newRole);
-        } catch (RemoteException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
@@ -115,10 +113,14 @@ public class DataPlanManager {
             PurchaseManagerBuyer.getInstance().setDataPlanListener(dataPlanListener);
             PurchaseManagerSeller.getInstance().destroyObject();
 
+            PurchaseManagerBuyer.getInstance().setPayControllerListener();
+
         } else if (getDataPlanRole() == DataPlanConstants.USER_ROLE.DATA_SELLER) {
 
             PurchaseManagerBuyer.getInstance().setDataPlanListener(null);
             PurchaseManagerBuyer.getInstance().destroyObject();
+
+            PurchaseManagerSeller.getInstance().setPayControllerListener();
         }
         if (dataPlanListener != null){
             dataPlanListener.onRoleSwitchCompleted();
@@ -158,7 +160,6 @@ public class DataPlanManager {
     public long getSellDataAmount() {
         return preferencesHelperDataplan.getSellDataAmount();
     }
-
 
     public void setSellFromDate(long fromDate) {
         preferencesHelperDataplan.setSellFromDate(fromDate);
@@ -331,7 +332,6 @@ public class DataPlanManager {
                 .setLabel(label)
                 .setBtnText(PurchaseConstants.SELLERS_BTN_TEXT.PURCHASE);
     }
-
 
     private void setDataManagerObserver(){
         AppDataObserver.on().startObserver(ApiEvent.TRANSPORT_INIT, event -> {

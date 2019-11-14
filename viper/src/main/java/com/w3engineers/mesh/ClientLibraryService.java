@@ -19,10 +19,12 @@ import com.w3engineers.mesh.application.data.remote.service.BaseTmServiceNotific
 import com.w3engineers.mesh.util.MeshApp;
 import com.w3engineers.mesh.util.MeshLog;
 import com.w3engineers.mesh.util.lib.mesh.DataManager;
+import com.w3engineers.models.UserInfo;
+
+import java.util.List;
 
 
 public class ClientLibraryService extends Service {
-
 
     @Override
     public void onCreate() {
@@ -98,6 +100,11 @@ public class ClientLibraryService extends Service {
             MeshApp.getContext().sendBroadcast(intent);
         }
 
+        @Override
+        public void onUserInfoReceive(List<UserInfo> userInfoList) throws RemoteException {
+
+        }
+
 
         @Override
         public void setServiceForeground(boolean isForeGround) throws RemoteException {
@@ -130,9 +137,8 @@ public class ClientLibraryService extends Service {
         }
 
         @Override
-        public void onUserPublicKeyReceived(String address, String publicKey) throws RemoteException {
-            MeshLog.v("onUserPublicKeyReceived cls");
-            DataManager.on().onUserPublicKeyReceived(address, publicKey);
+        public void onProbableSellerDisconnected(String sellerId) throws RemoteException {
+
         }
     };
 

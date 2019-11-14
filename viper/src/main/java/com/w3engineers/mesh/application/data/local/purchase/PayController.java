@@ -18,6 +18,7 @@ import com.w3engineers.mesh.application.data.model.PayMessage;
 import com.w3engineers.mesh.application.data.model.PayMessageAck;
 import com.w3engineers.mesh.application.data.model.PeerAdd;
 import com.w3engineers.mesh.application.data.model.PeerRemoved;
+import com.w3engineers.mesh.application.data.model.SellerRemoved;
 import com.w3engineers.mesh.application.data.remote.model.BuyerPendingMessage;
 import com.w3engineers.mesh.util.MeshApp;
 import com.w3engineers.mesh.util.MeshLog;
@@ -28,6 +29,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.web3j.crypto.Credentials;
 
+import java.util.IllegalFormatCodePointException;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -102,6 +104,13 @@ public class PayController {
         });
 
 
+        AppDataObserver.on().startObserver(ApiEvent.SELLER_REMOVED,event -> {
+            MeshLog.v("SELLER_REMOVED received " );
+            SellerRemoved sellerRemoved = (SellerRemoved) event;
+            if (payControllerListenerForBuyer != null){
+                payControllerListenerForBuyer.onProbableSellerDisconnected(sellerRemoved.sellerId);
+            }
+        });
     }
 
     private void onMessageReceived(String sender, byte[] paymentData) {
@@ -123,7 +132,12 @@ public class PayController {
                 switch (type) {
 
                     case PurchaseConstants.MESSAGE_TYPES.INIT_PURCHASE:
-                        payControllerListenerForSeller.onPurchaseInitRequested(fromAddress, endPointType);
+                        if (payControllerListenerForSeller != null){
+                            payControllerListenerForSeller.onPurchaseInitRequested(fromAddress, endPointType);
+                        } else {
+                            MeshLog.v("INIT_PURCHASE Listener not found");
+                        }
+
                         break;
 
                     case PurchaseConstants.MESSAGE_TYPES.INIT_PURCHASE_OK:
@@ -424,6 +438,12 @@ public class PayController {
                         }
                         break;
 
+                    case PurchaseConstants.MESSAGE_TYPES.CONNECT_BUYER:
+                        if (payControllerListenerForSeller != null) {
+                            payControllerListenerForSeller.onUserConnected(fromAddress);
+                        }
+                        break;
+
                     default:
                         break;
 
@@ -655,6 +675,8 @@ public class PayController {
 
         void giftResponse(boolean status, double ethBalance,
                           double tokenBalance, int endPoint);
+        void onProbableSellerDisconnected(String sellerId);
+
     }
 
     public void setBuyerListener(PayControllerListenerForBuyer listener1) {
@@ -887,6 +909,16 @@ public class PayController {
         }
     }
 
+//    public void sendDisconnectBuyer(JSONObject jsonObject, String receiver) {
+////        MeshLog.v("sendChannelClosed " + jsonObject.toString());
+////        try {
+////            jsonObject.put(PurchaseConstants.JSON_KEYS.MESSAGE_TYPE, PurchaseConstants.MESSAGE_TYPES.DISCONNECT_BUYER);
+////        } catch (JSONException e) {
+////            e.printStackTrace();
+////        }
+////        sendPayMessage(receiver, jsonObject.toString());
+////    }
+
     private void sendPayMessage(String receiver, String message) {
         String messageId = "";
         sendPayMessageToTransport(receiver, message, messageId.toString());
@@ -954,6 +986,16 @@ public class PayController {
         MeshLog.p("sendEtherRequestMessageOk " + jo.toString());
         try {
             jo.put(PurchaseConstants.JSON_KEYS.MESSAGE_TYPE, PurchaseConstants.MESSAGE_TYPES.ETHER_REQUEST_RESPONSE);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        sendPayMessage(receiver, jo.toString());
+    }
+
+    public void sendConnectBuyer(JSONObject jo, String receiver) {
+        MeshLog.p("sendConnectBuyer " + jo.toString());
+        try {
+            jo.put(PurchaseConstants.JSON_KEYS.MESSAGE_TYPE, PurchaseConstants.MESSAGE_TYPES.CONNECT_BUYER);
         } catch (JSONException e) {
             e.printStackTrace();
         }

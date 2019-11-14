@@ -11,6 +11,7 @@ import com.w3engineers.mesh.application.data.local.db.DatabaseService;
 import com.w3engineers.mesh.application.data.local.db.datausage.Datausage;
 import com.w3engineers.mesh.application.data.local.db.purchase.Purchase;
 import com.w3engineers.mesh.application.data.local.helper.PreferencesHelperDataplan;
+import com.w3engineers.mesh.application.data.local.wallet.WalletManager;
 import com.w3engineers.mesh.application.ui.util.ToastUtil;
 import com.w3engineers.mesh.util.DialogUtil;
 import com.w3engineers.mesh.util.EthereumServiceUtil;
@@ -31,15 +32,12 @@ public class PurchaseManagerBuyer extends PurchaseManager implements PayControll
     private static PurchaseManagerBuyer purchaseManagerBuyer;
     private double totalDataAmount;
     private PurchaseManagerBuyerListener purchaseManagerBuyerListener;
-    private MyBalanceInfoListener myBalanceInfoListener;
-    private EtherRequestListener etherRequestListener;
-    private TokenRequestListener tokenRequestListener;
-    private GiftRequestListener giftRequestListener;
 
     private boolean isWarningShown;
     private String giftRequestedSeller = null;
 
     private DataPlanManager.DataPlanListener dataPlanListener;
+    private WalletManager.WalletListener walletListener;
 
     private PurchaseManagerBuyer() {
         super();
@@ -55,6 +53,10 @@ public class PurchaseManagerBuyer extends PurchaseManager implements PayControll
 
     public void setDataPlanListener(DataPlanManager.DataPlanListener dataPlanListener) {
         this.dataPlanListener = dataPlanListener;
+    }
+
+    public void setWalletListener(WalletManager.WalletListener walletListener) {
+        this.walletListener = walletListener;
     }
 
     //***************************************************//
@@ -262,9 +264,6 @@ public class PurchaseManagerBuyer extends PurchaseManager implements PayControll
         payController.sendInitPurchase(jsonObject, sellerAddress);
     }
 
-
-
-
     //***************************************************//
     //******************Public Medthods******************//
     //***************************************************//
@@ -298,14 +297,15 @@ public class PurchaseManagerBuyer extends PurchaseManager implements PayControll
     }*/
     
 
-    public void getMyBalanceInfo(MyBalanceInfoListener listener) {
+    public void getMyBalanceInfo() {
         MeshLog.p("getMyBalanceInfo");
-        myBalanceInfoListener = listener;
         try {
             List<String> sellerIds = payController.getDataManager().getInternetSellers();
             if (sellerIds.size() == 0) {
-                if (myBalanceInfoListener != null)
-                    myBalanceInfoListener.onBalanceErrorReceived("No internet seller connected.");
+
+                if (walletListener != null) {
+                    walletListener.onBalanceInfo(false, "No internet seller connected.");
+                }
             } else {
                 String sellerId = sellerIds.get(0);
                 String query = PurchaseConstants.INFO_KEYS.ETH_BALANCE + "," + PurchaseConstants.INFO_KEYS.TKN_BALANCE;
@@ -319,14 +319,15 @@ public class PurchaseManagerBuyer extends PurchaseManager implements PayControll
 
     }
 
-    public void sendEtherRequest(EtherRequestListener listener) {
-
-        etherRequestListener = listener;
+    public void sendEtherRequest() {
 
         try {
             List<String> sellerIds = payController.getDataManager().getInternetSellers();
             if (sellerIds.size() == 0) {
-                listener.onResponseReceived(false, null, "No internet provider connected");
+
+                if (walletListener != null) {
+                    walletListener.onEtherRequestResponse(false, "No internet provider connected");
+                }
             } else {
                 String sellerId = sellerIds.get(0);
                 JSONObject jsonObject = new JSONObject();
@@ -345,12 +346,16 @@ public class PurchaseManagerBuyer extends PurchaseManager implements PayControll
 
     }
 
-    public void sendTokenRequest(TokenRequestListener listener) {
-        tokenRequestListener = listener;
+    public void sendTokenRequest() {
+
         try {
             List<String> sellerIds = payController.getDataManager().getInternetSellers();
             if (sellerIds.size() == 0) {
-                listener.onTokenRequestResponseReceived(false, null, "No internet provider connected", 0, 0);
+
+                if (walletListener != null) {
+                    walletListener.onTokenRequestResponse(false, "No internet provider connected");
+                }
+
             } else {
                 String sellerId = sellerIds.get(0);
 
@@ -418,8 +423,7 @@ public class PurchaseManagerBuyer extends PurchaseManager implements PayControll
         }
     }
 
-    public boolean giftEtherForOtherNetwork(GiftRequestListener giftRequestListener) {
-        this.giftRequestListener = giftRequestListener;
+    public boolean giftEtherForOtherNetwork() {
 
         try {
             List<String> sellerIds = payController.getDataManager().getInternetSellers();
@@ -437,13 +441,7 @@ public class PurchaseManagerBuyer extends PurchaseManager implements PayControll
         payController.setBuyerListener(null);
 
         purchaseManagerBuyer = null;
-        payController = null;
-        ethService = null;
-        dataPlanListener = null;
-        databaseService = null;
-        myBalanceInfoListener = null;
-        etherRequestListener = null;
-        tokenRequestListener = null;
+        walletListener = null;
     }
 
     public void setPayControllerListener() {
@@ -472,11 +470,7 @@ public class PurchaseManagerBuyer extends PurchaseManager implements PayControll
     @Override
     public void onUserDisconnected(String address) {
 
-        PreferencesHelperDataplan preferencesHelperDataplan =
-                PreferencesHelperDataplan.on();
-
-        if (!TextUtils.isEmpty(giftRequestedSeller)
-                && giftRequestedSeller.equals(address)){
+        if (!TextUtils.isEmpty(giftRequestedSeller) && giftRequestedSeller.equals(address)){
             if (preferencesHelperDataplan.getEtherRequestStatus(1) == PurchaseConstants.GIFT_REQUEST_STATE.REQUESTED_TO_SELLER){
                 preferencesHelperDataplan.setRequestedForEther(PurchaseConstants.GIFT_REQUEST_STATE.NOT_REQUESTED_YET, 1);
             }
@@ -484,7 +478,6 @@ public class PurchaseManagerBuyer extends PurchaseManager implements PayControll
                 preferencesHelperDataplan.setRequestedForEther(PurchaseConstants.GIFT_REQUEST_STATE.NOT_REQUESTED_YET, 2);
             }
         }
-
         DataPlanManager.getInstance().precessDisconnectedSeller(mContext, address);
     }
 
@@ -499,8 +492,8 @@ public class PurchaseManagerBuyer extends PurchaseManager implements PayControll
 
                     EthereumServiceUtil.getInstance(mContext).updateCurrencyAndToken(endPointType, ethBalance, tknBalance);
 
-                    if (myBalanceInfoListener != null) {
-                        myBalanceInfoListener.onBalanceInfoReceived(ethBalance, tknBalance);
+                    if (walletListener != null) {
+                        walletListener.onBalanceInfo(true, "Balance updated");
                     }
 
                 } catch (Exception e) {
@@ -541,30 +534,28 @@ public class PurchaseManagerBuyer extends PurchaseManager implements PayControll
 
                             payController.sendBuyToken(jsonObject, from);
 
-                            if (tokenRequestListener != null) {
-                                tokenRequestListener.onTokenRequestResponseReceived(true, from, "Purchase request sent.", token, currency);
+                            if (walletListener != null) {
+                                walletListener.onTokenRequestResponse(true, "Purchase request sent.");
                             }
 
-
                         } else {
-                            if (tokenRequestListener != null) {
-                                tokenRequestListener.onTokenRequestResponseReceived(false, from, Util.getCurrencyTypeMessage("You don't have enough %s."), token, currency);
+
+                            if (walletListener != null) {
+                                walletListener.onTokenRequestResponse(false, Util.getCurrencyTypeMessage("You don't have enough %s."));
                             }
                         }
                     } else {
-                        if (tokenRequestListener != null) {
-                            tokenRequestListener.onTokenRequestResponseReceived(false, from, "Can't reach network, please try again later.", token, currency);
+
+                        if (walletListener != null) {
+                            walletListener.onTokenRequestResponse(false, "Can't reach network, please try again later.");
                         }
                     }
 
 
-                } catch (JSONException e) {
-                    if (tokenRequestListener != null) {
-                        tokenRequestListener.onTokenRequestResponseReceived(false, from, e.getMessage(), token, currency);
-                    }
                 } catch (Exception e) {
-                    if (tokenRequestListener != null) {
-                        tokenRequestListener.onTokenRequestResponseReceived(false, from, e.getMessage(), token, currency);
+
+                    if (walletListener != null) {
+                        walletListener.onTokenRequestResponse(false, e.getMessage());
                     }
                 }
 
@@ -704,8 +695,9 @@ public class PurchaseManagerBuyer extends PurchaseManager implements PayControll
     public void onInfoErrorReceived(String from, int purpose, String msg) {
         switch (purpose) {
             case PurchaseConstants.INFO_PURPOSES.REFRESH_BALANCE:
-                if (myBalanceInfoListener != null) {
-                    myBalanceInfoListener.onBalanceErrorReceived(msg);
+
+                if (walletListener != null) {
+                    walletListener.onBalanceInfo(false, msg);
                 }
                 break;
             default:
@@ -745,7 +737,7 @@ public class PurchaseManagerBuyer extends PurchaseManager implements PayControll
             MeshLog.v("giftEther giftRequestSubmitted " + submitMessage);
             if (failedBy.equals("admin")){
                 preferencesHelperDataplan.setRequestedForEther(PurchaseConstants.GIFT_REQUEST_STATE.GOT_GIFT_ETHER, endPoint);
-                getMyBalanceInfo(null);
+                getMyBalanceInfo();
             }else {
                 preferencesHelperDataplan.setRequestedForEther(PurchaseConstants.GIFT_REQUEST_STATE.NOT_REQUESTED_YET, endPoint);
 
@@ -762,8 +754,8 @@ public class PurchaseManagerBuyer extends PurchaseManager implements PayControll
     }
 
     private void sendGiftListener(boolean status, boolean isGifted, String message) {
-        if (giftRequestListener != null) {
-            giftRequestListener.onGiftResponse(status, isGifted, message);
+        if (walletListener != null) {
+            walletListener.onGiftResponse(status, isGifted, message);
         }
     }
 
@@ -797,6 +789,24 @@ public class PurchaseManagerBuyer extends PurchaseManager implements PayControll
             preferencesHelperDataplan.setRequestedForEther(PurchaseConstants.GIFT_REQUEST_STATE.NOT_REQUESTED_YET, endPoint);
         }
 
+    }
+
+    @Override
+    public void onProbableSellerDisconnected(String sellerId) {
+        MeshLog.v("onProbableSellerDisconnected " + sellerId);
+        try {
+            List<Purchase> myOpenPurcheses  = databaseService.getMyPurchasesWithState(ethService.getAddress(), PurchaseConstants.CHANNEL_STATE.OPEN);
+            for (Purchase p : myOpenPurcheses){
+                if (payController.getDataManager().isUserConnected(p.sellerAddress)){
+                    JSONObject jsonObject = new JSONObject();
+                    jsonObject.put(PurchaseConstants.JSON_KEYS.MESSAME_FROM, ethService.getAddress());
+                    payController.sendConnectBuyer(jsonObject,p.sellerAddress);
+                    break;
+                }
+            }
+        } catch (Exception e){
+            e.printStackTrace();
+        }
     }
 
     @Override
@@ -867,12 +877,14 @@ public class PurchaseManagerBuyer extends PurchaseManager implements PayControll
     @Override
     public void onReceivedEtherRequestResponse(String from, int responseCode) {
         if (responseCode == 200) {
-            if (etherRequestListener != null) {
-                etherRequestListener.onResponseReceived(true, from, Util.getCurrencyTypeMessage("Request has been sent, %s will be added to your address soon."));
+
+            if (walletListener != null) {
+                walletListener.onEtherRequestResponse(true, Util.getCurrencyTypeMessage("Request has been sent, %s will be added to your address soon."));
             }
         } else {
-            if (etherRequestListener != null) {
-                etherRequestListener.onResponseReceived(false, from, Util.getCurrencyTypeMessage("%s request rejected!"));
+
+            if (walletListener != null) {
+                walletListener.onEtherRequestResponse(false, Util.getCurrencyTypeMessage("%s request rejected!"));
             }
         }
     }
@@ -883,8 +895,9 @@ public class PurchaseManagerBuyer extends PurchaseManager implements PayControll
     @Override
     public void onBuyTokenResponseReceived(String from, double tokenValue, double ethValue, int endPointType) {
         EthereumServiceUtil.getInstance(mContext).updateCurrencyAndToken(endPointType, ethValue, tokenValue);
-        if (tokenRequestListener != null) {
-            tokenRequestListener.onTokenRequestResponseReceived(true, from, "Congratulatioms, Token added to your account.", tokenValue, ethValue);
+
+        if (walletListener != null) {
+            walletListener.onTokenRequestResponse(true, "Congratulatioms, Token added to your account.");
         }
     }
 
@@ -1125,6 +1138,8 @@ public class PurchaseManagerBuyer extends PurchaseManager implements PayControll
                 dataPlanListener.onPurchaseCloseSuccess(closingPurchase.sellerAddress);
             }
 
+            payController.getDataManager().disconnectFromInternet();
+
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -1168,8 +1183,9 @@ public class PurchaseManagerBuyer extends PurchaseManager implements PayControll
                 break;
 
             case PurchaseConstants.REQUEST_TYPES.BUY_TOKEN:
-                if (tokenRequestListener != null) {
-                    tokenRequestListener.onTokenRequestResponseReceived(success, fromAddress, msg, 0, 0);
+
+                if (walletListener != null) {
+                    walletListener.onTokenRequestResponse(success, msg);
                 }
                 break;
 
@@ -1209,14 +1225,15 @@ public class PurchaseManagerBuyer extends PurchaseManager implements PayControll
                 break;
 
             case PurchaseConstants.INFO_PURPOSES.REFRESH_BALANCE:
-                if (myBalanceInfoListener != null) {
-                    myBalanceInfoListener.onBalanceErrorReceived(internetProviderError);
+                if (walletListener != null) {
+                    walletListener.onBalanceInfo(false, internetProviderError);
                 }
                 break;
 
             case PurchaseConstants.INFO_PURPOSES.BUY_TOKEN:
-                if (tokenRequestListener != null) {
-                    tokenRequestListener.onTokenRequestResponseReceived(false, null, internetProviderError, 0, 0);
+
+                if (walletListener != null) {
+                    walletListener.onTokenRequestResponse(false, internetProviderError);
                 }
                 break;
 
@@ -1238,8 +1255,9 @@ public class PurchaseManagerBuyer extends PurchaseManager implements PayControll
                 break;
 
             case PurchaseConstants.TimeoutPurpose.INIT_ETHER:
-                if (etherRequestListener != null) {
-                    etherRequestListener.onResponseReceived(false, null, internetProviderError);
+
+                if (walletListener != null) {
+                    walletListener.onEtherRequestResponse(false, internetProviderError);
                 }
                 break;
 
@@ -1283,7 +1301,7 @@ public class PurchaseManagerBuyer extends PurchaseManager implements PayControll
         void onTopUpFailed(String sellerAddress, String msg);
     }
 
-    public interface SellerSearchListener {
+    /*public interface SellerSearchListener {
         void onSellerFoundSuccess(String sellerId);
 
         void onSellerFoundError(String msg);
@@ -1293,18 +1311,10 @@ public class PurchaseManagerBuyer extends PurchaseManager implements PayControll
         void onBalanceInfoReceived(double ethBalance, double tknBalance);
 
         void onBalanceErrorReceived(String msg);
-    }
+    }*/
 
     public interface EtherRequestListener {
         void onResponseReceived(boolean success, String from, String msg);
-    }
-
-    public interface TokenRequestListener {
-        void onTokenRequestResponseReceived(boolean success, String from, String msg, double tokenValue, double ethValue);
-    }
-
-    public interface GiftRequestListener {
-        void onGiftResponse(boolean success, boolean isGifted, String message);
     }
 
     public LiveData<Integer> getDifferentNetworkData(String myAddress, int endpoint) {

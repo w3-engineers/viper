@@ -17,6 +17,7 @@ import com.w3engineers.mesh.application.data.local.db.datausage.Datausage;
 import com.w3engineers.mesh.application.data.local.db.purchase.Purchase;
 import com.w3engineers.mesh.application.data.local.db.purchaserequests.PurchaseRequests;
 import com.w3engineers.mesh.application.data.local.helper.PreferencesHelperDataplan;
+import com.w3engineers.mesh.application.data.local.wallet.WalletManager;
 import com.w3engineers.mesh.util.Constant;
 import com.w3engineers.mesh.util.DialogUtil;
 import com.w3engineers.mesh.util.EthereumServiceUtil;
@@ -43,10 +44,8 @@ import io.reactivex.Observable;
 public class PurchaseManagerSeller extends PurchaseManager implements PayController.PayControllerListenerForSeller, EthereumService.TransactionObserver {
     private static PurchaseManagerSeller purchaseManagerSeller;
 //    private BuyerPendingMessageListener buyerPendingMessageListener;
-    private TokenRequestListener tokenRequestListener;
-    private BalanceWithdrawtListener balanceWithdrawtListener;
 
-    private GiftRequestListener giftRequestListener;
+    private WalletManager.WalletListener walletListener;
 
     private PurchaseManagerSeller() {
         super();
@@ -66,8 +65,9 @@ public class PurchaseManagerSeller extends PurchaseManager implements PayControl
         return purchaseManagerSeller;
     }
 
-
-
+    public void setWalletListener(WalletManager.WalletListener walletListener) {
+        this.walletListener = walletListener;
+    }
 
     //***************************************************//
     //******************Private Methods******************//
@@ -224,11 +224,26 @@ public class PurchaseManagerSeller extends PurchaseManager implements PayControl
 
                         TransactionReceipt transactionReceipt = ethService.getTransactionReceipt(transactionHash, endPointType);
 
-                        if (transactionReceipt.getStatus().equals("0x1")) {
-                            // No need any operation
-                        } else if(transactionReceipt.getStatus().equals("0x0")) {
-                            databaseService.deletePurchaseRequest(purchaseRequest);
+                        if (transactionReceipt != null) {
+
+                            String transactionStatus = transactionReceipt.getStatus();
+
+                            if (!TextUtils.isEmpty(transactionStatus)) {
+
+                                if (transactionStatus.equals("0x1")) {
+                                    // No need any operation
+                                } else if (transactionStatus.equals("0x0")) {
+                                    databaseService.deletePurchaseRequest(purchaseRequest);
+                                } else {
+                                    pendingStatus = true;
+                                }
+
+                            } else {
+                                pendingStatus = true;
+                            }
+
                         } else {
+                            // If transaction is in pending mode
                             pendingStatus = true;
                         }
 
@@ -366,18 +381,25 @@ public class PurchaseManagerSeller extends PurchaseManager implements PayControl
         if (purchaseRequest.requesterAddress.equalsIgnoreCase(ethService.getAddress())) {
             switch (purchaseRequest.requestType) {
                 case PurchaseConstants.REQUEST_TYPES.BUY_TOKEN:
-                    if (tokenRequestListener != null) {
+
                         if (success) {
-                            tokenRequestListener.onTokenRequestResponseReceived(true, "Purchase request sent, Balance will be updated soon.", 0, 0);
+
+                            if (walletListener != null) {
+                                walletListener.onTokenRequestResponse(true, "Purchase request sent, Balance will be updated soon.");
+                            }
                         } else {
-                            tokenRequestListener.onTokenRequestResponseReceived(false, msg, 0, 0);
+
+                            if (walletListener != null) {
+                                walletListener.onTokenRequestResponse(false, msg);
+                            }
                         }
-                    }
+
                     break;
 
                 case PurchaseConstants.REQUEST_TYPES.WITHDRAW_CHANNEL:
-                    if (balanceWithdrawtListener != null) {
-                        balanceWithdrawtListener.onRequestSubmitted(success, msg);
+
+                    if (walletListener != null) {
+                        walletListener.onRequestSubmitted(success, msg);
                     }
 
                     break;
@@ -513,12 +535,7 @@ public class PurchaseManagerSeller extends PurchaseManager implements PayControl
     public void destroyObject() {
         payController.setSellerListener(null);
         purchaseManagerSeller = null;
-        payController = null;
-        ethService = null;
-        databaseService = null;
-        preferencesHelperDataplan = null;
-        tokenRequestListener = null;
-        balanceWithdrawtListener = null;
+        walletListener = null;
     }
 
     @Override
@@ -569,7 +586,7 @@ public class PurchaseManagerSeller extends PurchaseManager implements PayControl
         payController.setSellerListener(this);
     }
 
-    public void getMyBalanceInfo(MyBalanceInfoListener listener) {
+    public void getMyBalanceInfo() {
 
         if (InternetUtil.isNetworkConnected(mContext)) {
             try {
@@ -587,41 +604,54 @@ public class PurchaseManagerSeller extends PurchaseManager implements PayControl
                 }
 
                 if (etherBalance == null || tokenBalance == null) {
-                    if (listener != null)
-                        listener.onBalanceErrorReceived("Can't reach network, please try again later.");
+                    if(walletListener != null) {
+                        walletListener.onBalanceInfo(false, "Can't reach network, please try again later.");
+                    }
                 } else {
-                    if (listener != null)
-                        listener.onBalanceInfoReceived(etherBalance, tokenBalance);
+
+                    if(walletListener != null) {
+                        walletListener.onBalanceInfo(true, "Balance updated");
+                    }
                 }
             } catch (Exception e) {
-                if (listener != null)
-                    listener.onBalanceErrorReceived(e.getMessage());
+                if(walletListener != null) {
+                    walletListener.onBalanceInfo(false, e.getMessage());
+                }
             }
         } else {
-            if (listener != null)
-                listener.onBalanceErrorReceived("No internet found on this device.");
+            if(walletListener != null) {
+                walletListener.onBalanceInfo(false, "No internet found on this device.");
+            }
         }
     }
 
-    public void sendEtherRequest(EtherRequestListener listener) {
+    public void sendEtherRequest() {
         if (InternetUtil.isNetworkConnected(mContext)) {
             int endpointType = getEndpoint();
             ethService.requestEther(ethService.getAddress(), endpointType, new EthereumService.ReqEther() {
                 @Override
                 public void onEtherRequested(int responseCode) {
                     if (responseCode == 200) {
-                        listener.onEtherRequestResponseReceived(true, Util.getCurrencyTypeMessage("Request has been sent, %s will be added to your address soon."));
+                        if (walletListener != null) {
+                            walletListener.onEtherRequestResponse(true, Util.getCurrencyTypeMessage("Request has been sent, %s will be added to your address soon."));
+                        }
                     } else {
-                        listener.onEtherRequestResponseReceived(false, Util.getCurrencyTypeMessage("%s request rejected!"));
+
+                        if (walletListener != null) {
+                            walletListener.onEtherRequestResponse(false, Util.getCurrencyTypeMessage("%s request rejected!"));
+                        }
                     }
                 }
             });
         } else {
-            listener.onEtherRequestResponseReceived(false, "No internet found on this device.");
+
+            if (walletListener != null) {
+                walletListener.onEtherRequestResponse(false, "No internet found on this device.");
+            }
         }
     }
 
-    public void sendTokenRequest(TokenRequestListener listener) {
+    public void sendTokenRequest() {
 
         try {
 
@@ -629,7 +659,6 @@ public class PurchaseManagerSeller extends PurchaseManager implements PayControl
             double token = EthereumServiceUtil.getInstance(mContext).getToken(endPointType);
             double currency = EthereumServiceUtil.getInstance(mContext).getCurrency(endPointType);
 
-            tokenRequestListener = listener;
             if (InternetUtil.isNetworkConnected(mContext)) {
                 try {
 
@@ -651,17 +680,22 @@ public class PurchaseManagerSeller extends PurchaseManager implements PayControl
                         pickAndSubmitRequest(purchaseRequest.requesterAddress);
 
                     } else {
-                        listener.onTokenRequestResponseReceived(false, "Can't reach network, please try again later.", token, currency);
+
+                        if (walletListener != null) {
+                            walletListener.onTokenRequestResponse(false, "Can't reach network, please try again later.");
+                        }
                     }
-                } catch (ExecutionException e) {
-                    listener.onTokenRequestResponseReceived(false, e.getMessage(), token, currency);
-                } catch (InterruptedException e) {
-                    listener.onTokenRequestResponseReceived(false, e.getMessage(), token, currency);
-                } catch (Exception e) {
-                    listener.onTokenRequestResponseReceived(false, e.getMessage(), token, currency);
+                }  catch (Exception e) {
+
+                    if (walletListener != null) {
+                        walletListener.onTokenRequestResponse(false, e.getMessage());
+                    }
                 }
             } else {
-                listener.onTokenRequestResponseReceived(false, "No internet found on this device.", token, currency);
+
+                if (walletListener != null) {
+                    walletListener.onTokenRequestResponse(false, "No internet found on this device.");
+                }
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -672,8 +706,7 @@ public class PurchaseManagerSeller extends PurchaseManager implements PayControl
         return databaseService.getTotalOpenChannel(ethService.getAddress(), PurchaseConstants.CHANNEL_STATE.OPEN);
     }
 
-    public void getAllOpenDrawableBlock(BalanceWithdrawtListener listener) throws ExecutionException, InterruptedException {
-        balanceWithdrawtListener = listener;
+    public void getAllOpenDrawableBlock() throws ExecutionException, InterruptedException {
 
         int endPointType = getEndpoint();
 
@@ -759,9 +792,7 @@ public class PurchaseManagerSeller extends PurchaseManager implements PayControl
         }
     }
 
-    public boolean requestForGiftForSeller(GiftRequestListener giftRequestListener) {
-
-        this.giftRequestListener = giftRequestListener;
+    public boolean requestForGiftForSeller() {
 
         if (InternetUtil.isNetworkConnected(mContext)) {
 
@@ -804,7 +835,7 @@ public class PurchaseManagerSeller extends PurchaseManager implements PayControl
                                 MeshLog.v("giftEther giftRequestSubmitted " + msg);
                                 if (failedBy.equals("admin")) {
                                     preferencesHelperDataplan.setRequestedForEther(PurchaseConstants.GIFT_REQUEST_STATE.GOT_GIFT_ETHER, endpoint);
-                                    getMyBalanceInfo(null);
+                                    getMyBalanceInfo();
                                 } else {
                                     preferencesHelperDataplan.setRequestedForEther(PurchaseConstants.GIFT_REQUEST_STATE.NOT_REQUESTED_YET, endpoint);
 
@@ -838,8 +869,8 @@ public class PurchaseManagerSeller extends PurchaseManager implements PayControl
 
 
     private void sendGiftListener(boolean status, boolean isGifted, String message) {
-        if (giftRequestListener != null) {
-            giftRequestListener.onGiftResponse(status, isGifted, message);
+        if (walletListener != null) {
+            walletListener.onGiftResponse(status, isGifted, message);
         }
     }
 
@@ -1001,6 +1032,7 @@ public class PurchaseManagerSeller extends PurchaseManager implements PayControl
                     syncWithBuyer(address);
                 }
             } else {
+                syncWithBuyer(address);
                 MeshLog.v("no pending request");
             }
         } catch (Exception e) {
@@ -1735,6 +1767,8 @@ public class PurchaseManagerSeller extends PurchaseManager implements PayControl
                     databaseService.updatePurchase(purchase);
                 }
 
+                payController.getDataManager().onBuyerDisconnected(buyerAddress);
+
                 pickAndSubmitRequest(purchaseRequests.requesterAddress);
 
             } else {
@@ -1742,6 +1776,8 @@ public class PurchaseManagerSeller extends PurchaseManager implements PayControl
             }
 
         } catch (ExecutionException | InterruptedException | JSONException e) {
+            e.printStackTrace();
+        } catch (RemoteException e) {
             e.printStackTrace();
         }
 //        }
@@ -1781,11 +1817,9 @@ public class PurchaseManagerSeller extends PurchaseManager implements PayControl
                     // listener.onAllWithDrawnDone();
                     databaseService.updatePurchase(purchase);
 
-
-                    if (balanceWithdrawtListener != null) {
-                        balanceWithdrawtListener.onRequestCompleted(true, "Balance withdrawn");
+                    if (walletListener != null) {
+                        walletListener.onRequestCompleted(true, "Balance withdrawn");
                     }
-
 
                     pickAndSubmitRequest(purchaseRequests.requesterAddress);
 
@@ -1836,23 +1870,28 @@ public class PurchaseManagerSeller extends PurchaseManager implements PayControl
                     purchaseRequests.state = PurchaseConstants.REQUEST_STATE.NOTIFIED;
                     databaseService.updatePurchaseRequest(purchaseRequests);
 
-                    if (tokenRequestListener != null) {
+                    if (tokenValue == null)
+                        tokenValue = EthereumServiceUtil.getInstance(mContext).getToken(purchaseRequests.blockChainEndpoint);
 
-                        if (tokenValue == null)
-                            tokenValue = EthereumServiceUtil.getInstance(mContext).getToken(purchaseRequests.blockChainEndpoint);
+                    if (etherValue == null)
+                        etherValue = EthereumServiceUtil.getInstance(mContext).getCurrency(purchaseRequests.blockChainEndpoint);
 
-                        if (etherValue == null)
-                            etherValue = EthereumServiceUtil.getInstance(mContext).getCurrency(purchaseRequests.blockChainEndpoint);
+                    EthereumServiceUtil.getInstance(mContext).updateCurrencyAndToken(purchaseRequests.blockChainEndpoint,etherValue, tokenValue);
 
-                        EthereumServiceUtil.getInstance(mContext).updateCurrencyAndToken(purchaseRequests.blockChainEndpoint,etherValue, tokenValue);
+                    if (tokenValue == null || etherValue == null) {
 
-                        if (tokenValue == null || etherValue == null) {
-                            tokenRequestListener.onTokenRequestResponseReceived(true, "Congratulations, Your purchase has been completed, Please try to refresh after some time", tokenValue, etherValue);
-                        } else {
-                            EthereumServiceUtil.getInstance(mContext).updateToken(purchaseRequests.blockChainEndpoint, tokenValue);
-                            tokenRequestListener.onTokenRequestResponseReceived(true, "Congratulations, Token added to your account.", tokenValue, etherValue);
+                        if (walletListener != null) {
+                            walletListener.onTokenRequestResponse(true, "Congratulations, Your purchase has been completed, Please try to refresh after some time");
                         }
+                    } else {
+
+                        if (walletListener != null) {
+                            walletListener.onTokenRequestResponse(false, "Congratulations, Token added to your account.");
+                        }
+                        EthereumServiceUtil.getInstance(mContext).updateToken(purchaseRequests.blockChainEndpoint, tokenValue);
                     }
+
+
                 } else {
                     purchaseRequests.state = PurchaseConstants.REQUEST_STATE.COMPLETED;
 
@@ -1955,29 +1994,14 @@ public class PurchaseManagerSeller extends PurchaseManager implements PayControl
         void onPaymentGotForOutgoingMessage(boolean success, String owner, String sender, String msg_id, String msgData);
     }
 
-    public interface BalanceWithdrawtListener {
-        void onRequestSubmitted(boolean success, String msg);
-
-        void onRequestCompleted(boolean success, String msg);
-    }
-
-    public interface MyBalanceInfoListener {
+    /*public interface MyBalanceInfoListener {
         void onBalanceInfoReceived(double ethBalance, double tknBalance);
 
         void onBalanceErrorReceived(String msg);
-    }
+    }*/
 
     public interface EtherRequestListener {
         void onEtherRequestResponseReceived(boolean success, String msg);
-    }
-
-    public interface TokenRequestListener {
-        void onTokenRequestResponseReceived(boolean success, String msg, double tknBalance, double ethBalance);
-
-    }
-
-    public interface GiftRequestListener {
-        void onGiftResponse(boolean success, boolean isGifted, String message);
     }
 
     public LiveData<Integer> getDifferentNetworkData(String myAddress, int endpoint) {

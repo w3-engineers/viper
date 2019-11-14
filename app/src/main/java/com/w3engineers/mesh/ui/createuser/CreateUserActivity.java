@@ -13,6 +13,7 @@ import com.w3engineers.ext.viper.databinding.ActivityCreateUserBinding;
 import com.w3engineers.mesh.application.data.local.db.SharedPref;
 import com.w3engineers.mesh.ui.nav.BottomNavActivity;
 import com.w3engineers.mesh.util.Constant;
+import com.w3engineers.mesh.util.MeshLog;
 
 
 import java.util.UUID;
@@ -31,7 +32,6 @@ public class CreateUserActivity extends AppCompatActivity implements View.OnClic
         mBInding.createUser.setOnClickListener(this);
 
         CheckLogin();
-
     }
 
     private void CheckLogin() {
