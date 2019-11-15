@@ -9,15 +9,18 @@
         <activity
             android:name=".application.ui.wallet.WalletActivity"
             android:label="@string/title_activity_wallet"
+            android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar"/>
         <activity
             android:name="com.w3engineers.mesh.application.ui.dataplan.DataPlanActivity"
             android:label="@string/title_activity_data_plan"
+            android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar" />
 
         <activity
             android:name="com.w3engineers.mesh.application.ui.dataplan.TestDataPlanActivity"
             android:label="@string/title_activity_data_plan"
+            android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar" />
 
         <activity
