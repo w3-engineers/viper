@@ -37,9 +37,11 @@ public class TestDataPlanActivity extends TelemeshBaseActivity {
         setTitle();
 
         localButton = findViewById(R.id.localButton);
+        localButton.setTopViewGone();
         sellerButton = findViewById(R.id.sellDataButton);
         buyerButton = findViewById(R.id.buyDataButton);
         internetOnlyButton = findViewById(R.id.internetOnlyButton);
+        internetOnlyButton.setBottomViewGone();
 
 
         setListenerForAllExpandable();

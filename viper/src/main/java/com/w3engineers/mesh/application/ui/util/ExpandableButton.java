@@ -24,6 +24,7 @@ public class ExpandableButton extends FrameLayout {
      */
     public interface ExpandableButtonListener {
         void onViewExpanded();
+
         void onViewCollapsed();
     }
 
@@ -31,6 +32,8 @@ public class ExpandableButton extends FrameLayout {
     TextView textView;          //text view
     ImageView imageArrow;       //image arrow
     View viewColor;             //strip color
+    View viewTop;             //strip color
+    View viewBottom;             //strip color
 
     int childViewResId = 0;     //child view id
     View childView;             //child view
@@ -62,8 +65,9 @@ public class ExpandableButton extends FrameLayout {
     /**
      * Initialize button on every constructor call.
      * Used to reference views and set attributes to the view.
+     *
      * @param context context
-     * @param attrs attribute set for setting some properties
+     * @param attrs   attribute set for setting some properties
      */
     private void initButton(Context context, AttributeSet attrs) {
         this.context = context;
@@ -71,7 +75,10 @@ public class ExpandableButton extends FrameLayout {
         View view = inflater.inflate(R.layout.expandable_button, this);
         textView = view.findViewById(R.id.tv_text);
         imageArrow = view.findViewById(R.id.iv_arrow);
-      //  viewColor = view.findViewById(R.id.view_color);
+        viewTop = view.findViewById(R.id.topView);
+        viewBottom = view.findViewById(R.id.bottomView);
+        //  viewColor = view.findViewById(R.id.view_color);
+
 
         setClickListener();
 
@@ -92,6 +99,7 @@ public class ExpandableButton extends FrameLayout {
 
     /**
      * Set text to expandable button
+     *
      * @param text string text
      */
     public void setText(String text) {
@@ -101,6 +109,7 @@ public class ExpandableButton extends FrameLayout {
     /**
      * Set color to bar on left side of the button
      * User can set color anytime to this view as indicators
+     *
      * @param color color of bar
      */
     public void setBarColor(int color) {
@@ -109,6 +118,7 @@ public class ExpandableButton extends FrameLayout {
 
     /**
      * User can set any icon as arrow
+     *
      * @param icon drawable
      */
     public void setIcon(Drawable icon) {
@@ -117,6 +127,7 @@ public class ExpandableButton extends FrameLayout {
 
     /**
      * Set child view programmatically
+     *
      * @param view child view
      */
     public void setChildView(View view) {
@@ -125,10 +136,19 @@ public class ExpandableButton extends FrameLayout {
 
     /**
      * Setting up event listeners for expandable button
+     *
      * @param expandableButtonListener listener
      */
     public void setCallbackListener(ExpandableButtonListener expandableButtonListener) {
         this.expandableButtonListener = expandableButtonListener;
+    }
+
+    public void setTopViewGone() {
+        viewTop.setVisibility(GONE);
+    }
+
+    public void setBottomViewGone() {
+        viewBottom.setVisibility(GONE);
     }
 
     /**
@@ -160,9 +180,10 @@ public class ExpandableButton extends FrameLayout {
 
     public void collapseView() {
         if (childView.getVisibility() == VISIBLE) {
-          //  rotateArrow();
+            rotateArrow();
             childView.setVisibility(GONE);
             if (expandableButtonListener != null) expandableButtonListener.onViewCollapsed();
+            setIcon(getResources().getDrawable(R.mipmap.ic_collapse));
         }
     }
 
