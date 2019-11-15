@@ -268,9 +268,10 @@ public class ConnectionManager {
             try {
                 String userId = getUserId();
                 String userJson = UserModel.getUserJson(userId);
-                viperClient.sendMessage(userId, nodeId, uniqueId.toString(), userJson.getBytes());
+                viperClient.sendMessage(userId, nodeId, uniqueId.toString(), userJson.getBytes(), false);
             } catch (RemoteException e) {
                 e.printStackTrace();
+                showToast();
             }
         }
 
@@ -304,9 +305,10 @@ public class ConnectionManager {
 
             try {
                 String userId = getUserId();
-                viperClient.sendMessage(userId, nodeId, messageId, userJson.getBytes());
+                viperClient.sendMessage(userId, nodeId, messageId, userJson.getBytes(), true);
             } catch (RemoteException e) {
                 e.printStackTrace();
+                showToast();
             }
         }
     }
@@ -315,9 +317,10 @@ public class ConnectionManager {
         try {
             String userId = getUserId();
             String msgJson = MessageModel.buildMessage(messageModel, userId);
-            viperClient.sendMessage(userId, receiverId, messageModel.messageId, msgJson.getBytes());
+            viperClient.sendMessage(userId, receiverId, messageModel.messageId, msgJson.getBytes(), true);
         } catch (RemoteException e) {
             e.printStackTrace();
+            showToast();
         }
     }
 
@@ -354,6 +357,7 @@ public class ConnectionManager {
             type = viperClient.getLinkTypeById(nodeId);
         } catch (RemoteException e) {
             e.printStackTrace();
+            showToast();
         }
 
         if (type == Link.Type.NA.getValue()) {
@@ -380,6 +384,7 @@ public class ConnectionManager {
                 return userId;
             } catch (RemoteException e) {
                 e.printStackTrace();
+                showToast();
                 return null;
             }
         } else {
@@ -402,6 +407,13 @@ public class ConnectionManager {
         }
         return json;
 
+    }
+
+    private void showToast() {
+        HandlerUtil.postForeground(() ->
+                Toast.makeText(mContext,
+                        "TeleMesh Service is not running",
+                        Toast.LENGTH_LONG).show());
     }
 
 }
