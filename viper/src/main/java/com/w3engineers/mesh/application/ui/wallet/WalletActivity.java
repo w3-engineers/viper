@@ -110,13 +110,18 @@ public class WalletActivity extends TelemeshBaseActivity implements WalletManage
 
         mBinding.pullToRefresh.setOnRefreshListener(() -> {
             runOnUiThread(() -> {
-                refreshMyBalance();
-                setLastUpdated();
-                mBinding.pullToRefresh.setRefreshing(false);
+                refreshBalance();
             });
         });
 
       //  mBinding.currency.setOnClickListener(this);
+    }
+
+
+    private void refreshBalance(){
+        refreshMyBalance();
+        setLastUpdated();
+        mBinding.pullToRefresh.setRefreshing(false);
     }
 
     public static void openActivity(Context context){
@@ -243,7 +248,8 @@ public class WalletActivity extends TelemeshBaseActivity implements WalletManage
         } else if (v.getId() == R.id.currency) {
             //openCurrencyPopup(v);
         }else if (v.getId() == R.id.img_refresh) {
-           openActivity(this);
+           //openActivity(this);
+            refreshBalance();
         }
     }
 
@@ -391,7 +397,7 @@ public class WalletActivity extends TelemeshBaseActivity implements WalletManage
 
         if (totalEarningObserver != null) {
             totalEarningObserver.observe(this, aDouble -> {
-              //  mBinding.tvEarned.setText(aDouble == null ? "0" : aDouble.toString());
+               mBinding.tvEarned.setText(aDouble == null ? "0.0" : aDouble.toString());
             });
         }
     }
@@ -411,7 +417,7 @@ public class WalletActivity extends TelemeshBaseActivity implements WalletManage
 
         if (totalSpentObserver != null) {
             totalSpentObserver.observe(this, totalSpent -> {
-              //  mBinding.tvSpent.setText(totalSpent == null ? "0" : totalSpent.toString());
+               mBinding.tvSpent.setText(totalSpent == null ? "0.0" : totalSpent.toString());
             });
         }
     }
