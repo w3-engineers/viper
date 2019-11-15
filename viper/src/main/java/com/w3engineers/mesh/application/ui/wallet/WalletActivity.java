@@ -5,7 +5,9 @@ import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.ViewModel;
 import android.arch.lifecycle.ViewModelProvider;
 import android.arch.lifecycle.ViewModelProviders;
+import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.graphics.Color;
 import android.os.Build;
 import android.support.annotation.NonNull;
@@ -28,6 +30,7 @@ import com.w3engineers.mesh.application.data.local.DataPlanConstants;
 import com.w3engineers.mesh.application.data.local.dataplan.DataPlanManager;
 import com.w3engineers.mesh.application.data.local.wallet.WalletManager;
 import com.w3engineers.mesh.application.ui.base.TelemeshBaseActivity;
+import com.w3engineers.mesh.application.ui.dataplan.TestDataPlanActivity;
 import com.w3engineers.mesh.databinding.ActivityWalletBinding;
 import com.w3engineers.mesh.databinding.PromptWalletWithdrowBinding;
 import com.w3engineers.mesh.util.DialogUtil;
@@ -79,7 +82,7 @@ public class WalletActivity extends TelemeshBaseActivity implements WalletManage
 
         walletManager.setWalletListener(this);
 
-        setClickListener(mBinding.opBack, mBinding.imgMyAddress, mBinding.tmeshBlock);
+        setClickListener(mBinding.opBack, mBinding.imgMyAddress, mBinding.tmeshBlock, mBinding.imgRefresh);
 
         setCurrencyAndTokenObserver();
 
@@ -114,6 +117,12 @@ public class WalletActivity extends TelemeshBaseActivity implements WalletManage
 
       //  mBinding.currency.setOnClickListener(this);
     }
+
+    public static void openActivity(Context context){
+        Intent intent = new Intent(context, TestDataPlanActivity.class);
+        context.startActivity(intent);
+    }
+
 
     private String convertTwoDigitString(double value) {
         String result = String.format("%.2f", value);
@@ -232,6 +241,8 @@ public class WalletActivity extends TelemeshBaseActivity implements WalletManage
           //  showRequestAlert("Purchase Token", "Do you want to send a request for token?", REQUEST_TYPE.TOKEN);
         } else if (v.getId() == R.id.currency) {
             //openCurrencyPopup(v);
+        }else if (v.getId() == R.id.img_refresh) {
+           openActivity(this);
         }
     }
 

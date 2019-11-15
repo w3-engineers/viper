@@ -16,6 +16,11 @@
             android:theme="@style/AppTheme.NoActionBar" />
 
         <activity
+            android:name="com.w3engineers.mesh.application.ui.dataplan.TestDataPlanActivity"
+            android:label="@string/title_activity_data_plan"
+            android:theme="@style/AppTheme.NoActionBar" />
+
+        <activity
             android:name="com.w3engineers.mesh.application.ui.premission.PermissionActivity" />
 
 <!--        <service

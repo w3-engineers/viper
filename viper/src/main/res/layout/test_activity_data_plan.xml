@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/white"
+    android:orientation="vertical"
+    tools:context="com.w3engineers.mesh.application.ui.dataplan.TestDataPlanActivity">
+
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:background="@color/colorAccent"
+        android:elevation="4dp"
+        android:fitsSystemWindows="true"
+        app:title="My data plan"
+        app:titleTextColor="@color/white" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:animateLayoutChanges="true"
+        android:orientation="vertical">
+
+        <com.w3engineers.mesh.application.ui.util.ExpandableButton
+            android:id="@+id/localButton"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            app:childView="@+id/localTextView"
+            app:text="Local" />
+
+        <TextView
+            android:id="@+id/localTextView"
+            android:layout_width="match_parent"
+            android:layout_height="100dp"
+            android:gravity="center"
+            android:text="Local is the default plan. Use local to connect users nearby you. Data cost is free"
+            android:textColor="@color/black"
+            android:textSize="@dimen/text_size_16" />
+
+        <com.w3engineers.mesh.application.ui.util.ExpandableButton
+            android:id="@+id/sellDataButton"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            app:childView="@+id/sellDataTextView"
+            app:color="#297e55"
+            app:text="Sell Data" />
+
+        <TextView
+            android:id="@+id/sellDataTextView"
+            android:layout_width="match_parent"
+            android:layout_height="100dp"
+            android:gravity="center"
+            android:text="Local is the default plan. Use local to connect users nearby you. Data cost is free"
+            android:textColor="@color/black"
+            android:textSize="@dimen/text_size_16" />
+
+        <com.w3engineers.mesh.application.ui.util.ExpandableButton
+            android:id="@+id/buyDataButton"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            app:childView="@+id/buyDataTextView"
+            app:color="#297e55"
+            app:text="Buy Data" />
+
+        <TextView
+            android:id="@+id/buyDataTextView"
+            android:layout_width="match_parent"
+            android:layout_height="100dp"
+            android:gravity="center"
+            android:text="Local is the default plan. Use local to connect users nearby you. Data cost is free"
+            android:textColor="@color/black"
+            android:textSize="@dimen/text_size_16" />
+
+        <com.w3engineers.mesh.application.ui.util.ExpandableButton
+            android:id="@+id/internetOnlyButton"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            app:childView="@+id/internetOnlyTextView"
+            app:color="#297e55"
+            app:text="Internet Only" />
+
+        <TextView
+            android:id="@+id/internetOnlyTextView"
+            android:layout_width="match_parent"
+            android:layout_height="100dp"
+            android:gravity="center"
+            android:text="Local is the default plan. Use local to connect users nearby you. Data cost is free"
+            android:textColor="@color/black"
+            android:textSize="@dimen/text_size_16" />
+
+    </LinearLayout>
+
+</LinearLayout>
