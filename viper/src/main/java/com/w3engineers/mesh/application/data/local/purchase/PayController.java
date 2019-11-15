@@ -77,7 +77,7 @@ public class PayController {
 
         void onInternetMessageResponseFailed(String sender, String message);
 
-        void onPendingMessageInfo(String fromAddress, long dataSize, String msg_id);
+        void onPendingMessageInfo(String fromAddress, long dataSize, String msg_id, boolean isIncoming);
 
         void onSyncSellerToBuyerReceived(String buyerAddress, String sellerAddress, long blockNumner,
                                          double usedDataAmount, double totalDataAmount, double balance,
@@ -346,8 +346,9 @@ public class PayController {
                     case PurchaseConstants.MESSAGE_TYPES.GOT_MESSAGE:
                         long dataSize = jsonObject.getLong(PurchaseConstants.JSON_KEYS.DATA_SIZE);
                         msg_id = jsonObject.getString(PurchaseConstants.JSON_KEYS.MESSAGE_ID);
+                        boolean isIncoming = jsonObject.getBoolean(PurchaseConstants.JSON_KEYS.IS_INCOMING);
                         if (payControllerListenerForBuyer != null) {
-                            payControllerListenerForBuyer.onPendingMessageInfo(fromAddress, dataSize, msg_id);
+                            payControllerListenerForBuyer.onPendingMessageInfo(fromAddress, dataSize, msg_id, isIncoming);
                         } else {
                             MeshLog.v("GOT_MESSAGE Listener not found");
                         }

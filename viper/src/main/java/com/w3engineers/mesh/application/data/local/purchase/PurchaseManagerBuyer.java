@@ -965,7 +965,7 @@ public class PurchaseManagerBuyer extends PurchaseManager implements PayControll
     }
 
     @Override
-    public void onPendingMessageInfo(String fromAddress, long dataSize, String msg_id) {
+    public void onPendingMessageInfo(String fromAddress, long dataSize, String msg_id, boolean isIncoming) {
         MeshLog.o("onPendingMessageInfo " + fromAddress + " " + msg_id);
         try {
             Purchase purchase = databaseService.getPurchaseByState(PurchaseConstants.CHANNEL_STATE.OPEN, ethService.getAddress(), fromAddress);
@@ -989,10 +989,6 @@ public class PurchaseManagerBuyer extends PurchaseManager implements PayControll
 
                     int endPointType = getEndpoint();
                     String bps = ethService.getBalanceProof(purchase.sellerAddress, purchase.openBlockNumber, totalBalance, endPointType);
-//                    MeshLog.p("balanceproofcheck 1 " + purchase.sellerAddress);
-//                    MeshLog.p("balanceproofcheck 2 " + purchase.openBlockNumber);
-//                    MeshLog.p("balanceproofcheck 3 " + totalBalance);
-//                    MeshLog.p("balance proof " + bps);
 
 //                    ethService.verifyBalanceProofSignature(purchase.sellerAddress, purchase.openBlockNumber, totalBalance, bps, new EthereumService.VerifyBalanceProof() {
 //                        @Override
@@ -1018,11 +1014,32 @@ public class PurchaseManagerBuyer extends PurchaseManager implements PayControll
                     jo.put(PurchaseConstants.JSON_KEYS.MESSAGE_ID, msg_id);
                     payController.sendPayForMessageError(jo, fromAddress);
 
-                    NotificationUtil.showNotification(mContext, "Internet Usage", "Your current internet volume insufficient");
-                    if (dataPlanListener != null) {
-                        dataPlanListener.onBalancedFinished(purchase.sellerAddress, 0);
-                    } else {
-                        HandlerUtil.postForeground(() -> ToastUtil.showLong(mContext, "Your purchased data has finished."));
+
+                    Activity currentActivity = MeshApp.getCurrentActivity();
+                    if (currentActivity != null && !isIncoming) {
+                        HandlerUtil.postForeground(() -> DialogUtil.showConfirmationDialog(currentActivity, "Internet Usage Finished!", "Your current internet volume insufficient, please purchase again and continue messaging", "No, Thanks", "Ok", new DialogUtil.DialogButtonListener() {
+                            @Override
+                            public void onClickPositive() {
+                                DataPlanManager.openActivity(currentActivity);
+                            }
+
+                            @Override
+                            public void onCancel() {
+
+                            }
+
+                            @Override
+                            public void onClickNegative() {
+
+                            }
+                        }));
+                    }else {
+                        NotificationUtil.showNotification(mContext, "Internet Usage Finished!", "Your current internet volume is insufficient, please purchase again and continue messaging");
+                        if (dataPlanListener != null) {
+                            dataPlanListener.onBalancedFinished(purchase.sellerAddress, 0);
+                        } else {
+                            HandlerUtil.postForeground(() -> ToastUtil.showLong(mContext, "Your purchased data has finished."));
+                        }
                     }
                 }
             } else {

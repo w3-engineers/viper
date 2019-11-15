@@ -112,6 +112,8 @@ public interface PurchaseConstants {
 
         String GIFT_ETH_BALANCE = "geb";
         String GIFT_TKN_BALANCE = "gtb";
+
+        String IS_INCOMING = "ii";
     }
 
     interface REQUEST_TYPES {

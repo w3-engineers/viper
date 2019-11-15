@@ -184,6 +184,7 @@ public class PurchaseManagerSeller extends PurchaseManager implements PayControl
 
                 jObject.put(PurchaseConstants.JSON_KEYS.DATA_SIZE, dataSize);
                 jObject.put(PurchaseConstants.JSON_KEYS.MESSAGE_ID, msg_id);
+                jObject.put(PurchaseConstants.JSON_KEYS.IS_INCOMING, buyerPendingMessage.isIncomming);
 
                 payController.sendBuyerPendingMessageInfo(jObject, owner);
 
