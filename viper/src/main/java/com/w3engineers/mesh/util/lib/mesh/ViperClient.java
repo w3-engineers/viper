@@ -134,7 +134,7 @@ public class ViperClient {
         context.startActivity(permissionIntent);
     }
 
-    public void sendMessage(String senderId, String receiverId, String messageId, byte[] data) throws RemoteException {
+    public void sendMessage(String senderId, String receiverId, String messageId, byte[] data, boolean isNotificationNeeded) throws RemoteException {
         String plainString = new String(data);
         String userPublicKey = DataManager.on().getUserPublicKey(receiverId);
 
@@ -142,7 +142,7 @@ public class ViperClient {
             MeshLog.v("Before encryption " + plainString);
             String encryptedMessage = CryptoHelper.encryptMessage(WalletService.getInstance(mContext).getPrivateKey(), userPublicKey , plainString);
             MeshLog.v("Encrypted message " + encryptedMessage);
-            DataManager.on().sendData(senderId, receiverId, messageId, encryptedMessage.getBytes());
+            DataManager.on().sendData(senderId, receiverId, messageId, encryptedMessage.getBytes(),isNotificationNeeded);
         } else {
             MeshLog.v("User public key not found " + senderId);
         }

@@ -2,6 +2,7 @@ package com.w3engineers.mesh.application.data.local.purchase;
 
 import android.app.Activity;
 import android.arch.lifecycle.LiveData;
+import android.os.RemoteException;
 import android.text.TextUtils;
 import android.widget.Toast;
 
@@ -38,6 +39,7 @@ public class PurchaseManagerBuyer extends PurchaseManager implements PayControll
 
     private DataPlanManager.DataPlanListener dataPlanListener;
     private WalletManager.WalletListener walletListener;
+    private String probableSellerId = null;
 
     private PurchaseManagerBuyer() {
         super();
@@ -154,32 +156,6 @@ public class PurchaseManagerBuyer extends PurchaseManager implements PayControll
         }
     }
 
-    /*    private void syncWithSeller(String sellerAddress) {
-        JSONObject jsonObject = new JSONObject();
-        try {
-
-            jsonObject.put(PurchaseConstants.JSON_KEYS.MESSAME_FROM, ethService.getAddress());
-            jsonObject.put(PurchaseConstants.JSON_KEYS.SELLER_ADDRESS, sellerAddress);
-
-        } catch (JSONException e) {
-        }
-
-        payController.saySyncSeller(jsonObject, sellerAddress);
-    }*/
-
-    private void sendSyncOkMessage(String sellerAddress) {
-        JSONObject jsonObject = new JSONObject();
-        try {
-
-            jsonObject.put(PurchaseConstants.JSON_KEYS.MESSAME_FROM, ethService.getAddress());
-            jsonObject.put(PurchaseConstants.JSON_KEYS.SELLER_ADDRESS, sellerAddress);
-
-        } catch (JSONException e) {
-        }
-
-        payController.sendSyncOkMessage(jsonObject, sellerAddress);
-    }
-
     private void purchaseCloseFailed(String sellerId, String s) {
         setCurrentSellerWithStatus(sellerId, PurchaseConstants.SELLERS_BTN_TEXT.CLOSE);
 
@@ -268,34 +244,38 @@ public class PurchaseManagerBuyer extends PurchaseManager implements PayControll
     //******************Public Medthods******************//
     //***************************************************//
     public void buyData(double amount, String sellerAddress) {
-        totalDataAmount = amount;
-
         try {
 
-            int currentEndPoint = getEndpoint();
+            if (!TextUtils.isEmpty(probableSellerId) || (!TextUtils.isEmpty(payController.getDataManager().getCurrentSellerId()) && !sellerAddress.equalsIgnoreCase(payController.getDataManager().getCurrentSellerId()))){
+                if (dataPlanListener != null) {
+                    dataPlanListener.onPurchaseFailed(sellerAddress, "You already have an active purchase in the same network.");
+                }
+            } else {
+                totalDataAmount = amount;
 
-            Purchase purchase = databaseService.getPurchaseByState(PurchaseConstants.CHANNEL_STATE.OPEN,
-                    ethService.getAddress(), sellerAddress, currentEndPoint);
+                int currentEndPoint = getEndpoint();
 
-            prepareChannel(sellerAddress, purchase);
+                Purchase purchase = databaseService.getPurchaseByState(PurchaseConstants.CHANNEL_STATE.OPEN,
+                        ethService.getAddress(), sellerAddress, currentEndPoint);
 
+                prepareChannel(sellerAddress, purchase);
+
+                setCurrentSellerWithStatus(sellerAddress, PurchaseConstants.SELLERS_BTN_TEXT.PURCHASING);
+
+                if (dataPlanListener != null) {
+                    dataPlanListener.onConnectingWithSeller(sellerAddress);
+                }
+            }
         } catch (ExecutionException e) {
             e.printStackTrace();
         } catch (InterruptedException e) {
             e.printStackTrace();
+        } catch (RemoteException e) {
+            e.printStackTrace();
         }
 
-        setCurrentSellerWithStatus(sellerAddress, PurchaseConstants.SELLERS_BTN_TEXT.PURCHASING);
 
-        if (dataPlanListener != null) {
-            dataPlanListener.onConnectingWithSeller(sellerAddress);
-        }
     }
-
-    /*public void setPurchaseManagerBuyerListener(PurchaseManagerBuyerListener listener) {
-        this.purchaseManagerBuyerListener = listener;
-    }*/
-    
 
     public void getMyBalanceInfo() {
         MeshLog.p("getMyBalanceInfo");
@@ -401,7 +381,6 @@ public class PurchaseManagerBuyer extends PurchaseManager implements PayControll
 
                     purchase.state = PurchaseConstants.CHANNEL_STATE.CLOSING;
                     databaseService.updatePurchase(purchase);
-
                     setCurrentSellerWithStatus(sellerId, PurchaseConstants.SELLERS_BTN_TEXT.CLOSING);
 
                     if (dataPlanListener != null) {
@@ -451,8 +430,6 @@ public class PurchaseManagerBuyer extends PurchaseManager implements PayControll
     }
 
 
-
-
     //*********************************************************//
     //******************PayControllerListener******************//
     //*********************************************************//
@@ -461,7 +438,31 @@ public class PurchaseManagerBuyer extends PurchaseManager implements PayControll
         try {
             if (payController.getDataManager().isInternetSeller(address)) {
                 DataPlanManager.getInstance().processAllSeller(mContext);
+                if (TextUtils.isEmpty(payController.getDataManager().getCurrentSellerId()) && TextUtils.isEmpty(probableSellerId)){
+                    Purchase purchase = databaseService.getPurchaseByState(PurchaseConstants.CHANNEL_STATE.OPEN, ethService.getAddress(), address);
+                    if (purchase != null && purchase.totalDataAmount > purchase.usedDataAmount){
+                        probableSellerId = purchase.sellerAddress;
+
+                        JSONObject jsonObject = new JSONObject();
+                        jsonObject.put(PurchaseConstants.JSON_KEYS.MESSAME_FROM, ethService.getAddress());
+                        jsonObject.put(PurchaseConstants.JSON_KEYS.BUYER_ADDRESS, purchase.buyerAddress);
+
+                        jsonObject.put(PurchaseConstants.JSON_KEYS.SELLER_ADDRESS, purchase.sellerAddress);
+                        jsonObject.put(PurchaseConstants.JSON_KEYS.OPEN_BLOCK, purchase.openBlockNumber);
+                        jsonObject.put(PurchaseConstants.JSON_KEYS.USED_DATA, purchase.usedDataAmount);
+                        jsonObject.put(PurchaseConstants.JSON_KEYS.TOTAL_DATA, purchase.totalDataAmount);
+                        jsonObject.put(PurchaseConstants.JSON_KEYS.BPS_BALANCE, purchase.balance);
+                        jsonObject.put(PurchaseConstants.JSON_KEYS.MESSAGE_BPS, purchase.balanceProof);
+                        jsonObject.put(PurchaseConstants.JSON_KEYS.MESSAGE_CHS, purchase.closingHash);
+
+                        setEndPointInfoInJson(jsonObject, purchase.blockChainEndpoint);
+
+                        payController.sendSyncMessageToSeller(jsonObject, purchase.sellerAddress);
+                    }
+                }
             }
+
+
         } catch (Exception e){
             e.printStackTrace();
         }
@@ -469,6 +470,10 @@ public class PurchaseManagerBuyer extends PurchaseManager implements PayControll
 
     @Override
     public void onUserDisconnected(String address) {
+
+        if (probableSellerId != null && probableSellerId.equalsIgnoreCase(address)){
+            probableSellerId = null;
+        }
 
         if (!TextUtils.isEmpty(giftRequestedSeller) && giftRequestedSeller.equals(address)){
             if (preferencesHelperDataplan.getEtherRequestStatus(1) == PurchaseConstants.GIFT_REQUEST_STATE.REQUESTED_TO_SELLER){
@@ -794,13 +799,30 @@ public class PurchaseManagerBuyer extends PurchaseManager implements PayControll
     @Override
     public void onProbableSellerDisconnected(String sellerId) {
         MeshLog.v("onProbableSellerDisconnected " + sellerId);
+
         try {
             List<Purchase> myOpenPurcheses  = databaseService.getMyPurchasesWithState(ethService.getAddress(), PurchaseConstants.CHANNEL_STATE.OPEN);
             for (Purchase p : myOpenPurcheses){
-                if (payController.getDataManager().isUserConnected(p.sellerAddress)){
+                if (payController.getDataManager().isUserConnected(p.sellerAddress) && p.totalDataAmount > p.usedDataAmount){
+                    probableSellerId = p.sellerAddress;
+
                     JSONObject jsonObject = new JSONObject();
                     jsonObject.put(PurchaseConstants.JSON_KEYS.MESSAME_FROM, ethService.getAddress());
-                    payController.sendConnectBuyer(jsonObject,p.sellerAddress);
+                    jsonObject.put(PurchaseConstants.JSON_KEYS.BUYER_ADDRESS, p.buyerAddress);
+
+                    jsonObject.put(PurchaseConstants.JSON_KEYS.SELLER_ADDRESS, p.sellerAddress);
+                    jsonObject.put(PurchaseConstants.JSON_KEYS.OPEN_BLOCK, p.openBlockNumber);
+                    jsonObject.put(PurchaseConstants.JSON_KEYS.USED_DATA, p.usedDataAmount);
+                    jsonObject.put(PurchaseConstants.JSON_KEYS.TOTAL_DATA, p.totalDataAmount);
+                    jsonObject.put(PurchaseConstants.JSON_KEYS.BPS_BALANCE, p.balance);
+                    jsonObject.put(PurchaseConstants.JSON_KEYS.MESSAGE_BPS, p.balanceProof);
+                    jsonObject.put(PurchaseConstants.JSON_KEYS.MESSAGE_CHS, p.closingHash);
+
+                    setEndPointInfoInJson(jsonObject, p.blockChainEndpoint);
+
+                    payController.sendSyncMessageToSeller(jsonObject, p.sellerAddress);
+
+
                     break;
                 }
             }
@@ -926,6 +948,8 @@ public class PurchaseManagerBuyer extends PurchaseManager implements PayControll
                     dataPlanListener.onPurchaseSuccess(from, totalDta, openBlock);
                 }
             }
+
+            sendSyncOkMessageToSeller(from);
         } catch (Exception e) {
             MeshLog.v("Exception " + e.getMessage());
         }
@@ -941,7 +965,7 @@ public class PurchaseManagerBuyer extends PurchaseManager implements PayControll
     }
 
     @Override
-    public void onPendingMessageInfo(String fromAddress, long dataSize, String msg_id) {
+    public void onPendingMessageInfo(String fromAddress, long dataSize, String msg_id, boolean isIncoming) {
         MeshLog.o("onPendingMessageInfo " + fromAddress + " " + msg_id);
         try {
             Purchase purchase = databaseService.getPurchaseByState(PurchaseConstants.CHANNEL_STATE.OPEN, ethService.getAddress(), fromAddress);
@@ -965,10 +989,6 @@ public class PurchaseManagerBuyer extends PurchaseManager implements PayControll
 
                     int endPointType = getEndpoint();
                     String bps = ethService.getBalanceProof(purchase.sellerAddress, purchase.openBlockNumber, totalBalance, endPointType);
-//                    MeshLog.p("balanceproofcheck 1 " + purchase.sellerAddress);
-//                    MeshLog.p("balanceproofcheck 2 " + purchase.openBlockNumber);
-//                    MeshLog.p("balanceproofcheck 3 " + totalBalance);
-//                    MeshLog.p("balance proof " + bps);
 
 //                    ethService.verifyBalanceProofSignature(purchase.sellerAddress, purchase.openBlockNumber, totalBalance, bps, new EthereumService.VerifyBalanceProof() {
 //                        @Override
@@ -994,11 +1014,32 @@ public class PurchaseManagerBuyer extends PurchaseManager implements PayControll
                     jo.put(PurchaseConstants.JSON_KEYS.MESSAGE_ID, msg_id);
                     payController.sendPayForMessageError(jo, fromAddress);
 
-                    NotificationUtil.showNotification(mContext, "Internet Usage", "Your current internet volume insufficient");
-                    if (dataPlanListener != null) {
-                        dataPlanListener.onBalancedFinished(purchase.sellerAddress, 0);
-                    } else {
-                        HandlerUtil.postForeground(() -> ToastUtil.showLong(mContext, "Your purchased data has finished."));
+
+                    Activity currentActivity = MeshApp.getCurrentActivity();
+                    if (currentActivity != null && !isIncoming) {
+                        HandlerUtil.postForeground(() -> DialogUtil.showConfirmationDialog(currentActivity, "Internet Usage Finished!", "Your current internet volume insufficient, please purchase again and continue messaging", "No, Thanks", "Ok", new DialogUtil.DialogButtonListener() {
+                            @Override
+                            public void onClickPositive() {
+                                DataPlanManager.openActivity(currentActivity);
+                            }
+
+                            @Override
+                            public void onCancel() {
+
+                            }
+
+                            @Override
+                            public void onClickNegative() {
+
+                            }
+                        }));
+                    }else {
+                        NotificationUtil.showNotification(mContext, "Internet Usage Finished!", "Your current internet volume is insufficient, please purchase again and continue messaging");
+                        if (dataPlanListener != null) {
+                            dataPlanListener.onBalancedFinished(purchase.sellerAddress, 0);
+                        } else {
+                            HandlerUtil.postForeground(() -> ToastUtil.showLong(mContext, "Your purchased data has finished."));
+                        }
                     }
                 }
             } else {
@@ -1056,8 +1097,6 @@ public class PurchaseManagerBuyer extends PurchaseManager implements PayControll
         }
     }
 
-
-
     @Override
     public void onInternetMessageResponseFailed(String sender, String message) {
 
@@ -1066,7 +1105,7 @@ public class PurchaseManagerBuyer extends PurchaseManager implements PayControll
     }
 
     @Override
-    public void onSyncMessageOKReceived(String buyerAddress, String sellerAddress, long blockNumber, double usedDataAmount, double totalDataAmount, double balance, String bps, String chs, int endPointType) {
+    public void onSyncSellerToBuyerReceived(String buyerAddress, String sellerAddress, long blockNumber, double usedDataAmount, double totalDataAmount, double balance, String bps, String chs, int endPointType) {
 //        MeshLog.p( "onSyncMessageOKReceived: " + sellerAddress);
 //
         if (blockNumber == 0) {
@@ -1116,11 +1155,24 @@ public class PurchaseManagerBuyer extends PurchaseManager implements PayControll
 
             }
 
-            sendSyncOkMessage(sellerAddress);
-
+           sendSyncOkMessageToSeller(sellerAddress);
         }
     }
 
+    private void sendSyncOkMessageToSeller(String sellerAddress){
+        JSONObject jsonObject = new JSONObject();
+        try {
+
+            jsonObject.put(PurchaseConstants.JSON_KEYS.MESSAME_FROM, ethService.getAddress());
+            jsonObject.put(PurchaseConstants.JSON_KEYS.SELLER_ADDRESS, sellerAddress);
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        payController.sendSyncOkMessageToSeller(jsonObject, sellerAddress);
+
+    }
 
     @Override
     public void onChannelCloseReceived(String fromAddress, String sellerAddress, long open_block, int endPointType) {
@@ -1162,6 +1214,8 @@ public class PurchaseManagerBuyer extends PurchaseManager implements PayControll
             if (dataPlanListener != null) {
                 dataPlanListener.onPurchaseSuccess(fromAddress, totalData, openBlock);
             }
+
+            sendSyncOkMessageToSeller(fromAddress);
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -1275,8 +1329,6 @@ public class PurchaseManagerBuyer extends PurchaseManager implements PayControll
     }
 
 
-
-
     //*********************************************************//
     //************************interface************************//
     //*********************************************************//
@@ -1299,22 +1351,6 @@ public class PurchaseManagerBuyer extends PurchaseManager implements PayControll
         void onBalancedFinished(String sellerAddress, int remain);
 
         void onTopUpFailed(String sellerAddress, String msg);
-    }
-
-    /*public interface SellerSearchListener {
-        void onSellerFoundSuccess(String sellerId);
-
-        void onSellerFoundError(String msg);
-    }
-
-    public interface MyBalanceInfoListener {
-        void onBalanceInfoReceived(double ethBalance, double tknBalance);
-
-        void onBalanceErrorReceived(String msg);
-    }*/
-
-    public interface EtherRequestListener {
-        void onResponseReceived(boolean success, String from, String msg);
     }
 
     public LiveData<Integer> getDifferentNetworkData(String myAddress, int endpoint) {

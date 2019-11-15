@@ -249,7 +249,7 @@ public class DataManager {
             mTmCommunicator = ITmCommunicator.Stub.asInterface(binder);
 
             try {
-//                mTmCommunicator.saveUserInfo(userInfo);
+                //mTmCommunicator.saveUserInfo(userInfo);
                 Log.e("service_status", "onServiceConnected");
                 boolean status = mTmCommunicator.startMesh(appName, userInfo);
                 if (!status) {
@@ -352,7 +352,7 @@ public class DataManager {
 
         @Override
         public void onProbableSellerDisconnected(String sellerId) throws RemoteException {
-
+            DataManager.this.onProbableSellerDisconnected(sellerId);
         }
     };
 
@@ -370,8 +370,8 @@ public class DataManager {
      * @param messageId
      * @param data
      */
-    public void sendData(String senderId, String receiverId, String messageId, byte[] data) throws RemoteException {
-        mTmCommunicator.sendData(senderId, receiverId, messageId, data);
+    public void sendData(String senderId, String receiverId, String messageId, byte[] data, boolean isNotificationNeeded) throws RemoteException {
+        mTmCommunicator.sendData(senderId, receiverId, messageId, data, isNotificationNeeded);
     }
 
     /**
@@ -565,6 +565,15 @@ public class DataManager {
             MeshLog.v("mTmCommunicator null");
         }
         return mTmCommunicator.isUserConnected(address);
+    }
+
+    public String getCurrentSellerId() throws RemoteException {
+        if (mTmCommunicator == null) {
+            MeshLog.v("mTmCommunicator null");
+        } else {
+            return mTmCommunicator.getCurrentSellerId();
+        }
+        return null;
     }
 
     public void onBuyerConnected(String address) throws RemoteException {

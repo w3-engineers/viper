@@ -21,14 +21,15 @@ public interface PurchaseConstants {
         int PAY_FOR_MESSAGE_OK = 11;
         int PAY_FOR_MESSAGE_ERROR = 12;
         int PAY_FOR_MESSAGE_RESPONSE = 13;
-        int BUYER_UPDATE_NOTIFYER = 101;
+        int BUYER_UPDATE_NOTIFYER = 14;
 
         int BUY_TOKEN = 17;
         int BUY_TOKEN_RESPONSE = 18;
 
-        int SYNC_BUYER = 20;
-        int SYNC_SELLER_OK = 21;
-        int SYNC_BUYER_OK = 22;
+        int SYNC_BUYER_TO_SELLER = 19;
+
+        int SYNC_SELLER_TO_BUYER = 21;
+        int SYNC_SELLER_TO_BUYER_OK = 22;
 
         int ETHER_REQUEST = 23;
         int ETHER_REQUEST_RESPONSE = 24;
@@ -46,6 +47,7 @@ public interface PurchaseConstants {
         int GIFT_RESPONSE = 34;
 
         int CONNECT_BUYER = 35;
+
     }
 
     interface INTERNAL_MESSAGE_TYPES {
@@ -110,6 +112,8 @@ public interface PurchaseConstants {
 
         String GIFT_ETH_BALANCE = "geb";
         String GIFT_TKN_BALANCE = "gtb";
+
+        String IS_INCOMING = "ii";
     }
 
     interface REQUEST_TYPES {
