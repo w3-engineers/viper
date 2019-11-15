@@ -246,7 +246,7 @@ public class PurchaseManagerBuyer extends PurchaseManager implements PayControll
     public void buyData(double amount, String sellerAddress) {
         try {
 
-            if (!TextUtils.isEmpty(probableSellerId) || !TextUtils.isEmpty(payController.getDataManager().getCurrentSellerId())){
+            if (!TextUtils.isEmpty(probableSellerId) || (!TextUtils.isEmpty(payController.getDataManager().getCurrentSellerId()) && !sellerAddress.equalsIgnoreCase(payController.getDataManager().getCurrentSellerId()))){
                 if (dataPlanListener != null) {
                     dataPlanListener.onPurchaseFailed(sellerAddress, "You already have an active purchase in the same network.");
                 }
