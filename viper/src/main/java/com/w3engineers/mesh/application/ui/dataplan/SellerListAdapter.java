@@ -90,6 +90,11 @@ class SellerListAdapter extends BaseAdapter<Seller> {
         }
     }
 
+    private String convertTwoDigitString(double value) {
+        String result = String.format("%.2f", value);
+        return result;
+    }
+
     private class SellerViewModel extends BaseAdapterViewHolder<Seller> {
         private ItemDataSellerBinding itemDataSellerBinding;
 
@@ -104,8 +109,8 @@ class SellerListAdapter extends BaseAdapter<Seller> {
             Context context = itemDataSellerBinding.userName.getContext();
             itemDataSellerBinding.userName.setText(seller.getName());
 
-            String usedDataInfo = String.format(context.getResources().getString(R.string.used_s), " " + seller.getUsedData())
-                    + " " + String.format(context.getResources().getString(R.string.total_mb) , " " + seller.getPurchasedData());
+            String usedDataInfo = String.format(context.getResources().getString(R.string.used_s), " " + convertTwoDigitString(seller.getUsedData()))
+                    + " " + String.format(context.getResources().getString(R.string.total_mb) , " " + convertTwoDigitString(seller.getPurchasedData()));
 
             itemDataSellerBinding.userUseAmount.setText(usedDataInfo);
 

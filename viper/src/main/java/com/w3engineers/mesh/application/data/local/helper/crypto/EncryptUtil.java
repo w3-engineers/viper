@@ -4,10 +4,6 @@ package com.w3engineers.mesh.application.data.local.helper.crypto;
 import android.util.Base64;
 
 import com.w3engineers.mesh.util.MeshLog;
-
-//import org.apache.commons.net.util.Base64;
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
