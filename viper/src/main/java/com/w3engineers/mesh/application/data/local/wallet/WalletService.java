@@ -28,16 +28,19 @@ public class WalletService {
 
     public interface WalletLoadListener {
         void onWalletLoaded(String walletAddress, String publicKey);
+
         void onErrorOccurred(String message);
     }
 
     public interface WalletCreateListener {
         void onWalletCreated(String walletAddress, String publicKey);
+
         void onError(String message);
     }
 
     public interface WalletImportListener {
         void onWalletImported(String walletAddress, String publicKey);
+
         void onError(String message);
     }
 
@@ -121,9 +124,9 @@ public class WalletService {
     }
 
     public void createWallet(String password, WalletCreateListener listener) {
-        if (isWalletExists()){
+        if (isWalletExists()) {
             // delete wallet file
-        }else {
+        } else {
             SharedPref.write(WALLET_PASSWORD_KEY, password);
 
             String keyStoreFileName = Web3jWalletHelper.onInstance(mContext).createWallet(password, walletSuffixDir);
@@ -144,7 +147,7 @@ public class WalletService {
         }
     }
 
-    public void loadWallet(String password, WalletLoadListener listener){
+    public void loadWallet(String password, WalletLoadListener listener) {
         if (isWalletExists()) {
             SharedPref.write(WALLET_PASSWORD_KEY, password);
             String keyStoreFileName = SharedPref.read(WALLET_FILE_NAME);
@@ -158,14 +161,16 @@ public class WalletService {
         }
     }
 
-    public void importWallet(String password, String filePath, WalletImportListener listener){
+    public void importWallet(String password, String filePath, WalletImportListener listener) {
 
         // copy file from filepath to library file path which will get using  Web3jWalletHelper.onInstance(mContext).getKeyStoreFilePath()
 
         // then call load loadWallet()
 
+        String savePtah = Web3jWalletHelper.onInstance(mContext).getKeyStoreFilePath(walletSuffixDir);
 
-        if (isWalletExists()){
+
+        if (isWalletExists()) {
             SharedPref.write(WALLET_PASSWORD_KEY, password);
             String keyStoreFileName = SharedPref.read(WALLET_FILE_NAME);
             loadWalletFromKeystore(password, keyStoreFileName);
@@ -175,7 +180,7 @@ public class WalletService {
             } else {
                 listener.onError("Wallet import failed");
             }
-        }else {
+        } else {
             listener.onError("Wallet import failed");
         }
 
