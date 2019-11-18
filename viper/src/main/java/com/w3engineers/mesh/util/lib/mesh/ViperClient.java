@@ -35,6 +35,7 @@ public class ViperClient {
     public static long regTime;
     public static boolean isSync;
     public static String packageName;
+    boolean status = false;
 
     private static ViperClient mViperClient;
 
@@ -45,7 +46,7 @@ public class ViperClient {
         }
     }
 
-    protected ViperClient(Context context, String appName, String packageName, String networkPrefix, String userName, int avatar, long regTime, boolean isSync) {
+    protected ViperClient(Context context, String appName, String packageName, String networkPrefix, String userName, String walletAddress, String publicKey, int avatar, long regTime, boolean isSync) {
         this.mContext = context;
         this.appName = appName;
         this.packageName = packageName;
@@ -56,18 +57,20 @@ public class ViperClient {
         this.isSync = isSync;
 
 
-        if (PermissionUtil.on(context).isAllowed(Manifest.permission.READ_EXTERNAL_STORAGE)) {
+        startClient(walletAddress, publicKey);
+
+/*        if (PermissionUtil.on(context).isAllowed(Manifest.permission.READ_EXTERNAL_STORAGE)) {
             startClient();
         } else {
             startPermissionActivity(context);
-        }
+        }*/
     }
 
-    public static ViperClient on(Context context, String appName, String packageName, String networkPrefix, String userName, int avatar, long regTime, boolean isSync) {
+    public static ViperClient on(Context context, String appName, String packageName, String networkPrefix, String userName, String walletAddress, String publicKey, int avatar, long regTime, boolean isSync) {
         if (mViperClient == null) {
             synchronized (ViperClient.class) {
                 if (mViperClient == null)
-                    mViperClient = new ViperClient(context, appName, packageName, networkPrefix, userName, avatar, regTime, isSync);
+                    mViperClient = new ViperClient(context, appName, packageName, networkPrefix, userName, walletAddress, publicKey, avatar, regTime, isSync);
             }
         }
         return mViperClient;
@@ -83,9 +86,8 @@ public class ViperClient {
         return this;
     }
 
-    public void startClient() {
-
-        WalletManager.getInstance().readWallet(mContext, new WalletManager.WaletListener() {
+    public void startClient(String walletAddress, String publicKey) {
+/*        WalletManager.getInstance().readWallet(mContext, WalletService.getInstance(mContext).PASSWORD, new WalletManager.WaletListener() {
             @Override
             public void onWalletLoaded(String walletAddress, String publicKey) {
                 MeshLog.i(" ViperClient loaded succesful " + walletAddress);
@@ -125,7 +127,34 @@ public class ViperClient {
                 walletLoaded.success = false;
                 AppDataObserver.on().sendObserverData(walletLoaded);
             }
-        });
+        });*/
+
+        UserInfo userInfo = new UserInfo();
+
+        userInfo.setAddress(walletAddress);
+        userInfo.setAvatar(avatar);
+        userInfo.setRegTime(regTime);
+        userInfo.setSync(isSync);
+        userInfo.setUserName(usersName);
+        userInfo.setPublicKey(publicKey);
+        userInfo.setPackageName(packageName);
+
+        DataManager.on().doBindService(mContext, appName, networkPrefix, userInfo);
+
+        if (PreferencesHelperDataplan.on().getDataPlanRole() == DataPlanConstants.USER_ROLE.DATA_SELLER) {
+            PurchaseManagerSeller.getInstance().setPayControllerListener();
+        }
+
+        if (PreferencesHelperDataplan.on().getDataPlanRole() == DataPlanConstants.USER_ROLE.DATA_BUYER) {
+            PurchaseManagerBuyer.getInstance().setPayControllerListener();
+        }
+
+        WalletLoaded walletLoaded = new WalletLoaded();
+        walletLoaded.walletAddress = walletAddress;
+        walletLoaded.publicKey = publicKey;
+        walletLoaded.success = true;
+
+        AppDataObserver.on().sendObserverData(walletLoaded);
     }
 
     private void startPermissionActivity(Context context) {
@@ -138,11 +167,11 @@ public class ViperClient {
         String plainString = new String(data);
         String userPublicKey = DataManager.on().getUserPublicKey(receiverId);
 
-        if (!TextUtils.isEmpty(userPublicKey)){
+        if (!TextUtils.isEmpty(userPublicKey)) {
             MeshLog.v("Before encryption " + plainString);
-            String encryptedMessage = CryptoHelper.encryptMessage(WalletService.getInstance(mContext).getPrivateKey(), userPublicKey , plainString);
+            String encryptedMessage = CryptoHelper.encryptMessage(WalletService.getInstance(mContext).getPrivateKey(), userPublicKey, plainString);
             MeshLog.v("Encrypted message " + encryptedMessage);
-            DataManager.on().sendData(senderId, receiverId, messageId, encryptedMessage.getBytes(),isNotificationNeeded);
+            DataManager.on().sendData(senderId, receiverId, messageId, encryptedMessage.getBytes(), isNotificationNeeded);
         } else {
             MeshLog.v("User public key not found " + senderId);
         }
@@ -156,11 +185,58 @@ public class ViperClient {
         return DataManager.on().getUserId();
     }
 
-    public void stopMesh(){
+/*    public void createWallet() {
+        WalletManager.getInstance().readWallet(mContext, WalletService.getInstance(mContext).PASSWORD, new WalletManager.WaletListener() {
+            @Override
+            public void onWalletLoaded(String walletAddress, String publicKey) {
+                MeshLog.i(" ViperClient loaded succesful " + walletAddress);
+
+                UserInfo userInfo = new UserInfo();
+
+                userInfo.setAddress(walletAddress);
+                userInfo.setAvatar(avatar);
+                userInfo.setRegTime(regTime);
+                userInfo.setSync(isSync);
+                userInfo.setUserName(usersName);
+                userInfo.setPublicKey(publicKey);
+                userInfo.setPackageName(packageName);
+
+                DataManager.on().doBindService(mContext, appName, networkPrefix, userInfo);
+
+                if (PreferencesHelperDataplan.on().getDataPlanRole() == DataPlanConstants.USER_ROLE.DATA_SELLER) {
+                    PurchaseManagerSeller.getInstance().setPayControllerListener();
+                }
+
+                if (PreferencesHelperDataplan.on().getDataPlanRole() == DataPlanConstants.USER_ROLE.DATA_BUYER) {
+                    PurchaseManagerBuyer.getInstance().setPayControllerListener();
+                }
+
+                WalletLoaded walletLoaded = new WalletLoaded();
+                walletLoaded.walletAddress = walletAddress;
+                walletLoaded.publicKey = publicKey;
+                walletLoaded.success = true;
+                AppDataObserver.on().sendObserverData(walletLoaded);
+
+                status = true;
+            }
+
+            @Override
+            public void onErrorOccurred(String message) {
+                MeshLog.v("ViperClient loading failed " + message);
+                WalletLoaded walletLoaded = new WalletLoaded();
+                walletLoaded.message = message;
+                walletLoaded.success = false;
+                AppDataObserver.on().sendObserverData(walletLoaded);
+
+            }
+        });
+    }*/
+
+    public void stopMesh() {
         DataManager.on().stopMesh();
     }
 
-    public void restartMesh(int currentRole){
+    public void restartMesh(int currentRole) {
         DataManager.on().restartMesh(currentRole);
     }
 
@@ -171,4 +247,5 @@ public class ViperClient {
     public List<String> getInternetSellers() throws RemoteException {
         return DataManager.on().getInternetSellers();
     }
+
 }

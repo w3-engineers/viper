@@ -199,10 +199,10 @@ public class WalletManager {
         void onErrorOccurred(String message);
     }
 
-    public void readWallet(Context context, WaletListener listener) {
+    public void readWallet(Context context, String password, WaletListener listener) {
         WalletService mWalletService =  WalletService.getInstance(context);
 
-        mWalletService.createOrLoadWallet(WalletService.PASSWORD, new WalletService.Listener() {
+        mWalletService.createOrLoadWallet(password, new WalletService.WalletLoadListener() {
             @Override
             public void onWalletLoaded(String walletAddress, String publicKey) {
                 MeshLog.i(" WalletManager loaded succesful");

@@ -72,7 +72,7 @@ public class Web3jWalletHelper extends Web3jWallet {
         return walletFullPath;
     }
 
-    public String readWalletFile(String filePath){
+    public String readWalletFile(String filePath) {
         String jsonStr = null;
         try {
             File yourFile = new File(filePath);
@@ -83,11 +83,9 @@ public class Web3jWalletHelper extends Web3jWallet {
                 MappedByteBuffer bb = fc.map(FileChannel.MapMode.READ_ONLY, 0, fc.size());
 
                 jsonStr = Charset.defaultCharset().decode(bb).toString();
-            }
-            catch(Exception e){
+            } catch (Exception e) {
                 e.printStackTrace();
-            }
-            finally {
+            } finally {
                 stream.close();
             }
 
@@ -98,6 +96,11 @@ public class Web3jWalletHelper extends Web3jWallet {
         return jsonStr;
     }
 
+    public String getKeyStoreFilePath(String keyStoreFolderName) {
+        String filePath = getKeystoreDir(keyStoreFolderName);
+        String keyStorePath = getKeystorePath(keyStoreFolderName, filePath);
 
+        return keyStorePath;
+    }
 
 }
