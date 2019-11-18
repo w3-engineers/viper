@@ -22,7 +22,7 @@ import com.w3engineers.mesh.util.lib.mesh.DataManager;
  */
 public abstract class TelemeshBaseActivity extends BaseActivity {
 
-    protected abstract BaseServiceLocator getBaseServiceLocator();
+    protected abstract BaseServiceLocator getServiceLocator();
 
     @Override
     protected void startUI() {
@@ -53,7 +53,7 @@ public abstract class TelemeshBaseActivity extends BaseActivity {
 
     private void startMeshService() {
 
-        BaseServiceLocator baseServiceLocator = getBaseServiceLocator();
+        BaseServiceLocator baseServiceLocator = getServiceLocator();
 
         if (baseServiceLocator != null) {
             baseServiceLocator.initViper();

@@ -16,7 +16,7 @@ public class TransportInit extends Event implements Parcelable {
     protected TransportInit(Parcel in) {
         nodeId = in.readString();
         publicKey = in.readString();
-        success = in.readBoolean();
+        success = in.readByte() == 1;
         msg = in.readString();
     }
 
@@ -41,7 +41,7 @@ public class TransportInit extends Event implements Parcelable {
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeString(nodeId);
         dest.writeString(publicKey);
-        dest.writeBoolean(success);
+        dest.writeByte((byte) (success ? 1 : 0));
         dest.writeString(msg);
     }
 }

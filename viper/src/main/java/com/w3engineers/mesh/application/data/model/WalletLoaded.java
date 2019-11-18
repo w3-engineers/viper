@@ -12,7 +12,7 @@ public class WalletLoaded extends Event implements Parcelable {
     public WalletLoaded(){}
 
     protected WalletLoaded(Parcel in) {
-        success = in.readBoolean();
+        success = in.readByte() == 1;
         walletAddress = in.readString();
         publicKey = in.readString();
         message = in.readString();
@@ -37,7 +37,7 @@ public class WalletLoaded extends Event implements Parcelable {
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
-        dest.writeBoolean(success);
+        dest.writeByte((byte) (success ? 1 : 0));
         dest.writeString(walletAddress);
         dest.writeString(publicKey);
         dest.writeString(message);
