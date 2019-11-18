@@ -66,8 +66,6 @@ public class TestDataPlanActivity extends TelemeshBaseActivity {
                     }
                 });
 
-
-
     }
 
     private void setListenerForAllExpandable() {
