@@ -212,7 +212,6 @@ public class DataPlanActivity extends TelemeshBaseActivity implements DataPlanMa
                 }
             }
         });
-
     }
 
     @Override
