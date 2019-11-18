@@ -16,7 +16,6 @@ import android.widget.Toast;
 
 import com.w3engineers.ext.strom.App;
 import com.w3engineers.mesh.R;
-import com.w3engineers.mesh.databinding.DialogAppInstallProgressBinding;
 import com.w3engineers.mesh.databinding.DialogServiceAppInstallProgressBinding;
 import com.w3engineers.mesh.util.lib.remote.RetrofitInterface;
 import com.w3engineers.mesh.util.lib.remote.RetrofitService;
