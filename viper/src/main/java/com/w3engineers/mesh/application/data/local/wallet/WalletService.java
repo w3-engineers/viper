@@ -169,7 +169,6 @@ public class WalletService {
 
         String savePtah = Web3jWalletHelper.onInstance(mContext).getKeyStoreFilePath(walletSuffixDir);
 
-
         if (isWalletExists()) {
             SharedPref.write(WALLET_PASSWORD_KEY, password);
             String keyStoreFileName = SharedPref.read(WALLET_FILE_NAME);
