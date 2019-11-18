@@ -27,6 +27,7 @@
            android:text="My Wallet Address" />
 
         <TextView
+            android:id="@+id/tv_my_address"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/margin_20"
@@ -48,7 +49,7 @@
             android:src="@mipmap/qr_code" />
 
         <Button
-            android:id="@+id/button_book_token"
+            android:id="@+id/button_copy_address"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/margin_20"

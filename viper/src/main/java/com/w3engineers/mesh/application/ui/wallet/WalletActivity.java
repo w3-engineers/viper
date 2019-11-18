@@ -18,6 +18,7 @@ import android.text.SpannableStringBuilder;
 import android.text.TextUtils;
 import android.text.method.LinkMovementMethod;
 import android.text.style.ForegroundColorSpan;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.Window;
@@ -109,13 +110,18 @@ public class WalletActivity extends TelemeshBaseActivity implements WalletManage
 
         mBinding.pullToRefresh.setOnRefreshListener(() -> {
             runOnUiThread(() -> {
-                refreshMyBalance();
-                setLastUpdated();
-                mBinding.pullToRefresh.setRefreshing(false);
+                refreshBalance();
             });
         });
 
       //  mBinding.currency.setOnClickListener(this);
+    }
+
+
+    private void refreshBalance(){
+        refreshMyBalance();
+        setLastUpdated();
+        mBinding.pullToRefresh.setRefreshing(false);
     }
 
     public static void openActivity(Context context){
@@ -226,7 +232,7 @@ public class WalletActivity extends TelemeshBaseActivity implements WalletManage
 /*            AddressLayout cdd = new AddressLayout(WalletActivity.this, walletManager.getMyAddress());
             cdd.show();*/
 
-            BottomSheetFragment bottomSheetFragment = new BottomSheetFragment();
+            BottomSheetFragment bottomSheetFragment = new BottomSheetFragment(walletManager.getMyAddress());
             bottomSheetFragment.show(getSupportFragmentManager(), bottomSheetFragment.getTag());
 
         } else if (v.getId() == R.id.btn_withdraw) {
@@ -242,7 +248,8 @@ public class WalletActivity extends TelemeshBaseActivity implements WalletManage
         } else if (v.getId() == R.id.currency) {
             //openCurrencyPopup(v);
         }else if (v.getId() == R.id.img_refresh) {
-           openActivity(this);
+           //openActivity(this);
+            refreshBalance();
         }
     }
 
@@ -390,7 +397,7 @@ public class WalletActivity extends TelemeshBaseActivity implements WalletManage
 
         if (totalEarningObserver != null) {
             totalEarningObserver.observe(this, aDouble -> {
-              //  mBinding.tvEarned.setText(aDouble == null ? "0" : aDouble.toString());
+               mBinding.tvEarned.setText(aDouble == null ? "0.0" : aDouble.toString());
             });
         }
     }
@@ -410,7 +417,7 @@ public class WalletActivity extends TelemeshBaseActivity implements WalletManage
 
         if (totalSpentObserver != null) {
             totalSpentObserver.observe(this, totalSpent -> {
-              //  mBinding.tvSpent.setText(totalSpent == null ? "0" : totalSpent.toString());
+               mBinding.tvSpent.setText(totalSpent == null ? "0.0" : totalSpent.toString());
             });
         }
     }
@@ -484,9 +491,10 @@ public class WalletActivity extends TelemeshBaseActivity implements WalletManage
 
     private void setCurrencyAndTokenObserver() {
         walletViewModel.networkMutableLiveData.observe(this, walletInfo -> {
+            Log.e("Wallet_info","Wallet info received from ");
             if (walletInfo != null) {
-/*                mBinding.tvEthBalance.setText(convertTwoDigitString(walletInfo.currencyAmount));
-                mBinding.tvRmeshBalance.setText(convertTwoDigitString(walletInfo.tokenAmount));*/
+                //mBinding.tvEthBalance.setText(convertTwoDigitString(walletInfo.currencyAmount));
+                mBinding.textViewPointValue.setText(convertTwoDigitString(walletInfo.tokenAmount));
 
                 int dataShareMode = dataPlanManager.getDataPlanRole();
 
@@ -502,6 +510,8 @@ public class WalletActivity extends TelemeshBaseActivity implements WalletManage
                 mBinding.titleRmeshCurrency.setText(walletInfo.tokenSymbol);*/
 
               //  mBinding.currency.setText(walletInfo.currencySymbol);
+            }else {
+                Log.e("Wallet_info","Wallet info null received from ");
             }
         });
 
