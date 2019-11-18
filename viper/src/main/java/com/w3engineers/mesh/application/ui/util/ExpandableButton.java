@@ -32,8 +32,8 @@ public class ExpandableButton extends FrameLayout {
     TextView textView;          //text view
     ImageView imageArrow;       //image arrow
     View viewColor;             //strip color
-    View viewTop;             //strip color
-    View viewBottom;             //strip color
+    View viewTop;             //top line view
+    View viewBottom;             //bottom line view
 
     int childViewResId = 0;     //child view id
     View childView;             //child view
@@ -178,12 +178,26 @@ public class ExpandableButton extends FrameLayout {
         }
     }
 
+    /**
+     * this is used to collapse the others expandable view
+     */
     public void collapseView() {
         if (childView.getVisibility() == VISIBLE) {
             rotateArrow();
             childView.setVisibility(GONE);
             if (expandableButtonListener != null) expandableButtonListener.onViewCollapsed();
             setIcon(getResources().getDrawable(R.mipmap.ic_collapse));
+        }
+    }
+
+    /**
+     * This is used to expand all collapse view
+     */
+    public void expandView() {
+        if (childView.getVisibility() == GONE) {
+            rotateArrow();
+            childView.setVisibility(VISIBLE);
+            if (expandableButtonListener != null) expandableButtonListener.onViewExpanded();
         }
     }
 

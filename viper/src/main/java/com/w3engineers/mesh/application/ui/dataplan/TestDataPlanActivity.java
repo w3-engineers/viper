@@ -4,9 +4,10 @@ import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
+import android.widget.CompoundButton;
+import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import com.w3engineers.mesh.R;
 import com.w3engineers.mesh.application.data.BaseServiceLocator;
 import com.w3engineers.mesh.application.ui.base.TelemeshBaseActivity;
@@ -19,6 +20,7 @@ public class TestDataPlanActivity extends TelemeshBaseActivity {
     ExpandableButton buyerButton;
     ExpandableButton internetOnlyButton;
     private Toolbar mTopToolbar;
+    private Switch switchButtonBuyer;
 
 
     @Override
@@ -40,11 +42,32 @@ public class TestDataPlanActivity extends TelemeshBaseActivity {
         localButton.setTopViewGone();
         sellerButton = findViewById(R.id.sellDataButton);
         buyerButton = findViewById(R.id.buyDataButton);
+        switchButtonBuyer = findViewById(R.id.switchButtonBuyer);
+
         internetOnlyButton = findViewById(R.id.internetOnlyButton);
         internetOnlyButton.setBottomViewGone();
 
-
         setListenerForAllExpandable();
+
+        initSwitchListener();
+    }
+
+    private void initSwitchListener() {
+        switchButtonBuyer.setOnCheckedChangeListener(
+                new CompoundButton.OnCheckedChangeListener() {
+                    public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                        if (isChecked) {
+                            Toast.makeText(TestDataPlanActivity.this,
+                                    "Switch On", Toast.LENGTH_SHORT).show();
+                        } else {
+                            Toast.makeText(TestDataPlanActivity.this,
+                                    "Switch Off", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                });
+
+
+
     }
 
     private void setListenerForAllExpandable() {
@@ -137,4 +160,6 @@ public class TestDataPlanActivity extends TelemeshBaseActivity {
         ((TextView) view).setText("Task Completed (Expandable Button color changed)");
         buyerButton.setBarColor(Color.parseColor("#297e55"));
     }
+
+
 }
