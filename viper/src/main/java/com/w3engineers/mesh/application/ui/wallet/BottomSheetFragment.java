@@ -2,14 +2,17 @@ package com.w3engineers.mesh.application.ui.wallet;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.support.design.widget.BottomSheetDialogFragment;
 import android.util.Base64;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,7 +23,16 @@ import android.widget.Toast;
 
 import com.w3engineers.mesh.R;
 import com.w3engineers.mesh.application.data.local.db.SharedPref;
+import com.w3engineers.mesh.application.data.local.wallet.WalletService;
 import com.w3engineers.mesh.util.Constant;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.nio.channels.FileChannel;
+
+import lib.folderpicker.FolderPicker;
 
 public class BottomSheetFragment extends BottomSheetDialogFragment implements View.OnClickListener {
     /**
@@ -29,13 +41,18 @@ public class BottomSheetFragment extends BottomSheetDialogFragment implements Vi
     private String address;
     private Bitmap bitmap;
     private Activity activity;
-    public BottomSheetFragment(){}
+    private final int FOLDER_CHOOSE_ACTION = 100;
+    private ProgressDialog dialog;
+
+
+    public BottomSheetFragment() {
+    }
 
     @SuppressLint("ValidFragment")
     public BottomSheetFragment(String address) {
         this.address = address;
         String bitmapString = SharedPref.read(Constant.PreferenceKeys.ADDRESS_BITMAP);
-        byte [] encodeByte = Base64.decode(bitmapString, Base64.DEFAULT);
+        byte[] encodeByte = Base64.decode(bitmapString, Base64.DEFAULT);
         bitmap = BitmapFactory.decodeByteArray(encodeByte, 0, encodeByte.length);
     }
 
@@ -50,7 +67,7 @@ public class BottomSheetFragment extends BottomSheetDialogFragment implements Vi
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View view =  inflater.inflate(R.layout.fragment_bottom_sheet_dialog, container, false);
+        View view = inflater.inflate(R.layout.fragment_bottom_sheet_dialog, container, false);
         ImageView imageView = view.findViewById(R.id.qrImage);
         Button copyButton = view.findViewById(R.id.button_copy_address);
         TextView textView = view.findViewById(R.id.tv_my_address);
@@ -60,13 +77,97 @@ public class BottomSheetFragment extends BottomSheetDialogFragment implements Vi
         return view;
     }
 
-    @Override
-    public void onClick(View v) {
-        if(activity == null) return;
+    private void copyAddress() {
+        if (activity == null) return;
         ClipboardManager clipboard = (ClipboardManager) activity.getSystemService(Context.CLIPBOARD_SERVICE);
         ClipData clip = ClipData.newPlainText(address, address);
         clipboard.setPrimaryClip(clip);
+    }
 
-        Toast.makeText(activity, "address copied", Toast.LENGTH_SHORT).show();
+    @Override
+    public void onClick(View v) {
+        if (v.getId() == R.id.button_copy_address) {
+            Intent intent = new Intent(activity, FolderPicker.class);
+            startActivityForResult(intent, FOLDER_CHOOSE_ACTION);
+        }
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == FOLDER_CHOOSE_ACTION && resultCode == Activity.RESULT_OK) {
+            String folderLocation = data.getExtras().getString("data");
+            //Log.i( "folderLocation", folderLocation );
+            Log.e("Choose_dir", "Dir =" + folderLocation);
+            String walletPath = WalletService.getInstance(activity).getWalletFilePath();
+            Log.e("Choose_dir", "walletPath =" + walletPath);
+            showProgress(true);
+            copyFileOrDirectory(walletPath, folderLocation);
+        }
+
+    }
+
+    private void showProgress(boolean isNeeded) {
+        if (isNeeded) {
+            dialog = new ProgressDialog(activity);
+            dialog.setMessage("Copying please wait...");
+            dialog.show();
+        } else {
+            if (dialog != null) {
+                dialog.dismiss();
+            }
+        }
+    }
+
+
+    private void copyFileOrDirectory(String srcDir, String dstDir) {
+
+        try {
+            File src = new File(srcDir);
+            File dst = new File(dstDir, src.getName());
+
+            if (src.isDirectory()) {
+
+                String files[] = src.list();
+                int filesLength = files.length;
+                for (int i = 0; i < filesLength; i++) {
+                    String src1 = (new File(src, files[i]).getPath());
+                    String dst1 = dst.getPath();
+                    copyFileOrDirectory(src1, dst1);
+
+                }
+            } else {
+                copyFile(src, dst);
+            }
+        } catch (Exception e) {
+            showProgress(false);
+            e.printStackTrace();
+        }
+    }
+
+    private void copyFile(File sourceFile, File destFile) throws IOException {
+        if (!destFile.getParentFile().exists())
+            destFile.getParentFile().mkdirs();
+
+        if (!destFile.exists()) {
+            destFile.createNewFile();
+        }
+
+        FileChannel source = null;
+        FileChannel destination = null;
+
+        try {
+            source = new FileInputStream(sourceFile).getChannel();
+            destination = new FileOutputStream(destFile).getChannel();
+            destination.transferFrom(source, 0, source.size());
+        } finally {
+            showProgress(false);
+            if (source != null) {
+                source.close();
+            }
+            if (destination != null) {
+                destination.close();
+            }
+        }
     }
 }

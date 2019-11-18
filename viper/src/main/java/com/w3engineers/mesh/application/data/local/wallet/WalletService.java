@@ -148,4 +148,20 @@ public class WalletService {
         String privateKey = SharedPref.read(PRIVATE_KEY);
         return  privateKey;
     }
+
+    public String getWalletFilePath(){
+        String filePath = Web3jWalletHelper.onInstance(mContext).getWalletDir(walletSuffixDir);
+        File directory = new File(filePath);
+
+        File[] list = directory.listFiles();
+        if (list != null) {
+            for (File f : list) {
+                String name = f.getName();
+                if (name.endsWith(".json")) {
+                    return f.getAbsolutePath();
+                }
+            }
+        }
+        return null;
+    }
 }
