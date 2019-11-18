@@ -31,6 +31,8 @@ public class ViperClient {
     public static String appName;
 
     public static String usersName;
+    public static String wallerAddress;
+    public static String publicKey;
     public static int avatar;
     public static long regTime;
     public static boolean isSync;
@@ -52,18 +54,21 @@ public class ViperClient {
         this.packageName = packageName;
         this.networkPrefix = networkPrefix;
         this.usersName = userName;
+        this.wallerAddress = walletAddress;
+        this.publicKey = publicKey;
+        this.usersName = userName;
         this.avatar = avatar;
         this.regTime = regTime;
         this.isSync = isSync;
 
 
-        startClient(walletAddress, publicKey);
+    //    startClient(walletAddress, publicKey);
 
-/*        if (PermissionUtil.on(context).isAllowed(Manifest.permission.READ_EXTERNAL_STORAGE)) {
+        if (PermissionUtil.on(context).isAllowed(Manifest.permission.READ_EXTERNAL_STORAGE)) {
             startClient();
         } else {
             startPermissionActivity(context);
-        }*/
+        }
     }
 
     public static ViperClient on(Context context, String appName, String packageName, String networkPrefix, String userName, String walletAddress, String publicKey, int avatar, long regTime, boolean isSync) {
@@ -86,8 +91,8 @@ public class ViperClient {
         return this;
     }
 
-    public void startClient(String walletAddress, String publicKey) {
-/*        WalletManager.getInstance().readWallet(mContext, WalletService.getInstance(mContext).PASSWORD, new WalletManager.WaletListener() {
+    public void startClient() {
+        WalletManager.getInstance().readWallet(mContext, WalletService.getInstance(mContext).PASSWORD, new WalletManager.WaletListener() {
             @Override
             public void onWalletLoaded(String walletAddress, String publicKey) {
                 MeshLog.i(" ViperClient loaded succesful " + walletAddress);
@@ -127,9 +132,9 @@ public class ViperClient {
                 walletLoaded.success = false;
                 AppDataObserver.on().sendObserverData(walletLoaded);
             }
-        });*/
+        });
 
-        UserInfo userInfo = new UserInfo();
+/*        UserInfo userInfo = new UserInfo();
 
         userInfo.setAddress(walletAddress);
         userInfo.setAvatar(avatar);
@@ -154,7 +159,7 @@ public class ViperClient {
         walletLoaded.publicKey = publicKey;
         walletLoaded.success = true;
 
-        AppDataObserver.on().sendObserverData(walletLoaded);
+        AppDataObserver.on().sendObserverData(walletLoaded);*/
     }
 
     private void startPermissionActivity(Context context) {

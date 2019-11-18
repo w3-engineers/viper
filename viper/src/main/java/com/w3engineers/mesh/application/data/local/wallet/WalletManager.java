@@ -199,6 +199,21 @@ public class WalletManager {
         void onErrorOccurred(String message);
     }
 
+    public interface WalletLoadListener {
+        void onWalletLoaded(String walletAddress, String publicKey);
+        void onErrorOccurred(String message);
+    }
+
+    public interface WalletCreateListener {
+        void onWalletCreated(String walletAddress, String publicKey);
+        void onError(String message);
+    }
+
+    public interface WalletImportListener {
+        void onWalletImported(String walletAddress, String publicKey);
+        void onError(String message);
+    }
+
     public void readWallet(Context context, String password, WaletListener listener) {
         WalletService mWalletService =  WalletService.getInstance(context);
 
@@ -239,6 +254,58 @@ public class WalletManager {
             }
         });
     }
+
+    public void createWallet(Context context, String password, WalletCreateListener listener){
+        WalletService mWalletService =  WalletService.getInstance(context);
+
+        mWalletService.createWallet(password, new WalletService.WalletCreateListener() {
+            @Override
+            public void onWalletCreated(String walletAddress, String publicKey) {
+
+            }
+
+            @Override
+            public void onError(String message) {
+
+            }
+        });
+    }
+
+    public void loadWallet(Context context, String password, WalletLoadListener listener){
+        WalletService mWalletService =  WalletService.getInstance(context);
+
+        mWalletService.loadWallet(password, new WalletService.WalletLoadListener() {
+            @Override
+            public void onWalletLoaded(String walletAddress, String publicKey) {
+
+            }
+
+            @Override
+            public void onErrorOccurred(String message) {
+
+            }
+        });
+
+    }
+
+    public void importWallet(Context context, String password, String filePath, WalletLoadListener listener){
+        WalletService mWalletService =  WalletService.getInstance(context);
+
+        mWalletService.importWallet(password, filePath, new WalletService.WalletImportListener() {
+            @Override
+            public void onWalletImported(String walletAddress, String publicKey) {
+
+            }
+
+            @Override
+            public void onError(String message) {
+
+            }
+        });
+    }
+
+
+
     /**
      * @param bitmap
      * @return converting bitmap and return a string
