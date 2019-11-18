@@ -66,7 +66,7 @@ public class DataPlanActivity extends TelemeshBaseActivity implements DataPlanMa
     }
 
     @Override
-    protected BaseServiceLocator getBaseServiceLocator() {
+    protected BaseServiceLocator getServiceLocator() {
         return null;
     }
 

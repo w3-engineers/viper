@@ -21,7 +21,7 @@ public class BuyerPendingMessage extends Event implements Parcelable {
         messageId = in.readString();
         messageData = in.readString();
         dataLength = in.readLong();
-        isIncoming = in.readBoolean();
+        isIncoming = in.readByte() == 1;
     }
 
     public static final Creator<BuyerPendingMessage> CREATOR = new Creator<BuyerPendingMessage>() {
@@ -48,6 +48,6 @@ public class BuyerPendingMessage extends Event implements Parcelable {
         dest.writeString(messageId);
         dest.writeString(messageData);
         dest.writeLong(dataLength);
-        dest.writeBoolean(isIncoming);
+        dest.writeByte((byte) (isIncoming ? 1 : 0));
     }
 }

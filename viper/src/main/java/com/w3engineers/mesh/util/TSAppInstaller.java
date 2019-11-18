@@ -17,6 +17,7 @@ import android.widget.Toast;
 import com.w3engineers.ext.strom.App;
 import com.w3engineers.mesh.R;
 import com.w3engineers.mesh.databinding.DialogAppInstallProgressBinding;
+import com.w3engineers.mesh.databinding.DialogServiceAppInstallProgressBinding;
 import com.w3engineers.mesh.util.lib.remote.RetrofitInterface;
 import com.w3engineers.mesh.util.lib.remote.RetrofitService;
 
@@ -45,7 +46,7 @@ public class TSAppInstaller {
     private static DownloadZipFileTask downloadZipFileTask;
     private static final String TAG = "appDownloadTest";
     public static boolean isAppUpdating;
-    private static DialogAppInstallProgressBinding binding;
+    private static DialogServiceAppInstallProgressBinding binding;
     private static AlertDialog dialog;
 
     public static void downloadApkFile(Context context, String baseUrl) {
@@ -221,7 +222,7 @@ public class TSAppInstaller {
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
 
         LayoutInflater inflater = LayoutInflater.from(context);
-        binding = DataBindingUtil.inflate(inflater, R.layout.dialog_app_install_progress, null, false);
+        binding = DataBindingUtil.inflate(inflater, R.layout.dialog_service_app_install_progress, null, false);
         builder.setView(binding.getRoot());
         dialog = builder.create();
         dialog.setCancelable(false);
