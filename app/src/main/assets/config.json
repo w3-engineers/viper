@@ -1,6 +1,6 @@
 {
-  "AUTH_USER_NAME" : "superadminformeshlib",
-  "AUTH_PASSWORD" : "jAJsb78dvw68C",
-  "APP_DOWNLOAD_LINK" : "https://meshlib.w3engineers.com/app/",
-  "GIFT_DONATE_LINK" : "http://3.228.165.182:8547/request/"
+  "AUTH_USER_NAME" : "<AUTH_USER_NAME>",
+  "AUTH_PASSWORD" : "<AUTH_PASSWORD>",
+  "APP_DOWNLOAD_LINK" : "<UPDATED_APP_DOWNLOAD_LINK>",
+  "GIFT_DONATE_LINK" : "<GIFT_DONATE_URL>"
 }
