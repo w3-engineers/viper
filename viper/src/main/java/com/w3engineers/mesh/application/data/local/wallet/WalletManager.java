@@ -1,5 +1,7 @@
 package com.w3engineers.mesh.application.data.local.wallet;
 
+import android.app.Activity;
+import android.app.ProgressDialog;
 import android.arch.lifecycle.LiveData;
 import android.content.Context;
 import android.content.Intent;
@@ -35,6 +37,7 @@ public class WalletManager {
     private PreferencesHelperDataplan preferencesHelperDataplan;
     private DataPlanManager dataPlanManager;
     private WalletListener walletListener;
+    private ProgressDialog dialog;
 
 
     public static void openActivity(Context context){
@@ -288,20 +291,32 @@ public class WalletManager {
 
     }
 
-    public void importWallet(Context context, String password, String filePath, WalletLoadListener listener){
+    public void importWallet(Context context, String password, String filePath, WalletImportListener listener){
         WalletService mWalletService =  WalletService.getInstance(context);
 
         mWalletService.importWallet(password, filePath, new WalletService.WalletImportListener() {
             @Override
             public void onWalletImported(String walletAddress, String publicKey) {
-
+              listener.onWalletImported(walletAddress, publicKey);
             }
 
             @Override
             public void onError(String message) {
-
+                listener.onError(message);
             }
         });
+    }
+
+    private void showProgress(Context activity, boolean isNeeded) {
+        if (isNeeded) {
+            dialog = new ProgressDialog(activity);
+            dialog.setMessage("Copying please wait...");
+            dialog.show();
+        } else {
+            if (dialog != null) {
+                dialog.dismiss();
+            }
+        }
     }
 
 

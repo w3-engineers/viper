@@ -66,11 +66,11 @@ public class Web3jWalletHelper extends Web3jWallet {
         String walletDir = getKeystoreDir(dir);
         return walletDir;
     }
-
+/*
     public String getWalletFullPath(String keyStoreFolderName, String keyStoreFileName) {
         String walletFullPath = getKeystorePath(keyStoreFolderName, keyStoreFileName);
         return walletFullPath;
-    }
+    }*/
 
     public String readWalletFile(String filePath) {
         String jsonStr = null;
@@ -96,11 +96,11 @@ public class Web3jWalletHelper extends Web3jWallet {
         return jsonStr;
     }
 
-    public String getKeyStoreFilePath(String keyStoreFolderName) {
-        String filePath = getKeystoreDir(keyStoreFolderName);
-        String keyStorePath = getKeystorePath(keyStoreFolderName, filePath);
+    /*public String getKeyStoreFilePath(String keyStoreFolderName, String keyStoreFileName) {
+       // String filePath = getKeystoreDir(keyStoreFolderName);
+        String keyStorePath = getKeystorePath(keyStoreFolderName, keyStoreFileName);
 
         return keyStorePath;
-    }
+    }*/
 
 }

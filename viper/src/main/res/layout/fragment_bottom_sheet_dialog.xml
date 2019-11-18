@@ -49,14 +49,14 @@
             android:src="@mipmap/qr_code" />
 
         <Button
-            android:id="@+id/button_copy_address"
+            android:id="@+id/button_export_wallet"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/margin_20"
             android:layout_marginLeft="@dimen/margin_40"
             android:layout_marginRight="@dimen/margin_40"
             android:background="@drawable/rectangle_button_shape"
-            android:text="@string/copy_address"
+            android:text="@string/export_my_profile"
             android:textAllCaps="true"
             android:textColor="@color/white"
             android:textSize="@dimen/text_size_16"/>

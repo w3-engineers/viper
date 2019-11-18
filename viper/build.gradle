@@ -85,7 +85,6 @@ dependencies {
     implementation 'de.hdodenhof:circleimageview:3.0.1'
 
     implementation 'com.makeramen:roundedimageview:2.3.0'
-
     implementation 'lib.kashif:folderpicker:2.4'
 
 }

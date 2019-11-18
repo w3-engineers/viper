@@ -23,7 +23,9 @@ import android.widget.Toast;
 
 import com.w3engineers.mesh.R;
 import com.w3engineers.mesh.application.data.local.db.SharedPref;
+import com.w3engineers.mesh.application.data.local.wallet.WalletManager;
 import com.w3engineers.mesh.application.data.local.wallet.WalletService;
+import com.w3engineers.mesh.application.data.local.wallet.Web3jWalletHelper;
 import com.w3engineers.mesh.util.Constant;
 
 import java.io.File;
@@ -69,7 +71,7 @@ public class BottomSheetFragment extends BottomSheetDialogFragment implements Vi
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_bottom_sheet_dialog, container, false);
         ImageView imageView = view.findViewById(R.id.qrImage);
-        Button copyButton = view.findViewById(R.id.button_copy_address);
+        Button copyButton = view.findViewById(R.id.button_export_wallet);
         TextView textView = view.findViewById(R.id.tv_my_address);
         imageView.setImageBitmap(bitmap);
         textView.setText(address);
@@ -86,11 +88,33 @@ public class BottomSheetFragment extends BottomSheetDialogFragment implements Vi
 
     @Override
     public void onClick(View v) {
-        if (v.getId() == R.id.button_copy_address) {
-            Intent intent = new Intent(activity, FolderPicker.class);
-            startActivityForResult(intent, FOLDER_CHOOSE_ACTION);
+        if (v.getId() == R.id.button_export_wallet) {
+    /*        Intent intent = new Intent(activity, FolderPicker.class);
+            startActivityForResult(intent, FOLDER_CHOOSE_ACTION);*/
+
+            showFileChooser();
         }
     }
+
+
+    private static final int FILE_SELECT_CODE = 0;
+
+    private void showFileChooser() {
+        Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+        intent.setType("*/*");
+        intent.addCategory(Intent.CATEGORY_OPENABLE);
+
+        try {
+            startActivityForResult(
+                    Intent.createChooser(intent, "Select a File to Upload"),
+                    FILE_SELECT_CODE);
+        } catch (android.content.ActivityNotFoundException ex) {
+            // Potentially direct the user to the Market with a Dialog
+            Toast.makeText(activity, "Please install a File Manager.",
+                    Toast.LENGTH_SHORT).show();
+        }
+    }
+
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -103,6 +127,23 @@ public class BottomSheetFragment extends BottomSheetDialogFragment implements Vi
             Log.e("Choose_dir", "walletPath =" + walletPath);
             showProgress(true);
             copyFileOrDirectory(walletPath, folderLocation);
+        }else if (requestCode == FILE_SELECT_CODE){
+            String path = data.getDataString();
+          //  String savePtah = Web3jWalletHelper.onInstance(activity).getKeyStoreFilePath("wallet/", "wallet/");
+
+            WalletManager.getInstance().importWallet(activity, "123456789", path, new WalletManager.WalletImportListener() {
+                @Override
+                public void onWalletImported(String walletAddress, String publicKey) {
+                    Log.e("wallet_adress", "wallet adress imported" + address);
+                }
+
+                @Override
+                public void onError(String message) {
+
+                }
+            });
+
+          //  Log.e("filePath", "file:: " +  path +"\nfile path save:: " + savePtah);
         }
 
     }

@@ -1,5 +1,6 @@
 package com.w3engineers.mesh.application.data.local.wallet;
 
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.text.TextUtils;
 
@@ -13,6 +14,10 @@ import com.w3engineers.mesh.util.MeshLog;
 import org.web3j.crypto.Credentials;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.nio.channels.FileChannel;
 
 public class WalletService {
     private Context mContext;
@@ -25,6 +30,7 @@ public class WalletService {
     private final String PRIVATE_KEY = "private_key";
     private final String WALLET_PASSWORD_KEY = "wallet_pass_key";
     private static WalletService walletService;
+
 
     public interface WalletLoadListener {
         void onWalletLoaded(String walletAddress, String publicKey);
@@ -164,25 +170,65 @@ public class WalletService {
     public void importWallet(String password, String filePath, WalletImportListener listener) {
 
         // copy file from filepath to library file path which will get using  Web3jWalletHelper.onInstance(mContext).getKeyStoreFilePath()
-
         // then call load loadWallet()
 
-        String savePtah = Web3jWalletHelper.onInstance(mContext).getKeyStoreFilePath(walletSuffixDir);
+     //   String savePtah = Web3jWalletHelper.onInstance(mContext).getKeyStoreFilePath(walletSuffixDir, walletSuffixDir);
 
-        if (isWalletExists()) {
-            SharedPref.write(WALLET_PASSWORD_KEY, password);
-            String keyStoreFileName = SharedPref.read(WALLET_FILE_NAME);
-            loadWalletFromKeystore(password, keyStoreFileName);
 
-            if (mCredentials != null) {
-                listener.onWalletImported(mCredentials.getAddress(), SharedPref.read(PUBLIC_KEY));
-            } else {
-                listener.onError("Wallet import failed");
+        HandlerUtil.postBackground(new Runnable() {
+            @Override
+            public void run() {
+                String savePtah = WalletService.getInstance(mContext).getWalletDirectory();
+
+
+                try {
+                    savePtah = savePtah  + new File(filePath).getName();
+                    copyFile(new File(filePath),new File(savePtah));
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
+                if (isWalletExists()) {
+                    SharedPref.write(WALLET_PASSWORD_KEY, password);
+                    String keyStoreFileName = SharedPref.read(WALLET_FILE_NAME);
+                    loadWalletFromKeystore(password, keyStoreFileName);
+
+                    if (mCredentials != null) {
+                        listener.onWalletImported(mCredentials.getAddress(), SharedPref.read(PUBLIC_KEY));
+                    } else {
+                        listener.onError("Wallet import failed");
+                    }
+                } else {
+                    listener.onError("Wallet import failed");
+                }
             }
-        } else {
-            listener.onError("Wallet import failed");
+        });
+
+    }
+
+    private void copyFile(File sourceFile, File destFile) throws IOException {
+        if (!destFile.getParentFile().exists())
+            destFile.getParentFile().mkdirs();
+
+        if (!destFile.exists()) {
+            destFile.createNewFile();
         }
 
+        FileChannel source = null;
+        FileChannel destination = null;
+
+        try {
+            source = new FileInputStream(sourceFile).getChannel();
+            destination = new FileOutputStream(destFile).getChannel();
+            destination.transferFrom(source, 0, source.size());
+        } finally {
+            if (source != null) {
+                source.close();
+            }
+            if (destination != null) {
+                destination.close();
+            }
+        }
     }
 
 
@@ -241,4 +287,10 @@ public class WalletService {
         }
         return null;
     }
+
+    public String getWalletDirectory(){
+        String filePath = Web3jWalletHelper.onInstance(mContext).getWalletDir(walletSuffixDir);
+        return filePath;
+    }
+
 }
