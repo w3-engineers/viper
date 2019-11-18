@@ -25,4 +25,5 @@ interface ITmCommunicator {
    void restartMesh(in int newRole);
    String getUserPublicKey(in String address);
    void disconnectFromInternet();
+   String getCurrentSellerId();
 }
