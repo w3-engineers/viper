@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:tools="http://schemas.android.com/tools">
+<LinearLayout
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/white"
@@ -306,12 +307,22 @@
                     android:textSize="@dimen/text_size_16" />
 
                 <android.support.v7.widget.RecyclerView
+                    android:id="@+id/test_data_seller_list"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:layout_marginStart="@dimen/margin_15"
                     android:layout_marginEnd="@dimen/margin_15"
                     android:layout_marginBottom="@dimen/margin_10"
                     tools:listitem="@layout/item_seller_view"/>
+               <!-- <com.w3engineers.ext.strom.application.ui.widget.BaseRecyclerView
+                    android:id="@+id/data_seller_list"
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    app:brv_emptyLayoutId="@id/empty_layout"
+                    app:layout_constraintBottom_toTopOf="@+id/textView_sell_price_info"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />-->
 
 
             </LinearLayout>
@@ -384,3 +395,22 @@
     </android.support.v7.widget.CardView>
 
 </LinearLayout>
+    <data>
+
+        <import type="android.view.View" />
+
+
+<!--        <import type="com.w3engineers.mesh.application.data.local.purchase.PurchaseConstants" />-->
+
+<!--        <import type="com.w3engineers.mesh.util.Util" />-->
+
+<!--        <import type="com.w3engineers.mesh.application.data.local.DataPlanConstants" />-->
+
+<!--        <import type="com.w3engineers.mesh.util.Constant" />-->
+
+        <variable
+            name="dataLimitModel"
+            type="com.w3engineers.mesh.application.ui.dataplan.DataLimitModel" />
+
+    </data>
+</layout>

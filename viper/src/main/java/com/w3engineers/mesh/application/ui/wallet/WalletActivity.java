@@ -248,8 +248,8 @@ public class WalletActivity extends TelemeshBaseActivity implements WalletManage
         } else if (v.getId() == R.id.currency) {
             //openCurrencyPopup(v);
         }else if (v.getId() == R.id.img_refresh) {
-           //openActivity(this);
-            refreshBalance();
+           openActivity(this);
+//            refreshBalance();
         }
     }
 
