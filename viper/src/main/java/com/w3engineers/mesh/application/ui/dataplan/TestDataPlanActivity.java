@@ -40,6 +40,7 @@ import com.w3engineers.mesh.application.ui.util.ExpandableButton;
 import com.w3engineers.mesh.databinding.TestActivityDataPlanBinding;
 import com.w3engineers.mesh.util.DialogUtil;
 import com.w3engineers.mesh.util.NotificationUtil;
+import com.w3engineers.mesh.util.lib.mesh.HandlerUtil;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -85,6 +86,8 @@ public class TestDataPlanActivity extends TelemeshBaseActivity implements DataPl
         mBinding = (TestActivityDataPlanBinding) getViewDataBinding();
 
         setTitle();
+        changeStatusBarColor();
+
 
         mBinding.localButton.setTopViewGone();
         mBinding.internetOnlyButton.setBottomViewGone();
@@ -95,9 +98,6 @@ public class TestDataPlanActivity extends TelemeshBaseActivity implements DataPl
 
         initAll();
 
-        changeStatusBarColor();
-
-        prepareDataPlanRadio();
 
         initRecyclerView();
 
@@ -116,17 +116,22 @@ public class TestDataPlanActivity extends TelemeshBaseActivity implements DataPl
 
         progressDialog = new ProgressDialog(this);
         dataLimitModel = DataLimitModel.getInstance(getApplicationContext());
-
-
         myCalendar = Calendar.getInstance();
-
         mCurrentRole = DataPlanManager.getInstance().getDataPlanRole();
         dataLimitModel.setInitialRole(mCurrentRole);
         mBinding.setDataLimitModel(dataLimitModel);
 
         setClickListener(mBinding.buttonSave);
 
+
         DataPlanManager.getInstance().setDataPlanListener(this);
+
+
+        expandableButtons = new ExpandableButton[]{mBinding.localButton, mBinding.sellDataButton, mBinding.buyDataButton, mBinding.internetOnlyButton};
+        roleSwitches = new Switch[]{mBinding.switchButtonLocal, mBinding.switchButtonSeller, mBinding.switchButtonBuyer, mBinding.switchButtonInternet};
+        dataLimitRadioButtons = new RadioButton[]{mBinding.unlimited, mBinding.limitTo};
+
+
     }
 
 
@@ -136,11 +141,14 @@ public class TestDataPlanActivity extends TelemeshBaseActivity implements DataPl
                     public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                         if (isChecked) {
                             dataPlanRadioClicked(DataPlanConstants.USER_ROLE.MESH_USER);
+
 //                            Toast.makeText(TestDataPlanActivity.this,
 //                                    "Switch On", Toast.LENGTH_SHORT).show();
                         } else {
-                            Toast.makeText(TestDataPlanActivity.this,
-                                    "Switch Off", Toast.LENGTH_SHORT).show();
+
+                            expandableButtons[mCurrentRole].setTextColor(Color.BLACK);
+//                            Toast.makeText(TestDataPlanActivity.this,
+//                                    "Switch Off", Toast.LENGTH_SHORT).show();
                         }
                     }
                 });
@@ -154,8 +162,9 @@ public class TestDataPlanActivity extends TelemeshBaseActivity implements DataPl
 //                          Toast.makeText(TestDataPlanActivity.this,
 //                                    "Switch On", Toast.LENGTH_SHORT).show();
                         } else {
-                            Toast.makeText(TestDataPlanActivity.this,
-                                    "Switch Off", Toast.LENGTH_SHORT).show();
+                            expandableButtons[mCurrentRole].setTextColor(Color.BLACK);
+//                            Toast.makeText(TestDataPlanActivity.this,
+//                                    "Switch Off", Toast.LENGTH_SHORT).show();
                         }
                     }
                 });
@@ -171,8 +180,9 @@ public class TestDataPlanActivity extends TelemeshBaseActivity implements DataPl
 //                            Toast.makeText(TestDataPlanActivity.this,
 //                                    "Switch On", Toast.LENGTH_SHORT).show();
                         } else {
-                            Toast.makeText(TestDataPlanActivity.this,
-                                    "Switch Off", Toast.LENGTH_SHORT).show();
+                            expandableButtons[mCurrentRole].setTextColor(Color.BLACK);
+//                            Toast.makeText(TestDataPlanActivity.this,
+//                                    "Switch Off", Toast.LENGTH_SHORT).show();
                         }
                     }
                 });
@@ -186,8 +196,9 @@ public class TestDataPlanActivity extends TelemeshBaseActivity implements DataPl
 //                            Toast.makeText(TestDataPlanActivity.this,
 //                                    "Switch On", Toast.LENGTH_SHORT).show();
                         } else {
-                            Toast.makeText(TestDataPlanActivity.this,
-                                    "Switch Off", Toast.LENGTH_SHORT).show();
+                            expandableButtons[mCurrentRole].setTextColor(Color.BLACK);
+//                            Toast.makeText(TestDataPlanActivity.this,
+//                                    "Switch Off", Toast.LENGTH_SHORT).show();
                         }
                     }
                 });
@@ -499,18 +510,15 @@ public class TestDataPlanActivity extends TelemeshBaseActivity implements DataPl
         return prev + "" + cur;
     }
 
-    private void prepareDataPlanRadio() {
 
-        expandableButtons = new ExpandableButton[]{mBinding.localButton, mBinding.sellDataButton, mBinding.buyDataButton, mBinding.internetOnlyButton};
-        roleSwitches = new Switch[]{mBinding.switchButtonLocal, mBinding.switchButtonSeller, mBinding.switchButtonBuyer, mBinding.switchButtonInternet};
-        dataLimitRadioButtons = new RadioButton[]{mBinding.unlimited, mBinding.limitTo};
-    }
 
     private void dataPlanRadioClicked(int type) {
         if (mCurrentRole == type)
             return;
 
         roleSwitches[mCurrentRole].setChecked(false);
+
+        expandableButtons[type].setTextColor(Color.argb(255, 0, 141, 255));
 
         setRoleTasks(mCurrentRole, type);
     }
@@ -537,8 +545,19 @@ public class TestDataPlanActivity extends TelemeshBaseActivity implements DataPl
 
     private void loadUI() {
 
-//        expandableButtons[DataPlanManager.getInstance().getDataPlanRole()].expandView();
+
         roleSwitches[DataPlanManager.getInstance().getDataPlanRole()].setChecked(true);
+        expandableButtons[DataPlanManager.getInstance().getDataPlanRole()].setTextColor(Color.argb(255, 0, 141, 255));
+
+        HandlerUtil.postForeground(new Runnable() {
+            @Override
+            public void run() {
+                expandableButtons[DataPlanManager.getInstance().getDataPlanRole()].expandView();
+            }
+        }, 500);
+
+
+
 
         dataLimitRadioButtons[dataLimitModel.getDataLimited() ? 1 : 0].setChecked(true);
 
