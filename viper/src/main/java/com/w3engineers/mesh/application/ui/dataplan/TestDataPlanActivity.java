@@ -547,12 +547,24 @@ public class TestDataPlanActivity extends TelemeshBaseActivity implements DataPl
             }
         }, 500);
 
-
-
-
         dataLimitRadioButtons[dataLimitModel.getDataLimited() ? 1 : 0].setChecked(true);
 
         setDataLimitEnabled(dataLimitModel.getDataLimited());
+
+        if (dataLimitModel.getFromDate() > 0) {
+            mBinding.fromDate.setText(sdf.format(dataLimitModel.getFromDate()));
+        } else {
+            mBinding.fromDate.setText(sdf.format(myCalendar.getTime()));
+            dataLimitModel.setFromDate(myCalendar.getTimeInMillis());
+        }
+        if (dataLimitModel.getToDate() > 0) {
+            mBinding.toDate.setText(sdf.format(dataLimitModel.getToDate()));
+        } else {
+            mBinding.toDate.setText(sdf.format(myCalendar.getTime()));
+            dataLimitModel.setToDate(myCalendar.getTimeInMillis());
+        }
+
+
 
         long sharedData = DataPlanManager.getInstance().getSellAmountData();
 
@@ -564,6 +576,7 @@ public class TestDataPlanActivity extends TelemeshBaseActivity implements DataPl
             mBinding.range.setText(amount + "");
         }
 
+        mBinding.fromDate.setEnabled(false);
 
         disableSaveButton();
     }
@@ -578,6 +591,7 @@ public class TestDataPlanActivity extends TelemeshBaseActivity implements DataPl
 
     private void setDataLimitEnabled(boolean value) {
         mBinding.range.setEnabled(value);
+        mBinding.toDate.setEnabled(value);
     }
 
     private void setEventListener() {
@@ -607,20 +621,22 @@ public class TestDataPlanActivity extends TelemeshBaseActivity implements DataPl
             myCalendar.set(Calendar.YEAR, year);
             myCalendar.set(Calendar.MONTH, monthOfYear);
             myCalendar.set(Calendar.DAY_OF_MONTH, dayOfMonth);
+            mBinding.toDate.setText(sdf.format(myCalendar.getTimeInMillis()));
+            mBinding.fromDate.setText(sdf.format(System.currentTimeMillis()));
 
             enableSaveButton();
         };
 
 
-//        mBinding.toDate.setOnClickListener(v -> {
-//            if (dataLimitModel.getToDate() > myCalendar.getTimeInMillis() - 1000) {
-//                myCalendar.setTimeInMillis(dataLimitModel.getToDate());
-//            }
-//
-//            DatePickerDialog toDatePickerDialog = new DatePickerDialog(DataPlanActivity.this, date, myCalendar.get(Calendar.YEAR), myCalendar.get(Calendar.MONTH), myCalendar.get(Calendar.DAY_OF_MONTH));
-//            toDatePickerDialog.getDatePicker().setMinDate(dataLimitModel.getFromDate() > System.currentTimeMillis() ? dataLimitModel.getFromDate() : System.currentTimeMillis());
-//            toDatePickerDialog.show();
-//        });
+        mBinding.toDate.setOnClickListener(v -> {
+            if (dataLimitModel.getToDate() > myCalendar.getTimeInMillis() - 1000) {
+                myCalendar.setTimeInMillis(dataLimitModel.getToDate());
+            }
+
+            DatePickerDialog toDatePickerDialog = new DatePickerDialog(TestDataPlanActivity.this, date, myCalendar.get(Calendar.YEAR), myCalendar.get(Calendar.MONTH), myCalendar.get(Calendar.DAY_OF_MONTH));
+            toDatePickerDialog.getDatePicker().setMinDate(dataLimitModel.getFromDate() > System.currentTimeMillis() ? dataLimitModel.getFromDate() : System.currentTimeMillis());
+            toDatePickerDialog.show();
+        });
     }
 
     private void parseIntent() {
@@ -769,12 +785,12 @@ public class TestDataPlanActivity extends TelemeshBaseActivity implements DataPl
 
             long from = 0l, to = 0l;
             long tempSharedData = convertMegabytesToBytes(Integer.valueOf(mBinding.range.getText().toString()));
-//            try {
-//                from = getDayWiseTimeStamp(sdf.parse(mBinding.fromDate.getText().toString()).getTime());
-//                to = getDayWiseTimeStamp(sdf.parse(mBinding.toDate.getText().toString()).getTime()) + (24 * 60 * 60 * 1000 - 1000);
-//            } catch (ParseException e) {
-//                e.printStackTrace();
-//            }
+            try {
+                from = getDayWiseTimeStamp(sdf.parse(mBinding.fromDate.getText().toString()).getTime());
+                to = getDayWiseTimeStamp(sdf.parse(mBinding.toDate.getText().toString()).getTime()) + (24 * 60 * 60 * 1000 - 1000);
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
 
             if (to <= System.currentTimeMillis()) {
 //                mBinding.dateError.setVisibility(View.VISIBLE);
