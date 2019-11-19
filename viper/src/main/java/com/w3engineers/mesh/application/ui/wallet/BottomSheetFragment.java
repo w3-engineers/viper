@@ -23,9 +23,7 @@ import android.widget.Toast;
 
 import com.w3engineers.mesh.R;
 import com.w3engineers.mesh.application.data.local.db.SharedPref;
-import com.w3engineers.mesh.application.data.local.wallet.WalletManager;
 import com.w3engineers.mesh.application.data.local.wallet.WalletService;
-import com.w3engineers.mesh.application.data.local.wallet.Web3jWalletHelper;
 import com.w3engineers.mesh.util.Constant;
 
 import java.io.File;
@@ -89,10 +87,8 @@ public class BottomSheetFragment extends BottomSheetDialogFragment implements Vi
     @Override
     public void onClick(View v) {
         if (v.getId() == R.id.button_export_wallet) {
-    /*        Intent intent = new Intent(activity, FolderPicker.class);
-            startActivityForResult(intent, FOLDER_CHOOSE_ACTION);*/
-
-            showFileChooser();
+            Intent intent = new Intent(activity, FolderPicker.class);
+            startActivityForResult(intent, FOLDER_CHOOSE_ACTION);
         }
     }
 
@@ -127,23 +123,6 @@ public class BottomSheetFragment extends BottomSheetDialogFragment implements Vi
             Log.e("Choose_dir", "walletPath =" + walletPath);
             showProgress(true);
             copyFileOrDirectory(walletPath, folderLocation);
-        }else if (requestCode == FILE_SELECT_CODE){
-            String path = data.getDataString();
-          //  String savePtah = Web3jWalletHelper.onInstance(activity).getKeyStoreFilePath("wallet/", "wallet/");
-
-            WalletManager.getInstance().importWallet(activity, "123456789", path, new WalletManager.WalletImportListener() {
-                @Override
-                public void onWalletImported(String walletAddress, String publicKey) {
-                    Log.e("wallet_adress", "wallet adress imported" + address);
-                }
-
-                @Override
-                public void onError(String message) {
-
-                }
-            });
-
-          //  Log.e("filePath", "file:: " +  path +"\nfile path save:: " + savePtah);
         }
 
     }

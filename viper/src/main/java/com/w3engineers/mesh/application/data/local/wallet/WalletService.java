@@ -2,7 +2,13 @@ package com.w3engineers.mesh.application.data.local.wallet;
 
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.Intent;
+import android.net.Uri;
+import android.os.Build;
+import android.os.Environment;
+import android.support.v4.content.FileProvider;
 import android.text.TextUtils;
+import android.util.Log;
 
 
 import com.w3engineers.eth.util.helper.HandlerUtil;
@@ -13,10 +19,15 @@ import com.w3engineers.mesh.util.MeshLog;
 
 import org.web3j.crypto.Credentials;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.nio.channels.FileChannel;
 
 public class WalletService {
@@ -129,9 +140,10 @@ public class WalletService {
         });
     }
 
+
     public void createWallet(String password, WalletCreateListener listener) {
         if (isWalletExists()) {
-            // delete wallet file
+            deleteExistsWallet();
         } else {
             SharedPref.write(WALLET_PASSWORD_KEY, password);
 
@@ -164,29 +176,22 @@ public class WalletService {
             } else {
                 listener.onErrorOccurred("Wallet load failed");
             }
+        }else {
+            listener.onErrorOccurred("Wallet is not exist");
         }
     }
 
-    public void importWallet(String password, String filePath, WalletImportListener listener) {
-
-        // copy file from filepath to library file path which will get using  Web3jWalletHelper.onInstance(mContext).getKeyStoreFilePath()
-        // then call load loadWallet()
-
-     //   String savePtah = Web3jWalletHelper.onInstance(mContext).getKeyStoreFilePath(walletSuffixDir, walletSuffixDir);
-
+    public void importWallet(String password, Uri fileUri, WalletImportListener listener) {
+        if (isWalletExists()) {
+            // delete wallet file
+            deleteExistsWallet();
+        }
 
         HandlerUtil.postBackground(new Runnable() {
             @Override
             public void run() {
                 String savePtah = WalletService.getInstance(mContext).getWalletDirectory();
-
-
-                try {
-                    savePtah = savePtah  + new File(filePath).getName();
-                    copyFile(new File(filePath),new File(savePtah));
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
+                copyFile(mContext, fileUri, savePtah);
 
                 if (isWalletExists()) {
                     SharedPref.write(WALLET_PASSWORD_KEY, password);
@@ -206,29 +211,62 @@ public class WalletService {
 
     }
 
-    private void copyFile(File sourceFile, File destFile) throws IOException {
-        if (!destFile.getParentFile().exists())
-            destFile.getParentFile().mkdirs();
-
-        if (!destFile.exists()) {
-            destFile.createNewFile();
-        }
-
-        FileChannel source = null;
-        FileChannel destination = null;
-
+    /**
+     * This is used to copy the content of file
+     *
+     * @param mConText
+     * @param source
+     * @param destination
+     */
+    private void copyFile(Context mConText, Uri source, String destination) {
         try {
-            source = new FileInputStream(sourceFile).getChannel();
-            destination = new FileOutputStream(destFile).getChannel();
-            destination.transferFrom(source, 0, source.size());
-        } finally {
-            if (source != null) {
-                source.close();
+            InputStream inputStream = mConText.getContentResolver().openInputStream(source);
+            if (inputStream != null) {
+                String ret = "";
+                InputStreamReader inputStreamReader = new InputStreamReader(inputStream);
+                BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
+                String receiveString = "";
+                StringBuilder stringBuilder = new StringBuilder();
+
+                while ((receiveString = bufferedReader.readLine()) != null) {
+                    stringBuilder.append(receiveString);
+                }
+                inputStream.close();
+                ret = stringBuilder.toString();
+
+                File mainFile = new File(source.getPath());
+
+                File outputDir = new File(destination);
+                if (!outputDir.exists()) {
+                    outputDir.mkdir();
+                }
+                File outputFile = File.createTempFile(mainFile.getName(), ".json", outputDir);
+
+                FileOutputStream fos = new FileOutputStream(outputFile);
+                fos.write(ret.getBytes());
+                fos.close();
             }
-            if (destination != null) {
-                destination.close();
+
+        } catch (IOException e) {
+            e.printStackTrace();
+
+        }
+    }
+
+    public boolean deleteExistsWallet() {
+        boolean isWalletExists = false;
+
+        String filePath = Web3jWalletHelper.onInstance(mContext).getWalletDir(walletSuffixDir);
+        File directory = new File(filePath);
+
+        File[] list = directory.listFiles();
+        if (list != null) {
+            for (File f : list) {
+             f.delete();
             }
         }
+
+        return isWalletExists;
     }
 
 
@@ -272,7 +310,7 @@ public class WalletService {
         return privateKey;
     }
 
-    public String getWalletFilePath(){
+    public String getWalletFilePath() {
         String filePath = Web3jWalletHelper.onInstance(mContext).getWalletDir(walletSuffixDir);
         File directory = new File(filePath);
 
@@ -288,7 +326,7 @@ public class WalletService {
         return null;
     }
 
-    public String getWalletDirectory(){
+    public String getWalletDirectory() {
         String filePath = Web3jWalletHelper.onInstance(mContext).getWalletDir(walletSuffixDir);
         return filePath;
     }

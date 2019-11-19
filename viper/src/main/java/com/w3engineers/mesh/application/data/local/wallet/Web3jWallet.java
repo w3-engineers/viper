@@ -70,7 +70,7 @@ class Web3jWallet {
 
     protected String getKeystorePath(String keyStoreFolderName, String keyStoreFileName) {
         String walletDir = getKeystoreDir(keyStoreFolderName);
-        return walletDir + keyStoreFileName;
+        return walletDir + File.separator + keyStoreFileName;
     }
 
 }

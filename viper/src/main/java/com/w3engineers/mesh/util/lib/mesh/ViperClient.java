@@ -62,13 +62,13 @@ public class ViperClient {
         this.isSync = isSync;
 
 
-    //    startClient(walletAddress, publicKey);
+        startClient(walletAddress, publicKey);
 
-        if (PermissionUtil.on(context).isAllowed(Manifest.permission.READ_EXTERNAL_STORAGE)) {
+/*        if (PermissionUtil.on(context).isAllowed(Manifest.permission.READ_EXTERNAL_STORAGE)) {
             startClient();
         } else {
             startPermissionActivity(context);
-        }
+        }*/
     }
 
     public static ViperClient on(Context context, String appName, String packageName, String networkPrefix, String userName, String walletAddress, String publicKey, int avatar, long regTime, boolean isSync) {
@@ -91,8 +91,8 @@ public class ViperClient {
         return this;
     }
 
-    public void startClient() {
-        WalletManager.getInstance().readWallet(mContext, WalletService.getInstance(mContext).PASSWORD, new WalletManager.WaletListener() {
+    public void startClient(String wallerAddress, String publicKey) {
+/*        WalletManager.getInstance().readWallet(mContext, WalletService.getInstance(mContext).PASSWORD, new WalletManager.WaletListener() {
             @Override
             public void onWalletLoaded(String walletAddress, String publicKey) {
                 MeshLog.i(" ViperClient loaded succesful " + walletAddress);
@@ -132,11 +132,11 @@ public class ViperClient {
                 walletLoaded.success = false;
                 AppDataObserver.on().sendObserverData(walletLoaded);
             }
-        });
+        });*/
 
-/*        UserInfo userInfo = new UserInfo();
+        UserInfo userInfo = new UserInfo();
 
-        userInfo.setAddress(walletAddress);
+        userInfo.setAddress(wallerAddress);
         userInfo.setAvatar(avatar);
         userInfo.setRegTime(regTime);
         userInfo.setSync(isSync);
@@ -155,11 +155,11 @@ public class ViperClient {
         }
 
         WalletLoaded walletLoaded = new WalletLoaded();
-        walletLoaded.walletAddress = walletAddress;
+        walletLoaded.walletAddress = wallerAddress;
         walletLoaded.publicKey = publicKey;
         walletLoaded.success = true;
 
-        AppDataObserver.on().sendObserverData(walletLoaded);*/
+        AppDataObserver.on().sendObserverData(walletLoaded);
     }
 
     private void startPermissionActivity(Context context) {

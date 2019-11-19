@@ -6,7 +6,9 @@ import android.arch.lifecycle.LiveData;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.net.Uri;
 import android.os.AsyncTask;
+import android.text.TextUtils;
 import android.util.Base64;
 
 import com.google.zxing.WriterException;
@@ -204,7 +206,7 @@ public class WalletManager {
 
     public interface WalletLoadListener {
         void onWalletLoaded(String walletAddress, String publicKey);
-        void onErrorOccurred(String message);
+        void onError(String message);
     }
 
     public interface WalletCreateListener {
@@ -237,9 +239,7 @@ public class WalletManager {
                             try {
                                 // Getting QR-Code as Bitmap
                                 Bitmap bitmap = qrgEncoder.encodeAsBitmap();
-
                                 String bitmapAddress = bitMapToString(bitmap);
-
                                 SharedPref.write(Constant.PreferenceKeys.ADDRESS_BITMAP, bitmapAddress);
 
                             } catch (WriterException e) {
@@ -258,54 +258,151 @@ public class WalletManager {
         });
     }
 
+    /**
+     * This api is used to create wallet
+     * @param context
+     * @param password
+     * @param listener
+     */
     public void createWallet(Context context, String password, WalletCreateListener listener){
-        WalletService mWalletService =  WalletService.getInstance(context);
+        if (TextUtils.isEmpty(password)){
+            listener.onError("Password cant be empty");
+        }else if (password.length() < 8){
+            listener.onError("Password can't be smaller then 8 character");
+        }else {
+            WalletService mWalletService =  WalletService.getInstance(context);
+            mWalletService.createWallet(password, new WalletService.WalletCreateListener() {
+                @Override
+                public void onWalletCreated(String walletAddress, String publicKey) {
+                    listener.onWalletCreated(walletAddress, publicKey);
 
-        mWalletService.createWallet(password, new WalletService.WalletCreateListener() {
-            @Override
-            public void onWalletCreated(String walletAddress, String publicKey) {
+                    if (!walletAddress.equalsIgnoreCase(SharedPref.read(Constant.PreferenceKeys.ADDRESS))){
 
-            }
+                        AsyncTask.execute(new Runnable() {
+                            @Override
+                            public void run() {
+                                SharedPref.write(Constant.PreferenceKeys.ADDRESS, walletAddress);
+                                QRGEncoder qrgEncoder = new QRGEncoder(walletAddress, null, QRGContents.Type.TEXT, 300);
+                                try {
+                                    // Getting QR-Code as Bitmap
+                                    Bitmap bitmap = qrgEncoder.encodeAsBitmap();
+                                    String bitmapAddress = bitMapToString(bitmap);
+                                    SharedPref.write(Constant.PreferenceKeys.ADDRESS_BITMAP, bitmapAddress);
 
-            @Override
-            public void onError(String message) {
+                                } catch (WriterException e) {
 
-            }
-        });
+                                }
+                            }
+                        });
+                    }
+                }
+
+                @Override
+                public void onError(String message) {
+                  listener.onError(message);
+                }
+            });
+        }
     }
+
+    /**
+     * This api is used to load wallet
+     * @param context
+     * @param password
+     * @param listener
+     */
 
     public void loadWallet(Context context, String password, WalletLoadListener listener){
-        WalletService mWalletService =  WalletService.getInstance(context);
+        if (TextUtils.isEmpty(password)){
+            listener.onError("Password cant be empty");
+        }else if (password.length() < 8){
+            listener.onError("Password can't be smaller then 8 character");
+        }else {
+            WalletService mWalletService =  WalletService.getInstance(context);
 
-        mWalletService.loadWallet(password, new WalletService.WalletLoadListener() {
-            @Override
-            public void onWalletLoaded(String walletAddress, String publicKey) {
+            mWalletService.loadWallet(password, new WalletService.WalletLoadListener() {
+                @Override
+                public void onWalletLoaded(String walletAddress, String publicKey) {
+                    listener.onWalletLoaded(walletAddress, publicKey);
 
-            }
+                    if (!walletAddress.equalsIgnoreCase(SharedPref.read(Constant.PreferenceKeys.ADDRESS))){
 
-            @Override
-            public void onErrorOccurred(String message) {
+                        AsyncTask.execute(new Runnable() {
+                            @Override
+                            public void run() {
+                                SharedPref.write(Constant.PreferenceKeys.ADDRESS, walletAddress);
+                                QRGEncoder qrgEncoder = new QRGEncoder(walletAddress, null, QRGContents.Type.TEXT, 300);
+                                try {
+                                    // Getting QR-Code as Bitmap
+                                    Bitmap bitmap = qrgEncoder.encodeAsBitmap();
+                                    String bitmapAddress = bitMapToString(bitmap);
+                                    SharedPref.write(Constant.PreferenceKeys.ADDRESS_BITMAP, bitmapAddress);
 
-            }
-        });
+                                } catch (WriterException e) {
 
+                                }
+                            }
+                        });
+                    }
+                }
+                @Override
+                public void onErrorOccurred(String message) {
+
+                }
+            });
+        }
     }
 
-    public void importWallet(Context context, String password, String filePath, WalletImportListener listener){
-        WalletService mWalletService =  WalletService.getInstance(context);
+    /**
+     * This api is used to import wallet
+     * @param context
+     * @param password
+     * @param fileUri
+     * @param listener
+     */
+    public void importWallet(Context context, String password, Uri fileUri, WalletImportListener listener){
+        if (TextUtils.isEmpty(password)){
+            listener.onError("Password cant be empty");
+        }else if (password.length() < 8){
+            listener.onError("Password can't be smaller then 8 character");
+        }else {
+            WalletService mWalletService =  WalletService.getInstance(context);
 
-        mWalletService.importWallet(password, filePath, new WalletService.WalletImportListener() {
-            @Override
-            public void onWalletImported(String walletAddress, String publicKey) {
-              listener.onWalletImported(walletAddress, publicKey);
-            }
+            mWalletService.importWallet(password, fileUri, new WalletService.WalletImportListener() {
+                @Override
+                public void onWalletImported(String walletAddress, String publicKey) {
+                    listener.onWalletImported(walletAddress, publicKey);
 
-            @Override
-            public void onError(String message) {
-                listener.onError(message);
-            }
-        });
+                    if (!walletAddress.equalsIgnoreCase(SharedPref.read(Constant.PreferenceKeys.ADDRESS))){
+
+                        AsyncTask.execute(new Runnable() {
+                            @Override
+                            public void run() {
+                                SharedPref.write(Constant.PreferenceKeys.ADDRESS, walletAddress);
+                                QRGEncoder qrgEncoder = new QRGEncoder(walletAddress, null, QRGContents.Type.TEXT, 300);
+                                try {
+                                    // Getting QR-Code as Bitmap
+                                    Bitmap bitmap = qrgEncoder.encodeAsBitmap();
+                                    String bitmapAddress = bitMapToString(bitmap);
+                                    SharedPref.write(Constant.PreferenceKeys.ADDRESS_BITMAP, bitmapAddress);
+
+                                } catch (WriterException e) {
+
+                                }
+                            }
+                        });
+                    }
+                }
+
+                @Override
+                public void onError(String message) {
+                    listener.onError(message);
+                }
+            });
+        }
     }
+
+
 
     private void showProgress(Context activity, boolean isNeeded) {
         if (isNeeded) {

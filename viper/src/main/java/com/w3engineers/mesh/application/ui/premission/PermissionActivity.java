@@ -33,7 +33,7 @@ public class PermissionActivity extends AppCompatActivity {
     }
 
     private void closeCurrentActivity() {
-        ViperClient.on(this, appName, packageName, networkPrefix, usersName, wallerAddress, publicKey, avatar, regTime, isSync).startClient();
+        ViperClient.on(this, appName, packageName, networkPrefix, usersName, wallerAddress, publicKey, avatar, regTime, isSync).startClient(wallerAddress, publicKey);
         finish();
     }
 

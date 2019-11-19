@@ -1,7 +1,9 @@
 package com.w3engineers.mesh.ui.nav;
 
+import android.Manifest;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -9,6 +11,7 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.w3engineers.ext.strom.util.helper.Toaster;
 import com.w3engineers.ext.viper.R;
@@ -17,6 +20,7 @@ import com.w3engineers.mesh.application.data.ApiEvent;
 import com.w3engineers.mesh.application.data.AppDataObserver;
 import com.w3engineers.mesh.application.data.local.dataplan.DataPlanManager;
 import com.w3engineers.mesh.application.data.local.db.SharedPref;
+import com.w3engineers.mesh.application.data.local.wallet.WalletManager;
 import com.w3engineers.mesh.application.data.model.TransportInit;
 import com.w3engineers.mesh.application.data.model.WalletLoaded;
 import com.w3engineers.mesh.model.UserModel;
@@ -28,6 +32,7 @@ import com.w3engineers.mesh.ui.meshlog.MeshLogFragment;
 import com.w3engineers.mesh.util.ConnectionManager;
 import com.w3engineers.mesh.util.Constant;
 import com.w3engineers.mesh.util.MeshLog;
+import com.w3engineers.mesh.util.PermissionUtil;
 
 import java.util.HashMap;
 
@@ -74,7 +79,7 @@ public class BottomNavActivity extends AppCompatActivity implements UserConnecti
 
 
         MeshLog.v("BottomNavActivity");
-        AppDataObserver.on().startObserver(ApiEvent.WALLET_LOADED, event -> {
+/*        AppDataObserver.on().startObserver(ApiEvent.WALLET_LOADED, event -> {
 
             WalletLoaded walletLoaded = (WalletLoaded) event;
 
@@ -92,8 +97,54 @@ public class BottomNavActivity extends AppCompatActivity implements UserConnecti
                     Toaster.showLong("Wallet loading error.");
                 });
             }
-        });
+        });*/
+    }
 
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        requestPermission();
+    }
+
+    private void requestPermission(){
+        if (PermissionUtil.init(this).request(Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE)){
+            WalletManager.getInstance().readWallet(this, "123456789", new WalletManager.WaletListener() {
+                @Override
+                public void onWalletLoaded(String walletAddress, String publicKey) {
+                    walletLoadedSuccess = true;
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                          if (myDataPlanMenuItem !=null){
+                              myDataPlanMenuItem.setEnabled(true);
+                          }
+
+                          //  Toast.makeText(BottomNavActivity.this, "Wallet load success", Toast.LENGTH_SHORT).show();
+                        }
+                    });
+
+
+                    SharedPref.write(Constant.PreferenceKeys.ADDRESS, walletAddress);
+                    SharedPref.write(Constant.PreferenceKeys.PUBLIC_KEY, publicKey);
+
+                    ConnectionManager.on(BottomNavActivity.this);
+
+
+                }
+
+                @Override
+                public void onErrorOccurred(String message) {
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            Toast.makeText(BottomNavActivity.this, "Wallet load fail", Toast.LENGTH_SHORT).show();
+                        }
+                    });
+
+                }
+            });
+
+        }
     }
 
 
@@ -101,7 +152,7 @@ public class BottomNavActivity extends AppCompatActivity implements UserConnecti
     protected void onResume() {
         super.onResume();
 
-        ConnectionManager.on(this);
+        requestPermission();
     }
 
 
