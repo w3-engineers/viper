@@ -20,6 +20,7 @@ android {
     }
     buildTypes {
         release {
+            debuggable true
             minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
 
@@ -64,7 +65,7 @@ dependencies {
     implementation deps.room.rxjava2
 
     implementation 'com.android.support.constraint:constraint-layout:1.1.3'
-    debugImplementation deps.debugdb
+    debugImplementation 'com.awesomedroidapps:inappstoragereader:1.0.2'
     api deps.strom_remote
     api project(path: ':paylib')
     implementation "io.reactivex.rxjava2:rxandroid:2.1.0"

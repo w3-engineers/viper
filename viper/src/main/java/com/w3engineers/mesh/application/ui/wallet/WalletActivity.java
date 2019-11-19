@@ -69,7 +69,7 @@ public class WalletActivity extends TelemeshBaseActivity implements WalletManage
     }
 
     @Override
-    protected BaseServiceLocator getBaseServiceLocator() {
+    protected BaseServiceLocator getServiceLocator() {
         return null;
     }
 
