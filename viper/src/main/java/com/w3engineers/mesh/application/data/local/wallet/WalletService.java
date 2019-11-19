@@ -144,24 +144,23 @@ public class WalletService {
     public void createWallet(String password, WalletCreateListener listener) {
         if (isWalletExists()) {
             deleteExistsWallet();
-        } else {
-            SharedPref.write(WALLET_PASSWORD_KEY, password);
+        }
+         SharedPref.write(WALLET_PASSWORD_KEY, password);
 
-            String keyStoreFileName = Web3jWalletHelper.onInstance(mContext).createWallet(password, walletSuffixDir);
+         String keyStoreFileName = Web3jWalletHelper.onInstance(mContext).createWallet(password, walletSuffixDir);
 
-            if (keyStoreFileName != null) {
+        if (keyStoreFileName != null) {
 
-                loadWalletFromKeystore(password, keyStoreFileName);
+            loadWalletFromKeystore(password, keyStoreFileName);
 
-                if (mCredentials != null) {
-                    listener.onWalletCreated(mCredentials.getAddress(), SharedPref.read(PUBLIC_KEY));
-                } else {
-                    listener.onError("Wallet creation failed");
-                }
+            if (mCredentials != null) {
+                listener.onWalletCreated(mCredentials.getAddress(), SharedPref.read(PUBLIC_KEY));
             } else {
-
-                listener.onError("File creation failed");
+                listener.onError("Wallet creation failed");
             }
+        } else {
+
+            listener.onError("File creation failed");
         }
     }
 
@@ -176,7 +175,7 @@ public class WalletService {
             } else {
                 listener.onErrorOccurred("Wallet load failed");
             }
-        }else {
+        } else {
             listener.onErrorOccurred("Wallet is not exist");
         }
     }
@@ -262,7 +261,7 @@ public class WalletService {
         File[] list = directory.listFiles();
         if (list != null) {
             for (File f : list) {
-             f.delete();
+                f.delete();
             }
         }
 

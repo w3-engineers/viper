@@ -1,6 +1,5 @@
 package com.w3engineers.mesh.application.data.local.wallet;
 
-import android.app.Activity;
 import android.app.ProgressDialog;
 import android.arch.lifecycle.LiveData;
 import android.content.Context;
@@ -13,8 +12,8 @@ import android.util.Base64;
 
 import com.google.zxing.WriterException;
 import com.w3engineers.mesh.application.data.local.DataPlanConstants;
-import com.w3engineers.mesh.application.data.local.db.SharedPref;
 import com.w3engineers.mesh.application.data.local.dataplan.DataPlanManager;
+import com.w3engineers.mesh.application.data.local.db.SharedPref;
 import com.w3engineers.mesh.application.data.local.db.networkinfo.NetworkInfo;
 import com.w3engineers.mesh.application.data.local.helper.PreferencesHelperDataplan;
 import com.w3engineers.mesh.application.data.local.purchase.PurchaseManager;
