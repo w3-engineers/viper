@@ -84,7 +84,7 @@ public class WalletActivity extends TelemeshBaseActivity implements WalletManage
 
         mBinding = (ActivityWalletBinding) getViewDataBinding();
         Intent intent = getIntent();
-        if(intent.hasExtra("picture")){
+        if (intent.hasExtra("picture")) {
             picture = intent.getByteArrayExtra("picture");
         }
 
@@ -257,7 +257,7 @@ public class WalletActivity extends TelemeshBaseActivity implements WalletManage
             openUrl();
         } else if (v.getId() == R.id.img_refresh) {
             openActivity(this);
-          //  refreshBalance();
+            //  refreshBalance();
         }
     }
 
