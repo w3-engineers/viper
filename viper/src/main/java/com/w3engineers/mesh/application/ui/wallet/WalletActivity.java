@@ -463,6 +463,10 @@ public class WalletActivity extends TelemeshBaseActivity implements WalletManage
                 } else {
                     payableDeposit = 0;
                 }
+
+                if (payableDeposit >= 10){
+                    performWithdrawBalance();
+                }
                 //  mBinding.tvPendingPayableDeposit.setText(totalPendingEarn == null ? "0" : totalPendingEarn.toString());
             });
         }
