@@ -86,8 +86,6 @@ public class TestDataPlanActivity extends TelemeshBaseActivity implements DataPl
         mBinding = (TestActivityDataPlanBinding) getViewDataBinding();
 
         setTitle();
-        changeStatusBarColor();
-
 
         mBinding.localButton.setTopViewGone();
         mBinding.internetOnlyButton.setBottomViewGone();
@@ -492,25 +490,9 @@ public class TestDataPlanActivity extends TelemeshBaseActivity implements DataPl
         return (SellerListAdapter) mBinding.testDataSellerList.getAdapter();
     }
 
-
-    private void changeStatusBarColor() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_STABLE |
-                    View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN);
-        }
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            Window window = getWindow();
-            window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-            window.setStatusBarColor(Color.TRANSPARENT);
-        }
-    }
-
-
     private String getKey(int prev, int cur) {
         return prev + "" + cur;
     }
-
-
 
     private void dataPlanRadioClicked(int type) {
         if (mCurrentRole == type)
