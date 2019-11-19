@@ -44,7 +44,9 @@ public class WalletManager {
 
     public static void openActivity(Context context, byte[] picture){
         Intent intent = new Intent(context, WalletActivity.class);
-        intent.putExtra("picture", picture);
+        if(picture != null) {
+            intent.putExtra("picture", picture);
+        }
         context.startActivity(intent);
     }
 
