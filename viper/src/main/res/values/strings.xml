@@ -153,6 +153,7 @@
     <string name="view_transactions">View Transactions</string>
 
     <string name="copy_address">Copy address</string>
+    <string name="save">Save</string>
 
 
 </resources>

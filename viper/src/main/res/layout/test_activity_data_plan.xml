@@ -175,6 +175,7 @@
                     <RadioButton
                         android:id="@+id/unlimited"
                         style="@style/limit_radio"
+                        android:onClick="onRadioUnlimitedButtonClicked"
                         android:text="@string/unlimited"
                         android:textColor="@drawable/bg_radio_selection"
                         tools:ignore="UnusedAttribute" />
@@ -183,6 +184,7 @@
                         android:id="@+id/limit_to"
                         style="@style/limit_radio"
                         android:layout_marginTop="@dimen/margin_10"
+                        android:onClick="onRadioLimitedButtonClicked"
                         android:text="@string/limit_to"
                         android:textColor="@drawable/bg_radio_selection"
                         tools:ignore="UnusedAttribute" />
@@ -229,6 +231,21 @@
                         android:textSize="@dimen/text_size_18" />
 
                 </LinearLayout>
+
+
+                <Button
+                    android:id="@+id/button_save"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/margin_10"
+                    android:layout_marginLeft="@dimen/margin_15"
+                    android:layout_marginRight="@dimen/margin_15"
+                    android:background="@drawable/rectangle_button_shape"
+                    android:text="@string/save"
+                    android:textAllCaps="true"
+                    android:textColor="@color/white"
+                    android:textSize="@dimen/text_size_16"
+                    android:layout_marginBottom="@dimen/margin_20"/>
 
             </LinearLayout>
 
@@ -305,12 +322,17 @@
                     android:textStyle="bold"
                     android:textColor="@color/black"
                     android:textSize="@dimen/text_size_16" />
+                <TextView
+                    android:id="@+id/empty_layout"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent" />
 
-                <android.support.v7.widget.RecyclerView
+                <com.w3engineers.ext.strom.application.ui.widget.BaseRecyclerView
                     android:id="@+id/test_data_seller_list"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:layout_marginStart="@dimen/margin_15"
+                    app:brv_emptyLayoutId="@id/empty_layout"
                     android:layout_marginEnd="@dimen/margin_15"
                     android:layout_marginBottom="@dimen/margin_10"
                     tools:listitem="@layout/item_seller_view"/>

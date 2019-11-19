@@ -41,6 +41,7 @@ import com.w3engineers.mesh.databinding.TestActivityDataPlanBinding;
 import com.w3engineers.mesh.util.DialogUtil;
 import com.w3engineers.mesh.util.NotificationUtil;
 
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Map;
@@ -49,29 +50,24 @@ import java.util.concurrent.ExecutionException;
 
 public class TestDataPlanActivity extends TelemeshBaseActivity implements DataPlanManager.DataPlanListener {
 
-//    ExpandableButton localButton;
-//    ExpandableButton sellerButton;
-//    ExpandableButton buyerButton;
-//    ExpandableButton internetOnlyButton;
-//    private Toolbar mTopToolbar;
-//    private Switch switchButtonBuyer;
-
-
     private SellerListAdapter sellerListAdapter;
     private DataPlanViewModel viewModel;
     private DataLimitModel dataLimitModel;
 
-    private volatile Map<String, String> roleSwitchMap;
-    private RadioButton[] radioButtonsDataPlan, dataLimitRadioButtons;
-    private ConstraintLayout[] dataPlanViews;
+    private RadioButton[] dataLimitRadioButtons;
+
+    private Switch[] roleSwitches;
+    private ExpandableButton[] expandableButtons;
+
     private Calendar myCalendar;
-    private SimpleDateFormat sdf;
 
     private ProgressDialog progressDialog;
 
     private int mCurrentRole;
 
     private TestActivityDataPlanBinding mBinding;
+    private View view;
+    private SimpleDateFormat sdf;
 
 
     @Override
@@ -86,17 +82,11 @@ public class TestDataPlanActivity extends TelemeshBaseActivity implements DataPl
 
     @Override
     protected void startUI() {
+        mBinding = (TestActivityDataPlanBinding) getViewDataBinding();
 
         setTitle();
 
-        mBinding = (TestActivityDataPlanBinding) getViewDataBinding();
-//        localButton = findViewById(R.id.localButton);
         mBinding.localButton.setTopViewGone();
-//        sellerButton = findViewById(R.id.sellDataButton);
-//        buyerButton = findViewById(R.id.buyDataButton);
-//        switchButtonBuyer = findViewById(R.id.switchButtonBuyer);
-
-//        internetOnlyButton = findViewById(R.id.internetOnlyButton);
         mBinding.internetOnlyButton.setBottomViewGone();
 
         setListenerForAllExpandable();
@@ -104,24 +94,37 @@ public class TestDataPlanActivity extends TelemeshBaseActivity implements DataPl
         initSwitchListener();
 
         initAll();
+
+        changeStatusBarColor();
+
+        prepareDataPlanRadio();
+
+        initRecyclerView();
+
+        loadUI();
+
+        setEventListener();
+
+        parseIntent();
     }
 
     private void initAll() {
-        mBinding = (TestActivityDataPlanBinding) getViewDataBinding();
+
+        sdf = new SimpleDateFormat("dd/MM/yy");
+
         viewModel = getViewModel();
 
-        roleSwitchMap = new ConcurrentHashMap<>();
         progressDialog = new ProgressDialog(this);
         dataLimitModel = DataLimitModel.getInstance(getApplicationContext());
 
+
         myCalendar = Calendar.getInstance();
-        sdf = new SimpleDateFormat("dd/MM/yy");
 
         mCurrentRole = DataPlanManager.getInstance().getDataPlanRole();
         dataLimitModel.setInitialRole(mCurrentRole);
         mBinding.setDataLimitModel(dataLimitModel);
 
-//        setClickListener(mBinding.imageViewBack, mBinding.icWallet, mBinding.layoutDataplan, mBinding.saveButton);
+        setClickListener(mBinding.buttonSave);
 
         DataPlanManager.getInstance().setDataPlanListener(this);
     }
@@ -132,8 +135,9 @@ public class TestDataPlanActivity extends TelemeshBaseActivity implements DataPl
                 new CompoundButton.OnCheckedChangeListener() {
                     public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                         if (isChecked) {
-                            Toast.makeText(TestDataPlanActivity.this,
-                                    "Switch On", Toast.LENGTH_SHORT).show();
+                            dataPlanRadioClicked(DataPlanConstants.USER_ROLE.MESH_USER);
+//                            Toast.makeText(TestDataPlanActivity.this,
+//                                    "Switch On", Toast.LENGTH_SHORT).show();
                         } else {
                             Toast.makeText(TestDataPlanActivity.this,
                                     "Switch Off", Toast.LENGTH_SHORT).show();
@@ -145,8 +149,10 @@ public class TestDataPlanActivity extends TelemeshBaseActivity implements DataPl
                 new CompoundButton.OnCheckedChangeListener() {
                     public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                         if (isChecked) {
-                            Toast.makeText(TestDataPlanActivity.this,
-                                    "Switch On", Toast.LENGTH_SHORT).show();
+                            dataPlanRadioClicked(DataPlanConstants.USER_ROLE.DATA_SELLER);
+
+//                          Toast.makeText(TestDataPlanActivity.this,
+//                                    "Switch On", Toast.LENGTH_SHORT).show();
                         } else {
                             Toast.makeText(TestDataPlanActivity.this,
                                     "Switch Off", Toast.LENGTH_SHORT).show();
@@ -158,8 +164,12 @@ public class TestDataPlanActivity extends TelemeshBaseActivity implements DataPl
                 new CompoundButton.OnCheckedChangeListener() {
                     public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                         if (isChecked) {
-                            Toast.makeText(TestDataPlanActivity.this,
-                                    "Switch On", Toast.LENGTH_SHORT).show();
+
+                            dataPlanRadioClicked(DataPlanConstants.USER_ROLE.DATA_BUYER);
+
+
+//                            Toast.makeText(TestDataPlanActivity.this,
+//                                    "Switch On", Toast.LENGTH_SHORT).show();
                         } else {
                             Toast.makeText(TestDataPlanActivity.this,
                                     "Switch Off", Toast.LENGTH_SHORT).show();
@@ -171,8 +181,10 @@ public class TestDataPlanActivity extends TelemeshBaseActivity implements DataPl
                 new CompoundButton.OnCheckedChangeListener() {
                     public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                         if (isChecked) {
-                            Toast.makeText(TestDataPlanActivity.this,
-                                    "Switch On", Toast.LENGTH_SHORT).show();
+                            dataPlanRadioClicked(DataPlanConstants.USER_ROLE.INTERNET_USER);
+
+//                            Toast.makeText(TestDataPlanActivity.this,
+//                                    "Switch On", Toast.LENGTH_SHORT).show();
                         } else {
                             Toast.makeText(TestDataPlanActivity.this,
                                     "Switch Off", Toast.LENGTH_SHORT).show();
@@ -296,17 +308,14 @@ public class TestDataPlanActivity extends TelemeshBaseActivity implements DataPl
     public void onClick(View view) {
         super.onClick(view);
 
-        if (view.getId() == R.id.imageView_back) {
-            finish();
-        } else if (view.getId() == R.id.ic_wallet) {
-            WalletManager.openActivity(this);
-        } else if (view.getId() == R.id.save_button) {
+        if (view.getId() == R.id.button_save) {
             checkSharingLimit();
         } else if (view.getId() == R.id.status) {
             Seller seller = (Seller) view.getTag();
             onButtonClickListener(seller);
         }
-    }
+
+}
 
     @Override
     public void onConnectingWithSeller(String sellerAddress) {
@@ -485,23 +494,6 @@ public class TestDataPlanActivity extends TelemeshBaseActivity implements DataPl
         }
     }
 
-    private void roleSwitchingMapMsg() {
-        roleSwitchMap.put(getKey(DataPlanConstants.USER_ROLE.MESH_USER, DataPlanConstants.USER_ROLE.DATA_BUYER), getResources().getString(R.string.mesh_user_to_buyer));
-        roleSwitchMap.put(getKey(DataPlanConstants.USER_ROLE.MESH_USER, DataPlanConstants.USER_ROLE.DATA_SELLER), getResources().getString(R.string.mesh_user_to_seller));
-        roleSwitchMap.put(getKey(DataPlanConstants.USER_ROLE.MESH_USER, DataPlanConstants.USER_ROLE.INTERNET_USER), getResources().getString(R.string.mesh_user_to_internet_user));
-
-        roleSwitchMap.put(getKey(DataPlanConstants.USER_ROLE.DATA_BUYER, DataPlanConstants.USER_ROLE.DATA_SELLER), getResources().getString(R.string.data_buyer_to_seller));
-        roleSwitchMap.put(getKey(DataPlanConstants.USER_ROLE.DATA_BUYER, DataPlanConstants.USER_ROLE.MESH_USER), getResources().getString(R.string.data_buyer_to_mesh_user));
-        roleSwitchMap.put(getKey(DataPlanConstants.USER_ROLE.DATA_BUYER, DataPlanConstants.USER_ROLE.INTERNET_USER), getResources().getString(R.string.data_buyer_to_internet_user));
-
-        roleSwitchMap.put(getKey(DataPlanConstants.USER_ROLE.DATA_SELLER, DataPlanConstants.USER_ROLE.DATA_BUYER), getResources().getString(R.string.data_seller_to_buyer));
-        roleSwitchMap.put(getKey(DataPlanConstants.USER_ROLE.DATA_SELLER, DataPlanConstants.USER_ROLE.MESH_USER), getResources().getString(R.string.data_seller_to_mesh_user));
-        roleSwitchMap.put(getKey(DataPlanConstants.USER_ROLE.DATA_SELLER, DataPlanConstants.USER_ROLE.INTERNET_USER), getResources().getString(R.string.data_seller_to_internet_user));
-
-        roleSwitchMap.put(getKey(DataPlanConstants.USER_ROLE.INTERNET_USER, DataPlanConstants.USER_ROLE.DATA_BUYER), getResources().getString(R.string.internet_user_to_buyer));
-        roleSwitchMap.put(getKey(DataPlanConstants.USER_ROLE.INTERNET_USER, DataPlanConstants.USER_ROLE.DATA_SELLER), getResources().getString(R.string.internet_user_to_seller));
-        roleSwitchMap.put(getKey(DataPlanConstants.USER_ROLE.INTERNET_USER, DataPlanConstants.USER_ROLE.MESH_USER), getResources().getString(R.string.internet_user_to_internet_user));
-    }
 
     private String getKey(int prev, int cur) {
         return prev + "" + cur;
@@ -509,63 +501,26 @@ public class TestDataPlanActivity extends TelemeshBaseActivity implements DataPl
 
     private void prepareDataPlanRadio() {
 
-
-//        radioButtonsDataPlan = new RadioButton[]{mBinding.meshUser, mBinding.dataSeller, mBinding.dataBuyer, mBinding.internetUser};
-//        dataLimitRadioButtons = new RadioButton[]{mBinding.unlimited, mBinding.limitTo};
-//        dataPlanViews = new ConstraintLayout[]{mBinding.meshUserLayout, mBinding.dataSellLayout, mBinding.dataBuyLayout, mBinding.internetUserLayout};
-//
-//        mBinding.dataPlanType.setOnCheckedChangeListener((group, checkedId) -> {
-//            if (checkedId == R.id.mesh_user) {
-//                dataPlanRadioClicked(DataPlanConstants.USER_ROLE.MESH_USER);
-//            } else if (checkedId == R.id.data_seller) {
-//                dataPlanRadioClicked(DataPlanConstants.USER_ROLE.DATA_SELLER);
-//            } else if (checkedId == R.id.data_buyer) {
-//                dataPlanRadioClicked(DataPlanConstants.USER_ROLE.DATA_BUYER);
-//            } else if (checkedId == R.id.internet_user) {
-//                dataPlanRadioClicked(DataPlanConstants.USER_ROLE.INTERNET_USER);
-//            }
-//        });
+        expandableButtons = new ExpandableButton[]{mBinding.localButton, mBinding.sellDataButton, mBinding.buyDataButton, mBinding.internetOnlyButton};
+        roleSwitches = new Switch[]{mBinding.switchButtonLocal, mBinding.switchButtonSeller, mBinding.switchButtonBuyer, mBinding.switchButtonInternet};
+        dataLimitRadioButtons = new RadioButton[]{mBinding.unlimited, mBinding.limitTo};
     }
 
     private void dataPlanRadioClicked(int type) {
         if (mCurrentRole == type)
             return;
-        showRoleSwitchConfirmation(mCurrentRole, type);
+
+        roleSwitches[mCurrentRole].setChecked(false);
+
+        setRoleTasks(mCurrentRole, type);
     }
 
-    private void showRoleSwitchConfirmation(int prevRole, int currentRole) {
-        DialogUtil.showConfirmationDialog(TestDataPlanActivity.this,
-                getResources().getString(R.string.switch_role),
-                roleSwitchMap.get(getKey(prevRole, currentRole)),
-                getResources().getString(R.string.cancel),
-                getResources().getString(R.string.yes),
-                new DialogUtil.DialogButtonListener() {
-                    @Override
-                    public void onClickPositive() {
-//                        mBinding.tvHint.setVisibility(View.GONE);
-                        setRoleTasks(prevRole, currentRole);
-                    }
-
-                    @Override
-                    public void onCancel() {
-
-                    }
-
-                    @Override
-                    public void onClickNegative() {
-                        radioButtonsDataPlan[prevRole].setChecked(true);
-                    }
-                });
-    }
 
     private void setRoleTasks(int prev, int current) {
 
         progressDialog.setMessage(getResources().getString(R.string.switching_role));
         progressDialog.setCancelable(false);
         progressDialog.show();
-
-        dataPlanViews[prev].setVisibility(View.GONE);
-        dataPlanViews[current].setVisibility(View.VISIBLE);
 
         mCurrentRole = current;
         viewModel.roleSwitch(mCurrentRole);
@@ -582,24 +537,12 @@ public class TestDataPlanActivity extends TelemeshBaseActivity implements DataPl
 
     private void loadUI() {
 
-        dataPlanViews[DataPlanManager.getInstance().getDataPlanRole()].setVisibility(View.VISIBLE);
+//        expandableButtons[DataPlanManager.getInstance().getDataPlanRole()].expandView();
+        roleSwitches[DataPlanManager.getInstance().getDataPlanRole()].setChecked(true);
+
         dataLimitRadioButtons[dataLimitModel.getDataLimited() ? 1 : 0].setChecked(true);
 
         setDataLimitEnabled(dataLimitModel.getDataLimited());
-
-//        if (dataLimitModel.getFromDate() > 0) {
-//            mBinding.fromDate.setText(sdf.format(dataLimitModel.getFromDate()));
-//        } else {
-//            mBinding.fromDate.setText(sdf.format(myCalendar.getTime()));
-//            dataLimitModel.setFromDate(myCalendar.getTimeInMillis());
-//        }
-
-//        if (dataLimitModel.getToDate() > 0) {
-//            mBinding.toDate.setText(sdf.format(dataLimitModel.getToDate()));
-//        } else {
-//            mBinding.toDate.setText(sdf.format(myCalendar.getTime()));
-//            dataLimitModel.setToDate(myCalendar.getTimeInMillis());
-//        }
 
         long sharedData = DataPlanManager.getInstance().getSellAmountData();
 
@@ -611,12 +554,6 @@ public class TestDataPlanActivity extends TelemeshBaseActivity implements DataPl
             mBinding.range.setText(amount + "");
         }
 
-//        mBinding.fromDate.setEnabled(false);
-
-//        mBinding.dataUsageLimited.setVisibility(DataPlanManager.getInstance().getDataAmountMode() == DataPlanConstants.DATA_MODE.LIMITED
-//                ? View.VISIBLE : View.INVISIBLE);
-//        mBinding.dataUsageUnlimited.setVisibility(DataPlanManager.getInstance().getDataAmountMode() == DataPlanConstants.DATA_MODE.UNLIMITED
-//                ? View.VISIBLE : View.INVISIBLE);
 
         disableSaveButton();
     }
@@ -631,7 +568,6 @@ public class TestDataPlanActivity extends TelemeshBaseActivity implements DataPl
 
     private void setDataLimitEnabled(boolean value) {
         mBinding.range.setEnabled(value);
-//        mBinding.toDate.setEnabled(value);
     }
 
     private void setEventListener() {
@@ -661,8 +597,6 @@ public class TestDataPlanActivity extends TelemeshBaseActivity implements DataPl
             myCalendar.set(Calendar.YEAR, year);
             myCalendar.set(Calendar.MONTH, monthOfYear);
             myCalendar.set(Calendar.DAY_OF_MONTH, dayOfMonth);
-
-//            mBinding.fromDate.setText(sdf.format(System.currentTimeMillis()));
 
             enableSaveButton();
         };
@@ -802,20 +736,20 @@ public class TestDataPlanActivity extends TelemeshBaseActivity implements DataPl
     }
 
     private void disableSaveButton() {
-//        mBinding.saveButton.setEnabled(false);
+        mBinding.buttonSave.setEnabled(false);
 //        int paddingTopBottom = mBinding.saveButton.getPaddingTop();
 //        int paddingLeftRight = mBinding.saveButton.getTotalPaddingLeft();
-//        mBinding.saveButton.setBackground(ContextCompat.getDrawable(DataPlanActivity.this, R.drawable.rectangular_gray_small));
-//        mBinding.saveButton.setTextColor(this.getResources().getColor(R.color.colorEtBorder));
-//        mBinding.saveButton.setPadding(paddingLeftRight, paddingTopBottom, paddingLeftRight, paddingTopBottom);
+        mBinding.buttonSave.setBackground(ContextCompat.getDrawable(TestDataPlanActivity.this, R.drawable.rectangular_gray_small));
+        mBinding.buttonSave.setTextColor(TestDataPlanActivity.this.getResources().getColor(R.color.colorEtBorder));
+//        mBinding.buttonSave.setPadding(paddingLeftRight, paddingTopBottom, paddingLeftRight, paddingTopBottom);
     }
 
     private void enableSaveButton() {
-//        mBinding.saveButton.setEnabled(true);
+        mBinding.buttonSave.setEnabled(true);
 //        int paddingTopBottom = mBinding.saveButton.getPaddingTop();
 //        int paddingLeftRight = mBinding.saveButton.getTotalPaddingLeft();
-//        mBinding.saveButton.setBackground(ContextCompat.getDrawable(DataPlanActivity.this, R.drawable.ractangular_green_small));
-//        mBinding.saveButton.setTextColor(DataPlanActivity.this.getResources().getColor(R.color.colorGradientPrimary));
+        mBinding.buttonSave.setBackground(ContextCompat.getDrawable(TestDataPlanActivity.this, R.drawable.ractangular_green_small));
+        mBinding.buttonSave.setTextColor(TestDataPlanActivity.this.getResources().getColor(R.color.colorGradientPrimary));
 //        mBinding.saveButton.setPadding(paddingLeftRight, paddingTopBottom, paddingLeftRight, paddingTopBottom);
     }
 
@@ -823,48 +757,73 @@ public class TestDataPlanActivity extends TelemeshBaseActivity implements DataPl
 
         if (mBinding.limitTo.isChecked()) {
 
-
-//            long tempSharedData = convertMegabytesToBytes(Integer.valueOf(mBinding.range.getText().toString()));
-//
-//
-////                mBinding.dateError.setVisibility(View.INVISIBLE);
-//            long usedData = 0;
+            long from = 0l, to = 0l;
+            long tempSharedData = convertMegabytesToBytes(Integer.valueOf(mBinding.range.getText().toString()));
 //            try {
-//                usedData = DataPlanManager.getInstance().getUsedData(this, from, to);
-//            } catch (ExecutionException e) {
+//                from = getDayWiseTimeStamp(sdf.parse(mBinding.fromDate.getText().toString()).getTime());
+//                to = getDayWiseTimeStamp(sdf.parse(mBinding.toDate.getText().toString()).getTime()) + (24 * 60 * 60 * 1000 - 1000);
+//            } catch (ParseException e) {
 //                e.printStackTrace();
-//            } catch (InterruptedException e) {
-//                e.printStackTrace();
-//            }
-//
-//            if (tempSharedData <= usedData) {
-//                mBinding.dataLimitError.setVisibility(View.VISIBLE);
-//                mBinding.dataLimitError.setText(this.getString(R.string.data_lomit_larger_needed));
-//
-//            } else {
-//                mBinding.dataLimitError.setVisibility(View.INVISIBLE);
-//                dataLimitModel.setFromDate(from);
-//                dataLimitModel.setToDate(to);
-//                dataLimitModel.setSharedData(tempSharedData);
-//
-//                dataLimitModel.setDataLimited(true);
-//
-//                if (dataLimitModel != null
-//                        && dataLimitModel.getUsedData().getValue() != null
-//                        && dataLimitModel.getSharedData().getValue() != null) {
-//
-//                    if (dataLimitModel.getUsedData().getValue() >= (dataLimitModel.getSharedData().getValue() - DataPlanConstants.SELLER_MINIMUM_WARNING_DATA)) {
-//                        mBinding.textViewDataLimitWarning.setVisibility(View.VISIBLE);
-//                    } else {
-//                        mBinding.textViewDataLimitWarning.setVisibility(View.GONE);
-//                    }
-//                } else {
-//                    mBinding.textViewDataLimitWarning.setVisibility(View.GONE);
-//                }
-//
-//                disableSaveButton();
 //            }
 
+            if (to <= System.currentTimeMillis()) {
+//                mBinding.dateError.setVisibility(View.VISIBLE);
+//                mBinding.dateError.setText(getString(R.string.date_expired));
+
+            } else {
+//                mBinding.dateError.setVisibility(View.INVISIBLE);
+                long usedData = 0;
+                try {
+                    usedData = DataPlanManager.getInstance().getUsedData(this, from, to);
+                } catch (ExecutionException e) {
+                    e.printStackTrace();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+
+                if (tempSharedData <= usedData) {
+//                    mBinding.dataLimitError.setVisibility(View.VISIBLE);
+//                    mBinding.dataLimitError.setText(this.getString(R.string.data_lomit_larger_needed));
+
+                } else {
+//                    mBinding.dataLimitError.setVisibility(View.INVISIBLE);
+                    dataLimitModel.setFromDate(from);
+                    dataLimitModel.setToDate(to);
+                    dataLimitModel.setSharedData(tempSharedData);
+
+                    dataLimitModel.setDataLimited(true);
+
+                    if (dataLimitModel != null
+                            && dataLimitModel.getUsedData().getValue() != null
+                            && dataLimitModel.getSharedData().getValue() != null) {
+
+                        if (dataLimitModel.getUsedData().getValue() >= (dataLimitModel.getSharedData().getValue() - DataPlanConstants.SELLER_MINIMUM_WARNING_DATA)) {
+//                            mBinding.textViewDataLimitWarning.setVisibility(View.VISIBLE);
+                        } else {
+//                            mBinding.textViewDataLimitWarning.setVisibility(View.GONE);
+                        }
+                    } else {
+//                        mBinding.textViewDataLimitWarning.setVisibility(View.GONE);
+                    }
+
+                    disableSaveButton();
+                }
+            }
+        } else {
+//            mBinding.dataLimitError.setVisibility(View.INVISIBLE);
+//            mBinding.dateError.setVisibility(View.INVISIBLE);
+
+            dataLimitModel.setDataLimited(false);
+
+            disableSaveButton();
         }
+    }
+    public long getDayWiseTimeStamp(long timeStamp) {
+        Calendar cal = Calendar.getInstance();
+        cal.setTimeInMillis(timeStamp);
+        cal.set(Calendar.HOUR_OF_DAY, 0); //set hours to zero
+        cal.set(Calendar.MINUTE, 0); // set minutes to zero
+        cal.set(Calendar.SECOND, 0); //set seconds to zero
+        return (cal.getTimeInMillis() / 1000) * 1000;
     }
 }

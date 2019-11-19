@@ -291,8 +291,7 @@ public class DataPlanActivity extends TelemeshBaseActivity implements DataPlanMa
         dataLimitModel.setInitialRole(mCurrentRole);
         mBinding.setDataLimitModel(dataLimitModel);
 
-        setClickListener(mBinding.imageViewBack, mBinding.icWallet,
-                mBinding.layoutDataplan, mBinding.saveButton);
+        setClickListener(mBinding.imageViewBack, mBinding.icWallet, mBinding.layoutDataplan, mBinding.saveButton);
 
         DataPlanManager.getInstance().setDataPlanListener(this);
     }
