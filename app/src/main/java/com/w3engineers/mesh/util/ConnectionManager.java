@@ -46,13 +46,12 @@ public class ConnectionManager {
     private Map<String, String> requestUserInfoList;
 
     public static ConnectionManager on(Context context) {
-    /*    if (mConnectionManager == null) {
+        if (mConnectionManager == null) {
             synchronized (ViperClient.class) {
                 if (mConnectionManager == null)
                     mConnectionManager = new ConnectionManager(context, APP_NAME, NETWORK_PREFIX);
             }
-        }*/
-
+        }
         mConnectionManager = new ConnectionManager(context, APP_NAME, NETWORK_PREFIX);
         return mConnectionManager;
     }

@@ -57,6 +57,8 @@ public class PurchaseManagerBuyer extends PurchaseManager implements PayControll
         this.dataPlanListener = dataPlanListener;
     }
 
+
+
     public void setWalletListener(WalletManager.WalletListener walletListener) {
         this.walletListener = walletListener;
     }

@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:tools="http://schemas.android.com/tools">
+<LinearLayout
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/white"
@@ -147,7 +148,6 @@
                     android:layout_marginStart="@dimen/margin_15"
                     android:layout_marginTop="@dimen/margin_10"
                     android:layout_marginEnd="@dimen/margin_15"
-                    android:layout_marginBottom="@dimen/margin_10"
                     android:text="Sell your data to other local users and earn coins. You need an active internet connection. Sell price 1 coin = 1MB."
                     android:textColor="@color/black"
                     android:textSize="@dimen/text_size_16" />
@@ -158,9 +158,8 @@
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_vertical"
                     android:layout_marginStart="@dimen/margin_15"
-                    android:layout_marginTop="@dimen/margin_10"
+                    android:layout_marginTop="@dimen/margin_5"
                     android:layout_marginEnd="@dimen/margin_15"
-                    android:layout_marginBottom="@dimen/margin_10"
                     android:text="Data Limit"
                     android:textStyle="bold"
                     android:textColor="@color/black"
@@ -174,6 +173,7 @@
                     <RadioButton
                         android:id="@+id/unlimited"
                         style="@style/limit_radio"
+                        android:onClick="onRadioUnlimitedButtonClicked"
                         android:text="@string/unlimited"
                         android:textColor="@drawable/bg_radio_selection"
                         tools:ignore="UnusedAttribute" />
@@ -181,7 +181,7 @@
                     <RadioButton
                         android:id="@+id/limit_to"
                         style="@style/limit_radio"
-                        android:layout_marginTop="@dimen/margin_10"
+                        android:onClick="onRadioLimitedButtonClicked"
                         android:text="@string/limit_to"
                         android:textColor="@drawable/bg_radio_selection"
                         tools:ignore="UnusedAttribute" />
@@ -228,6 +228,171 @@
                         android:textSize="@dimen/text_size_18" />
 
                 </LinearLayout>
+
+
+     <!--           <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:layout_marginStart="@dimen/margin_15"
+                    android:layout_marginTop="@dimen/margin_10"
+                    android:layout_marginEnd="@dimen/margin_15"
+                    android:layout_marginBottom="@dimen/margin_10"
+                    android:text="Data Range"
+                    android:textStyle="bold"
+                    android:textColor="@color/black"
+                    android:textSize="@dimen/text_size_16" />-->
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginStart="@dimen/margin_5"
+                    android:layout_marginTop="@dimen/margin_5"
+                    android:layout_marginEnd="@dimen/margin_5">
+
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal">
+
+                        <TextView
+                            android:id="@+id/from"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginRight="@dimen/margin_5"
+                            android:clickable="false"
+                            android:fontFamily="@font/opensans_regular"
+                            android:text="@string/from"
+                            android:textColor="@color/deep_grey"
+                            android:textSize="@dimen/text_size_16" />
+
+
+
+                        <EditText
+                            android:id="@+id/from_date"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:background="@drawable/ractangular_round_white"
+                            android:clickable="false"
+                            android:enabled="false"
+                            android:focusable="false"
+                            android:hint="13/06/2019"
+                            android:inputType="date"
+                            android:maxLength="10"
+                            android:maxLines="1"
+                            android:minWidth="@dimen/width_80"
+                            android:paddingLeft="@dimen/padding_10"
+                            android:paddingTop="@dimen/padding_3"
+                            android:paddingRight="@dimen/padding_10"
+                            android:paddingBottom="@dimen/padding_3"
+                            android:textAlignment="center"
+                            android:textSize="@dimen/text_size_18" />
+
+                    </LinearLayout>
+
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="@dimen/margin_10"
+                        android:orientation="horizontal">
+
+                        <TextView
+                            android:id="@+id/to"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginRight="@dimen/margin_5"
+                            android:fontFamily="@font/opensans_regular"
+                            android:text="@string/to"
+                            android:textColor="@color/deep_grey"
+                            android:textSize="@dimen/text_size_16" />
+
+
+                        <EditText
+                            android:id="@+id/to_date"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:background="@drawable/ractangular_round_white"
+                            android:clickable="false"
+                            android:enabled="false"
+                            android:focusable="false"
+                            android:hint="13/06/2019"
+                            android:inputType="date"
+                            android:maxLength="10"
+                            android:maxLines="1"
+                            android:minWidth="@dimen/width_80"
+                            android:paddingLeft="@dimen/padding_10"
+                            android:paddingTop="@dimen/padding_3"
+                            android:paddingRight="@dimen/padding_10"
+                            android:paddingBottom="@dimen/padding_3"
+                            android:textAlignment="center"
+                            android:textSize="@dimen/text_size_18" />
+
+                    </LinearLayout>
+
+
+
+                </LinearLayout>
+
+
+<!--                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/margin_15"
+                    android:layout_marginTop="@dimen/margin_5"
+                    android:layout_marginEnd="@dimen/margin_15"
+                    android:layout_marginBottom="@dimen/margin_10">
+
+                    <TextView
+                        android:id="@+id/to"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginRight="@dimen/margin_5"
+                        android:fontFamily="@font/opensans_regular"
+                        android:text="@string/to"
+                        android:textColor="@color/deep_grey"
+                        android:textSize="@dimen/text_size_16" />
+
+
+                    <EditText
+                        android:id="@+id/to_date"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/ractangular_round_white"
+                        android:clickable="false"
+                        android:enabled="false"
+                        android:focusable="false"
+                        android:hint="13/06/2019"
+                        android:inputType="date"
+                        android:maxLength="10"
+                        android:maxLines="1"
+                        android:minWidth="@dimen/width_80"
+                        android:paddingLeft="@dimen/padding_10"
+                        android:paddingTop="@dimen/padding_3"
+                        android:paddingRight="@dimen/padding_10"
+                        android:paddingBottom="@dimen/padding_3"
+                        android:textAlignment="center"
+                        android:textSize="@dimen/text_size_18" />
+
+
+                </LinearLayout>-->
+
+
+                <Button
+                    android:id="@+id/button_save"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/margin_10"
+                    android:layout_marginLeft="@dimen/margin_15"
+                    android:layout_marginRight="@dimen/margin_15"
+                    android:background="@drawable/rectangle_button_shape"
+                    android:text="@string/save"
+                    android:textAllCaps="true"
+                    android:textColor="@color/white"
+                    android:textSize="@dimen/text_size_16"
+                    android:layout_marginBottom="@dimen/margin_20"/>
 
             </LinearLayout>
 
@@ -304,14 +469,29 @@
                     android:textStyle="bold"
                     android:textColor="@color/black"
                     android:textSize="@dimen/text_size_16" />
+                <TextView
+                    android:id="@+id/empty_layout"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent" />
 
-                <android.support.v7.widget.RecyclerView
+                <com.w3engineers.ext.strom.application.ui.widget.BaseRecyclerView
+                    android:id="@+id/test_data_seller_list"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:layout_marginStart="@dimen/margin_15"
+                    app:brv_emptyLayoutId="@id/empty_layout"
                     android:layout_marginEnd="@dimen/margin_15"
                     android:layout_marginBottom="@dimen/margin_10"
                     tools:listitem="@layout/item_seller_view"/>
+               <!-- <com.w3engineers.ext.strom.application.ui.widget.BaseRecyclerView
+                    android:id="@+id/data_seller_list"
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    app:brv_emptyLayoutId="@id/empty_layout"
+                    app:layout_constraintBottom_toTopOf="@+id/textView_sell_price_info"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />-->
 
 
             </LinearLayout>
@@ -384,3 +564,22 @@
     </android.support.v7.widget.CardView>
 
 </LinearLayout>
+    <data>
+
+        <import type="android.view.View" />
+
+
+<!--        <import type="com.w3engineers.mesh.application.data.local.purchase.PurchaseConstants" />-->
+
+<!--        <import type="com.w3engineers.mesh.util.Util" />-->
+
+<!--        <import type="com.w3engineers.mesh.application.data.local.DataPlanConstants" />-->
+
+<!--        <import type="com.w3engineers.mesh.util.Constant" />-->
+
+        <variable
+            name="dataLimitModel"
+            type="com.w3engineers.mesh.application.ui.dataplan.DataLimitModel" />
+
+    </data>
+</layout>

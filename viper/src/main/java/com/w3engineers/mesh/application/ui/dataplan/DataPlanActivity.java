@@ -282,7 +282,6 @@ public class DataPlanActivity extends TelemeshBaseActivity implements DataPlanMa
         return (SellerListAdapter) mBinding.dataSellerList.getAdapter();
     }
 
-
     private void initAll() {
         mBinding = (ActivityDataPlanBinding) getViewDataBinding();
         viewModel = getViewModel();
@@ -298,12 +297,10 @@ public class DataPlanActivity extends TelemeshBaseActivity implements DataPlanMa
         dataLimitModel.setInitialRole(mCurrentRole);
         mBinding.setDataLimitModel(dataLimitModel);
 
-        setClickListener(mBinding.imageViewBack, mBinding.icWallet,
-                mBinding.layoutDataplan, mBinding.saveButton);
+        setClickListener(mBinding.imageViewBack, mBinding.icWallet, mBinding.layoutDataplan, mBinding.saveButton);
 
         DataPlanManager.getInstance().setDataPlanListener(this);
     }
-
 
     private void changeStatusBarColor() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
@@ -316,7 +313,6 @@ public class DataPlanActivity extends TelemeshBaseActivity implements DataPlanMa
             window.setStatusBarColor(Color.TRANSPARENT);
         }
     }
-
 
     private void roleSwitchingMapMsg() {
         roleSwitchMap.put(getKey(DataPlanConstants.USER_ROLE.MESH_USER, DataPlanConstants.USER_ROLE.DATA_BUYER), getResources().getString(R.string.mesh_user_to_buyer));
@@ -339,7 +335,6 @@ public class DataPlanActivity extends TelemeshBaseActivity implements DataPlanMa
     private String getKey(int prev, int cur) {
         return prev + "" + cur;
     }
-
 
     private void prepareDataPlanRadio() {
 
@@ -404,7 +399,6 @@ public class DataPlanActivity extends TelemeshBaseActivity implements DataPlanMa
         viewModel.roleSwitch(mCurrentRole);
     }
 
-
     private void initRecyclerView() {
         mBinding.dataSellerList.setItemAnimator(null);
         mBinding.dataSellerList.setHasFixedSize(true);
@@ -413,7 +407,6 @@ public class DataPlanActivity extends TelemeshBaseActivity implements DataPlanMa
         sellerListAdapter = new SellerListAdapter(this);
         mBinding.dataSellerList.setAdapter(sellerListAdapter);
     }
-
 
     private void loadUI() {
 
@@ -468,7 +461,6 @@ public class DataPlanActivity extends TelemeshBaseActivity implements DataPlanMa
         mBinding.toDate.setEnabled(value);
     }
 
-
     private void setEventListener() {
         mBinding.range.addTextChangedListener(new TextWatcher() {
 
@@ -514,7 +506,6 @@ public class DataPlanActivity extends TelemeshBaseActivity implements DataPlanMa
         });
     }
 
-
     private void parseIntent() {
         Intent intent = getIntent();
         if (intent.hasExtra(DataPlanActivity.class.getName())) {
@@ -547,7 +538,6 @@ public class DataPlanActivity extends TelemeshBaseActivity implements DataPlanMa
                     }
                 });
     }
-
 
     public void onButtonClickListener(Seller item) {
         String btnText = item.getBtnText();
@@ -621,7 +611,6 @@ public class DataPlanActivity extends TelemeshBaseActivity implements DataPlanMa
             alertDialog.show();
         });
     }
-
 
     public void onRadioUnlimitedButtonClicked(View view) {
         setDataLimitEnabled(false);
