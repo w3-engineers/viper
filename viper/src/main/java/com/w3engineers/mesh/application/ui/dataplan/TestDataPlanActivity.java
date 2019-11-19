@@ -793,11 +793,11 @@ public class TestDataPlanActivity extends TelemeshBaseActivity implements DataPl
             }
 
             if (to <= System.currentTimeMillis()) {
-//                mBinding.dateError.setVisibility(View.VISIBLE);
-//                mBinding.dateError.setText(getString(R.string.date_expired));
+                mBinding.dateError.setVisibility(View.VISIBLE);
+                mBinding.dateError.setText(getString(R.string.date_expired));
 
             } else {
-//                mBinding.dateError.setVisibility(View.INVISIBLE);
+                mBinding.dateError.setVisibility(View.INVISIBLE);
                 long usedData = 0;
                 try {
                     usedData = DataPlanManager.getInstance().getUsedData(this, from, to);
@@ -808,11 +808,11 @@ public class TestDataPlanActivity extends TelemeshBaseActivity implements DataPl
                 }
 
                 if (tempSharedData <= usedData) {
-//                    mBinding.dataLimitError.setVisibility(View.VISIBLE);
-//                    mBinding.dataLimitError.setText(this.getString(R.string.data_lomit_larger_needed));
+                    mBinding.dataLimitError.setVisibility(View.VISIBLE);
+                    mBinding.dataLimitError.setText(this.getString(R.string.data_lomit_larger_needed));
 
                 } else {
-//                    mBinding.dataLimitError.setVisibility(View.INVISIBLE);
+                    mBinding.dataLimitError.setVisibility(View.INVISIBLE);
                     dataLimitModel.setFromDate(from);
                     dataLimitModel.setToDate(to);
                     dataLimitModel.setSharedData(tempSharedData);
@@ -836,8 +836,8 @@ public class TestDataPlanActivity extends TelemeshBaseActivity implements DataPl
                 }
             }
         } else {
-//            mBinding.dataLimitError.setVisibility(View.INVISIBLE);
-//            mBinding.dateError.setVisibility(View.INVISIBLE);
+            mBinding.dataLimitError.setVisibility(View.INVISIBLE);
+            mBinding.dateError.setVisibility(View.INVISIBLE);
 
             dataLimitModel.setDataLimited(false);
 
