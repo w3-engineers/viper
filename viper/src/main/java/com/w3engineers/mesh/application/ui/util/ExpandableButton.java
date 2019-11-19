@@ -106,6 +106,11 @@ public class ExpandableButton extends FrameLayout {
         textView.setText(text);
     }
 
+    public void setTextColor(int color){
+        if (color != 0)
+            textView.setTextColor(color);
+    }
+
     /**
      * Set color to bar on left side of the button
      * User can set color anytime to this view as indicators

@@ -134,7 +134,7 @@
     <string name="transferred_total"><![CDATA[<b>%sMB</b> transferred total <b>%sMB</b>]]></string>
     <string name="date_range">Date Range</string>
     <string name="from">From</string>
-    <string name="to">to</string>
+    <string name="to">To</string>
     <string name="used_s">Used: %sMB</string>
     <string name="total_mb">of %sMB</string>
 
@@ -154,6 +154,7 @@
 
     <string name="copy_address">Copy address</string>
     <string name="export_my_profile">Export My Profile</string>
+    <string name="save">Save</string>
 
 
 </resources>
