@@ -99,7 +99,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="50dp"
                 android:layout_marginStart="@dimen/margin_8"
-                app:childView="@+id/seller_view"
+
                 app:text="Sell Data" />
 
             <LinearLayout
@@ -360,7 +360,7 @@
                     android:id="@+id/dateError"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginLeft="@dimen/margin_20"
+                    android:layout_marginStart="@dimen/margin_30"
                     android:layout_marginTop="@dimen/margin_5"
                     android:fontFamily="@font/opensans_regular"
                     android:text="@string/date_expired"
