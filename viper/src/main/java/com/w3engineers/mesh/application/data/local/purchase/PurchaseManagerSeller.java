@@ -1290,7 +1290,7 @@ public class PurchaseManagerSeller extends PurchaseManager implements PayControl
                                 databaseService.updatePurchase(purchase);
                                 MeshLog.o("/*/*/*/*/*/*/*/*/ seller updated the database /*/*/*/*/*/*/*/");
 
-                                buyerPendingMessage.status = PurchaseConstants.BUYER_PENDING_MESSAGE_STATUS.SENT_PAID;
+//                                buyerPendingMessage.status = PurchaseConstants.BUYER_PENDING_MESSAGE_STATUS.SENT_PAID;
 
                                 MeshLog.o("balancemismatchcheck3 " + bps_balance + "  " + purchase.usedDataAmount);
                                 databaseService.updateBuyerPendingMessage(buyerPendingMessage);
@@ -1354,7 +1354,7 @@ public class PurchaseManagerSeller extends PurchaseManager implements PayControl
                             databaseService.updatePurchase(purchase);
                             MeshLog.o("/*/*/*/*/*/*/*/*/ seller updated the database /*/*/*/*/*/*/*/");
 
-                            buyerPendingMessage.status = PurchaseConstants.BUYER_PENDING_MESSAGE_STATUS.SENT_PAID;
+//                            buyerPendingMessage.status = PurchaseConstants.BUYER_PENDING_MESSAGE_STATUS.SENT_PAID;
 
                             MeshLog.o("balancemismatchcheck3 " + bps_balance + "  " + purchase.usedDataAmount);
                             databaseService.updateBuyerPendingMessage(buyerPendingMessage);
