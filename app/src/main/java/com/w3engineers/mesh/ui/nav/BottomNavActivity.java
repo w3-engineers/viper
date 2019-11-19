@@ -2,8 +2,6 @@ package com.w3engineers.mesh.ui.nav;
 
 import android.Manifest;
 import android.databinding.DataBindingUtil;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
@@ -15,28 +13,21 @@ import android.view.MenuItem;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.w3engineers.ext.strom.util.helper.Toaster;
 import com.w3engineers.ext.viper.R;
 import com.w3engineers.ext.viper.databinding.ActivityCreateGroupBinding;
-import com.w3engineers.mesh.application.data.ApiEvent;
-import com.w3engineers.mesh.application.data.AppDataObserver;
 import com.w3engineers.mesh.application.data.local.dataplan.DataPlanManager;
 import com.w3engineers.mesh.application.data.local.db.SharedPref;
 import com.w3engineers.mesh.application.data.local.wallet.WalletManager;
-import com.w3engineers.mesh.application.data.model.TransportInit;
-import com.w3engineers.mesh.application.data.model.WalletLoaded;
 import com.w3engineers.mesh.model.UserModel;
 import com.w3engineers.mesh.ui.Nearby.NearbyFragment;
 import com.w3engineers.mesh.ui.Nearby.UserConnectionCallBack;
 import com.w3engineers.mesh.ui.base.BaseFragment;
 import com.w3engineers.mesh.ui.history.HistoryFragment;
 import com.w3engineers.mesh.ui.meshlog.MeshLogFragment;
-import com.w3engineers.mesh.util.ConnectionManager;
 import com.w3engineers.mesh.util.Constant;
 import com.w3engineers.mesh.util.MeshLog;
 import com.w3engineers.mesh.util.PermissionUtil;
 
-import java.io.ByteArrayOutputStream;
 import java.util.HashMap;
 
 public class BottomNavActivity extends AppCompatActivity implements UserConnectionCallBack,  BottomMessageListener {
