@@ -26,4 +26,5 @@ interface ITmCommunicator {
    String getUserPublicKey(in String address);
    void disconnectFromInternet();
    String getCurrentSellerId();
+   String getUserNameByAddress(in String address);
 }

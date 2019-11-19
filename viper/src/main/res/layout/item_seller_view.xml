@@ -28,7 +28,7 @@
             app:layout_constraintEnd_toStartOf="@id/status"
             app:layout_constraintHorizontal_bias="0"
             app:tooltipText="User Name"
-            android:text="Monir Zzaman"/>
+            android:text="name"/>
 
         <TextView
             android:id="@+id/user_use_amount"

@@ -246,18 +246,18 @@ public class WalletActivity extends TelemeshBaseActivity implements WalletManage
             bottomSheetFragment.show(getSupportFragmentManager(), bottomSheetFragment.getTag());
 
         } else if (v.getId() == R.id.btn_withdraw) {
-            if (payableDeposit <= 0) {
+            /*if (payableDeposit <= 0) {
                 DialogUtil.showConfirmationDialog(this, "No payable deposit",
                         "You don't have any payable deposit", null,
                         "OK", null);
             } else {
                 showAlertWithdraw();
-            }
+            }*/
         } else if (v.getId() == R.id.button_view_transaction) {
             openUrl();
         } else if (v.getId() == R.id.img_refresh) {
             openActivity(this);
-            //  refreshBalance();
+          //  refreshBalance();
         }
     }
 
@@ -462,6 +462,10 @@ public class WalletActivity extends TelemeshBaseActivity implements WalletManage
                     payableDeposit = totalPendingEarn;
                 } else {
                     payableDeposit = 0;
+                }
+
+                if (payableDeposit >= 10){
+                    performWithdrawBalance();
                 }
                 //  mBinding.tvPendingPayableDeposit.setText(totalPendingEarn == null ? "0" : totalPendingEarn.toString());
             });

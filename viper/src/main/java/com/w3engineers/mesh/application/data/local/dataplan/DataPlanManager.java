@@ -21,6 +21,7 @@ import com.w3engineers.mesh.application.data.local.purchase.PurchaseConstants;
 import com.w3engineers.mesh.application.data.local.purchase.PurchaseManagerBuyer;
 import com.w3engineers.mesh.application.data.local.purchase.PurchaseManagerSeller;
 import com.w3engineers.mesh.application.ui.dataplan.DataPlanActivity;
+import com.w3engineers.mesh.application.ui.dataplan.TestDataPlanActivity;
 import com.w3engineers.mesh.util.EthereumServiceUtil;
 import com.w3engineers.mesh.util.MeshLog;
 
@@ -63,7 +64,7 @@ public class DataPlanManager {
     }
 
     public static void openActivity(Context context, int imageValue){
-        Intent intent = new Intent(context, DataPlanActivity.class);
+        Intent intent = new Intent(context, TestDataPlanActivity.class);
         if(imageValue != 0) {
             byte[] image = getPicture(context, imageValue);
             intent.putExtra("picture", image);
@@ -85,6 +86,10 @@ public class DataPlanManager {
         if (getDataPlanRole() == DataPlanConstants.USER_ROLE.DATA_BUYER) {
             PurchaseManagerBuyer.getInstance().setDataPlanListener(dataPlanListener);
         }
+    }
+
+    public void closeMesh() {
+        payController.getDataManager().stopMesh();
     }
 
     public interface DataPlanListener {
@@ -249,10 +254,11 @@ public class DataPlanManager {
 
                 if (!TextUtils.isEmpty(purchase.sellerAddress) && connectedSellers.contains(purchase.sellerAddress)) {
 
+
                     if(purchase.balance < purchase.deposit) {
-                        connectedWithPurchasesClose.add(purchase.toSeller(DataPlanConstants.SELLER_LABEL.ONLINE_PURCHASED));
+                        connectedWithPurchasesClose.add(purchase.toSeller(DataPlanConstants.SELLER_LABEL.ONLINE_PURCHASED, payController.getDataManager().getUserNameByAddress(purchase.sellerAddress)));
                     } else {
-                        connectedWithPurchasesOpen.add(purchase.toSeller(DataPlanConstants.SELLER_LABEL.ONLINE_NOT_PURCHASED));
+                        connectedWithPurchasesOpen.add(purchase.toSeller(DataPlanConstants.SELLER_LABEL.ONLINE_NOT_PURCHASED, payController.getDataManager().getUserNameByAddress(purchase.sellerAddress)));
                     }
 
                     connectedSellers.remove(purchase.sellerAddress);
@@ -265,7 +271,7 @@ public class DataPlanManager {
             if (connectedSellers.size() > 0) {
 
                 for (String sellerId : connectedSellers) {
-                    finalSeller.add(getSellerById(sellerId, DataPlanConstants.SELLER_LABEL.ONLINE_NOT_PURCHASED));
+                    finalSeller.add(getSellerById(sellerId, DataPlanConstants.SELLER_LABEL.ONLINE_NOT_PURCHASED, payController.getDataManager().getUserNameByAddress(sellerId)));
                 }
 
                 // Add all top up seller in connected seller list
@@ -285,7 +291,7 @@ public class DataPlanManager {
                     // Ony added seller for close action seller
                     // Because those are not connected
                     if(purchase.balance < purchase.deposit) {
-                        finalSeller.add(purchase.toSeller(DataPlanConstants.SELLER_LABEL.OFFLINE_PURCHASED));
+                        finalSeller.add(purchase.toSeller(DataPlanConstants.SELLER_LABEL.OFFLINE_PURCHASED, payController.getDataManager().getUserNameByAddress(purchase.sellerAddress)));
                     }
                 }
             }
@@ -309,6 +315,8 @@ public class DataPlanManager {
             setSellers(finalSeller);
 
         } catch (ExecutionException | InterruptedException e) {
+            e.printStackTrace();
+        } catch (RemoteException e) {
             e.printStackTrace();
         }
     }
@@ -337,10 +345,10 @@ public class DataPlanManager {
         }
     }
 
-    private Seller getSellerById(String sellerId, int label) {
+    private Seller getSellerById(String sellerId, int label, String name) {
         return new Seller()
                 .setId(sellerId)
-                .setName(sellerId)
+                .setName(name)
                 .setPurchasedData(0)
                 .setUsedData(0)
                 .setBtnEnabled(true)

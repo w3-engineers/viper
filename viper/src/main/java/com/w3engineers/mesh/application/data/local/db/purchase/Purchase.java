@@ -57,10 +57,10 @@ public class Purchase {
     @ColumnInfo(name = "block_chain_endpoint")
     public int blockChainEndpoint;
 
-    public Seller toSeller(int label) {
+    public Seller toSeller(int label, String name) {
         Seller seller =  new Seller()
                 .setId(sellerAddress)
-                .setName(sellerAddress)
+                .setName(name)
                 .setPurchasedData(totalDataAmount)
                 .setUsedData(usedDataAmount)
                 .setLabel(label);
