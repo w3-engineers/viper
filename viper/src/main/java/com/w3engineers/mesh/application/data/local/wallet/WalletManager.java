@@ -42,10 +42,14 @@ public class WalletManager {
     private ProgressDialog dialog;
 
 
-    public static void openActivity(Context context){
+    public static void openActivity(Context context, byte[] picture){
         Intent intent = new Intent(context, WalletActivity.class);
+        intent.putExtra("picture", picture);
         context.startActivity(intent);
     }
+
+
+
 
     public static WalletManager getInstance(){
         if (walletManager == null){

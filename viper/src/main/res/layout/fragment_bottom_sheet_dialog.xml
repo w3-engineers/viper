@@ -96,6 +96,7 @@
         android:gravity="bottom|center_horizontal">
 
         <de.hdodenhof.circleimageview.CircleImageView
+            android:id="@+id/user_image"
             android:layout_width="@dimen/height_100"
             android:layout_height="@dimen/width_100"
             android:src="@mipmap/ic_profile_user" />

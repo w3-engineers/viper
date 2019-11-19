@@ -61,6 +61,7 @@ public class WalletActivity extends TelemeshBaseActivity implements WalletManage
 
     private final String ropstenUrl = "https://ropsten.etherscan.io/address/";
     private final String kottyUrl = "https://explorer.eth.events/ethereum/ethereum/kotti/address/";
+    private byte[] picture;
 
     private interface REQUEST_TYPE {
         int ETHER = 1;
@@ -82,6 +83,12 @@ public class WalletActivity extends TelemeshBaseActivity implements WalletManage
     protected void startUI() {
 
         mBinding = (ActivityWalletBinding) getViewDataBinding();
+        Intent intent = getIntent();
+        if(intent.hasExtra("picture")){
+            picture = intent.getByteArrayExtra("picture");
+        }
+
+
         walletViewModel = getWalletViewModel();
         walletManager = WalletManager.getInstance();
         dataPlanManager = DataPlanManager.getInstance();
@@ -235,7 +242,7 @@ public class WalletActivity extends TelemeshBaseActivity implements WalletManage
         if (v.getId() == R.id.op_back) {
             finish();
         } else if (v.getId() == R.id.img_my_address) {
-            BottomSheetFragment bottomSheetFragment = new BottomSheetFragment(walletManager.getMyAddress());
+            BottomSheetFragment bottomSheetFragment = new BottomSheetFragment(walletManager.getMyAddress(), picture);
             bottomSheetFragment.show(getSupportFragmentManager(), bottomSheetFragment.getTag());
 
         } else if (v.getId() == R.id.btn_withdraw) {

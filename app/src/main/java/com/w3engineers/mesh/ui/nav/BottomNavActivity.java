@@ -2,6 +2,8 @@ package com.w3engineers.mesh.ui.nav;
 
 import android.Manifest;
 import android.databinding.DataBindingUtil;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
@@ -34,6 +36,7 @@ import com.w3engineers.mesh.util.Constant;
 import com.w3engineers.mesh.util.MeshLog;
 import com.w3engineers.mesh.util.PermissionUtil;
 
+import java.io.ByteArrayOutputStream;
 import java.util.HashMap;
 
 public class BottomNavActivity extends AppCompatActivity implements UserConnectionCallBack,  BottomMessageListener {
@@ -260,10 +263,12 @@ public class BottomNavActivity extends AppCompatActivity implements UserConnecti
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == R.id.menu_data_plan_setting) {
-            DataPlanManager.openActivity(this);
+            DataPlanManager.openActivity(this, R.mipmap.ic_launcher);
         }
         return false;
     }
+
+
 
     @Override
     protected void onPause() {

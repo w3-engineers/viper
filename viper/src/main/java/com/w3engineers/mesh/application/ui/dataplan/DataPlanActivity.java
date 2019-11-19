@@ -59,6 +59,7 @@ public class DataPlanActivity extends TelemeshBaseActivity implements DataPlanMa
     private ProgressDialog progressDialog;
 
     private int mCurrentRole;
+    private byte[] picture;
 
     @Override
     protected int getLayoutId() {
@@ -72,6 +73,11 @@ public class DataPlanActivity extends TelemeshBaseActivity implements DataPlanMa
 
     @Override
     protected void startUI() {
+        Intent intent = getIntent();
+        if(intent.hasExtra("picture")){
+            picture = intent.getByteArrayExtra("picture");
+        }
+
         initAll();
 
         changeStatusBarColor();
@@ -104,7 +110,7 @@ public class DataPlanActivity extends TelemeshBaseActivity implements DataPlanMa
         if (view.getId() == R.id.imageView_back) {
             finish();
         } else if (view.getId() == R.id.ic_wallet) {
-            WalletManager.openActivity(this);
+            WalletManager.openActivity(this, picture);
         } else if (view.getId() == R.id.save_button) {
             checkSharingLimit();
         } else if (view.getId() == R.id.status) {

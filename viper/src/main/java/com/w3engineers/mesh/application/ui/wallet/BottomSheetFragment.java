@@ -32,6 +32,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.channels.FileChannel;
 
+import de.hdodenhof.circleimageview.CircleImageView;
 import lib.folderpicker.FolderPicker;
 
 public class BottomSheetFragment extends BottomSheetDialogFragment implements View.OnClickListener {
@@ -43,14 +44,15 @@ public class BottomSheetFragment extends BottomSheetDialogFragment implements Vi
     private Activity activity;
     private final int FOLDER_CHOOSE_ACTION = 100;
     private ProgressDialog dialog;
-
+    private byte[] picture;
 
     public BottomSheetFragment() {
     }
 
     @SuppressLint("ValidFragment")
-    public BottomSheetFragment(String address) {
+    public BottomSheetFragment(String address, byte[] picture) {
         this.address = address;
+        this.picture = picture;
         String bitmapString = SharedPref.read(Constant.PreferenceKeys.ADDRESS_BITMAP);
         byte[] encodeByte = Base64.decode(bitmapString, Base64.DEFAULT);
         bitmap = BitmapFactory.decodeByteArray(encodeByte, 0, encodeByte.length);
@@ -72,6 +74,12 @@ public class BottomSheetFragment extends BottomSheetDialogFragment implements Vi
         ImageView copyImageView = view.findViewById(R.id.copy_image_view);
         Button copyButton = view.findViewById(R.id.button_export_wallet);
         TextView textView = view.findViewById(R.id.tv_my_address);
+        CircleImageView userImageView = view.findViewById(R.id.user_image);
+        if(picture != null) {
+            Bitmap bmp = BitmapFactory.decodeByteArray(picture, 0, picture.length);
+            userImageView.setImageBitmap(bmp);
+        }
+
         qrImageView.setImageBitmap(bitmap);
         textView.setText(address);
         copyButton.setOnClickListener(this::onClick);

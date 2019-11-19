@@ -1020,7 +1020,7 @@ public class PurchaseManagerBuyer extends PurchaseManager implements PayControll
                         HandlerUtil.postForeground(() -> DialogUtil.showConfirmationDialog(currentActivity, "Internet Usage Finished!", "Your current internet volume insufficient, please purchase again and continue messaging", "No, Thanks", "Ok", new DialogUtil.DialogButtonListener() {
                             @Override
                             public void onClickPositive() {
-                                DataPlanManager.openActivity(currentActivity);
+                                DataPlanManager.openActivity(currentActivity, 0);
                             }
 
                             @Override
