@@ -21,6 +21,7 @@ import com.w3engineers.mesh.application.data.local.purchase.PurchaseConstants;
 import com.w3engineers.mesh.application.data.local.purchase.PurchaseManagerBuyer;
 import com.w3engineers.mesh.application.data.local.purchase.PurchaseManagerSeller;
 import com.w3engineers.mesh.application.ui.dataplan.DataPlanActivity;
+import com.w3engineers.mesh.application.ui.dataplan.TestDataPlanActivity;
 import com.w3engineers.mesh.util.EthereumServiceUtil;
 import com.w3engineers.mesh.util.MeshLog;
 
@@ -63,11 +64,11 @@ public class DataPlanManager {
     }
 
     public static void openActivity(Context context, int imageValue){
-        Intent intent = new Intent(context, DataPlanActivity.class);
-        if(imageValue != 0) {
+        Intent intent = new Intent(context, TestDataPlanActivity.class);
+        /*if(imageValue != 0) {
             byte[] image = getPicture(context, imageValue);
             intent.putExtra("picture", image);
-        }
+        }*/
         context.startActivity(intent);
     }
 
