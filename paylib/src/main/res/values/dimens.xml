@@ -173,6 +173,7 @@
     <dimen name="text_size_toolbar_extension_title_standard">36sp</dimen>
     <dimen name="text_size_toolbar_extension_title_minimum">25sp</dimen>
     <dimen name="text_size_12">12sp</dimen>
+    <dimen name="text_size_10">10sp</dimen>
 
     <!-- Default screen margins, per the Android Design guidelines. -->
     <dimen name="activity_horizontal_margin">10dp</dimen>
