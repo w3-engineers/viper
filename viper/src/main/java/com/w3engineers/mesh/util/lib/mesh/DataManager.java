@@ -533,6 +533,17 @@ public class DataManager {
         return mTmCommunicator.getUserPublicKey(address);
     }
 
+    public String getUserNameByAddress(String address) throws RemoteException {
+        MeshLog.v("getUserNameByAddress dtm " + address);
+
+        if (mTmCommunicator == null) {
+            MeshLog.v("mTmCommunicator null");
+        } else {
+            return mTmCommunicator.getUserNameByAddress(address);
+        }
+     return null;
+    }
+
     public void sendPayMessage(String receiverId, String message, String messageId) throws RemoteException {
         MeshLog.v("sendPayMessage dtm");
         mTmCommunicator.sendPayMessage(receiverId, message, messageId);

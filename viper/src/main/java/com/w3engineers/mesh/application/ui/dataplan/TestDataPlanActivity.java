@@ -51,7 +51,7 @@ import java.util.concurrent.ExecutionException;
 
 public class TestDataPlanActivity extends TelemeshBaseActivity implements DataPlanManager.DataPlanListener {
 
-    private SellerListAdapter sellerListAdapter;
+    private TestSellerListAdapter sellerListAdapter;
     private DataPlanViewModel viewModel;
     private DataLimitModel dataLimitModel;
 
@@ -132,6 +132,12 @@ public class TestDataPlanActivity extends TelemeshBaseActivity implements DataPl
 
     }
 
+    private void checkAndCloseMesh(int role){
+        if (mCurrentRole == role){
+            DataPlanManager.getInstance().closeMesh();
+        }
+    }
+
 
     private void initSwitchListener() {
         mBinding.switchButtonLocal.setOnCheckedChangeListener(
@@ -145,6 +151,7 @@ public class TestDataPlanActivity extends TelemeshBaseActivity implements DataPl
                         } else {
 
                             expandableButtons[mCurrentRole].setTextColor(Color.BLACK);
+                            checkAndCloseMesh(DataPlanConstants.USER_ROLE.MESH_USER);
 //                            Toast.makeText(TestDataPlanActivity.this,
 //                                    "Switch Off", Toast.LENGTH_SHORT).show();
                         }
@@ -161,6 +168,7 @@ public class TestDataPlanActivity extends TelemeshBaseActivity implements DataPl
 //                                    "Switch On", Toast.LENGTH_SHORT).show();
                         } else {
                             expandableButtons[mCurrentRole].setTextColor(Color.BLACK);
+                            checkAndCloseMesh(DataPlanConstants.USER_ROLE.DATA_SELLER);
 //                            Toast.makeText(TestDataPlanActivity.this,
 //                                    "Switch Off", Toast.LENGTH_SHORT).show();
                         }
@@ -179,6 +187,7 @@ public class TestDataPlanActivity extends TelemeshBaseActivity implements DataPl
 //                                    "Switch On", Toast.LENGTH_SHORT).show();
                         } else {
                             expandableButtons[mCurrentRole].setTextColor(Color.BLACK);
+                            checkAndCloseMesh(DataPlanConstants.USER_ROLE.DATA_BUYER);
 //                            Toast.makeText(TestDataPlanActivity.this,
 //                                    "Switch Off", Toast.LENGTH_SHORT).show();
                         }
@@ -195,6 +204,7 @@ public class TestDataPlanActivity extends TelemeshBaseActivity implements DataPl
 //                                    "Switch On", Toast.LENGTH_SHORT).show();
                         } else {
                             expandableButtons[mCurrentRole].setTextColor(Color.BLACK);
+                            checkAndCloseMesh(DataPlanConstants.USER_ROLE.INTERNET_USER);
 //                            Toast.makeText(TestDataPlanActivity.this,
 //                                    "Switch Off", Toast.LENGTH_SHORT).show();
                         }
@@ -208,52 +218,52 @@ public class TestDataPlanActivity extends TelemeshBaseActivity implements DataPl
         mBinding.localButton.setCallbackListener(new ExpandableButton.ExpandableButtonListener() {
             @Override
             public void onViewExpanded() {
-                Toast.makeText(TestDataPlanActivity.this, "local Button Expanded", Toast.LENGTH_SHORT).show();
+//                Toast.makeText(TestDataPlanActivity.this, "local Button Expanded", Toast.LENGTH_SHORT).show();
                 collapseView(mBinding.localButton);
             }
 
             @Override
             public void onViewCollapsed() {
-                Toast.makeText(TestDataPlanActivity.this, "local Button Collapsed", Toast.LENGTH_SHORT).show();
+//                Toast.makeText(TestDataPlanActivity.this, "local Button Collapsed", Toast.LENGTH_SHORT).show();
             }
         });
 
         mBinding.sellDataButton.setCallbackListener(new ExpandableButton.ExpandableButtonListener() {
             @Override
             public void onViewExpanded() {
-                Toast.makeText(TestDataPlanActivity.this, "seller Button Expanded", Toast.LENGTH_SHORT).show();
+//                Toast.makeText(TestDataPlanActivity.this, "seller Button Expanded", Toast.LENGTH_SHORT).show();
                 collapseView(mBinding.sellDataButton);
             }
 
             @Override
             public void onViewCollapsed() {
-                Toast.makeText(TestDataPlanActivity.this, "seller Button Collapsed", Toast.LENGTH_SHORT).show();
+//                Toast.makeText(TestDataPlanActivity.this, "seller Button Collapsed", Toast.LENGTH_SHORT).show();
             }
         });
 
         mBinding.buyDataButton.setCallbackListener(new ExpandableButton.ExpandableButtonListener() {
             @Override
             public void onViewExpanded() {
-                Toast.makeText(TestDataPlanActivity.this, "buyer Button  Button Expanded", Toast.LENGTH_SHORT).show();
+//                Toast.makeText(TestDataPlanActivity.this, "buyer Button  Button Expanded", Toast.LENGTH_SHORT).show();
                 collapseView(mBinding.buyDataButton);
             }
 
             @Override
             public void onViewCollapsed() {
-                Toast.makeText(TestDataPlanActivity.this, "buyer Button Button Collapsed", Toast.LENGTH_SHORT).show();
+//                Toast.makeText(TestDataPlanActivity.this, "buyer Button Button Collapsed", Toast.LENGTH_SHORT).show();
             }
         });
 
         mBinding.internetOnlyButton.setCallbackListener(new ExpandableButton.ExpandableButtonListener() {
             @Override
             public void onViewExpanded() {
-                Toast.makeText(TestDataPlanActivity.this, "internet Only Button Expanded", Toast.LENGTH_SHORT).show();
+//                Toast.makeText(TestDataPlanActivity.this, "internet Only Button Expanded", Toast.LENGTH_SHORT).show();
                 collapseView(mBinding.internetOnlyButton);
             }
 
             @Override
             public void onViewCollapsed() {
-                Toast.makeText(TestDataPlanActivity.this, "internetOnly Button Collapsed", Toast.LENGTH_SHORT).show();
+//                Toast.makeText(TestDataPlanActivity.this, "internetOnly Button Collapsed", Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -486,8 +496,8 @@ public class TestDataPlanActivity extends TelemeshBaseActivity implements DataPl
     }
 
 
-    private SellerListAdapter getAdapter() {
-        return (SellerListAdapter) mBinding.testDataSellerList.getAdapter();
+    private TestSellerListAdapter getAdapter() {
+        return (TestSellerListAdapter) mBinding.testDataSellerList.getAdapter();
     }
 
     private String getKey(int prev, int cur) {
@@ -521,7 +531,7 @@ public class TestDataPlanActivity extends TelemeshBaseActivity implements DataPl
         mBinding.testDataSellerList.setHasFixedSize(true);
         mBinding.testDataSellerList.setLayoutManager(new LinearLayoutManager(this));
 
-        sellerListAdapter = new SellerListAdapter(this);
+        sellerListAdapter = new TestSellerListAdapter(this);
         mBinding.testDataSellerList.setAdapter(sellerListAdapter);
     }
 
