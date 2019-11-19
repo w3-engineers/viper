@@ -11,55 +11,79 @@
         android:layout_height="match_parent"
         android:layout_alignParentTop="true"
         android:layout_marginTop="50dp"
-        android:orientation="vertical"
-        android:background="@color/white">
-
-       <TextView
-           android:layout_width="wrap_content"
-           android:layout_height="wrap_content"
-           android:layout_marginTop="@dimen/margin_60"
-           android:layout_gravity="center_horizontal"
-           android:layout_marginStart="@dimen/margin_20"
-           android:layout_marginEnd="@dimen/margin_20"
-           android:gravity="center"
-           android:textSize="@dimen/text_size_20"
-           android:textColor="@color/black"
-           android:text="My Wallet Address" />
+        android:background="@color/white"
+        android:orientation="vertical">
 
         <TextView
-            android:id="@+id/tv_my_address"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/margin_20"
             android:layout_gravity="center_horizontal"
-            android:layout_marginStart="@dimen/margin_40"
-            android:layout_marginEnd="@dimen/margin_40"
+            android:layout_marginStart="@dimen/margin_20"
+            android:layout_marginTop="@dimen/margin_60"
+            android:layout_marginEnd="@dimen/margin_20"
             android:gravity="center"
-            android:textSize="@dimen/text_size_14"
-            android:textColor="@color/ninety_black"
-            android:text="jhgdagdgsa3546576asdjahsjkdshad47586a7sadasdsalkdjasoiudsajdlskaj546768adjasg"/>
+            android:text="My Wallet Address"
+            android:textColor="@color/black"
+            android:textSize="@dimen/text_size_20" />
+
+
+        <android.support.constraint.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/margin_40"
+            android:layout_marginTop="@dimen/margin_20"
+            android:layout_marginEnd="@dimen/margin_40">
+
+            <TextView
+                android:id="@+id/tv_my_address"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:gravity="center"
+                android:text="ajhgdagdgsa3546576asdjahsjkdshad47586a7sadasdsalkdjas spodif"
+                android:textColor="@color/ninety_black"
+                android:textSize="@dimen/text_size_16"
+                app:layout_constraintEnd_toStartOf="@+id/copy_image_view"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <ImageView
+                android:id="@+id/copy_image_view"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginTop="@dimen/margin_20"
+                android:src="@mipmap/ic_copy"
+                app:layout_constraintEnd_toEndOf="parent"
+                android:padding="@dimen/padding_5"
+                app:layout_constraintBottom_toBottomOf="@+id/tv_my_address"
+                app:layout_constraintTop_toTopOf="@id/tv_my_address" />
+
+        </android.support.constraint.ConstraintLayout>
+
+
 
 
         <ImageView
             android:id="@+id/qrImage"
-            android:layout_marginTop="@dimen/margin_20"
             android:layout_width="@dimen/height_150"
             android:layout_height="@dimen/height_150"
             android:layout_gravity="center"
+            android:layout_marginTop="@dimen/margin_20"
             android:src="@mipmap/qr_code" />
 
         <Button
-            android:id="@+id/button_copy_address"
+            android:id="@+id/button_export_wallet"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/margin_20"
             android:layout_marginLeft="@dimen/margin_40"
+            android:layout_marginTop="@dimen/margin_20"
             android:layout_marginRight="@dimen/margin_40"
             android:background="@drawable/rectangle_button_shape"
-            android:text="@string/copy_address"
+            android:text="@string/export_my_profile"
             android:textAllCaps="true"
             android:textColor="@color/white"
-            android:textSize="@dimen/text_size_16"/>
+            android:textSize="@dimen/text_size_16" />
 
 
     </LinearLayout>
@@ -72,6 +96,7 @@
         android:gravity="bottom|center_horizontal">
 
         <de.hdodenhof.circleimageview.CircleImageView
+            android:id="@+id/user_image"
             android:layout_width="@dimen/height_100"
             android:layout_height="@dimen/width_100"
             android:src="@mipmap/ic_profile_user" />

@@ -71,14 +71,15 @@ public class TestDataPlanActivity extends TelemeshBaseActivity implements DataPl
     private SimpleDateFormat sdf;
 
 
-    @Override
-    protected BaseServiceLocator getBaseServiceLocator() {
-        return null;
-    }
 
     @Override
     protected int getLayoutId() {
         return R.layout.test_activity_data_plan;
+    }
+
+    @Override
+    protected BaseServiceLocator getServiceLocator() {
+        return null;
     }
 
     @Override
@@ -128,8 +129,6 @@ public class TestDataPlanActivity extends TelemeshBaseActivity implements DataPl
         expandableButtons = new ExpandableButton[]{mBinding.localButton, mBinding.sellDataButton, mBinding.buyDataButton, mBinding.internetOnlyButton};
         roleSwitches = new Switch[]{mBinding.switchButtonLocal, mBinding.switchButtonSeller, mBinding.switchButtonBuyer, mBinding.switchButtonInternet};
         dataLimitRadioButtons = new RadioButton[]{mBinding.unlimited, mBinding.limitTo};
-
-
     }
 
     private void checkAndCloseMesh(int role){

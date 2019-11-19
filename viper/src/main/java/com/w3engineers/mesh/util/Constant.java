@@ -81,6 +81,7 @@ public class Constant {
 
     public interface PreferenceKeys {
         String ADDRESS = "eth_address";
+        String PUBLIC_KEY = "public_key";
         String ADDRESS_BITMAP = "address_bitmap";
         String AUTH_USER_NAME = "AUTH_USER_NAME";
         String AUTH_PASSWORD = "AUTH_PASSWORD";

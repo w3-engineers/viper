@@ -52,6 +52,7 @@ public class ConnectionManager {
                     mConnectionManager = new ConnectionManager(context, APP_NAME, NETWORK_PREFIX);
             }
         }
+        mConnectionManager = new ConnectionManager(context, APP_NAME, NETWORK_PREFIX);
         return mConnectionManager;
     }
 
@@ -72,7 +73,8 @@ public class ConnectionManager {
                 String APP_DOWNLOAD_LINK = jsonObject.optString("APP_DOWNLOAD_LINK");
                 String GIFT_DONATE_LINK = jsonObject.optString("GIFT_DONATE_LINK");
 
-                viperClient = ViperClient.on(context, appName, "com.w3engineers.ext.viper", networkPrefix, SharedPref.read(Constant.KEY_USER_NAME), 1, System.currentTimeMillis(), true)
+                viperClient = ViperClient.on(context, appName, "com.w3engineers.ext.viper", networkPrefix, SharedPref.read(Constant.KEY_USER_NAME),
+                        SharedPref.read(Constant.PreferenceKeys.ADDRESS), SharedPref.read(Constant.PreferenceKeys.PUBLIC_KEY), 1, System.currentTimeMillis(), true)
                         .setConfig(AUTH_USER_NAME, AUTH_PASSWORD, APP_DOWNLOAD_LINK, GIFT_DONATE_LINK);
 
                 startAllObserver();
@@ -269,7 +271,7 @@ public class ConnectionManager {
                 String userId = getUserId();
                 String userJson = UserModel.getUserJson(userId);
                 viperClient.sendMessage(userId, nodeId, uniqueId.toString(), userJson.getBytes(), false);
-            } catch (RemoteException e) {
+            } catch (Exception e) {
                 e.printStackTrace();
                 showToast();
             }
@@ -306,7 +308,7 @@ public class ConnectionManager {
             try {
                 String userId = getUserId();
                 viperClient.sendMessage(userId, nodeId, messageId, userJson.getBytes(), true);
-            } catch (RemoteException e) {
+            } catch (Exception e) {
                 e.printStackTrace();
                 showToast();
             }
@@ -318,7 +320,7 @@ public class ConnectionManager {
             String userId = getUserId();
             String msgJson = MessageModel.buildMessage(messageModel, userId);
             viperClient.sendMessage(userId, receiverId, messageModel.messageId, msgJson.getBytes(), true);
-        } catch (RemoteException e) {
+        } catch (Exception e) {
             e.printStackTrace();
             showToast();
         }
@@ -355,7 +357,7 @@ public class ConnectionManager {
         int type = 0;
         try {
             type = viperClient.getLinkTypeById(nodeId);
-        } catch (RemoteException e) {
+        } catch (Exception e) {
             e.printStackTrace();
             showToast();
         }
@@ -382,7 +384,7 @@ public class ConnectionManager {
                 String userId = viperClient.getUserId();
                 SharedPref.write(Constant.KEY_USER_ID, userId);
                 return userId;
-            } catch (RemoteException e) {
+            } catch (Exception e) {
                 e.printStackTrace();
                 showToast();
                 return null;

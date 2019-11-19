@@ -148,6 +148,7 @@ public class DataManager {
                         Toast.makeText(mContext, "Bind service successful", Toast.LENGTH_LONG).show();
                         return;
                     }
+                    MeshLog.i("Bind Service failed 1 " + isAlreadyToPlayStore);
                     HandlerUtil.postBackground(this, 5000);
 
                     if (!isAlreadyToPlayStore) {
@@ -162,6 +163,9 @@ public class DataManager {
     }
 
     private void showConfirmationPopUp() {
+
+        MeshLog.i("Bind Service failed 2");
+
         DialogUtil.showConfirmationDialog(mContext,
                 mContext.getResources().getString(R.string.install_ts),
                 mContext.getResources().getString(R.string.need_ts),

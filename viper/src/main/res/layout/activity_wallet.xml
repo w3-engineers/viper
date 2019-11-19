@@ -153,7 +153,7 @@
                                 android:layout_height="wrap_content"
                                 android:paddingStart="@dimen/padding_10"
                                 android:paddingEnd="@dimen/padding_10"
-                                android:text="1750.092"
+                                android:text="0.00"
                                 android:textColor="@color/white"
                                 android:textSize="@dimen/text_size_50sp"
                                 android:textStyle="bold"
@@ -305,7 +305,7 @@
                         </android.support.constraint.ConstraintLayout>
 
                         <Button
-                            android:id="@+id/button_book_token"
+                            android:id="@+id/button_view_transaction"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="@dimen/margin_60"

@@ -3,6 +3,9 @@ package com.w3engineers.mesh.application.data.local.dataplan;
 import android.arch.lifecycle.LiveData;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.drawable.Drawable;
 import android.os.RemoteException;
 import android.text.TextUtils;
 
@@ -22,6 +25,7 @@ import com.w3engineers.mesh.application.ui.dataplan.DataPlanActivity;
 import com.w3engineers.mesh.util.EthereumServiceUtil;
 import com.w3engineers.mesh.util.MeshLog;
 
+import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
@@ -59,9 +63,21 @@ public class DataPlanManager {
         return dataPlanManager;
     }
 
-    public static void openActivity(Context context){
+    public static void openActivity(Context context, int imageValue){
         Intent intent = new Intent(context, DataPlanActivity.class);
+        if(imageValue != 0) {
+            byte[] image = getPicture(context, imageValue);
+            intent.putExtra("picture", image);
+        }
         context.startActivity(intent);
+    }
+
+    private static byte[] getPicture(Context context, int value){
+        Bitmap bitmap = BitmapFactory.decodeResource(context.getResources(), value);
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        bitmap.compress(Bitmap.CompressFormat.PNG, 100, baos);
+        byte[] b = baos.toByteArray();
+        return b;
     }
 
     public void setDataPlanListener(DataPlanListener dataPlanListener) {
