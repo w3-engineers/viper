@@ -23,14 +23,15 @@ public class TestDataPlanActivity extends TelemeshBaseActivity {
     private Switch switchButtonBuyer;
 
 
-    @Override
-    protected BaseServiceLocator getBaseServiceLocator() {
-        return null;
-    }
 
     @Override
     protected int getLayoutId() {
         return R.layout.test_activity_data_plan;
+    }
+
+    @Override
+    protected BaseServiceLocator getServiceLocator() {
+        return null;
     }
 
     @Override

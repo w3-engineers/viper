@@ -68,12 +68,14 @@ public class BottomSheetFragment extends BottomSheetDialogFragment implements Vi
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_bottom_sheet_dialog, container, false);
-        ImageView imageView = view.findViewById(R.id.qrImage);
+        ImageView qrImageView = view.findViewById(R.id.qrImage);
+        ImageView copyImageView = view.findViewById(R.id.copy_image_view);
         Button copyButton = view.findViewById(R.id.button_export_wallet);
         TextView textView = view.findViewById(R.id.tv_my_address);
-        imageView.setImageBitmap(bitmap);
+        qrImageView.setImageBitmap(bitmap);
         textView.setText(address);
         copyButton.setOnClickListener(this::onClick);
+        copyImageView.setOnClickListener(this::onClick);
         return view;
     }
 
@@ -82,6 +84,7 @@ public class BottomSheetFragment extends BottomSheetDialogFragment implements Vi
         ClipboardManager clipboard = (ClipboardManager) activity.getSystemService(Context.CLIPBOARD_SERVICE);
         ClipData clip = ClipData.newPlainText(address, address);
         clipboard.setPrimaryClip(clip);
+        Toast.makeText(activity, "Copied", Toast.LENGTH_SHORT).show();
     }
 
     @Override
@@ -89,6 +92,8 @@ public class BottomSheetFragment extends BottomSheetDialogFragment implements Vi
         if (v.getId() == R.id.button_export_wallet) {
             Intent intent = new Intent(activity, FolderPicker.class);
             startActivityForResult(intent, FOLDER_CHOOSE_ACTION);
+        }else if (v.getId() == R.id.copy_image_view){
+            copyAddress();
         }
     }
 

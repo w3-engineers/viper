@@ -227,8 +227,6 @@ public class WalletManager {
             public void onWalletLoaded(String walletAddress, String publicKey) {
                 MeshLog.i(" WalletManager loaded succesful");
 
-                listener.onWalletLoaded(walletAddress, publicKey);
-
                 if (!walletAddress.equalsIgnoreCase(SharedPref.read(Constant.PreferenceKeys.ADDRESS))){
 
                     AsyncTask.execute(new Runnable() {
@@ -248,6 +246,8 @@ public class WalletManager {
                         }
                     });
                 }
+
+                listener.onWalletLoaded(walletAddress, publicKey);
             }
 
             @Override
@@ -274,7 +274,6 @@ public class WalletManager {
             mWalletService.createWallet(password, new WalletService.WalletCreateListener() {
                 @Override
                 public void onWalletCreated(String walletAddress, String publicKey) {
-                    listener.onWalletCreated(walletAddress, publicKey);
 
                     if (!walletAddress.equalsIgnoreCase(SharedPref.read(Constant.PreferenceKeys.ADDRESS))){
 
@@ -295,6 +294,8 @@ public class WalletManager {
                             }
                         });
                     }
+
+                    listener.onWalletCreated(walletAddress, publicKey);
                 }
 
                 @Override
@@ -323,7 +324,6 @@ public class WalletManager {
             mWalletService.loadWallet(password, new WalletService.WalletLoadListener() {
                 @Override
                 public void onWalletLoaded(String walletAddress, String publicKey) {
-                    listener.onWalletLoaded(walletAddress, publicKey);
 
                     if (!walletAddress.equalsIgnoreCase(SharedPref.read(Constant.PreferenceKeys.ADDRESS))){
 
@@ -344,6 +344,8 @@ public class WalletManager {
                             }
                         });
                     }
+
+                    listener.onWalletLoaded(walletAddress, publicKey);
                 }
                 @Override
                 public void onErrorOccurred(String message) {
