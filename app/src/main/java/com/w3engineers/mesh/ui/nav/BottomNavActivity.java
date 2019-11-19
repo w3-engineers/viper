@@ -127,7 +127,7 @@ public class BottomNavActivity extends AppCompatActivity implements UserConnecti
                     SharedPref.write(Constant.PreferenceKeys.ADDRESS, walletAddress);
                     SharedPref.write(Constant.PreferenceKeys.PUBLIC_KEY, publicKey);
 
-                    ConnectionManager.on(BottomNavActivity.this);
+                 //   ConnectionManager.on(BottomNavActivity.this);
 
 
                 }
