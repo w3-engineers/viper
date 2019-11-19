@@ -774,8 +774,8 @@ public class TestDataPlanActivity extends TelemeshBaseActivity implements DataPl
         mBinding.buttonSave.setEnabled(true);
 //        int paddingTopBottom = mBinding.saveButton.getPaddingTop();
 //        int paddingLeftRight = mBinding.saveButton.getTotalPaddingLeft();
-        mBinding.buttonSave.setBackground(ContextCompat.getDrawable(TestDataPlanActivity.this, R.drawable.ractangular_green_small));
-        mBinding.buttonSave.setTextColor(TestDataPlanActivity.this.getResources().getColor(R.color.colorGradientPrimary));
+        mBinding.buttonSave.setBackground(ContextCompat.getDrawable(TestDataPlanActivity.this, R.drawable.gradient_color_primary_and_dark));
+        mBinding.buttonSave.setTextColor(Color.WHITE);
 //        mBinding.saveButton.setPadding(paddingLeftRight, paddingTopBottom, paddingLeftRight, paddingTopBottom);
     }
 

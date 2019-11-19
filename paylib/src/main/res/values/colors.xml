@@ -21,4 +21,5 @@
     <color name="light_paste_color">#7397CAFF</color>
     <color name="light_magenta">#73008DFF</color>
     <color name="color_magenta">#008DFF</color>
+    <color name="color_yellow">#FFAE43</color>
 </resources>

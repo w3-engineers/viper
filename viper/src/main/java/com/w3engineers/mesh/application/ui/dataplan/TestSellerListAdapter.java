@@ -10,6 +10,8 @@ Proprietary and confidential
 
 import android.content.Context;
 import android.databinding.ViewDataBinding;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.support.annotation.NonNull;
 import android.support.v4.content.ContextCompat;
 import android.text.TextUtils;
@@ -20,6 +22,7 @@ import com.w3engineers.ext.strom.application.ui.base.BaseAdapter;
 import com.w3engineers.mesh.R;
 import com.w3engineers.mesh.application.data.local.DataPlanConstants;
 import com.w3engineers.mesh.application.data.local.model.Seller;
+import com.w3engineers.mesh.application.data.local.purchase.PurchaseConstants;
 import com.w3engineers.mesh.databinding.ItemDataSellerBinding;
 import com.w3engineers.mesh.databinding.ItemSellerViewBinding;
 
@@ -116,10 +119,8 @@ class TestSellerListAdapter extends BaseAdapter<Seller> {
             itemDataSellerBinding.status.setText(seller.getBtnText());
             itemDataSellerBinding.status.setEnabled(seller.isBtnEnabled());
 
-
-
-            itemDataSellerBinding.status.setBackground(seller.isBtnEnabled() ? ContextCompat.getDrawable(context, R.drawable.ractangular_green_small) : ContextCompat.getDrawable(context, R.drawable.rectangular_gray_small));
-            itemDataSellerBinding.status.setTextColor(seller.isBtnEnabled() ? context.getResources().getColor(R.color.colorGradientPrimary) : context.getResources().getColor(R.color.grey_text) );
+            itemDataSellerBinding.status.setBackground(seller.isBtnEnabled() ? (seller.getBtnText().equalsIgnoreCase(PurchaseConstants.SELLERS_BTN_TEXT.CLOSE) ? ContextCompat.getDrawable(context, R.drawable.gradient_color_close_button) : ContextCompat.getDrawable(context, R.drawable.gradient_color_primary_and_dark)) : ContextCompat.getDrawable(context, R.drawable.rectangular_gray_small));
+            itemDataSellerBinding.status.setTextColor(seller.isBtnEnabled() ? Color.WHITE : context.getResources().getColor(R.color.grey_text) );
 
             int padding =  itemDataSellerBinding.status.getPaddingTop();
             itemDataSellerBinding.status.setPadding(padding, padding, padding, padding);
