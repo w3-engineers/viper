@@ -78,6 +78,11 @@ public class TestDataPlanActivity extends TelemeshBaseActivity implements DataPl
     }
 
     @Override
+    protected int statusBarColor() {
+        return R.color.colorPrimaryDark;
+    }
+
+    @Override
     protected BaseServiceLocator getServiceLocator() {
         return null;
     }
