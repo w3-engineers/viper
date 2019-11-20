@@ -51,7 +51,7 @@ import java.util.concurrent.ExecutionException;
 
 public class TestDataPlanActivity extends TelemeshBaseActivity implements DataPlanManager.DataPlanListener {
 
-    private SellerListAdapter sellerListAdapter;
+    private TestSellerListAdapter sellerListAdapter;
     private DataPlanViewModel viewModel;
     private DataLimitModel dataLimitModel;
 
@@ -131,6 +131,12 @@ public class TestDataPlanActivity extends TelemeshBaseActivity implements DataPl
         dataLimitRadioButtons = new RadioButton[]{mBinding.unlimited, mBinding.limitTo};
     }
 
+    private void checkAndCloseMesh(int role){
+        if (mCurrentRole == role){
+            DataPlanManager.getInstance().closeMesh();
+        }
+    }
+
 
     private void initSwitchListener() {
         mBinding.switchButtonLocal.setOnCheckedChangeListener(
@@ -144,6 +150,7 @@ public class TestDataPlanActivity extends TelemeshBaseActivity implements DataPl
                         } else {
 
                             expandableButtons[mCurrentRole].setTextColor(Color.BLACK);
+                            checkAndCloseMesh(DataPlanConstants.USER_ROLE.MESH_USER);
 //                            Toast.makeText(TestDataPlanActivity.this,
 //                                    "Switch Off", Toast.LENGTH_SHORT).show();
                         }
@@ -160,6 +167,7 @@ public class TestDataPlanActivity extends TelemeshBaseActivity implements DataPl
 //                                    "Switch On", Toast.LENGTH_SHORT).show();
                         } else {
                             expandableButtons[mCurrentRole].setTextColor(Color.BLACK);
+                            checkAndCloseMesh(DataPlanConstants.USER_ROLE.DATA_SELLER);
 //                            Toast.makeText(TestDataPlanActivity.this,
 //                                    "Switch Off", Toast.LENGTH_SHORT).show();
                         }
@@ -178,6 +186,7 @@ public class TestDataPlanActivity extends TelemeshBaseActivity implements DataPl
 //                                    "Switch On", Toast.LENGTH_SHORT).show();
                         } else {
                             expandableButtons[mCurrentRole].setTextColor(Color.BLACK);
+                            checkAndCloseMesh(DataPlanConstants.USER_ROLE.DATA_BUYER);
 //                            Toast.makeText(TestDataPlanActivity.this,
 //                                    "Switch Off", Toast.LENGTH_SHORT).show();
                         }
@@ -194,6 +203,7 @@ public class TestDataPlanActivity extends TelemeshBaseActivity implements DataPl
 //                                    "Switch On", Toast.LENGTH_SHORT).show();
                         } else {
                             expandableButtons[mCurrentRole].setTextColor(Color.BLACK);
+                            checkAndCloseMesh(DataPlanConstants.USER_ROLE.INTERNET_USER);
 //                            Toast.makeText(TestDataPlanActivity.this,
 //                                    "Switch Off", Toast.LENGTH_SHORT).show();
                         }
@@ -207,52 +217,52 @@ public class TestDataPlanActivity extends TelemeshBaseActivity implements DataPl
         mBinding.localButton.setCallbackListener(new ExpandableButton.ExpandableButtonListener() {
             @Override
             public void onViewExpanded() {
-                Toast.makeText(TestDataPlanActivity.this, "local Button Expanded", Toast.LENGTH_SHORT).show();
+//                Toast.makeText(TestDataPlanActivity.this, "local Button Expanded", Toast.LENGTH_SHORT).show();
                 collapseView(mBinding.localButton);
             }
 
             @Override
             public void onViewCollapsed() {
-                Toast.makeText(TestDataPlanActivity.this, "local Button Collapsed", Toast.LENGTH_SHORT).show();
+//                Toast.makeText(TestDataPlanActivity.this, "local Button Collapsed", Toast.LENGTH_SHORT).show();
             }
         });
 
         mBinding.sellDataButton.setCallbackListener(new ExpandableButton.ExpandableButtonListener() {
             @Override
             public void onViewExpanded() {
-                Toast.makeText(TestDataPlanActivity.this, "seller Button Expanded", Toast.LENGTH_SHORT).show();
+//                Toast.makeText(TestDataPlanActivity.this, "seller Button Expanded", Toast.LENGTH_SHORT).show();
                 collapseView(mBinding.sellDataButton);
             }
 
             @Override
             public void onViewCollapsed() {
-                Toast.makeText(TestDataPlanActivity.this, "seller Button Collapsed", Toast.LENGTH_SHORT).show();
+//                Toast.makeText(TestDataPlanActivity.this, "seller Button Collapsed", Toast.LENGTH_SHORT).show();
             }
         });
 
         mBinding.buyDataButton.setCallbackListener(new ExpandableButton.ExpandableButtonListener() {
             @Override
             public void onViewExpanded() {
-                Toast.makeText(TestDataPlanActivity.this, "buyer Button  Button Expanded", Toast.LENGTH_SHORT).show();
+//                Toast.makeText(TestDataPlanActivity.this, "buyer Button  Button Expanded", Toast.LENGTH_SHORT).show();
                 collapseView(mBinding.buyDataButton);
             }
 
             @Override
             public void onViewCollapsed() {
-                Toast.makeText(TestDataPlanActivity.this, "buyer Button Button Collapsed", Toast.LENGTH_SHORT).show();
+//                Toast.makeText(TestDataPlanActivity.this, "buyer Button Button Collapsed", Toast.LENGTH_SHORT).show();
             }
         });
 
         mBinding.internetOnlyButton.setCallbackListener(new ExpandableButton.ExpandableButtonListener() {
             @Override
             public void onViewExpanded() {
-                Toast.makeText(TestDataPlanActivity.this, "internet Only Button Expanded", Toast.LENGTH_SHORT).show();
+//                Toast.makeText(TestDataPlanActivity.this, "internet Only Button Expanded", Toast.LENGTH_SHORT).show();
                 collapseView(mBinding.internetOnlyButton);
             }
 
             @Override
             public void onViewCollapsed() {
-                Toast.makeText(TestDataPlanActivity.this, "internetOnly Button Collapsed", Toast.LENGTH_SHORT).show();
+//                Toast.makeText(TestDataPlanActivity.this, "internetOnly Button Collapsed", Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -485,8 +495,8 @@ public class TestDataPlanActivity extends TelemeshBaseActivity implements DataPl
     }
 
 
-    private SellerListAdapter getAdapter() {
-        return (SellerListAdapter) mBinding.testDataSellerList.getAdapter();
+    private TestSellerListAdapter getAdapter() {
+        return (TestSellerListAdapter) mBinding.testDataSellerList.getAdapter();
     }
 
     private String getKey(int prev, int cur) {
@@ -520,7 +530,7 @@ public class TestDataPlanActivity extends TelemeshBaseActivity implements DataPl
         mBinding.testDataSellerList.setHasFixedSize(true);
         mBinding.testDataSellerList.setLayoutManager(new LinearLayoutManager(this));
 
-        sellerListAdapter = new SellerListAdapter(this);
+        sellerListAdapter = new TestSellerListAdapter(this);
         mBinding.testDataSellerList.setAdapter(sellerListAdapter);
     }
 
@@ -537,12 +547,24 @@ public class TestDataPlanActivity extends TelemeshBaseActivity implements DataPl
             }
         }, 500);
 
-
-
-
         dataLimitRadioButtons[dataLimitModel.getDataLimited() ? 1 : 0].setChecked(true);
 
         setDataLimitEnabled(dataLimitModel.getDataLimited());
+
+        if (dataLimitModel.getFromDate() > 0) {
+            mBinding.fromDate.setText(sdf.format(dataLimitModel.getFromDate()));
+        } else {
+            mBinding.fromDate.setText(sdf.format(myCalendar.getTime()));
+            dataLimitModel.setFromDate(myCalendar.getTimeInMillis());
+        }
+        if (dataLimitModel.getToDate() > 0) {
+            mBinding.toDate.setText(sdf.format(dataLimitModel.getToDate()));
+        } else {
+            mBinding.toDate.setText(sdf.format(myCalendar.getTime()));
+            dataLimitModel.setToDate(myCalendar.getTimeInMillis());
+        }
+
+
 
         long sharedData = DataPlanManager.getInstance().getSellAmountData();
 
@@ -554,6 +576,7 @@ public class TestDataPlanActivity extends TelemeshBaseActivity implements DataPl
             mBinding.range.setText(amount + "");
         }
 
+        mBinding.fromDate.setEnabled(false);
 
         disableSaveButton();
     }
@@ -568,6 +591,7 @@ public class TestDataPlanActivity extends TelemeshBaseActivity implements DataPl
 
     private void setDataLimitEnabled(boolean value) {
         mBinding.range.setEnabled(value);
+        mBinding.toDate.setEnabled(value);
     }
 
     private void setEventListener() {
@@ -597,20 +621,22 @@ public class TestDataPlanActivity extends TelemeshBaseActivity implements DataPl
             myCalendar.set(Calendar.YEAR, year);
             myCalendar.set(Calendar.MONTH, monthOfYear);
             myCalendar.set(Calendar.DAY_OF_MONTH, dayOfMonth);
+            mBinding.toDate.setText(sdf.format(myCalendar.getTimeInMillis()));
+            mBinding.fromDate.setText(sdf.format(System.currentTimeMillis()));
 
             enableSaveButton();
         };
 
 
-//        mBinding.toDate.setOnClickListener(v -> {
-//            if (dataLimitModel.getToDate() > myCalendar.getTimeInMillis() - 1000) {
-//                myCalendar.setTimeInMillis(dataLimitModel.getToDate());
-//            }
-//
-//            DatePickerDialog toDatePickerDialog = new DatePickerDialog(DataPlanActivity.this, date, myCalendar.get(Calendar.YEAR), myCalendar.get(Calendar.MONTH), myCalendar.get(Calendar.DAY_OF_MONTH));
-//            toDatePickerDialog.getDatePicker().setMinDate(dataLimitModel.getFromDate() > System.currentTimeMillis() ? dataLimitModel.getFromDate() : System.currentTimeMillis());
-//            toDatePickerDialog.show();
-//        });
+        mBinding.toDate.setOnClickListener(v -> {
+            if (dataLimitModel.getToDate() > myCalendar.getTimeInMillis() - 1000) {
+                myCalendar.setTimeInMillis(dataLimitModel.getToDate());
+            }
+
+            DatePickerDialog toDatePickerDialog = new DatePickerDialog(TestDataPlanActivity.this, date, myCalendar.get(Calendar.YEAR), myCalendar.get(Calendar.MONTH), myCalendar.get(Calendar.DAY_OF_MONTH));
+            toDatePickerDialog.getDatePicker().setMinDate(dataLimitModel.getFromDate() > System.currentTimeMillis() ? dataLimitModel.getFromDate() : System.currentTimeMillis());
+            toDatePickerDialog.show();
+        });
     }
 
     private void parseIntent() {
@@ -748,8 +774,8 @@ public class TestDataPlanActivity extends TelemeshBaseActivity implements DataPl
         mBinding.buttonSave.setEnabled(true);
 //        int paddingTopBottom = mBinding.saveButton.getPaddingTop();
 //        int paddingLeftRight = mBinding.saveButton.getTotalPaddingLeft();
-        mBinding.buttonSave.setBackground(ContextCompat.getDrawable(TestDataPlanActivity.this, R.drawable.ractangular_green_small));
-        mBinding.buttonSave.setTextColor(TestDataPlanActivity.this.getResources().getColor(R.color.colorGradientPrimary));
+        mBinding.buttonSave.setBackground(ContextCompat.getDrawable(TestDataPlanActivity.this, R.drawable.gradient_color_primary_and_dark));
+        mBinding.buttonSave.setTextColor(Color.WHITE);
 //        mBinding.saveButton.setPadding(paddingLeftRight, paddingTopBottom, paddingLeftRight, paddingTopBottom);
     }
 
@@ -759,19 +785,19 @@ public class TestDataPlanActivity extends TelemeshBaseActivity implements DataPl
 
             long from = 0l, to = 0l;
             long tempSharedData = convertMegabytesToBytes(Integer.valueOf(mBinding.range.getText().toString()));
-//            try {
-//                from = getDayWiseTimeStamp(sdf.parse(mBinding.fromDate.getText().toString()).getTime());
-//                to = getDayWiseTimeStamp(sdf.parse(mBinding.toDate.getText().toString()).getTime()) + (24 * 60 * 60 * 1000 - 1000);
-//            } catch (ParseException e) {
-//                e.printStackTrace();
-//            }
+            try {
+                from = getDayWiseTimeStamp(sdf.parse(mBinding.fromDate.getText().toString()).getTime());
+                to = getDayWiseTimeStamp(sdf.parse(mBinding.toDate.getText().toString()).getTime()) + (24 * 60 * 60 * 1000 - 1000);
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
 
             if (to <= System.currentTimeMillis()) {
-//                mBinding.dateError.setVisibility(View.VISIBLE);
-//                mBinding.dateError.setText(getString(R.string.date_expired));
+                mBinding.dateError.setVisibility(View.VISIBLE);
+                mBinding.dateError.setText(getString(R.string.date_expired));
 
             } else {
-//                mBinding.dateError.setVisibility(View.INVISIBLE);
+                mBinding.dateError.setVisibility(View.INVISIBLE);
                 long usedData = 0;
                 try {
                     usedData = DataPlanManager.getInstance().getUsedData(this, from, to);
@@ -782,11 +808,11 @@ public class TestDataPlanActivity extends TelemeshBaseActivity implements DataPl
                 }
 
                 if (tempSharedData <= usedData) {
-//                    mBinding.dataLimitError.setVisibility(View.VISIBLE);
-//                    mBinding.dataLimitError.setText(this.getString(R.string.data_lomit_larger_needed));
+                    mBinding.dataLimitError.setVisibility(View.VISIBLE);
+                    mBinding.dataLimitError.setText(this.getString(R.string.data_lomit_larger_needed));
 
                 } else {
-//                    mBinding.dataLimitError.setVisibility(View.INVISIBLE);
+                    mBinding.dataLimitError.setVisibility(View.INVISIBLE);
                     dataLimitModel.setFromDate(from);
                     dataLimitModel.setToDate(to);
                     dataLimitModel.setSharedData(tempSharedData);
@@ -810,8 +836,8 @@ public class TestDataPlanActivity extends TelemeshBaseActivity implements DataPl
                 }
             }
         } else {
-//            mBinding.dataLimitError.setVisibility(View.INVISIBLE);
-//            mBinding.dateError.setVisibility(View.INVISIBLE);
+            mBinding.dataLimitError.setVisibility(View.INVISIBLE);
+            mBinding.dateError.setVisibility(View.INVISIBLE);
 
             dataLimitModel.setDataLimited(false);
 
@@ -827,3 +853,6 @@ public class TestDataPlanActivity extends TelemeshBaseActivity implements DataPl
         return (cal.getTimeInMillis() / 1000) * 1000;
     }
 }
+//1574445599000
+//1574445599000
+//1574445599000
