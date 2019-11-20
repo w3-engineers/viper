@@ -61,8 +61,6 @@ public class ConnectionManager {
         mContext = context;
         discoverUserMap = Collections.synchronizedMap(new HashMap());
         requestUserInfoList = Collections.synchronizedMap(new HashMap<>());
-
-
     }
 
     public void startViper(){
