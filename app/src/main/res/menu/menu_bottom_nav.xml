@@ -11,6 +11,12 @@
         android:title="@string/my_data_plan"
         app:showAsAction="always"
         android:enabled="false"/>
+
+    <item
+        android:id="@+id/menu_wallet"
+        android:title="@string/my_wallet"
+        app:showAsAction="always"
+        />
 <!--
     <item
         android:id="@+id/menu_ping_self"

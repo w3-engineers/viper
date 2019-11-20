@@ -8,19 +8,17 @@ import android.arch.lifecycle.ViewModelProviders;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
-import android.os.Build;
 import android.support.annotation.NonNull;
-import android.support.constraint.ConstraintLayout;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
-import android.view.Window;
-import android.view.WindowManager;
 import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.RadioButton;
@@ -39,6 +37,7 @@ import com.w3engineers.mesh.application.ui.base.TelemeshBaseActivity;
 import com.w3engineers.mesh.application.ui.util.ExpandableButton;
 import com.w3engineers.mesh.databinding.TestActivityDataPlanBinding;
 import com.w3engineers.mesh.util.DialogUtil;
+import com.w3engineers.mesh.util.MeshLog;
 import com.w3engineers.mesh.util.NotificationUtil;
 import com.w3engineers.mesh.util.lib.mesh.HandlerUtil;
 
@@ -137,7 +136,7 @@ public class TestDataPlanActivity extends TelemeshBaseActivity implements DataPl
 
     private void checkAndCloseMesh(int role) {
         if (mCurrentRole == role) {
-            DataPlanManager.getInstance().closeMesh();
+            DataPlanManager.getInstance().closeMesh(DataPlanConstants.USER_ROLE.MESH_STOP);
         }
     }
 
@@ -552,9 +551,11 @@ public class TestDataPlanActivity extends TelemeshBaseActivity implements DataPl
         if (mCurrentRole == type)
             return;
 
-        roleSwitches[mCurrentRole].setChecked(false);
+        if (mCurrentRole < roleSwitches.length ){
+            roleSwitches[mCurrentRole].setChecked(false);
+            expandableButtons[type].setTextColor(Color.argb(255, 0, 141, 255));
+        }
 
-        expandableButtons[type].setTextColor(Color.argb(255, 0, 141, 255));
 
         setRoleTasks(mCurrentRole, type);
     }
@@ -581,16 +582,17 @@ public class TestDataPlanActivity extends TelemeshBaseActivity implements DataPl
 
     private void loadUI() {
 
+        if (mCurrentRole < roleSwitches.length ) {
+            roleSwitches[DataPlanManager.getInstance().getDataPlanRole()].setChecked(true);
+            expandableButtons[DataPlanManager.getInstance().getDataPlanRole()].setTextColor(Color.argb(255, 0, 141, 255));
 
-        roleSwitches[DataPlanManager.getInstance().getDataPlanRole()].setChecked(true);
-        expandableButtons[DataPlanManager.getInstance().getDataPlanRole()].setTextColor(Color.argb(255, 0, 141, 255));
-
-        HandlerUtil.postForeground(new Runnable() {
-            @Override
-            public void run() {
-                expandableButtons[DataPlanManager.getInstance().getDataPlanRole()].expandView();
-            }
-        }, 500);
+            HandlerUtil.postForeground(new Runnable() {
+                @Override
+                public void run() {
+                    expandableButtons[DataPlanManager.getInstance().getDataPlanRole()].expandView();
+                }
+            }, 500);
+        }
 
         dataLimitRadioButtons[dataLimitModel.getDataLimited() ? 1 : 0].setChecked(true);
 
@@ -603,6 +605,7 @@ public class TestDataPlanActivity extends TelemeshBaseActivity implements DataPl
             dataLimitModel.setFromDate(myCalendar.getTimeInMillis());
         }
         if (dataLimitModel.getToDate() > 0) {
+            MeshLog.v("todate " + sdf.format(dataLimitModel.getToDate()) + "  " + dataLimitModel.getToDate());
             mBinding.toDate.setText(sdf.format(dataLimitModel.getToDate()));
         } else {
             mBinding.toDate.setText(sdf.format(myCalendar.getTime()));
@@ -897,7 +900,28 @@ public class TestDataPlanActivity extends TelemeshBaseActivity implements DataPl
         cal.set(Calendar.SECOND, 0); //set seconds to zero
         return (cal.getTimeInMillis() / 1000) * 1000;
     }
+
+//    @Override
+//    public boolean onCreateOptionsMenu(Menu menu) {
+//
+//        MeshLog.v("option menu created ");
+//        MenuInflater inflater = getMenuInflater();
+//        inflater.inflate(R.menu.menu_wallet, menu);
+//        return true;
+//    }
+//
+//    /*
+//     * (non-Javadoc)
+//     * @see android.app.Activity#onOptionsItemSelected(android.view.MenuItem)
+//     */
+//    @Override
+//    public boolean onOptionsItemSelected(MenuItem item) {
+//        if (item.getItemId() == R.id.menu_wallet) {
+//            WalletManager.openActivity(this, null);
+//        }
+//        else if (item.getItemId() == android.R.id.home){
+//            onBackPressed();
+//        }
+//        return false;
+//    }
 }
-//1574445599000
-//1574445599000
-//1574445599000

@@ -88,8 +88,9 @@ public class DataPlanManager {
         }
     }
 
-    public void closeMesh() {
-        payController.getDataManager().stopMesh();
+    public void closeMesh(int role) {
+        preferencesHelperDataplan.setDataPlanRole(role);
+        payController.getDataManager().restartMesh(role);
     }
 
     public interface DataPlanListener {
@@ -174,7 +175,7 @@ public class DataPlanManager {
     }
 
     public long getSellToDate() {
-        return preferencesHelperDataplan.getSellDataAmount();
+        return preferencesHelperDataplan.getSellToDate();
     }
 
     public long getSellDataAmount() {

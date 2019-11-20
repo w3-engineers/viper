@@ -271,14 +271,16 @@ public class WalletService {
 
     private void loadWalletFromKeystore(String password, String keyStoreFileName) {
         mCredentials = Web3jWalletHelper.onInstance(mContext).getWallet(password, walletSuffixDir, keyStoreFileName);
-        SharedPref.write(WALLET_ADDRESS, mCredentials.getAddress());
-        SharedPref.write(Constant.KEY_USER_ID, mCredentials.getAddress());
-        //SharedPref.write(PUBLIC_KEY, mCredentials.getEcKeyPair().getPublicKey().toString(16));
-        SharedPref.write(Constant.KEY_USER_ID, mCredentials.getAddress());
-        SharedPref.write(PRIVATE_KEY, mCredentials.getEcKeyPair().getPrivateKey().toString(16));
-        SharedPref.write(PUBLIC_KEY, ECDSA.getHexEncodedPoint(SharedPref.read(PRIVATE_KEY)));
+        if (mCredentials != null){
+            SharedPref.write(WALLET_ADDRESS, mCredentials.getAddress());
+            SharedPref.write(Constant.KEY_USER_ID, mCredentials.getAddress());
+            //SharedPref.write(PUBLIC_KEY, mCredentials.getEcKeyPair().getPublicKey().toString(16));
+            SharedPref.write(Constant.KEY_USER_ID, mCredentials.getAddress());
+            SharedPref.write(PRIVATE_KEY, mCredentials.getEcKeyPair().getPrivateKey().toString(16));
+            SharedPref.write(PUBLIC_KEY, ECDSA.getHexEncodedPoint(SharedPref.read(PRIVATE_KEY)));
 
-        MeshLog.e("publickey::" + ECDSA.getHexEncodedPoint(SharedPref.read(PRIVATE_KEY)) + "\n" + "Length " + ECDSA.getHexEncodedPoint(SharedPref.read(PRIVATE_KEY)).length());
+            MeshLog.e("publickey::" + ECDSA.getHexEncodedPoint(SharedPref.read(PRIVATE_KEY)) + "\n" + "Length " + ECDSA.getHexEncodedPoint(SharedPref.read(PRIVATE_KEY)).length());
+        }
     }
 
     public Credentials getCredentials() {

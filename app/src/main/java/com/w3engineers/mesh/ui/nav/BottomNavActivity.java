@@ -147,7 +147,9 @@ public class BottomNavActivity extends AppCompatActivity implements UserConnecti
     protected void onResume() {
         super.onResume();
 
-        requestPermission();
+        if (!walletLoadedSuccess){
+            requestPermission();
+        }
     }
 
 
@@ -255,9 +257,9 @@ public class BottomNavActivity extends AppCompatActivity implements UserConnecti
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == R.id.menu_data_plan_setting) {
-          //  DataPlanManager.openActivity(this, R.mipmap.ic_launcher);
-
-            MeshLogManager.openActivity(this);
+            DataPlanManager.openActivity(this, R.mipmap.ic_launcher);
+        } else if (item.getItemId() == R.id.menu_wallet) {
+            WalletManager.openActivity(this, null);
         }
         return false;
     }

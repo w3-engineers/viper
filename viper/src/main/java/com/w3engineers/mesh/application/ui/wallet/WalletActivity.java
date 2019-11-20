@@ -106,7 +106,7 @@ public class WalletActivity extends TelemeshBaseActivity implements WalletManage
 
         setCurrencyAndTokenObserver();
 
-        dialog = new ProgressDialog(this);
+        dialog = new ProgressDialog(WalletActivity.this);
 
         if (dataPlanManager.getDataPlanRole() == DataPlanConstants.USER_ROLE.DATA_BUYER) {
             //  mBinding.totalSpentBlock.setVisibility(View.GONE);
