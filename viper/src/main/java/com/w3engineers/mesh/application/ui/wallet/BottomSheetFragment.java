@@ -21,6 +21,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.w3engineers.ext.strom.util.helper.Toaster;
 import com.w3engineers.mesh.R;
 import com.w3engineers.mesh.application.data.local.db.SharedPref;
 import com.w3engineers.mesh.application.data.local.wallet.WalletService;
@@ -92,7 +93,7 @@ public class BottomSheetFragment extends BottomSheetDialogFragment implements Vi
         ClipboardManager clipboard = (ClipboardManager) activity.getSystemService(Context.CLIPBOARD_SERVICE);
         ClipData clip = ClipData.newPlainText(address, address);
         clipboard.setPrimaryClip(clip);
-        Toast.makeText(activity, "Copied", Toast.LENGTH_SHORT).show();
+        Toaster.showShort("Copied");
     }
 
     @Override
@@ -119,8 +120,7 @@ public class BottomSheetFragment extends BottomSheetDialogFragment implements Vi
                     FILE_SELECT_CODE);
         } catch (android.content.ActivityNotFoundException ex) {
             // Potentially direct the user to the Market with a Dialog
-            Toast.makeText(activity, "Please install a File Manager.",
-                    Toast.LENGTH_SHORT).show();
+            Toaster.showShort("Please install a File Manager.");
         }
     }
 

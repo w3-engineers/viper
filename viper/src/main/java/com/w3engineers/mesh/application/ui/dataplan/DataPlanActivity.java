@@ -596,10 +596,10 @@ public class DataPlanActivity extends TelemeshBaseActivity implements DataPlanMa
                     if (amount > 0) {
                         DataPlanManager.getInstance().initPurchase(amount, seller.getId());
                     } else {
-                        Toast.makeText(DataPlanActivity.this, "Data amount should be bigger than zero.", Toast.LENGTH_SHORT).show();
+                        Toaster.showShort("Data amount should be bigger than zero.");
                     }
                 } else {
-                    Toast.makeText(DataPlanActivity.this, "Data amount required.", Toast.LENGTH_SHORT).show();
+                    Toaster.showShort("Data amount required.");
                 }
                 alertDialog.cancel();
             });

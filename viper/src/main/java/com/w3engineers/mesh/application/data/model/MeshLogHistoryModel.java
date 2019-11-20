@@ -1,4 +1,4 @@
-package com.w3engineers.mesh.model;
+package com.w3engineers.mesh.application.data.model;
 
 /*
  *  ****************************************************************************

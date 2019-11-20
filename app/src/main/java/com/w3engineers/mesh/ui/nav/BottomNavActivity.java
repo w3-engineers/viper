@@ -17,6 +17,7 @@ import com.w3engineers.ext.viper.R;
 import com.w3engineers.ext.viper.databinding.ActivityCreateGroupBinding;
 import com.w3engineers.mesh.application.data.local.dataplan.DataPlanManager;
 import com.w3engineers.mesh.application.data.local.db.SharedPref;
+import com.w3engineers.mesh.application.data.local.meshlog.MeshLogManager;
 import com.w3engineers.mesh.application.data.local.wallet.WalletManager;
 import com.w3engineers.mesh.model.UserModel;
 import com.w3engineers.mesh.ui.Nearby.NearbyFragment;
