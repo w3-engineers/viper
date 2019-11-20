@@ -24,7 +24,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
-import android.widget.Toast;
 
 import com.w3engineers.ext.strom.util.helper.Toaster;
 import com.w3engineers.mesh.R;
@@ -473,7 +472,7 @@ public class WalletActivity extends TelemeshBaseActivity implements WalletManage
                 if (payableDeposit >= 10){
                     performWithdrawBalance();
                 }
-                //  mBinding.tvPendingPayableDeposit.setText(totalPendingEarn == null ? "0" : totalPendingEarn.toString());
+                  mBinding.textViewPendingBalance.setText(totalPendingEarn == null ? "0" : totalPendingEarn.toString());
             });
         }
     }
