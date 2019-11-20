@@ -39,6 +39,7 @@ import com.w3engineers.mesh.databinding.TestActivityDataPlanBinding;
 import com.w3engineers.mesh.util.DialogUtil;
 import com.w3engineers.mesh.util.MeshLog;
 import com.w3engineers.mesh.util.NotificationUtil;
+import com.w3engineers.mesh.util.lib.mesh.DataManager;
 import com.w3engineers.mesh.util.lib.mesh.HandlerUtil;
 
 import java.text.ParseException;
@@ -224,7 +225,7 @@ public class TestDataPlanActivity extends TelemeshBaseActivity implements DataPl
                 mBinding.localButton.setBackgroundColor(getResources().getColor(R.color.white));
                 collapseView(mBinding.localButton);
 
-                if (!expandableButtons[mCurrentRole].equals(mBinding.localButton)) {
+                if (mCurrentRole == DataPlanConstants.USER_ROLE.MESH_STOP || !expandableButtons[mCurrentRole].equals(mBinding.localButton)) {
                     mBinding.localButton.setTextColor(getResources().getColor(R.color.data_plan_selected_text));
                 }
             }
@@ -233,7 +234,7 @@ public class TestDataPlanActivity extends TelemeshBaseActivity implements DataPl
             public void onViewCollapsed() {
                 mBinding.localButton.setBackgroundColor(getResources().getColor(R.color.collapse_button_color));
 
-                if (!expandableButtons[mCurrentRole].equals(mBinding.localButton)) {
+                if (mCurrentRole == DataPlanConstants.USER_ROLE.MESH_STOP || !expandableButtons[mCurrentRole].equals(mBinding.localButton)) {
                     mBinding.localButton.setTextColor(getResources().getColor(R.color.data_plan_unselected_text));
                 }
                 //Toast.makeText(TestDataPlanActivity.this, "local Button Collapsed", Toast.LENGTH_SHORT).show();
@@ -247,7 +248,7 @@ public class TestDataPlanActivity extends TelemeshBaseActivity implements DataPl
                 mBinding.sellDataButton.setBackgroundColor(getResources().getColor(R.color.white));
                 collapseView(mBinding.sellDataButton);
 
-                if (!expandableButtons[mCurrentRole].equals(mBinding.sellDataButton)) {
+                if (mCurrentRole == DataPlanConstants.USER_ROLE.MESH_STOP || !expandableButtons[mCurrentRole].equals(mBinding.sellDataButton)) {
                     mBinding.sellDataButton.setTextColor(getResources().getColor(R.color.data_plan_selected_text));
                 }
             }
@@ -256,7 +257,7 @@ public class TestDataPlanActivity extends TelemeshBaseActivity implements DataPl
             public void onViewCollapsed() {
                 mBinding.sellDataButton.setBackgroundColor(getResources().getColor(R.color.collapse_button_color));
 
-                if (!expandableButtons[mCurrentRole].equals(mBinding.sellDataButton)) {
+                if (mCurrentRole == DataPlanConstants.USER_ROLE.MESH_STOP || !expandableButtons[mCurrentRole].equals(mBinding.sellDataButton)) {
                     mBinding.sellDataButton.setTextColor(getResources().getColor(R.color.data_plan_unselected_text));
                 }
                 //Toast.makeText(TestDataPlanActivity.this, "seller Button Collapsed", Toast.LENGTH_SHORT).show();
@@ -270,7 +271,7 @@ public class TestDataPlanActivity extends TelemeshBaseActivity implements DataPl
                 mBinding.buyDataButton.setBackgroundColor(getResources().getColor(R.color.white));
                 collapseView(mBinding.buyDataButton);
 
-                if (!expandableButtons[mCurrentRole].equals(mBinding.buyDataButton)) {
+                if (mCurrentRole == DataPlanConstants.USER_ROLE.MESH_STOP || !expandableButtons[mCurrentRole].equals(mBinding.buyDataButton)) {
                     mBinding.buyDataButton.setTextColor(getResources().getColor(R.color.data_plan_selected_text));
                 }
             }
@@ -279,7 +280,7 @@ public class TestDataPlanActivity extends TelemeshBaseActivity implements DataPl
             public void onViewCollapsed() {
                 mBinding.buyDataButton.setBackgroundColor(getResources().getColor(R.color.collapse_button_color));
 
-                if (!expandableButtons[mCurrentRole].equals(mBinding.buyDataButton)) {
+                if (mCurrentRole == DataPlanConstants.USER_ROLE.MESH_STOP || !expandableButtons[mCurrentRole].equals(mBinding.buyDataButton)) {
                     mBinding.buyDataButton.setTextColor(getResources().getColor(R.color.data_plan_unselected_text));
                 }
                 // Toast.makeText(TestDataPlanActivity.this, "buyer Button Button Collapsed", Toast.LENGTH_SHORT).show();
@@ -293,7 +294,7 @@ public class TestDataPlanActivity extends TelemeshBaseActivity implements DataPl
                 mBinding.internetOnlyButton.setBackgroundColor(getResources().getColor(R.color.white));
                 collapseView(mBinding.internetOnlyButton);
 
-                if (!expandableButtons[mCurrentRole].equals(mBinding.internetOnlyButton)) {
+                if (mCurrentRole == DataPlanConstants.USER_ROLE.MESH_STOP || !expandableButtons[mCurrentRole].equals(mBinding.internetOnlyButton)) {
                     mBinding.internetOnlyButton.setTextColor(getResources().getColor(R.color.data_plan_selected_text));
                 }
             }
@@ -302,7 +303,7 @@ public class TestDataPlanActivity extends TelemeshBaseActivity implements DataPl
             public void onViewCollapsed() {
                 mBinding.internetOnlyButton.setBackgroundColor(getResources().getColor(R.color.collapse_button_color));
 
-                if (!expandableButtons[mCurrentRole].equals(mBinding.internetOnlyButton)) {
+                if (mCurrentRole == DataPlanConstants.USER_ROLE.MESH_STOP || !expandableButtons[mCurrentRole].equals(mBinding.internetOnlyButton)) {
                     mBinding.internetOnlyButton.setTextColor(getResources().getColor(R.color.data_plan_unselected_text));
                 }
                 // Toast.makeText(TestDataPlanActivity.this, "internetOnly Button Collapsed", Toast.LENGTH_SHORT).show();
@@ -551,7 +552,7 @@ public class TestDataPlanActivity extends TelemeshBaseActivity implements DataPl
         if (mCurrentRole == type)
             return;
 
-        if (mCurrentRole < roleSwitches.length ){
+        if (mCurrentRole != DataPlanConstants.USER_ROLE.MESH_STOP){
             roleSwitches[mCurrentRole].setChecked(false);
             expandableButtons[type].setTextColor(Color.argb(255, 0, 141, 255));
         }
@@ -582,7 +583,7 @@ public class TestDataPlanActivity extends TelemeshBaseActivity implements DataPl
 
     private void loadUI() {
 
-        if (mCurrentRole < roleSwitches.length ) {
+        if (mCurrentRole != DataPlanConstants.USER_ROLE.MESH_STOP ) {
             roleSwitches[DataPlanManager.getInstance().getDataPlanRole()].setChecked(true);
             expandableButtons[DataPlanManager.getInstance().getDataPlanRole()].setTextColor(Color.argb(255, 0, 141, 255));
 
