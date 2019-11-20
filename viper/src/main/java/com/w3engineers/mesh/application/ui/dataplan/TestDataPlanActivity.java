@@ -131,7 +131,7 @@ public class TestDataPlanActivity extends TelemeshBaseActivity implements DataPl
 
     private void checkAndCloseMesh(int role) {
         if (mCurrentRole == role) {
-            DataPlanManager.getInstance().closeMesh();
+            DataPlanManager.getInstance().closeMesh(DataPlanConstants.USER_ROLE.MESH_STOP);
         }
     }
 
@@ -506,9 +506,11 @@ public class TestDataPlanActivity extends TelemeshBaseActivity implements DataPl
         if (mCurrentRole == type)
             return;
 
-        roleSwitches[mCurrentRole].setChecked(false);
+        if (mCurrentRole < roleSwitches.length ){
+            roleSwitches[mCurrentRole].setChecked(false);
+            expandableButtons[type].setTextColor(Color.argb(255, 0, 141, 255));
+        }
 
-        expandableButtons[type].setTextColor(Color.argb(255, 0, 141, 255));
 
         setRoleTasks(mCurrentRole, type);
     }
@@ -535,16 +537,17 @@ public class TestDataPlanActivity extends TelemeshBaseActivity implements DataPl
 
     private void loadUI() {
 
+        if (mCurrentRole < roleSwitches.length ) {
+            roleSwitches[DataPlanManager.getInstance().getDataPlanRole()].setChecked(true);
+            expandableButtons[DataPlanManager.getInstance().getDataPlanRole()].setTextColor(Color.argb(255, 0, 141, 255));
 
-        roleSwitches[DataPlanManager.getInstance().getDataPlanRole()].setChecked(true);
-        expandableButtons[DataPlanManager.getInstance().getDataPlanRole()].setTextColor(Color.argb(255, 0, 141, 255));
-
-        HandlerUtil.postForeground(new Runnable() {
-            @Override
-            public void run() {
-                expandableButtons[DataPlanManager.getInstance().getDataPlanRole()].expandView();
-            }
-        }, 500);
+            HandlerUtil.postForeground(new Runnable() {
+                @Override
+                public void run() {
+                    expandableButtons[DataPlanManager.getInstance().getDataPlanRole()].expandView();
+                }
+            }, 500);
+        }
 
         dataLimitRadioButtons[dataLimitModel.getDataLimited() ? 1 : 0].setChecked(true);
 
