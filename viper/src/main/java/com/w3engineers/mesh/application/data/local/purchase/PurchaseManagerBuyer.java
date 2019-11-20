@@ -7,6 +7,7 @@ import android.text.TextUtils;
 import android.widget.Toast;
 
 import com.w3engineers.eth.util.helper.HandlerUtil;
+import com.w3engineers.ext.strom.util.helper.Toaster;
 import com.w3engineers.mesh.application.data.local.dataplan.DataPlanManager;
 import com.w3engineers.mesh.application.data.local.db.DatabaseService;
 import com.w3engineers.mesh.application.data.local.db.datausage.Datausage;
@@ -1102,7 +1103,7 @@ public class PurchaseManagerBuyer extends PurchaseManager implements PayControll
     @Override
     public void onInternetMessageResponseFailed(String sender, String message) {
 
-        HandlerUtil.postForeground(() -> Toast.makeText(mContext, message, Toast.LENGTH_LONG).show());
+        HandlerUtil.postForeground(() -> Toaster.showShort(message));
 
     }
 

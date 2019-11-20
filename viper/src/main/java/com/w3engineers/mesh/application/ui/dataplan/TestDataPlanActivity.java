@@ -733,10 +733,10 @@ public class TestDataPlanActivity extends TelemeshBaseActivity implements DataPl
                     if (amount > 0) {
                         DataPlanManager.getInstance().initPurchase(amount, seller.getId());
                     } else {
-                        Toast.makeText(TestDataPlanActivity.this, "Data amount should be bigger than zero.", Toast.LENGTH_SHORT).show();
+                        Toaster.showShort("Data amount should be bigger than zero.");
                     }
                 } else {
-                    Toast.makeText(TestDataPlanActivity.this, "Data amount required.", Toast.LENGTH_SHORT).show();
+                    Toaster.showShort("Data amount required.");
                 }
                 alertDialog.cancel();
             });

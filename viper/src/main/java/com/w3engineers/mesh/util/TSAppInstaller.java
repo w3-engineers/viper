@@ -66,8 +66,6 @@ public class TSAppInstaller {
                 if (response.isSuccessful()) {
                     Log.d(TAG, "Got response body");
 
-                    //Toast.makeText(TeleMeshApplication.getContext(), "Downloading...", Toast.LENGTH_SHORT).show();
-
                     downloadZipFileTask = new DownloadZipFileTask(context);
                     downloadZipFileTask.execute(response.body());
 
@@ -114,7 +112,7 @@ public class TSAppInstaller {
             Log.d("API123", progress[0].second + " ");
 
             if (progress[0].first == 100) {
-                Toast.makeText(App.getContext(), "File downloaded successfully", Toast.LENGTH_SHORT).show();
+                Toaster.showShort("File downloaded successfully");
             }
 
 
