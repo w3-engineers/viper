@@ -79,7 +79,6 @@ public class MeshLog {
         writeText(m, true);
     }
 
-
     private static void v(String tag, String msg) {
         Log.v(tag, msg);
     }
