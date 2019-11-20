@@ -143,16 +143,14 @@ public class DataManager {
                     boolean isSuccess = initServiceConnection();
 
                     if (isSuccess) {
-                        Toast.makeText(mContext, "Bind service successful", Toast.LENGTH_LONG).show();
+                        Toaster.showShort("Bind service successful");
                         return;
                     }
                     MeshLog.i("Bind Service failed 1 " + isAlreadyToPlayStore);
                     HandlerUtil.postBackground(this, 5000);
 
                     if (!isAlreadyToPlayStore) {
-                        //   Toast.makeText(mContext, "Please install TeleMeshService app", Toast.LENGTH_LONG).show();
                         showConfirmationPopUp();
-
                     }
                     isAlreadyToPlayStore = true;
                 }
@@ -196,7 +194,6 @@ public class DataManager {
                     } else {
                         isAlreadyToPlayStore = false;
                         Toaster.showShort("Internet connection not available");
-//                        Toast.makeText(mContext, "Internet connection not available", Toast.LENGTH_SHORT).show();
                     }
                 })
 

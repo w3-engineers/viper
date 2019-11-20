@@ -17,6 +17,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.w3engineers.ext.strom.util.helper.Toaster;
 import com.w3engineers.mesh.R;
 
 import com.w3engineers.mesh.application.data.local.db.SharedPref;
@@ -70,6 +71,6 @@ public class AddressLayout extends Dialog implements View.OnClickListener {
         ClipData clip = ClipData.newPlainText(address, address);
         clipboard.setPrimaryClip(clip);
 
-        Toast.makeText(c, "address copied", Toast.LENGTH_SHORT).show();
+        Toaster.showShort("address copied");
     }
 }

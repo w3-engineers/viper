@@ -281,7 +281,7 @@ public class WalletActivity extends TelemeshBaseActivity implements WalletManage
             browserIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             startActivity(browserIntent);
         } else {
-            Toast.makeText(this, "No network selected", Toast.LENGTH_SHORT).show();
+            Toaster.showShort("No network selected");
         }
     }
 
