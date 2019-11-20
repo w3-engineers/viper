@@ -9,8 +9,10 @@ import android.util.Log;
 import android.view.View;
 
 import com.w3engineers.mesh.R;
+import com.w3engineers.mesh.application.data.BaseServiceLocator;
 import com.w3engineers.mesh.application.data.model.MeshLogHistoryModel;
 import com.w3engineers.mesh.application.ui.base.ItemClickListener;
+import com.w3engineers.mesh.application.ui.base.TelemeshBaseActivity;
 import com.w3engineers.mesh.databinding.ActivityMeshLogHistoryBinding;
 import com.w3engineers.mesh.util.Constant;
 
@@ -18,16 +20,28 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MeshLogHistoryActivity extends AppCompatActivity implements ItemClickListener<MeshLogHistoryModel>, View.OnClickListener {
+public class MeshLogHistoryActivity extends TelemeshBaseActivity implements ItemClickListener<MeshLogHistoryModel>, View.OnClickListener {
 
     private ActivityMeshLogHistoryBinding mBinding;
     private MeshLogHistoryAdapter mAdapter;
     private String currentLogFile;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        mBinding = DataBindingUtil.setContentView(this, R.layout.activity_mesh_log_history);
+    protected int getLayoutId() {
+        return R.layout.activity_mesh_log_history;
+    }
+
+
+    @Override
+    protected int statusBarColor() {
+        return R.color.colorPrimaryDark;
+    }
+
+    @Override
+    protected void startUI() {
+        super.startUI();
+
+        mBinding = (ActivityMeshLogHistoryBinding) getViewDataBinding();
 
         initView();
 
@@ -82,4 +96,8 @@ public class MeshLogHistoryActivity extends AppCompatActivity implements ItemCli
         mAdapter.addItem(models);
     }
 
+    @Override
+    protected BaseServiceLocator getServiceLocator() {
+        return null;
+    }
 }
