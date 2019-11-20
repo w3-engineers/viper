@@ -16,8 +16,10 @@ import android.widget.AdapterView;
 
 import com.w3engineers.mesh.R;
 
+import com.w3engineers.mesh.application.data.BaseServiceLocator;
 import com.w3engineers.mesh.application.data.helper.MeshLogKeys;
 import com.w3engineers.mesh.application.data.model.MeshLogModel;
+import com.w3engineers.mesh.application.ui.base.TelemeshBaseActivity;
 import com.w3engineers.mesh.databinding.FragmentMeshLogDetailsBinding;
 import com.w3engineers.mesh.util.Constant;
 import com.w3engineers.mesh.util.lib.mesh.HandlerUtil;
@@ -30,7 +32,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-public class MeshLogDetailsActivity extends AppCompatActivity implements View.OnClickListener {
+public class MeshLogDetailsActivity extends TelemeshBaseActivity implements View.OnClickListener {
 
     private IntentFilter intentFilter;
     private FragmentMeshLogDetailsBinding binding;
@@ -54,9 +56,20 @@ public class MeshLogDetailsActivity extends AppCompatActivity implements View.On
 
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        binding = DataBindingUtil.setContentView(this, R.layout.fragment_mesh_log_details);
+    protected int getLayoutId() {
+        return R.layout.fragment_mesh_log_details;
+    }
+
+    @Override
+    protected int statusBarColor() {
+        return R.color.colorPrimaryDark;
+    }
+
+    @Override
+    protected void startUI() {
+        super.startUI();
+
+        binding = (FragmentMeshLogDetailsBinding) getViewDataBinding();
         parseIntent();
 
         binding.imageViewBack.setOnClickListener(this);
@@ -71,7 +84,7 @@ public class MeshLogDetailsActivity extends AppCompatActivity implements View.On
 
         readFile(ALL);
 
-     //   MeshLog.sMeshLogListener = mMeshLogListener;
+        //   MeshLog.sMeshLogListener = mMeshLogListener;
 
         intentFilter = new IntentFilter();
         intentFilter.addAction("com.w3engineers.meshrnd.DEBUG_MESSAGE");
@@ -97,7 +110,6 @@ public class MeshLogDetailsActivity extends AppCompatActivity implements View.On
             logList.clear();
         });
     }
-
 
     @Override
     public void onClick(View v) {
@@ -367,7 +379,7 @@ public class MeshLogDetailsActivity extends AppCompatActivity implements View.On
         public void onReceive(Context context, Intent intent) {
             if (intent.getAction().equals("com.w3engineers.meshrnd.DEBUG_MESSAGE")) {
                 String text = intent.getStringExtra("value");
-                if (isCurrentLog){
+                if (isCurrentLog) {
                     newMessageFound(text);
                 }
             }
@@ -385,11 +397,16 @@ public class MeshLogDetailsActivity extends AppCompatActivity implements View.On
     };*/
 
     @Override
+    protected BaseServiceLocator getServiceLocator() {
+        return null;
+    }
+
+    @Override
     public void onPause() {
         super.onPause();
         this.unregisterReceiver(callBroadcast);
         try {
-           // MeshLogDetailsActivity.this.unregisterReceiver(callBroadcast);
+            // MeshLogDetailsActivity.this.unregisterReceiver(callBroadcast);
         } catch (IllegalArgumentException e) {
             e.printStackTrace();
         }
