@@ -730,7 +730,7 @@ public class PurchaseManagerBuyer extends PurchaseManager implements PayControll
             preferencesHelperDataplan.setGiftTokenHash(tokenTransactionHash, endPoint);
 //            preferencesHelperDataplan.setGiftEndpointType(endPoint);
 
-            String toastMessage = Util.getCurrencyTypeMessage("Congratulations!!!\nYou have been awarded 1 %s and 50 token.\nBalance will be added within few minutes.");
+            String toastMessage = Util.getCurrencyTypeMessage("Congratulations!!!\nYou have been awarded with 50 points which will be added within few minutes.");
 
             sendGiftListener(status, false, toastMessage);
 
@@ -780,7 +780,7 @@ public class PurchaseManagerBuyer extends PurchaseManager implements PayControll
             preferencesHelperDataplan.setGiftTokenHash(null, endPoint);
             databaseService.updateCurrencyAndToken(endPoint, ethBalance, tokenBalance);
 
-            sendGiftListener(status, true, "Congratulations!!!\nBalance has been added to your account.");
+            sendGiftListener(status, true, "Congratulations!!!\nPoints have been added to your account.");
 
 //            HandlerUtil.postForeground(() -> Toast.makeText(mContext, "Congratulations!!!\nBalance has been added to your account.", Toast.LENGTH_LONG).show());
             /*Activity currentActivity = MeshApp.getCurrentActivity();
