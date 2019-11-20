@@ -80,6 +80,12 @@ public class WalletActivity extends TelemeshBaseActivity implements WalletManage
     }
 
     @Override
+    protected int statusBarColor() {
+        return R.color.colorPrimaryDark;
+    }
+
+
+    @Override
     protected void startUI() {
 
         mBinding = (ActivityWalletBinding) getViewDataBinding();
@@ -119,7 +125,7 @@ public class WalletActivity extends TelemeshBaseActivity implements WalletManage
         getTotalPendingEarningBySeller();
         setDifferentNetworkInfo();
 
-        changeStatusBarColor();
+        //changeStatusBarColor();
 
         mBinding.pullToRefresh.setOnRefreshListener(() -> {
             runOnUiThread(() -> {

@@ -145,9 +145,9 @@ public class WalletService {
         if (isWalletExists()) {
             deleteExistsWallet();
         }
-         SharedPref.write(WALLET_PASSWORD_KEY, password);
+        SharedPref.write(WALLET_PASSWORD_KEY, password);
 
-         String keyStoreFileName = Web3jWalletHelper.onInstance(mContext).createWallet(password, walletSuffixDir);
+        String keyStoreFileName = Web3jWalletHelper.onInstance(mContext).createWallet(password, walletSuffixDir);
 
         if (keyStoreFileName != null) {
 
