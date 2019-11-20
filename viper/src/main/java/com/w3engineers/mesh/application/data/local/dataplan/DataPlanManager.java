@@ -175,7 +175,7 @@ public class DataPlanManager {
     }
 
     public long getSellToDate() {
-        return preferencesHelperDataplan.getSellDataAmount();
+        return preferencesHelperDataplan.getSellToDate();
     }
 
     public long getSellDataAmount() {

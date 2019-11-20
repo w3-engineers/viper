@@ -565,6 +565,7 @@ public class TestDataPlanActivity extends TelemeshBaseActivity implements DataPl
             dataLimitModel.setFromDate(myCalendar.getTimeInMillis());
         }
         if (dataLimitModel.getToDate() > 0) {
+            MeshLog.v("todate " + sdf.format(dataLimitModel.getToDate()) + "  " + dataLimitModel.getToDate());
             mBinding.toDate.setText(sdf.format(dataLimitModel.getToDate()));
         } else {
             mBinding.toDate.setText(sdf.format(myCalendar.getTime()));
