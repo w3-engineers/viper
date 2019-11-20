@@ -67,7 +67,8 @@
     <color name="ninety_black">#E6000000</color>
     <color name="sixty_black">#9900001F</color>
     <color name="eighty_black">#80000000</color>
-
+    <color name="currency_note_shape_color">#6E97CAFF</color>
+    <color name="currency_text_color">#083480</color>
 
 
 

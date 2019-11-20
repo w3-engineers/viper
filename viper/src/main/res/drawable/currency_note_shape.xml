@@ -4,8 +4,8 @@
 
     <gradient
         android:angle="0"
-        android:startColor="@color/light_paste_color"
-        android:endColor="@color/light_paste_color"/>
+        android:startColor="@color/currency_note_shape_color"
+        android:endColor="@color/currency_note_shape_color"/>
 
     <corners
         android:bottomLeftRadius="@dimen/margin_5"

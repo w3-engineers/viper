@@ -45,25 +45,29 @@ public class ConnectionManager {
     private Map<String, UserModel> discoverUserMap;
     private Map<String, String> requestUserInfoList;
 
+
     public static ConnectionManager on(Context context) {
         if (mConnectionManager == null) {
-            synchronized (ViperClient.class) {
+            synchronized (ConnectionManager.class) {
                 if (mConnectionManager == null)
-                    mConnectionManager = new ConnectionManager(context, APP_NAME, NETWORK_PREFIX);
+                    mConnectionManager = new ConnectionManager(context);
             }
         }
-        mConnectionManager = new ConnectionManager(context, APP_NAME, NETWORK_PREFIX);
         return mConnectionManager;
     }
 
-    private ConnectionManager(Context context, String appName, String networkPrefix) {
+    private ConnectionManager(Context context) {
         MeshLog.e("Connection Manager is called");
         mContext = context;
         discoverUserMap = Collections.synchronizedMap(new HashMap());
         requestUserInfoList = Collections.synchronizedMap(new HashMap<>());
 
+
+    }
+
+    public void startViper(){
         try {
-            String jsonData = loadJSONFromAsset(context);
+            String jsonData = loadJSONFromAsset(mContext);
 
             if (!TextUtils.isEmpty(jsonData)) {
                 JSONObject jsonObject = new JSONObject(jsonData);
@@ -73,7 +77,7 @@ public class ConnectionManager {
                 String APP_DOWNLOAD_LINK = jsonObject.optString("APP_DOWNLOAD_LINK");
                 String GIFT_DONATE_LINK = jsonObject.optString("GIFT_DONATE_LINK");
 
-                viperClient = ViperClient.on(context, appName, "com.w3engineers.ext.viper", networkPrefix, SharedPref.read(Constant.KEY_USER_NAME),
+                viperClient = ViperClient.on(mContext, APP_NAME, "com.w3engineers.ext.viper", NETWORK_PREFIX, SharedPref.read(Constant.KEY_USER_NAME),
                         SharedPref.read(Constant.PreferenceKeys.ADDRESS), SharedPref.read(Constant.PreferenceKeys.PUBLIC_KEY), 1, System.currentTimeMillis(), true)
                         .setConfig(AUTH_USER_NAME, AUTH_PASSWORD, APP_DOWNLOAD_LINK, GIFT_DONATE_LINK);
 

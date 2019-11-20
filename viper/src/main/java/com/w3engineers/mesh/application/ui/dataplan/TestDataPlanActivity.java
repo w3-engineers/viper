@@ -65,10 +65,14 @@ public class TestDataPlanActivity extends TelemeshBaseActivity implements DataPl
     private SimpleDateFormat sdf;
 
 
-
     @Override
     protected int getLayoutId() {
         return R.layout.test_activity_data_plan;
+    }
+
+    @Override
+    protected int statusBarColor() {
+        return R.color.colorPrimaryDark;
     }
 
     @Override
@@ -125,8 +129,8 @@ public class TestDataPlanActivity extends TelemeshBaseActivity implements DataPl
         dataLimitRadioButtons = new RadioButton[]{mBinding.unlimited, mBinding.limitTo};
     }
 
-    private void checkAndCloseMesh(int role){
-        if (mCurrentRole == role){
+    private void checkAndCloseMesh(int role) {
+        if (mCurrentRole == role) {
             DataPlanManager.getInstance().closeMesh();
         }
     }
@@ -265,6 +269,7 @@ public class TestDataPlanActivity extends TelemeshBaseActivity implements DataPl
     private void setTitle() {
 
         setSupportActionBar(mBinding.toolbar);
+        mBinding.toolbar.setTitle(getResources().getString(R.string.data_plan));
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
@@ -327,7 +332,7 @@ public class TestDataPlanActivity extends TelemeshBaseActivity implements DataPl
             onButtonClickListener(seller);
         }
 
-}
+    }
 
     @Override
     public void onConnectingWithSeller(String sellerAddress) {
@@ -557,7 +562,6 @@ public class TestDataPlanActivity extends TelemeshBaseActivity implements DataPl
             mBinding.toDate.setText(sdf.format(myCalendar.getTime()));
             dataLimitModel.setToDate(myCalendar.getTimeInMillis());
         }
-
 
 
         long sharedData = DataPlanManager.getInstance().getSellAmountData();
@@ -838,6 +842,7 @@ public class TestDataPlanActivity extends TelemeshBaseActivity implements DataPl
             disableSaveButton();
         }
     }
+
     public long getDayWiseTimeStamp(long timeStamp) {
         Calendar cal = Calendar.getInstance();
         cal.setTimeInMillis(timeStamp);
