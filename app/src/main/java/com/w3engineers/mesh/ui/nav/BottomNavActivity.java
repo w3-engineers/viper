@@ -146,7 +146,9 @@ public class BottomNavActivity extends AppCompatActivity implements UserConnecti
     protected void onResume() {
         super.onResume();
 
-        requestPermission();
+        if (!walletLoadedSuccess){
+            requestPermission();
+        }
     }
 
 
