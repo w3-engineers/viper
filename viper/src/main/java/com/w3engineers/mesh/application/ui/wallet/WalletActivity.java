@@ -153,6 +153,10 @@ public class WalletActivity extends TelemeshBaseActivity implements WalletManage
         return result;
     }
 
+    private String convertSixrDigitString(double value) {
+        String result = String.format("%.6f", value);
+        return result;
+    }
     @Override
     public void onGiftResponse(boolean success, boolean isGifted, String message) {
 
@@ -427,7 +431,7 @@ public class WalletActivity extends TelemeshBaseActivity implements WalletManage
 
         if (totalEarningObserver != null) {
             totalEarningObserver.observe(this, aDouble -> {
-                mBinding.tvEarned.setText(aDouble == null ? "0.0" : aDouble.toString());
+                mBinding.tvEarned.setText(aDouble == null ? "0.0" : convertSixrDigitString(aDouble));
             });
         }
     }
@@ -447,7 +451,7 @@ public class WalletActivity extends TelemeshBaseActivity implements WalletManage
 
         if (totalSpentObserver != null) {
             totalSpentObserver.observe(this, totalSpent -> {
-                mBinding.tvSpent.setText(totalSpent == null ? "0.0" : totalSpent.toString());
+                mBinding.tvSpent.setText(totalSpent == null ? "0.0" : convertSixrDigitString(totalSpent));
             });
         }
     }
@@ -471,7 +475,7 @@ public class WalletActivity extends TelemeshBaseActivity implements WalletManage
                 if (payableDeposit >= 10){
                     performWithdrawBalance();
                 }
-                  mBinding.textViewPendingBalance.setText(totalPendingEarn == null ? "0" : totalPendingEarn.toString());
+                  mBinding.textViewPendingBalance.setText(totalPendingEarn == null ? "0" : convertSixrDigitString(totalPendingEarn));
             });
         }
     }
