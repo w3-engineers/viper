@@ -61,6 +61,7 @@ public class ConnectionManager {
         mContext = context;
         discoverUserMap = Collections.synchronizedMap(new HashMap());
         requestUserInfoList = Collections.synchronizedMap(new HashMap<>());
+        startAllObserver();
     }
 
     public void startViper(){
@@ -68,6 +69,8 @@ public class ConnectionManager {
             String jsonData = loadJSONFromAsset(mContext);
 
             if (!TextUtils.isEmpty(jsonData)) {
+
+
                 JSONObject jsonObject = new JSONObject(jsonData);
 
                 String AUTH_USER_NAME = jsonObject.optString("AUTH_USER_NAME");
@@ -79,7 +82,6 @@ public class ConnectionManager {
                         SharedPref.read(Constant.PreferenceKeys.ADDRESS), SharedPref.read(Constant.PreferenceKeys.PUBLIC_KEY), 1, System.currentTimeMillis(), true)
                         .setConfig(AUTH_USER_NAME, AUTH_PASSWORD, APP_DOWNLOAD_LINK, GIFT_DONATE_LINK);
 
-                startAllObserver();
             }
 
         } catch (JSONException e) {
