@@ -2,619 +2,632 @@
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
-<LinearLayout
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="@color/white"
-    android:orientation="vertical"
-    tools:context="com.w3engineers.mesh.application.ui.dataplan.TestDataPlanActivity">
 
-    <android.support.v7.widget.Toolbar
-        android:id="@+id/toolbar"
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="?attr/actionBarSize"
-        android:background="@color/colorPrimary"
-        android:elevation="4dp"
-        android:fitsSystemWindows="true"
-        app:title="My data plan"
-        app:titleTextColor="@color/white" />
+        android:layout_height="match_parent"
+        android:background="@color/colorEtLogingBg"
+        android:orientation="vertical"
+        tools:context="com.w3engineers.mesh.application.ui.dataplan.TestDataPlanActivity">
 
-    <android.support.v7.widget.CardView xmlns:card_view="http://schemas.android.com/apk/res-auto"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:layout_margin="@dimen/margin_20"
-        android:elevation="@dimen/elevation_4"
-        card_view:cardCornerRadius="4dp">
+        <android.support.v7.widget.Toolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:background="@color/colorPrimary"
+            android:elevation="4dp"
+            android:fitsSystemWindows="true"
+            app:title="My data plan"
+            app:titleTextColor="@color/white" />
 
-        <ScrollView
+        <android.support.v7.widget.CardView xmlns:card_view="http://schemas.android.com/apk/res-auto"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:fillViewport="true">
+            android:layout_gravity="center"
+            android:layout_margin="@dimen/margin_20"
+            android:elevation="@dimen/elevation_4"
+            card_view:cardCornerRadius="4dp">
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:animateLayoutChanges="true"
-            android:orientation="vertical">
-
-            <com.w3engineers.mesh.application.ui.util.ExpandableButton
-                android:id="@+id/localButton"
-                android:layout_width="match_parent"
-                android:layout_height="50dp"
-                android:layout_marginStart="@dimen/margin_8"
-                app:childView="@+id/local_view"
-                app:text="Local" />
-
-            <LinearLayout
-                android:id="@+id/local_view"
+            <ScrollView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical">
-
-
-                <LinearLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="@dimen/margin_5"
-                    android:layout_marginTop="@dimen/margin_10"
-                    android:orientation="horizontal">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="@dimen/margin_10"
-                        android:text="OFF"
-                        android:textStyle="bold" />
-
-                    <Switch
-                        android:id="@+id/switchButtonLocal"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="@dimen/margin_10"
-                        android:theme="@style/MySwitch" />
-
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="@dimen/margin_10"
-                        android:text="ON"
-                        android:textStyle="bold" />
-
-                </LinearLayout>
-
-                <TextView
-                    android:id="@+id/localTextView"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center_vertical"
-                    android:layout_marginStart="@dimen/margin_15"
-                    android:layout_marginTop="@dimen/margin_10"
-                    android:layout_marginEnd="@dimen/margin_15"
-                    android:layout_marginBottom="@dimen/margin_10"
-                    android:text="Local is the default plan. Use local to connect users nearby you. Data cost is free."
-                    android:textColor="@color/black"
-                    android:textSize="@dimen/text_size_16" />
-
-            </LinearLayout>
-
-            <com.w3engineers.mesh.application.ui.util.ExpandableButton
-                android:id="@+id/sellDataButton"
-                android:layout_width="match_parent"
-                android:layout_height="50dp"
-                android:layout_marginStart="@dimen/margin_8"
-                app:childView="@+id/seller_view"
-                app:text="Sell Data" />
-
-            <LinearLayout
-                android:id="@+id/seller_view"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical">
-
+                android:fillViewport="true">
 
                 <LinearLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="@dimen/margin_5"
-                    android:layout_marginTop="@dimen/margin_10"
-                    android:orientation="horizontal">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="@dimen/margin_10"
-                        android:text="OFF"
-                        android:textStyle="bold" />
-
-                    <Switch
-                        android:id="@+id/switchButtonSeller"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="@dimen/margin_10"
-                        android:theme="@style/MySwitch" />
-
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="@dimen/margin_10"
-                        android:text="ON"
-                        android:textStyle="bold" />
-
-                </LinearLayout>
-
-                <TextView
-                    android:id="@+id/sellDataTextView"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center_vertical"
-                    android:layout_marginStart="@dimen/margin_15"
-                    android:layout_marginTop="@dimen/margin_10"
-                    android:layout_marginEnd="@dimen/margin_15"
-                    android:text="Sell your data to other local users and earn coins. You need an active internet connection. Sell price 1 coin = 1MB."
-                    android:textColor="@color/black"
-                    android:textSize="@dimen/text_size_16" />
-
-
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center_vertical"
-                    android:layout_marginStart="@dimen/margin_15"
-                    android:layout_marginTop="@dimen/margin_5"
-                    android:layout_marginEnd="@dimen/margin_15"
-                    android:text="Data Limit"
-                    android:textStyle="bold"
-                    android:textColor="@color/black"
-                    android:textSize="@dimen/text_size_16" />
-
-                <android.support.constraint.ConstraintLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
-
-                    <RadioGroup
-                        android:id="@+id/limit_control"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toTopOf="parent">
-
-                        <RadioButton
-                            android:id="@+id/unlimited"
-                            style="@style/limit_radio"
-                            android:onClick="onRadioUnlimitedButtonClicked"
-                            android:text="@string/unlimited"
-                            android:textColor="@drawable/bg_radio_selection"
-                            tools:ignore="UnusedAttribute" />
-
-                        <RadioButton
-                            android:id="@+id/limit_to"
-                            style="@style/limit_radio"
-                            android:onClick="onRadioLimitedButtonClicked"
-                            android:text="@string/limit_to"
-                            android:textColor="@drawable/bg_radio_selection"
-                            tools:ignore="UnusedAttribute" />
-
-                    </RadioGroup>
-
-                    <LinearLayout
-                        android:id="@+id/data"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="@dimen/margin_25"
-                        android:layout_marginTop="@dimen/margin_25"
-                        android:orientation="horizontal"
-                        app:layout_constraintStart_toEndOf="@+id/limit_control"
-                        app:layout_constraintBottom_toBottomOf="@+id/limit_control">
-
-                        <EditText
-                            android:id="@+id/range"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:background="@drawable/ractangular_round_white"
-                            android:clickable="false"
-                            android:digits="0123456789"
-                            android:inputType="number"
-                            android:maxLength="4"
-                            android:maxLines="1"
-                            android:minWidth="@dimen/width_50"
-                            android:paddingLeft="@dimen/padding_10"
-                            android:paddingTop="@dimen/padding_3"
-                            android:paddingRight="@dimen/padding_10"
-                            android:paddingBottom="@dimen/padding_3"
-                            android:text="10"
-                            android:textAlignment="center"
-                            android:textSize="@dimen/text_size_18" />
-
-                        <TextView
-                            android:id="@+id/data_unit"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginLeft="@dimen/margin_5"
-                            android:fontFamily="@font/opensans_regular"
-                            android:text="MB"
-                            android:layout_gravity="center_vertical"
-                            android:textColor="@color/black"
-                            android:textSize="@dimen/text_size_18" />
-
-                    </LinearLayout>
-
-                </android.support.constraint.ConstraintLayout>
-
-                <TextView
-                    android:id="@+id/dataLimitError"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:fontFamily="@font/opensans_regular"
-                    android:text="@string/data_limit_must_be_larger_than_used_data"
-                    android:textColor="@color/colorRed"
-                    android:textSize="@dimen/text_size_10"
-                    android:visibility="gone"
-                    android:layout_marginStart="@dimen/margin_30"
-                    android:layout_marginTop="@dimen/margin_5"/>
-
-
-     <!--           <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center_vertical"
-                    android:layout_marginStart="@dimen/margin_15"
-                    android:layout_marginTop="@dimen/margin_10"
-                    android:layout_marginEnd="@dimen/margin_15"
-                    android:layout_marginBottom="@dimen/margin_10"
-                    android:text="Data Range"
-                    android:textStyle="bold"
-                    android:textColor="@color/black"
-                    android:textSize="@dimen/text_size_16" />-->
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:layout_marginStart="@dimen/margin_5"
-                    android:layout_marginTop="@dimen/margin_5"
-                    android:layout_marginEnd="@dimen/margin_5">
-
-
-                    <LinearLayout
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:orientation="horizontal">
-
-                        <TextView
-                            android:id="@+id/from"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginRight="@dimen/margin_5"
-                            android:clickable="false"
-                            android:fontFamily="@font/opensans_regular"
-                            android:text="@string/from"
-                            android:textColor="@color/deep_grey"
-                            android:textSize="@dimen/text_size_16" />
-
-
-
-                        <EditText
-                            android:id="@+id/from_date"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:background="@drawable/ractangular_round_white"
-                            android:clickable="false"
-                            android:enabled="false"
-                            android:focusable="false"
-                            android:hint="13/06/2019"
-                            android:inputType="date"
-                            android:maxLength="10"
-                            android:maxLines="1"
-                            android:minWidth="@dimen/width_80"
-                            android:paddingLeft="@dimen/padding_10"
-                            android:paddingTop="@dimen/padding_3"
-                            android:paddingRight="@dimen/padding_10"
-                            android:paddingBottom="@dimen/padding_3"
-                            android:textAlignment="center"
-                            android:textSize="@dimen/text_size_18" />
-
-                    </LinearLayout>
-
-
-                    <LinearLayout
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="@dimen/margin_10"
-                        android:orientation="horizontal">
-
-                        <TextView
-                            android:id="@+id/to"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginRight="@dimen/margin_5"
-                            android:fontFamily="@font/opensans_regular"
-                            android:text="@string/to"
-                            android:textColor="@color/deep_grey"
-                            android:textSize="@dimen/text_size_16" />
-
-
-                        <EditText
-                            android:id="@+id/to_date"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:background="@drawable/ractangular_round_white"
-                            android:clickable="false"
-                            android:enabled="false"
-                            android:focusable="false"
-                            android:hint="13/06/2019"
-                            android:inputType="date"
-                            android:maxLength="10"
-                            android:maxLines="1"
-                            android:minWidth="@dimen/width_80"
-                            android:paddingLeft="@dimen/padding_10"
-                            android:paddingTop="@dimen/padding_3"
-                            android:paddingRight="@dimen/padding_10"
-                            android:paddingBottom="@dimen/padding_3"
-                            android:textAlignment="center"
-                            android:textSize="@dimen/text_size_18" />
-
-                    </LinearLayout>
-
-
-                </LinearLayout>
-
-                <TextView
-                    android:id="@+id/dateError"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="@dimen/margin_30"
-                    android:layout_marginTop="@dimen/margin_5"
-                    android:fontFamily="@font/opensans_regular"
-                    android:text="@string/date_expired"
-                    android:textColor="@color/colorRed"
-                    android:textSize="@dimen/text_size_10"
-                    android:visibility="gone" />
-
-
-<!--                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="@dimen/margin_15"
-                    android:layout_marginTop="@dimen/margin_5"
-                    android:layout_marginEnd="@dimen/margin_15"
-                    android:layout_marginBottom="@dimen/margin_10">
-
-                    <TextView
-                        android:id="@+id/to"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginRight="@dimen/margin_5"
-                        android:fontFamily="@font/opensans_regular"
-                        android:text="@string/to"
-                        android:textColor="@color/deep_grey"
-                        android:textSize="@dimen/text_size_16" />
-
-
-                    <EditText
-                        android:id="@+id/to_date"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:background="@drawable/ractangular_round_white"
-                        android:clickable="false"
-                        android:enabled="false"
-                        android:focusable="false"
-                        android:hint="13/06/2019"
-                        android:inputType="date"
-                        android:maxLength="10"
-                        android:maxLines="1"
-                        android:minWidth="@dimen/width_80"
-                        android:paddingLeft="@dimen/padding_10"
-                        android:paddingTop="@dimen/padding_3"
-                        android:paddingRight="@dimen/padding_10"
-                        android:paddingBottom="@dimen/padding_3"
-                        android:textAlignment="center"
-                        android:textSize="@dimen/text_size_18" />
-
-
-                </LinearLayout>-->
-
-
-                <Button
-                    android:id="@+id/button_save"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="@dimen/margin_10"
-                    android:layout_marginLeft="@dimen/margin_15"
-                    android:layout_marginRight="@dimen/margin_15"
-                    android:background="@drawable/rectangle_button_shape"
-                    android:text="@string/save"
-                    android:textAllCaps="true"
-                    android:textColor="@color/white"
-                    android:textSize="@dimen/text_size_16"
-                    android:layout_marginBottom="@dimen/margin_20"/>
-
-            </LinearLayout>
-
-
-            <com.w3engineers.mesh.application.ui.util.ExpandableButton
-                android:id="@+id/buyDataButton"
-                android:layout_width="match_parent"
-                android:layout_height="50dp"
-                android:layout_marginStart="@dimen/margin_8"
-                app:childView="@+id/buyer_view"
-                app:text="Buy Data" />
-
-            <LinearLayout
-                android:id="@+id/buyer_view"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical">
-
-
-                <LinearLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="@dimen/margin_5"
-                    android:layout_marginTop="@dimen/margin_10"
-                    android:orientation="horizontal">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="@dimen/margin_10"
-                        android:text="OFF"
-                        android:textStyle="bold" />
-
-                    <Switch
-                        android:id="@+id/switchButtonBuyer"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="@dimen/margin_10"
-                        android:theme="@style/MySwitch" />
-
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="@dimen/margin_10"
-                        android:text="ON"
-                        android:textStyle="bold" />
-
-                </LinearLayout>
-
-                <TextView
-                    android:id="@+id/buyDataTextView"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center_vertical"
-                    android:layout_marginStart="@dimen/margin_15"
-                    android:layout_marginTop="@dimen/margin_10"
-                    android:layout_marginEnd="@dimen/margin_15"
-                    android:layout_marginBottom="@dimen/margin_10"
-                    android:text="Buy data from nearby sellers. Data cost is 1 coin = 1MB."
-                    android:textColor="@color/black"
-                    android:textSize="@dimen/text_size_16" />
-
-
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center_vertical"
-                    android:layout_marginStart="@dimen/margin_15"
-                    android:layout_marginTop="@dimen/margin_10"
-                    android:layout_marginEnd="@dimen/margin_15"
-                    android:layout_marginBottom="@dimen/margin_10"
-                    android:text="Nearby Sellers"
-                    android:textStyle="bold"
-                    android:textColor="@color/black"
-                    android:textSize="@dimen/text_size_16" />
-                <TextView
-                    android:id="@+id/empty_layout"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent" />
-
-                <com.w3engineers.ext.strom.application.ui.widget.BaseRecyclerView
-                    android:id="@+id/test_data_seller_list"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:layout_marginStart="@dimen/margin_15"
-                    app:brv_emptyLayoutId="@id/empty_layout"
-                    android:layout_marginEnd="@dimen/margin_15"
-                    android:layout_marginBottom="@dimen/margin_10"
-                    tools:listitem="@layout/item_seller_view"/>
-               <!-- <com.w3engineers.ext.strom.application.ui.widget.BaseRecyclerView
-                    android:id="@+id/data_seller_list"
-                    android:layout_width="match_parent"
-                    android:layout_height="0dp"
-                    app:brv_emptyLayoutId="@id/empty_layout"
-                    app:layout_constraintBottom_toTopOf="@+id/textView_sell_price_info"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent" />-->
+                    android:animateLayoutChanges="true"
+                    android:orientation="vertical">
 
+                    <com.w3engineers.mesh.application.ui.util.ExpandableButton
+                        android:id="@+id/localButton"
+                        android:layout_width="match_parent"
+                        android:layout_height="50dp"
 
-            </LinearLayout>
+                        android:background="@color/collapse_button_color"
+                        app:childView="@+id/local_view"
+                        app:text="LOCAL" />
 
-
-            <com.w3engineers.mesh.application.ui.util.ExpandableButton
-                android:id="@+id/internetOnlyButton"
-                android:layout_width="match_parent"
-                android:layout_height="50dp"
-                android:layout_marginStart="@dimen/margin_8"
-                app:childView="@+id/internet_view"
-                app:text="Internet Only" />
-
-            <LinearLayout
-                android:id="@+id/internet_view"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical">
-
-
-                <LinearLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="@dimen/margin_5"
-                    android:layout_marginTop="@dimen/margin_10"
-                    android:orientation="horizontal">
-
-                    <TextView
-                        android:layout_width="wrap_content"
+                    <LinearLayout
+                        android:id="@+id/local_view"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginStart="@dimen/margin_10"
-                        android:text="OFF"
-                        android:textStyle="bold" />
+                        android:orientation="vertical">
 
-                    <Switch
-                        android:id="@+id/switchButtonInternet"
-                        android:layout_width="wrap_content"
+
+                        <LinearLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="@dimen/margin_5"
+                            android:layout_marginTop="@dimen/margin_10"
+                            android:orientation="horizontal">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginStart="@dimen/margin_10"
+                                android:text="OFF"
+                                android:textColor="@color/data_plan_selected_text"
+                                android:textStyle="bold" />
+
+                            <Switch
+                                android:id="@+id/switchButtonLocal"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginStart="@dimen/margin_10"
+                                android:theme="@style/MySwitch" />
+
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginStart="@dimen/margin_10"
+                                android:text="ON"
+                                android:textColor="@color/data_plan_selected_text"
+                                android:textStyle="bold" />
+
+                        </LinearLayout>
+
+                        <TextView
+                            android:id="@+id/localTextView"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center_vertical"
+                            android:layout_marginStart="@dimen/margin_15"
+                            android:layout_marginTop="@dimen/margin_10"
+                            android:layout_marginEnd="@dimen/margin_15"
+                            android:layout_marginBottom="@dimen/margin_10"
+                            android:text="Local is the default plan. Use local to connect users nearby you. Data cost is free."
+                            android:textColor="@color/black"
+                            android:textSize="@dimen/text_size_16" />
+
+                    </LinearLayout>
+
+                    <com.w3engineers.mesh.application.ui.util.ExpandableButton
+                        android:id="@+id/sellDataButton"
+                        android:layout_width="match_parent"
+                        android:layout_height="50dp"
+
+                        android:background="@color/collapse_button_color"
+                        app:childView="@+id/seller_view"
+                        app:text="SELL DATA" />
+
+                    <LinearLayout
+                        android:id="@+id/seller_view"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginStart="@dimen/margin_10"
-                        android:theme="@style/MySwitch" />
+                        android:orientation="vertical">
 
 
-                    <TextView
-                        android:layout_width="wrap_content"
+                        <LinearLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="@dimen/margin_5"
+                            android:layout_marginTop="@dimen/margin_10"
+                            android:orientation="horizontal">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginStart="@dimen/margin_10"
+                                android:text="OFF"
+                                android:textColor="@color/data_plan_selected_text"
+                                android:textStyle="bold" />
+
+                            <Switch
+                                android:id="@+id/switchButtonSeller"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginStart="@dimen/margin_10"
+                                android:theme="@style/MySwitch" />
+
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginStart="@dimen/margin_10"
+                                android:text="ON"
+                                android:textColor="@color/data_plan_selected_text"
+                                android:textStyle="bold" />
+
+                        </LinearLayout>
+
+                        <TextView
+                            android:id="@+id/sellDataTextView"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center_vertical"
+                            android:layout_marginStart="@dimen/margin_15"
+                            android:layout_marginTop="@dimen/margin_10"
+                            android:layout_marginEnd="@dimen/margin_15"
+                            android:text="Sell your data to other local users and earn coins. You need an active internet connection. Sell price 1 coin = 1MB."
+                            android:textColor="@color/black"
+                            android:textSize="@dimen/text_size_16" />
+
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center_vertical"
+                            android:layout_marginStart="@dimen/margin_15"
+                            android:layout_marginTop="@dimen/margin_5"
+                            android:layout_marginEnd="@dimen/margin_15"
+                            android:text="Data Limit"
+                            android:textColor="@color/black"
+                            android:textSize="@dimen/text_size_16"
+                            android:textStyle="bold" />
+
+                        <android.support.constraint.ConstraintLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content">
+
+                            <RadioGroup
+                                android:id="@+id/limit_control"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                app:layout_constraintStart_toStartOf="parent"
+                                app:layout_constraintTop_toTopOf="parent">
+
+                                <RadioButton
+                                    android:id="@+id/unlimited"
+                                    style="@style/limit_radio"
+                                    android:onClick="onRadioUnlimitedButtonClicked"
+                                    android:text="@string/unlimited"
+                                    android:textColor="@drawable/bg_radio_selection"
+                                    tools:ignore="UnusedAttribute" />
+
+                                <RadioButton
+                                    android:id="@+id/limit_to"
+                                    style="@style/limit_radio"
+                                    android:onClick="onRadioLimitedButtonClicked"
+                                    android:text="@string/limit_to"
+                                    android:textColor="@drawable/bg_radio_selection"
+                                    tools:ignore="UnusedAttribute" />
+
+                            </RadioGroup>
+
+                            <LinearLayout
+                                android:id="@+id/data"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginStart="@dimen/margin_25"
+                                android:layout_marginTop="@dimen/margin_25"
+                                android:orientation="horizontal"
+                                app:layout_constraintBottom_toBottomOf="@+id/limit_control"
+                                app:layout_constraintStart_toEndOf="@+id/limit_control">
+
+                                <EditText
+                                    android:id="@+id/range"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:background="@drawable/ractangular_round_white"
+                                    android:clickable="false"
+                                    android:digits="0123456789"
+                                    android:inputType="number"
+                                    android:maxLength="4"
+                                    android:maxLines="1"
+                                    android:minWidth="@dimen/width_50"
+                                    android:paddingLeft="@dimen/padding_10"
+                                    android:paddingTop="@dimen/padding_3"
+                                    android:paddingRight="@dimen/padding_10"
+                                    android:paddingBottom="@dimen/padding_3"
+                                    android:text="10"
+                                    android:textAlignment="center"
+                                    android:textSize="@dimen/text_size_18" />
+
+                                <TextView
+                                    android:id="@+id/data_unit"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_gravity="center_vertical"
+                                    android:layout_marginLeft="@dimen/margin_5"
+                                    android:fontFamily="@font/opensans_regular"
+                                    android:text="MB"
+                                    android:textColor="@color/black"
+                                    android:textSize="@dimen/text_size_18" />
+
+                            </LinearLayout>
+
+                        </android.support.constraint.ConstraintLayout>
+
+                        <TextView
+                            android:id="@+id/dataLimitError"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="@dimen/margin_30"
+                            android:layout_marginTop="@dimen/margin_5"
+                            android:fontFamily="@font/opensans_regular"
+                            android:text="@string/data_limit_must_be_larger_than_used_data"
+                            android:textColor="@color/colorRed"
+                            android:textSize="@dimen/text_size_10"
+                            android:visibility="gone" />
+
+
+                        <!--           <TextView
+                                       android:layout_width="match_parent"
+                                       android:layout_height="wrap_content"
+                                       android:layout_gravity="center_vertical"
+                                       android:layout_marginStart="@dimen/margin_15"
+                                       android:layout_marginTop="@dimen/margin_10"
+                                       android:layout_marginEnd="@dimen/margin_15"
+                                       android:layout_marginBottom="@dimen/margin_10"
+                                       android:text="Data Range"
+                                       android:textStyle="bold"
+                                       android:textColor="@color/black"
+                                       android:textSize="@dimen/text_size_16" />-->
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="@dimen/margin_5"
+                            android:layout_marginTop="@dimen/margin_5"
+                            android:layout_marginEnd="@dimen/margin_5"
+                            android:orientation="horizontal">
+
+
+                            <LinearLayout
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:orientation="horizontal">
+
+                                <TextView
+                                    android:id="@+id/from"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginRight="@dimen/margin_5"
+                                    android:clickable="false"
+                                    android:fontFamily="@font/opensans_regular"
+                                    android:text="@string/from"
+                                    android:textColor="@color/deep_grey"
+                                    android:textSize="@dimen/text_size_16" />
+
+
+                                <EditText
+                                    android:id="@+id/from_date"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:background="@drawable/ractangular_round_white"
+                                    android:clickable="false"
+                                    android:enabled="false"
+                                    android:focusable="false"
+                                    android:hint="13/06/2019"
+                                    android:inputType="date"
+                                    android:maxLength="10"
+                                    android:maxLines="1"
+                                    android:minWidth="@dimen/width_80"
+                                    android:paddingLeft="@dimen/padding_10"
+                                    android:paddingTop="@dimen/padding_3"
+                                    android:paddingRight="@dimen/padding_10"
+                                    android:paddingBottom="@dimen/padding_3"
+                                    android:textAlignment="center"
+                                    android:textSize="@dimen/text_size_18" />
+
+                            </LinearLayout>
+
+
+                            <LinearLayout
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginStart="@dimen/margin_10"
+                                android:orientation="horizontal">
+
+                                <TextView
+                                    android:id="@+id/to"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginRight="@dimen/margin_5"
+                                    android:fontFamily="@font/opensans_regular"
+                                    android:text="@string/to"
+                                    android:textColor="@color/deep_grey"
+                                    android:textSize="@dimen/text_size_16" />
+
+
+                                <EditText
+                                    android:id="@+id/to_date"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:background="@drawable/ractangular_round_white"
+                                    android:clickable="false"
+                                    android:enabled="false"
+                                    android:focusable="false"
+                                    android:hint="13/06/2019"
+                                    android:inputType="date"
+                                    android:maxLength="10"
+                                    android:maxLines="1"
+                                    android:minWidth="@dimen/width_80"
+                                    android:paddingLeft="@dimen/padding_10"
+                                    android:paddingTop="@dimen/padding_3"
+                                    android:paddingRight="@dimen/padding_10"
+                                    android:paddingBottom="@dimen/padding_3"
+                                    android:textAlignment="center"
+                                    android:textSize="@dimen/text_size_18" />
+
+                            </LinearLayout>
+
+
+                        </LinearLayout>
+
+                        <TextView
+                            android:id="@+id/dateError"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="@dimen/margin_30"
+                            android:layout_marginTop="@dimen/margin_5"
+                            android:fontFamily="@font/opensans_regular"
+                            android:text="@string/date_expired"
+                            android:textColor="@color/colorRed"
+                            android:textSize="@dimen/text_size_10"
+                            android:visibility="gone" />
+
+
+                        <!--                <LinearLayout
+                                            android:layout_width="match_parent"
+                                            android:layout_height="wrap_content"
+                                            android:layout_marginStart="@dimen/margin_15"
+                                            android:layout_marginTop="@dimen/margin_5"
+                                            android:layout_marginEnd="@dimen/margin_15"
+                                            android:layout_marginBottom="@dimen/margin_10">
+
+                                            <TextView
+                                                android:id="@+id/to"
+                                                android:layout_width="wrap_content"
+                                                android:layout_height="wrap_content"
+                                                android:layout_marginRight="@dimen/margin_5"
+                                                android:fontFamily="@font/opensans_regular"
+                                                android:text="@string/to"
+                                                android:textColor="@color/deep_grey"
+                                                android:textSize="@dimen/text_size_16" />
+
+
+                                            <EditText
+                                                android:id="@+id/to_date"
+                                                android:layout_width="wrap_content"
+                                                android:layout_height="wrap_content"
+                                                android:background="@drawable/ractangular_round_white"
+                                                android:clickable="false"
+                                                android:enabled="false"
+                                                android:focusable="false"
+                                                android:hint="13/06/2019"
+                                                android:inputType="date"
+                                                android:maxLength="10"
+                                                android:maxLines="1"
+                                                android:minWidth="@dimen/width_80"
+                                                android:paddingLeft="@dimen/padding_10"
+                                                android:paddingTop="@dimen/padding_3"
+                                                android:paddingRight="@dimen/padding_10"
+                                                android:paddingBottom="@dimen/padding_3"
+                                                android:textAlignment="center"
+                                                android:textSize="@dimen/text_size_18" />
+
+
+                                        </LinearLayout>-->
+
+
+                        <Button
+                            android:id="@+id/button_save"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginLeft="@dimen/margin_15"
+                            android:layout_marginTop="@dimen/margin_10"
+                            android:layout_marginRight="@dimen/margin_15"
+                            android:layout_marginBottom="@dimen/margin_20"
+                            android:background="@drawable/rectangle_button_shape"
+                            android:text="@string/save"
+                            android:textAllCaps="true"
+                            android:textColor="@color/white"
+                            android:textSize="@dimen/text_size_16" />
+
+                    </LinearLayout>
+
+
+                    <com.w3engineers.mesh.application.ui.util.ExpandableButton
+                        android:id="@+id/buyDataButton"
+                        android:layout_width="match_parent"
+                        android:layout_height="50dp"
+                        android:background="@color/collapse_button_color"
+                        app:childView="@+id/buyer_view"
+                        app:text="BUY DATA" />
+
+                    <LinearLayout
+                        android:id="@+id/buyer_view"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginStart="@dimen/margin_10"
-                        android:text="ON"
-                        android:textStyle="bold" />
+                        android:orientation="vertical">
+
+
+                        <LinearLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="@dimen/margin_5"
+                            android:layout_marginTop="@dimen/margin_10"
+                            android:orientation="horizontal">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginStart="@dimen/margin_10"
+                                android:text="OFF"
+                                android:textColor="@color/data_plan_selected_text"
+                                android:textStyle="bold" />
+
+                            <Switch
+                                android:id="@+id/switchButtonBuyer"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginStart="@dimen/margin_10"
+                                android:theme="@style/MySwitch" />
+
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginStart="@dimen/margin_10"
+                                android:text="ON"
+                                android:textColor="@color/data_plan_selected_text"
+                                android:textStyle="bold" />
+
+                        </LinearLayout>
+
+                        <TextView
+                            android:id="@+id/buyDataTextView"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center_vertical"
+                            android:layout_marginStart="@dimen/margin_15"
+                            android:layout_marginTop="@dimen/margin_10"
+                            android:layout_marginEnd="@dimen/margin_15"
+                            android:layout_marginBottom="@dimen/margin_10"
+                            android:text="Buy data from nearby sellers. Data cost is 1 coin = 1MB."
+                            android:textColor="@color/black"
+                            android:textSize="@dimen/text_size_16" />
+
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center_vertical"
+                            android:layout_marginStart="@dimen/margin_15"
+                            android:layout_marginTop="@dimen/margin_10"
+                            android:layout_marginEnd="@dimen/margin_15"
+                            android:layout_marginBottom="@dimen/margin_10"
+                            android:text="Nearby Sellers"
+                            android:textColor="@color/black"
+                            android:textSize="@dimen/text_size_16"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:id="@+id/empty_layout"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent" />
+
+                        <com.w3engineers.ext.strom.application.ui.widget.BaseRecyclerView
+                            android:id="@+id/test_data_seller_list"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:layout_marginStart="@dimen/margin_15"
+                            android:layout_marginEnd="@dimen/margin_15"
+                            android:layout_marginBottom="@dimen/margin_10"
+                            app:brv_emptyLayoutId="@id/empty_layout"
+                            tools:listitem="@layout/item_seller_view" />
+                        <!-- <com.w3engineers.ext.strom.application.ui.widget.BaseRecyclerView
+                             android:id="@+id/data_seller_list"
+                             android:layout_width="match_parent"
+                             android:layout_height="0dp"
+                             app:brv_emptyLayoutId="@id/empty_layout"
+                             app:layout_constraintBottom_toTopOf="@+id/textView_sell_price_info"
+                             app:layout_constraintEnd_toEndOf="parent"
+                             app:layout_constraintStart_toStartOf="parent"
+                             app:layout_constraintTop_toTopOf="parent" />-->
+
+
+                    </LinearLayout>
+
+
+                    <com.w3engineers.mesh.application.ui.util.ExpandableButton
+                        android:id="@+id/internetOnlyButton"
+                        android:layout_width="match_parent"
+                        android:layout_height="50dp"
+
+                        android:background="@color/collapse_button_color"
+                        app:childView="@+id/internet_view"
+                        app:text="INTERNET" />
+
+                    <LinearLayout
+                        android:id="@+id/internet_view"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical">
+
+
+                        <LinearLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="@dimen/margin_5"
+                            android:layout_marginTop="@dimen/margin_10"
+                            android:orientation="horizontal">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginStart="@dimen/margin_10"
+                                android:text="OFF"
+                                android:textColor="@color/data_plan_selected_text"
+                                android:textStyle="bold" />
+
+                            <Switch
+                                android:id="@+id/switchButtonInternet"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginStart="@dimen/margin_10"
+                                android:theme="@style/MySwitch" />
+
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginStart="@dimen/margin_10"
+                                android:text="ON"
+                                android:textColor="@color/data_plan_selected_text"
+                                android:textStyle="bold" />
+
+                        </LinearLayout>
+
+                        <TextView
+                            android:id="@+id/internetOnlyTextView"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center_vertical"
+                            android:layout_marginStart="@dimen/margin_15"
+                            android:layout_marginTop="@dimen/margin_10"
+                            android:layout_marginEnd="@dimen/margin_15"
+                            android:layout_marginBottom="@dimen/margin_10"
+                            android:text="Use your own internet data. The cost may vary depending on the data plan you are using from the operator."
+                            android:textColor="@color/black"
+                            android:textSize="@dimen/text_size_16" />
+
+                    </LinearLayout>
+
 
                 </LinearLayout>
 
-                <TextView
-                    android:id="@+id/internetOnlyTextView"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center_vertical"
-                    android:layout_marginStart="@dimen/margin_15"
-                    android:layout_marginTop="@dimen/margin_10"
-                    android:layout_marginEnd="@dimen/margin_15"
-                    android:layout_marginBottom="@dimen/margin_10"
-                    android:text="Use your own internet data. The cost may vary depending on the data plan you are using from the operator."
-                    android:textColor="@color/black"
-                    android:textSize="@dimen/text_size_16" />
+            </ScrollView>
 
-            </LinearLayout>
+        </android.support.v7.widget.CardView>
 
+    </LinearLayout>
 
-        </LinearLayout>
-
-        </ScrollView>
-
-    </android.support.v7.widget.CardView>
-
-</LinearLayout>
     <data>
 
         <import type="android.view.View" />
 
 
-<!--        <import type="com.w3engineers.mesh.application.data.local.purchase.PurchaseConstants" />-->
+        <!--        <import type="com.w3engineers.mesh.application.data.local.purchase.PurchaseConstants" />-->
 
-<!--        <import type="com.w3engineers.mesh.util.Util" />-->
+        <!--        <import type="com.w3engineers.mesh.util.Util" />-->
 
-<!--        <import type="com.w3engineers.mesh.application.data.local.DataPlanConstants" />-->
+        <!--        <import type="com.w3engineers.mesh.application.data.local.DataPlanConstants" />-->
 
-<!--        <import type="com.w3engineers.mesh.util.Constant" />-->
+        <!--        <import type="com.w3engineers.mesh.util.Constant" />-->
 
         <variable
             name="dataLimitModel"

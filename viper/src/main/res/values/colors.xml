@@ -70,6 +70,9 @@
     <color name="currency_note_shape_color">#6E97CAFF</color>
     <color name="currency_text_color">#083480</color>
 
-
+    <color name="data_plan_unselected_text">#7F7F7F</color>
+    <color name="divider_color">#99000000</color>
+    <color name="collapse_button_color">#FBFBFB</color>
+    <color name="data_plan_selected_text">#212121</color>
 
 </resources>

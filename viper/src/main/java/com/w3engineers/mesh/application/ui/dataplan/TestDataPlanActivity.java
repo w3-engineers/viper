@@ -153,7 +153,7 @@ public class TestDataPlanActivity extends TelemeshBaseActivity implements DataPl
 //                                    "Switch On", Toast.LENGTH_SHORT).show();
                         } else {
 
-                            expandableButtons[mCurrentRole].setTextColor(Color.BLACK);
+                            expandableButtons[mCurrentRole].setTextColor(getResources().getColor(R.color.data_plan_unselected_text));
                             checkAndCloseMesh(DataPlanConstants.USER_ROLE.MESH_USER);
 //                            Toast.makeText(TestDataPlanActivity.this,
 //                                    "Switch Off", Toast.LENGTH_SHORT).show();
@@ -170,7 +170,7 @@ public class TestDataPlanActivity extends TelemeshBaseActivity implements DataPl
 //                          Toast.makeText(TestDataPlanActivity.this,
 //                                    "Switch On", Toast.LENGTH_SHORT).show();
                         } else {
-                            expandableButtons[mCurrentRole].setTextColor(Color.BLACK);
+                            expandableButtons[mCurrentRole].setTextColor(getResources().getColor(R.color.data_plan_unselected_text));
                             checkAndCloseMesh(DataPlanConstants.USER_ROLE.DATA_SELLER);
 //                            Toast.makeText(TestDataPlanActivity.this,
 //                                    "Switch Off", Toast.LENGTH_SHORT).show();
@@ -189,7 +189,7 @@ public class TestDataPlanActivity extends TelemeshBaseActivity implements DataPl
 //                            Toast.makeText(TestDataPlanActivity.this,
 //                                    "Switch On", Toast.LENGTH_SHORT).show();
                         } else {
-                            expandableButtons[mCurrentRole].setTextColor(Color.BLACK);
+                            expandableButtons[mCurrentRole].setTextColor(getResources().getColor(R.color.data_plan_unselected_text));
                             checkAndCloseMesh(DataPlanConstants.USER_ROLE.DATA_BUYER);
 //                            Toast.makeText(TestDataPlanActivity.this,
 //                                    "Switch Off", Toast.LENGTH_SHORT).show();
@@ -206,7 +206,7 @@ public class TestDataPlanActivity extends TelemeshBaseActivity implements DataPl
 //                            Toast.makeText(TestDataPlanActivity.this,
 //                                    "Switch On", Toast.LENGTH_SHORT).show();
                         } else {
-                            expandableButtons[mCurrentRole].setTextColor(Color.BLACK);
+                            expandableButtons[mCurrentRole].setTextColor(getResources().getColor(R.color.data_plan_unselected_text));
                             checkAndCloseMesh(DataPlanConstants.USER_ROLE.INTERNET_USER);
 //                            Toast.makeText(TestDataPlanActivity.this,
 //                                    "Switch Off", Toast.LENGTH_SHORT).show();
@@ -221,52 +221,92 @@ public class TestDataPlanActivity extends TelemeshBaseActivity implements DataPl
         mBinding.localButton.setCallbackListener(new ExpandableButton.ExpandableButtonListener() {
             @Override
             public void onViewExpanded() {
-//                Toast.makeText(TestDataPlanActivity.this, "local Button Expanded", Toast.LENGTH_SHORT).show();
+                //Toast.makeText(TestDataPlanActivity.this, "local Button Expanded", Toast.LENGTH_SHORT).show();
+                mBinding.localButton.setBackgroundColor(getResources().getColor(R.color.white));
                 collapseView(mBinding.localButton);
+
+                if (!expandableButtons[mCurrentRole].equals(mBinding.localButton)) {
+                    mBinding.localButton.setTextColor(getResources().getColor(R.color.data_plan_selected_text));
+                }
             }
 
             @Override
             public void onViewCollapsed() {
-//                Toast.makeText(TestDataPlanActivity.this, "local Button Collapsed", Toast.LENGTH_SHORT).show();
+                mBinding.localButton.setBackgroundColor(getResources().getColor(R.color.collapse_button_color));
+
+                if (!expandableButtons[mCurrentRole].equals(mBinding.localButton)) {
+                    mBinding.localButton.setTextColor(getResources().getColor(R.color.data_plan_unselected_text));
+                }
+                //Toast.makeText(TestDataPlanActivity.this, "local Button Collapsed", Toast.LENGTH_SHORT).show();
             }
         });
 
         mBinding.sellDataButton.setCallbackListener(new ExpandableButton.ExpandableButtonListener() {
             @Override
             public void onViewExpanded() {
-//                Toast.makeText(TestDataPlanActivity.this, "seller Button Expanded", Toast.LENGTH_SHORT).show();
+                //Toast.makeText(TestDataPlanActivity.this, "seller Button Expanded", Toast.LENGTH_SHORT).show();
+                mBinding.sellDataButton.setBackgroundColor(getResources().getColor(R.color.white));
                 collapseView(mBinding.sellDataButton);
+
+                if (!expandableButtons[mCurrentRole].equals(mBinding.sellDataButton)) {
+                    mBinding.sellDataButton.setTextColor(getResources().getColor(R.color.data_plan_selected_text));
+                }
             }
 
             @Override
             public void onViewCollapsed() {
-//                Toast.makeText(TestDataPlanActivity.this, "seller Button Collapsed", Toast.LENGTH_SHORT).show();
+                mBinding.sellDataButton.setBackgroundColor(getResources().getColor(R.color.collapse_button_color));
+
+                if (!expandableButtons[mCurrentRole].equals(mBinding.sellDataButton)) {
+                    mBinding.sellDataButton.setTextColor(getResources().getColor(R.color.data_plan_unselected_text));
+                }
+                //Toast.makeText(TestDataPlanActivity.this, "seller Button Collapsed", Toast.LENGTH_SHORT).show();
             }
         });
 
         mBinding.buyDataButton.setCallbackListener(new ExpandableButton.ExpandableButtonListener() {
             @Override
             public void onViewExpanded() {
-//                Toast.makeText(TestDataPlanActivity.this, "buyer Button  Button Expanded", Toast.LENGTH_SHORT).show();
+                //Toast.makeText(TestDataPlanActivity.this, "buyer Button  Button Expanded", Toast.LENGTH_SHORT).show();
+                mBinding.buyDataButton.setBackgroundColor(getResources().getColor(R.color.white));
                 collapseView(mBinding.buyDataButton);
+
+                if (!expandableButtons[mCurrentRole].equals(mBinding.buyDataButton)) {
+                    mBinding.buyDataButton.setTextColor(getResources().getColor(R.color.data_plan_selected_text));
+                }
             }
 
             @Override
             public void onViewCollapsed() {
-//                Toast.makeText(TestDataPlanActivity.this, "buyer Button Button Collapsed", Toast.LENGTH_SHORT).show();
+                mBinding.buyDataButton.setBackgroundColor(getResources().getColor(R.color.collapse_button_color));
+
+                if (!expandableButtons[mCurrentRole].equals(mBinding.buyDataButton)) {
+                    mBinding.buyDataButton.setTextColor(getResources().getColor(R.color.data_plan_unselected_text));
+                }
+                // Toast.makeText(TestDataPlanActivity.this, "buyer Button Button Collapsed", Toast.LENGTH_SHORT).show();
             }
         });
 
         mBinding.internetOnlyButton.setCallbackListener(new ExpandableButton.ExpandableButtonListener() {
             @Override
             public void onViewExpanded() {
-//                Toast.makeText(TestDataPlanActivity.this, "internet Only Button Expanded", Toast.LENGTH_SHORT).show();
+                // Toast.makeText(TestDataPlanActivity.this, "internet Only Button Expanded", Toast.LENGTH_SHORT).show();
+                mBinding.internetOnlyButton.setBackgroundColor(getResources().getColor(R.color.white));
                 collapseView(mBinding.internetOnlyButton);
+
+                if (!expandableButtons[mCurrentRole].equals(mBinding.internetOnlyButton)) {
+                    mBinding.internetOnlyButton.setTextColor(getResources().getColor(R.color.data_plan_selected_text));
+                }
             }
 
             @Override
             public void onViewCollapsed() {
-//                Toast.makeText(TestDataPlanActivity.this, "internetOnly Button Collapsed", Toast.LENGTH_SHORT).show();
+                mBinding.internetOnlyButton.setBackgroundColor(getResources().getColor(R.color.collapse_button_color));
+
+                if (!expandableButtons[mCurrentRole].equals(mBinding.internetOnlyButton)) {
+                    mBinding.internetOnlyButton.setTextColor(getResources().getColor(R.color.data_plan_unselected_text));
+                }
+                // Toast.makeText(TestDataPlanActivity.this, "internetOnly Button Collapsed", Toast.LENGTH_SHORT).show();
             }
         });
     }
