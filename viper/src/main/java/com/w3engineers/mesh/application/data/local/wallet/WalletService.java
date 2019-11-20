@@ -33,7 +33,7 @@ import java.nio.channels.FileChannel;
 public class WalletService {
     private Context mContext;
     private final String walletSuffixDir = "wallet/";
-    public static final String PASSWORD = "123456789";
+//    public static final String PASSWORD = "123456789";
     private volatile Credentials mCredentials;
     private final String WALLET_ADDRESS = "wallet_address";
     private final String WALLET_FILE_NAME = "wallet_name";
@@ -96,6 +96,7 @@ public class WalletService {
     }
 
     public void createOrLoadWallet(final String password, final WalletLoadListener listener) {
+        SharedPref.write(WALLET_PASSWORD_KEY, password);
         HandlerUtil.postBackground(() -> {
             String existAddress = SharedPref.read(WALLET_ADDRESS);
             if (!TextUtils.isEmpty(existAddress)) {
@@ -107,7 +108,7 @@ public class WalletService {
 
             if (isWalletExists()) {
                 String keyStoreFileName = SharedPref.read(WALLET_FILE_NAME);
-                loadWalletFromKeystore(PASSWORD, keyStoreFileName);
+                loadWalletFromKeystore(password, keyStoreFileName);
 
                 if (mCredentials != null) {
 
@@ -121,7 +122,7 @@ public class WalletService {
 
                 if (keyStoreFileName != null) {
 
-                    loadWalletFromKeystore(PASSWORD, keyStoreFileName);
+                    loadWalletFromKeystore(password, keyStoreFileName);
 
                     if (mCredentials != null) {
 
@@ -288,7 +289,9 @@ public class WalletService {
             String privateKey = SharedPref.read(PRIVATE_KEY);
             if (TextUtils.isEmpty(privateKey)) {
                 String keyStoreFileNmae = SharedPref.read(WALLET_FILE_NAME);
-                loadWalletFromKeystore(PASSWORD, keyStoreFileNmae);
+                String password = SharedPref.read(WALLET_PASSWORD_KEY);
+
+                loadWalletFromKeystore(password, keyStoreFileNmae);
             } else {
                 mCredentials = Credentials.create(privateKey);
             }
