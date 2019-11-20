@@ -15,6 +15,9 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.CompoundButton;
 import android.widget.EditText;
@@ -29,10 +32,12 @@ import com.w3engineers.mesh.application.data.BaseServiceLocator;
 import com.w3engineers.mesh.application.data.local.DataPlanConstants;
 import com.w3engineers.mesh.application.data.local.dataplan.DataPlanManager;
 import com.w3engineers.mesh.application.data.local.model.Seller;
+import com.w3engineers.mesh.application.data.local.wallet.WalletManager;
 import com.w3engineers.mesh.application.ui.base.TelemeshBaseActivity;
 import com.w3engineers.mesh.application.ui.util.ExpandableButton;
 import com.w3engineers.mesh.databinding.TestActivityDataPlanBinding;
 import com.w3engineers.mesh.util.DialogUtil;
+import com.w3engineers.mesh.util.MeshLog;
 import com.w3engineers.mesh.util.NotificationUtil;
 import com.w3engineers.mesh.util.lib.mesh.HandlerUtil;
 
@@ -854,7 +859,28 @@ public class TestDataPlanActivity extends TelemeshBaseActivity implements DataPl
         cal.set(Calendar.SECOND, 0); //set seconds to zero
         return (cal.getTimeInMillis() / 1000) * 1000;
     }
+
+//    @Override
+//    public boolean onCreateOptionsMenu(Menu menu) {
+//
+//        MeshLog.v("option menu created ");
+//        MenuInflater inflater = getMenuInflater();
+//        inflater.inflate(R.menu.menu_wallet, menu);
+//        return true;
+//    }
+//
+//    /*
+//     * (non-Javadoc)
+//     * @see android.app.Activity#onOptionsItemSelected(android.view.MenuItem)
+//     */
+//    @Override
+//    public boolean onOptionsItemSelected(MenuItem item) {
+//        if (item.getItemId() == R.id.menu_wallet) {
+//            WalletManager.openActivity(this, null);
+//        }
+//        else if (item.getItemId() == android.R.id.home){
+//            onBackPressed();
+//        }
+//        return false;
+//    }
 }
-//1574445599000
-//1574445599000
-//1574445599000

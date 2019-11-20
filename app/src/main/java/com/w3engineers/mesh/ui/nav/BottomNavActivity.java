@@ -257,6 +257,8 @@ public class BottomNavActivity extends AppCompatActivity implements UserConnecti
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == R.id.menu_data_plan_setting) {
             DataPlanManager.openActivity(this, R.mipmap.ic_launcher);
+        } else if (item.getItemId() == R.id.menu_wallet) {
+            WalletManager.openActivity(this, null);
         }
         return false;
     }
