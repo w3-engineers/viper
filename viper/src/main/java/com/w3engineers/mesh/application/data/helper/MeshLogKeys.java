@@ -1,4 +1,4 @@
-package com.w3engineers.mesh.application.ui.meshlog.data.helper;
+package com.w3engineers.mesh.application.data.helper;
 
 /*
  *  ****************************************************************************

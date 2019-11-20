@@ -1,9 +1,8 @@
-package com.w3engineers.mesh.application.ui.meshlog.ui.base;
+package com.w3engineers.mesh.application.ui.base;
 
 import android.databinding.ViewDataBinding;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
-
 
 
 public abstract class BaseViewHolder<T> extends RecyclerView.ViewHolder implements View.OnClickListener {

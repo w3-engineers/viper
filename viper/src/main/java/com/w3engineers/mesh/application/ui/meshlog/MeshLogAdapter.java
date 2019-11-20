@@ -1,4 +1,4 @@
-package com.w3engineers.mesh.application.ui.meshlog.ui.meshlogdetails;
+package com.w3engineers.mesh.application.ui.meshlog;
 
 import android.content.Context;
 import android.content.res.ColorStateList;
@@ -17,9 +17,9 @@ import android.widget.Filter;
 import android.widget.Filterable;
 
 import com.w3engineers.mesh.R;
-import com.w3engineers.mesh.application.ui.meshlog.data.model.MeshLogModel;
-import com.w3engineers.mesh.application.ui.meshlog.ui.base.BaseAdapter;
-import com.w3engineers.mesh.application.ui.meshlog.ui.base.BaseViewHolder;
+import com.w3engineers.mesh.application.data.model.MeshLogModel;
+import com.w3engineers.mesh.application.ui.base.BaseAdapter;
+import com.w3engineers.mesh.application.ui.base.BaseViewHolder;
 import com.w3engineers.mesh.databinding.ItemMeshLogDetailsBinding;
 
 import java.util.ArrayList;

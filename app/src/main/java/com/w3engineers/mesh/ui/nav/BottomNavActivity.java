@@ -17,6 +17,7 @@ import com.w3engineers.ext.viper.R;
 import com.w3engineers.ext.viper.databinding.ActivityCreateGroupBinding;
 import com.w3engineers.mesh.application.data.local.dataplan.DataPlanManager;
 import com.w3engineers.mesh.application.data.local.db.SharedPref;
+import com.w3engineers.mesh.application.data.local.meshlog.MeshLogManager;
 import com.w3engineers.mesh.application.data.local.wallet.WalletManager;
 import com.w3engineers.mesh.model.UserModel;
 import com.w3engineers.mesh.ui.Nearby.NearbyFragment;
@@ -254,7 +255,9 @@ public class BottomNavActivity extends AppCompatActivity implements UserConnecti
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == R.id.menu_data_plan_setting) {
-            DataPlanManager.openActivity(this, R.mipmap.ic_launcher);
+          //  DataPlanManager.openActivity(this, R.mipmap.ic_launcher);
+
+            MeshLogManager.openActivity(this);
         }
         return false;
     }

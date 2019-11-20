@@ -1,6 +1,9 @@
-package com.w3engineers.mesh.application.ui.meshlog.ui.meshlogdetails;
+package com.w3engineers.mesh.application.ui.meshlog;
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -12,9 +15,9 @@ import android.view.View;
 import android.widget.AdapterView;
 
 import com.w3engineers.mesh.R;
-import com.w3engineers.mesh.application.ui.meshlog.data.helper.MeshLogKeys;
-import com.w3engineers.mesh.application.ui.meshlog.data.model.MeshLogModel;
-import com.w3engineers.mesh.application.ui.meshlog.ui.meshloghistory.MeshLogHistoryActivity;
+
+import com.w3engineers.mesh.application.data.helper.MeshLogKeys;
+import com.w3engineers.mesh.application.data.model.MeshLogModel;
 import com.w3engineers.mesh.databinding.FragmentMeshLogDetailsBinding;
 import com.w3engineers.mesh.util.Constant;
 import com.w3engineers.mesh.util.lib.mesh.HandlerUtil;
@@ -26,8 +29,10 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+
 public class MeshLogDetailsActivity extends AppCompatActivity implements View.OnClickListener {
 
+    private IntentFilter intentFilter;
     private FragmentMeshLogDetailsBinding binding;
     private String[] logArray = {"All", "Info", "Warning", "Error", "Special"};
     private final int ALL = 0, INFO = 1, WARNING = 2, ERROR = 3, SPECIAL = 4;
@@ -68,6 +73,9 @@ public class MeshLogDetailsActivity extends AppCompatActivity implements View.On
 
      //   MeshLog.sMeshLogListener = mMeshLogListener;
 
+        intentFilter = new IntentFilter();
+        intentFilter.addAction("com.w3engineers.meshrnd.DEBUG_MESSAGE");
+
 
         binding.spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
@@ -87,8 +95,6 @@ public class MeshLogDetailsActivity extends AppCompatActivity implements View.On
         binding.textViewClear.setOnClickListener(v -> {
             mAdapter.clear();
             logList.clear();
-            // We can remove text file also
-            // MeshLog.clearLog();
         });
     }
 
@@ -149,11 +155,9 @@ public class MeshLogDetailsActivity extends AppCompatActivity implements View.On
     }
 
     private void readFile(int type) {
-        /*File sdCard = Environment.getExternalStorageDirectory();
-        File directory = new File(sdCard.getAbsolutePath() +
-                "/MeshRnD");*/
         String sdCard = Constant.Directory.PARENT_DIRECTORY + Constant.Directory.MESH_LOG;
         File directory = new File(sdCard);
+
         File file = new File(directory, logFileName);
         StringBuilder text = new StringBuilder();
 
@@ -320,7 +324,6 @@ public class MeshLogDetailsActivity extends AppCompatActivity implements View.On
     }
 
     private void rightSectionSearch() {
-        // Log.d("AdvanceSearchTest", "totalItem: " + mAdapter.getMatchedPosition().size()+" current position: "+searchPosition);
         if (searchPosition < mAdapter.getMatchedPosition().size() - 1) {
             searchPosition++;
             scrollSmoothlyByPosition(searchPosition);
@@ -359,6 +362,18 @@ public class MeshLogDetailsActivity extends AppCompatActivity implements View.On
         });
     }
 
+    BroadcastReceiver callBroadcast = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (intent.getAction().equals("com.w3engineers.meshrnd.DEBUG_MESSAGE")) {
+                String text = intent.getStringExtra("value");
+                if (isCurrentLog){
+                    newMessageFound(text);
+                }
+            }
+        }
+    };
+
 /*    MeshLog.MeshLogListener mMeshLogListener = new MeshLog.MeshLogListener() {
         @Override
         public void onNewLog(String text) {
@@ -372,6 +387,7 @@ public class MeshLogDetailsActivity extends AppCompatActivity implements View.On
     @Override
     public void onPause() {
         super.onPause();
+        this.unregisterReceiver(callBroadcast);
         try {
            // MeshLogDetailsActivity.this.unregisterReceiver(callBroadcast);
         } catch (IllegalArgumentException e) {
@@ -382,11 +398,7 @@ public class MeshLogDetailsActivity extends AppCompatActivity implements View.On
     @Override
     public void onResume() {
         super.onResume();
-        try {
-          //  MeshLog.sMeshLogListener = mMeshLogListener;
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        this.registerReceiver(callBroadcast, intentFilter);
 
     }
 }

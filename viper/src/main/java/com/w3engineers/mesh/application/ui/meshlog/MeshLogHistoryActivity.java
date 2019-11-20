@@ -1,4 +1,4 @@
-package com.w3engineers.mesh.application.ui.meshlog.ui.meshloghistory;
+package com.w3engineers.mesh.application.ui.meshlog;
 
 import android.content.Intent;
 import android.databinding.DataBindingUtil;
@@ -9,9 +9,8 @@ import android.util.Log;
 import android.view.View;
 
 import com.w3engineers.mesh.R;
-import com.w3engineers.mesh.application.ui.meshlog.data.model.MeshLogHistoryModel;
-import com.w3engineers.mesh.application.ui.meshlog.ui.base.ItemClickListener;
-import com.w3engineers.mesh.application.ui.meshlog.ui.meshlogdetails.MeshLogDetailsActivity;
+import com.w3engineers.mesh.application.data.model.MeshLogHistoryModel;
+import com.w3engineers.mesh.application.ui.base.ItemClickListener;
 import com.w3engineers.mesh.databinding.ActivityMeshLogHistoryBinding;
 import com.w3engineers.mesh.util.Constant;
 

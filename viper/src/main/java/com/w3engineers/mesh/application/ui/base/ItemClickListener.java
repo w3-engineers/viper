@@ -1,4 +1,4 @@
-package com.w3engineers.mesh.application.ui.meshlog.ui.base;
+package com.w3engineers.mesh.application.ui.base;
 
 import android.view.View;
 

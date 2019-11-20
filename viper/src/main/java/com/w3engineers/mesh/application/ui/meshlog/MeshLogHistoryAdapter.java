@@ -1,4 +1,4 @@
-package com.w3engineers.mesh.application.ui.meshlog.ui.meshloghistory;
+package com.w3engineers.mesh.application.ui.meshlog;
 
 import android.databinding.DataBindingUtil;
 import android.databinding.ViewDataBinding;
@@ -7,11 +7,10 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.w3engineers.mesh.R;
-import com.w3engineers.mesh.application.ui.meshlog.data.model.MeshLogHistoryModel;
-import com.w3engineers.mesh.application.ui.meshlog.ui.base.BaseAdapter;
-import com.w3engineers.mesh.application.ui.meshlog.ui.base.BaseViewHolder;
+import com.w3engineers.mesh.application.data.model.MeshLogHistoryModel;
+import com.w3engineers.mesh.application.ui.base.BaseAdapter;
+import com.w3engineers.mesh.application.ui.base.BaseViewHolder;
 import com.w3engineers.mesh.databinding.ItemMeshHistoryBinding;
-
 
 
 public class MeshLogHistoryAdapter extends BaseAdapter<MeshLogHistoryModel> {
