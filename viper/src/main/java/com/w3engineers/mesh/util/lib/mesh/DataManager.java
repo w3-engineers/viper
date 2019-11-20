@@ -19,6 +19,7 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.w3engineers.ext.strom.util.helper.Toaster;
 import com.w3engineers.mesh.R;
 import com.w3engineers.mesh.ViperCommunicator;
 import com.w3engineers.mesh.application.data.AppDataObserver;
@@ -194,7 +195,8 @@ public class DataManager {
                         TSAppInstaller.downloadApkFile(mContext, SharedPref.read(Constant.PreferenceKeys.APP_DOWNLOAD_LINK));
                     } else {
                         isAlreadyToPlayStore = false;
-                        Toast.makeText(mContext, "Internet connection not available", Toast.LENGTH_SHORT).show();
+                        Toaster.showShort("Internet connection not available");
+//                        Toast.makeText(mContext, "Internet connection not available", Toast.LENGTH_SHORT).show();
                     }
                 })
 
