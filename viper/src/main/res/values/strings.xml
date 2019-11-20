@@ -48,7 +48,7 @@
 
     <string name="txt_data_use_statistics">Data Uses Statistics</string>
     <string name="txt_description_back">back</string>
-    <string name="txt_balance">Current balance</string>
+    <string name="txt_balance">CURRENT BALANCE</string>
     <string name="txt_eth">ETH</string>
     <string name="txt_tmesh">TMESH</string>
     <string name="txt_mb">MB</string>
@@ -149,12 +149,13 @@
     <string name="permission_message">Need to allow permission on Telemesh service app to work properly. You can open the Telemesh service app clicking on launcher icon or can give permission manually from setting</string>
     <string name="pending_balance">Pending balance will be deposited to main balance after crossing <b>10</b> coins.</string>
     <string name="points">Points</string>
-    <string name="pending_balance_point">Pending balance 8.8 point</string>
-    <string name="view_transactions">View Transactions</string>
+    <string name="pending_balance_point">PENDING BALANCE</string>
+    <string name="view_transactions">VIEW TRANSACTIONS</string>
 
     <string name="copy_address">Copy address</string>
-    <string name="export_my_profile">Export My Profile</string>
+    <string name="export_my_profile">EXPORT MY PROFILE</string>
     <string name="save">Save</string>
+    <string name="points_title">POINTS</string>
 
 
 </resources>

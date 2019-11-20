@@ -13,7 +13,7 @@
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
-        android:background="@color/colorAccent"
+        android:background="@color/colorPrimary"
         android:elevation="4dp"
         android:fitsSystemWindows="true"
         app:title="My data plan"

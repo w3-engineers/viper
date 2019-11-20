@@ -40,6 +40,7 @@ import com.w3engineers.mesh.util.DialogUtil;
 import com.w3engineers.mesh.util.MeshApp;
 import com.w3engineers.mesh.util.MeshLog;
 import com.w3engineers.mesh.util.TSAppInstaller;
+import com.w3engineers.mesh.util.Util;
 import com.w3engineers.meshrnd.ITmCommunicator;
 import com.w3engineers.models.UserInfo;
 
@@ -170,7 +171,7 @@ public class DataManager {
                 new DialogUtil.DialogButtonListener() {
                     @Override
                     public void onClickPositive() {
-                        TSAppInstaller.downloadApkFile(mContext, SharedPref.read(Constant.PreferenceKeys.APP_DOWNLOAD_LINK));
+                        checkConnectionAndStartDownload();
                         isAlreadyToPlayStore = true;
                     }
 
@@ -184,6 +185,20 @@ public class DataManager {
                         isAlreadyToPlayStore = false;
                     }
                 });
+    }
+
+    private void checkConnectionAndStartDownload() {
+        Util.isConnected(isConnected ->
+                HandlerUtil.postForeground(() -> {
+                    if (isConnected) {
+                        TSAppInstaller.downloadApkFile(mContext, SharedPref.read(Constant.PreferenceKeys.APP_DOWNLOAD_LINK));
+                    } else {
+                        isAlreadyToPlayStore = false;
+                        Toast.makeText(mContext, "Internet connection not available", Toast.LENGTH_SHORT).show();
+                    }
+                })
+
+        );
     }
 
     private void showPermissionPopUp() {
@@ -381,28 +396,28 @@ public class DataManager {
      * @return
      */
     public int getLinkTypeById(String nodeID) throws RemoteException {
-        if (mTmCommunicator !=null){
+        if (mTmCommunicator != null) {
             return mTmCommunicator.getLinkTypeById(nodeID);
         }
         return 0;
     }
 
     public String getUserId() throws RemoteException {
-        if (mTmCommunicator !=null){
+        if (mTmCommunicator != null) {
             return mTmCommunicator.getUserId();
         }
-       return "";
+        return "";
     }
 
     public void saveDiscoveredUserInfo(String userId, String userName) throws RemoteException {
-        if (mTmCommunicator !=null){
+        if (mTmCommunicator != null) {
             mTmCommunicator.saveDiscoveredUserInfo(userId, userName);
         }
 
     }
 
     public void saveUserInfo(UserInfo userInfo) throws RemoteException {
-        if (mTmCommunicator !=null){
+        if (mTmCommunicator != null) {
             mTmCommunicator.saveUserInfo(userInfo);
         }
     }
@@ -541,7 +556,7 @@ public class DataManager {
         } else {
             return mTmCommunicator.getUserNameByAddress(address);
         }
-     return null;
+        return null;
     }
 
     public void sendPayMessage(String receiverId, String message, String messageId) throws RemoteException {
@@ -606,7 +621,7 @@ public class DataManager {
     }
 
     public void disconnectFromInternet() throws RemoteException {
-        if (mTmCommunicator == null){
+        if (mTmCommunicator == null) {
             MeshLog.v("mTmCommunicator null");
         }
         mTmCommunicator.disconnectFromInternet();

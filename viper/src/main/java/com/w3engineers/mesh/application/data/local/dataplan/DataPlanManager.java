@@ -65,10 +65,10 @@ public class DataPlanManager {
 
     public static void openActivity(Context context, int imageValue){
         Intent intent = new Intent(context, TestDataPlanActivity.class);
-        if(imageValue != 0) {
+        /*if(imageValue != 0) {
             byte[] image = getPicture(context, imageValue);
             intent.putExtra("picture", image);
-        }
+        }*/
         context.startActivity(intent);
     }
 
@@ -314,9 +314,7 @@ public class DataPlanManager {
 
             setSellers(finalSeller);
 
-        } catch (ExecutionException | InterruptedException e) {
-            e.printStackTrace();
-        } catch (RemoteException e) {
+        } catch (ExecutionException | InterruptedException | RemoteException e) {
             e.printStackTrace();
         }
     }

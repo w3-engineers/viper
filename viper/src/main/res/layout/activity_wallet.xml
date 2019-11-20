@@ -56,12 +56,12 @@
                 android:id="@+id/img_refresh"
                 android:layout_width="@dimen/width_40"
                 android:layout_height="@dimen/width_35"
-                android:contentDescription="@string/refresh"
                 android:layout_marginRight="@dimen/margin_20"
-                android:src = "@mipmap/ic_refresh"
+                android:contentDescription="@string/refresh"
+                android:src="@mipmap/ic_refresh"
+                app:layout_constraintBottom_toBottomOf="@+id/img_my_address"
                 app:layout_constraintEnd_toStartOf="@+id/img_my_address"
-                app:layout_constraintTop_toTopOf="@+id/img_my_address"
-                app:layout_constraintBottom_toBottomOf="@+id/img_my_address"/>
+                app:layout_constraintTop_toTopOf="@+id/img_my_address" />
 
             <ImageView
                 android:id="@+id/img_my_address"
@@ -103,48 +103,37 @@
                         app:layout_constraintTop_toTopOf="parent">
 
 
-                      <android.support.constraint.ConstraintLayout
-                          android:layout_width="match_parent"
-                          android:layout_height="wrap_content">
+                        <android.support.constraint.ConstraintLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content">
 
 
-                          <TextView
-                              android:id="@+id/tv_balance_last_updated"
-                              android:layout_width="wrap_content"
-                              android:layout_height="wrap_content"
-                              android:layout_marginStart="@dimen/margin_40"
-                              android:layout_marginTop="@dimen/margin_20"
-                              android:layout_marginEnd="@dimen/margin_10"
-                              android:textAllCaps="true"
-                              android:text="@string/txt_balance"
-                              android:textColor="@color/white_light"
-                              android:textSize="@dimen/text_size_16"
-                              android:textStyle="bold"
-                              app:layout_constraintTop_toTopOf="parent"
-                              app:layout_constraintStart_toStartOf="parent"/>
+                            <TextView
+                                android:id="@+id/tv_balance_last_updated"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginStart="@dimen/margin_40"
+                                android:layout_marginTop="@dimen/margin_20"
+                                android:layout_marginEnd="@dimen/margin_10"
+                                android:text="@string/txt_balance"
+                                android:textAllCaps="true"
+                                android:textColor="@color/white_light"
+                                android:textSize="@dimen/text_size_16"
+                                android:textStyle="bold"
+                                app:layout_constraintStart_toStartOf="parent"
+                                app:layout_constraintTop_toTopOf="parent" />
 
-
-                          <ImageView
-                              android:layout_width="@dimen/width_40"
-                              android:layout_height="@dimen/width_35"
-                              android:layout_marginRight="@dimen/margin_20"
-                              android:contentDescription="@string/withdraw"
-                              android:src="@mipmap/ic_telemesh"
-                              app:layout_constraintEnd_toEndOf="parent"
-                              app:layout_constraintTop_toTopOf="@id/tv_balance_last_updated"
-                              app:layout_constraintBottom_toBottomOf="@+id/tv_balance_last_updated"/>
-
-                      </android.support.constraint.ConstraintLayout>
+                        </android.support.constraint.ConstraintLayout>
 
 
                         <android.support.constraint.ConstraintLayout
                             android:id="@+id/tmesh_block"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:layout_marginTop="@dimen/margin_20"
-                            android:layout_marginBottom="@dimen/margin_20"
                             android:layout_marginStart="@dimen/margin_5"
-                            android:layout_marginEnd="@dimen/margin_5">
+                            android:layout_marginTop="@dimen/margin_20"
+                            android:layout_marginEnd="@dimen/margin_5"
+                            android:layout_marginBottom="@dimen/margin_20">
 
 
                             <TextView
@@ -157,8 +146,8 @@
                                 android:textColor="@color/white"
                                 android:textSize="@dimen/text_size_50sp"
                                 android:textStyle="bold"
-                                app:layout_constraintStart_toStartOf="parent"
                                 app:layout_constraintEnd_toEndOf="parent"
+                                app:layout_constraintStart_toStartOf="parent"
                                 app:layout_constraintTop_toTopOf="parent" />
 
                             <TextView
@@ -166,13 +155,22 @@
                                 android:layout_width="@dimen/width_0"
                                 android:layout_height="wrap_content"
                                 android:gravity="end"
-                                android:text="@string/points"
+                                android:text="@string/points_title"
                                 android:textAllCaps="true"
-                                android:textSize="@dimen/text_size_16sp"
                                 android:textColor="@color/white"
+                                android:textSize="@dimen/text_size_16sp"
                                 android:textStyle="bold"
-                                app:layout_constraintTop_toBottomOf="@+id/textView_point_value"
-                                app:layout_constraintEnd_toEndOf="@id/textView_point_value"/>
+                                app:layout_constraintEnd_toEndOf="@id/textView_point_value"
+                                app:layout_constraintTop_toBottomOf="@+id/textView_point_value" />
+
+                            <ImageView
+                                android:layout_width="@dimen/width_40"
+                                android:layout_height="@dimen/width_35"
+                                android:contentDescription="@string/withdraw"
+                                android:src="@mipmap/ic_telemesh"
+                                app:layout_constraintBottom_toBottomOf="@+id/textView_point_value"
+                                app:layout_constraintEnd_toStartOf="@+id/textView_point_value"
+                                app:layout_constraintTop_toTopOf="@+id/textView_point_value" />
 
                         </android.support.constraint.ConstraintLayout>
 
@@ -181,18 +179,60 @@
                             android:layout_height="@dimen/height_10" />
 
 
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:textColor="@color/white_light"
-                            android:textAllCaps="true"
-                            android:textSize="@dimen/text_size_16"
-                            android:text="@string/pending_balance_point"
-                            android:layout_gravity="center"
-                            android:textStyle="bold"
-                            android:layout_marginBottom="@dimen/margin_20">
+                        <android.support.constraint.ConstraintLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:layout_marginBottom="@dimen/margin_15">
 
-                        </TextView>
+                            <android.support.constraint.Guideline
+                                android:id="@+id/guideline"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:orientation="vertical"
+                                app:layout_constraintGuide_percent="0.5" />
+
+                            <TextView
+                                android:id="@+id/text_view_pending_title"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_gravity="center"
+                                android:layout_marginEnd="@dimen/margin_8"
+                                android:text="@string/pending_balance_point"
+                                android:textAllCaps="true"
+                                android:textColor="@color/white_light"
+                                android:textSize="@dimen/text_size_16"
+                                android:textStyle="bold"
+                                app:layout_constraintBottom_toBottomOf="parent"
+                                app:layout_constraintEnd_toStartOf="@+id/guideline"
+                                app:layout_constraintTop_toTopOf="parent" />
+
+                            <TextView
+                                android:id="@+id/text_view_pending_balance"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginStart="@dimen/margin_8"
+                                android:text="8.8"
+                                android:textColor="@color/white"
+                                android:textSize="@dimen/text_size_22"
+                                android:textStyle="bold"
+                                app:layout_constraintBottom_toBottomOf="@+id/text_view_pending_title"
+                                app:layout_constraintStart_toEndOf="@+id/guideline"
+                                app:layout_constraintTop_toTopOf="@+id/text_view_pending_title" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginStart="@dimen/margin_4"
+                                android:text="@string/points_title"
+                                android:textColor="@color/white_light"
+                                android:textSize="@dimen/text_size_16"
+                                android:textStyle="bold"
+                                app:layout_constraintBottom_toBottomOf="@+id/text_view_pending_title"
+                                app:layout_constraintStart_toEndOf="@+id/text_view_pending_balance"
+                                app:layout_constraintTop_toTopOf="@+id/text_view_pending_title" />
+
+
+                        </android.support.constraint.ConstraintLayout>
 
                     </LinearLayout>
 
@@ -208,24 +248,22 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:background="@drawable/currency_note_shape"
+                            android:elevation="@dimen/elevation_4"
                             android:gravity="left"
-                            android:layout_marginLeft="@dimen/margin_20"
-                            android:layout_marginRight="@dimen/margin_20"
-                            android:paddingTop="@dimen/padding_10"
-                            android:paddingBottom="@dimen/padding_10"
                             android:paddingStart="@dimen/padding_20"
+                            android:paddingTop="@dimen/padding_10"
                             android:paddingEnd="@dimen/padding_20"
+                            android:paddingBottom="@dimen/padding_10"
                             android:text="@string/pending_balance"
                             android:textColor="@color/colorAccent"
-                            android:textSize="@dimen/text_size_15"
-                            android:elevation="@dimen/elevation_4"/>
+                            android:textSize="@dimen/text_size_15" />
 
 
                         <android.support.constraint.ConstraintLayout
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:layout_marginTop="@dimen/margin_40"
                             android:layout_marginStart="@dimen/margin_5"
+                            android:layout_marginTop="@dimen/margin_40"
                             android:layout_marginEnd="@dimen/margin_5"
                             android:theme="@style/allTextInputOfLayoutBlack">
 
@@ -251,12 +289,12 @@
                                 android:paddingStart="@dimen/padding_5"
                                 android:paddingEnd="@dimen/padding_5"
                                 android:text="0.000000000000"
+                                android:textColor="@color/color_green"
                                 android:textSize="@dimen/text_size_20"
                                 android:textStyle="bold"
-                                android:textColor="@color/color_green"
+                                app:layout_constraintBottom_toBottomOf="@+id/tv_title_total_earned"
                                 app:layout_constraintEnd_toEndOf="parent"
-                                app:layout_constraintTop_toTopOf="@+id/tv_title_total_earned"
-                                app:layout_constraintBottom_toBottomOf="@+id/tv_title_total_earned"/>
+                                app:layout_constraintTop_toTopOf="@+id/tv_title_total_earned" />
 
 
                             <View
@@ -266,8 +304,8 @@
                                 android:layout_marginTop="@dimen/margin_20"
                                 android:background="@drawable/dotted_line"
                                 android:layerType="software"
-                                app:layout_constraintStart_toStartOf="parent"
                                 app:layout_constraintEnd_toEndOf="parent"
+                                app:layout_constraintStart_toStartOf="parent"
                                 app:layout_constraintTop_toBottomOf="@+id/tv_earned" />
 
                             <TextView
@@ -294,12 +332,12 @@
                                 android:paddingEnd="@dimen/padding_5"
                                 android:paddingBottom="@dimen/padding_5"
                                 android:text="0.000000"
-                                android:textSize="@dimen/text_size_20"
                                 android:textColor="@color/color_orange"
+                                android:textSize="@dimen/text_size_20"
                                 android:textStyle="bold"
+                                app:layout_constraintBottom_toBottomOf="@+id/tv_title_total_spent"
                                 app:layout_constraintEnd_toEndOf="parent"
-                                app:layout_constraintTop_toTopOf="@+id/tv_title_total_spent"
-                                app:layout_constraintBottom_toBottomOf="@+id/tv_title_total_spent"/>
+                                app:layout_constraintTop_toTopOf="@+id/tv_title_total_spent" />
 
 
                         </android.support.constraint.ConstraintLayout>
@@ -308,15 +346,15 @@
                             android:id="@+id/button_view_transaction"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:layout_marginTop="@dimen/margin_60"
                             android:layout_marginLeft="@dimen/margin_15"
+                            android:layout_marginTop="@dimen/margin_60"
                             android:layout_marginRight="@dimen/margin_15"
+                            android:layout_marginBottom="@dimen/margin_20"
                             android:background="@drawable/rectangle_button_shape"
                             android:text="@string/view_transactions"
                             android:textAllCaps="true"
                             android:textColor="@color/white"
-                            android:textSize="@dimen/text_size_16"
-                            android:layout_marginBottom="@dimen/margin_20"/>
+                            android:textSize="@dimen/text_size_16" />
 
                     </LinearLayout>
                 </android.support.constraint.ConstraintLayout>

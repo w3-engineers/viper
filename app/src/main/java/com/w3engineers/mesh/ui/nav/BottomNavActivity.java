@@ -24,6 +24,7 @@ import com.w3engineers.mesh.ui.Nearby.UserConnectionCallBack;
 import com.w3engineers.mesh.ui.base.BaseFragment;
 import com.w3engineers.mesh.ui.history.HistoryFragment;
 import com.w3engineers.mesh.ui.meshlog.MeshLogFragment;
+import com.w3engineers.mesh.util.ConnectionManager;
 import com.w3engineers.mesh.util.Constant;
 import com.w3engineers.mesh.util.MeshLog;
 import com.w3engineers.mesh.util.PermissionUtil;
@@ -121,8 +122,7 @@ public class BottomNavActivity extends AppCompatActivity implements UserConnecti
                     SharedPref.write(Constant.PreferenceKeys.ADDRESS, walletAddress);
                     SharedPref.write(Constant.PreferenceKeys.PUBLIC_KEY, publicKey);
 
-                 //   ConnectionManager.on(BottomNavActivity.this);
-
+                    ConnectionManager.on(BottomNavActivity.this).startViper();
 
                 }
 
