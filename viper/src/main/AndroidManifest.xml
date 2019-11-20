@@ -26,6 +26,15 @@
         <activity
             android:name="com.w3engineers.mesh.application.ui.premission.PermissionActivity" />
 
+        <activity
+            android:name="com.w3engineers.mesh.application.ui.meshlog.MeshLogHistoryActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name="com.w3engineers.mesh.application.ui.meshlog.MeshLogDetailsActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.NoActionBar" />
+
 <!--        <service
             android:name="com.w3engineers.mesh.application.data.local.service.MeshService"
             android:enabled="true"
