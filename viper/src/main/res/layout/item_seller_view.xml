@@ -7,8 +7,6 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/margin_3"
         android:layout_marginBottom="@dimen/margin_65"
-        android:paddingBottom="@dimen/padding_5"
-        android:paddingTop="@dimen/padding_5"
         android:layout_marginStart="@dimen/margin_10"
         android:layout_marginEnd="@dimen/margin_10"
         android:background="@drawable/ractangular_white_small">
@@ -18,6 +16,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
+            android:paddingTop="@dimen/padding_5"
             android:ellipsize="end"
             android:fontFamily="@font/opensans_semibold"
             android:singleLine="true"
@@ -64,13 +63,14 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toStartOf="@id/status"
             app:layout_constraintHorizontal_bias="0"
+            android:paddingBottom="@dimen/padding_5"
             android:text="Total 0.0 MB"/>
 
 
         <Button
             android:id="@+id/status"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_height="@dimen/height_40"
             android:maxWidth="@dimen/width_100"
             android:layout_marginEnd="@dimen/margin_15"
             android:layout_marginRight="@dimen/margin_15"
@@ -80,7 +80,7 @@
             android:textAllCaps="true"
             android:textAlignment="center"
             android:textColor="@color/white"
-            android:textSize="@dimen/text_small_body_14"
+            android:textSize="@dimen/text_small_body_12"
             android:background="@color/color_magenta"
             app:layout_constraintHorizontal_bias="0.94"
             app:layout_constraintTop_toTopOf="parent"/>
