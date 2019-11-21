@@ -168,11 +168,12 @@ public class PurchaseManagerSeller extends PurchaseManager implements PayControl
             }
         } catch (ExecutionException e) {
             MeshLog.o("Exception in send internet message (ExecutionException): " + e);
-            return false;
+//            return false;
         } catch (InterruptedException e) {
             MeshLog.o("Exception in send internet message(InterruptedException): " + e);
-            return false;
+//            return false;
         }
+        isQueueing = false;
         return false;
     }
 
