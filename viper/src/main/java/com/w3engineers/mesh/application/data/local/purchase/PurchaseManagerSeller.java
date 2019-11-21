@@ -117,11 +117,15 @@ public class PurchaseManagerSeller extends PurchaseManager implements PayControl
         MeshLog.v("Message Queuing 2");
         try {
             BuyerPendingMessage buyerPendingMessage = databaseService.getBuyerPendingMessageByUser(PurchaseConstants.BUYER_PENDING_MESSAGE_STATUS.IN_PROGRESS, userAddress);
-            if (buyerPendingMessage == null && !isQueueing) {
-                isQueueing = true;
-                MeshLog.v("Message Queuing 3");
-                MeshLog.o("### no msg is in queue ###");
-                sendInternetMessageToBuyer(userAddress);
+            if (buyerPendingMessage == null){
+                if(!isQueueing) {
+                    isQueueing = true;
+                    MeshLog.v("Message Queuing 3");
+                    MeshLog.o("### no msg is in queue ###");
+                    sendInternetMessageToBuyer(userAddress);
+                }else {
+                    MeshLog.v("Atke achi");
+                }
             } else {
                 MeshLog.o("### message in queue ###");
                 if (buyerPendingMessage.updateTime < System.currentTimeMillis() - (10*1000)){
