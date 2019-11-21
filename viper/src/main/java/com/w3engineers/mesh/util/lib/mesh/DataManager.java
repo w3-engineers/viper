@@ -267,7 +267,7 @@ public class DataManager {
                 //mTmCommunicator.saveUserInfo(userInfo);
                 Log.e("service_status", "onServiceConnected");
                 int userRole = DataPlanManager.getInstance().getDataPlanRole();
-                boolean status = mTmCommunicator.startMesh(appName,userRole, userInfo);
+                boolean status = mTmCommunicator.startMesh(appName, userRole, userInfo);
                 if (!status) {
                     showPermissionPopUp();
                 }

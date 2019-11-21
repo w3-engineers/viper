@@ -117,7 +117,7 @@ public class BottomNavActivity extends AppCompatActivity implements UserConnecti
                           }
 
                           if (mWalletMenuItem !=null){
-                              myDataPlanMenuItem.setEnabled(true);
+                              mWalletMenuItem.setEnabled(true);
                           }
 
                           //  Toast.makeText(BottomNavActivity.this, "Wallet load success", Toast.LENGTH_SHORT).show();
