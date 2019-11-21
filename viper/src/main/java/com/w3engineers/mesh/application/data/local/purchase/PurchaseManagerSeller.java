@@ -122,7 +122,7 @@ public class PurchaseManagerSeller extends PurchaseManager implements PayControl
                 sendInternetMessageToBuyer(userAddress);
             } else {
                 MeshLog.o("### message in queue ###");
-                if (buyerPendingMessage.updateTime < System.currentTimeMillis() - (10*000)){
+                if (buyerPendingMessage.updateTime < System.currentTimeMillis() - (10*1000)){
                     MeshLog.o("### resending qued message ###");
                     resumeUserPendingMessage(userAddress);
                 }
