@@ -160,7 +160,7 @@
                             android:layout_marginStart="@dimen/margin_15"
                             android:layout_marginTop="@dimen/margin_10"
                             android:layout_marginEnd="@dimen/margin_15"
-                            android:text="Sell your data to other local users and earn coins. You need an active internet connection. Sell price 1 coin = 1MB."
+                            android:text="@string/sell_your_data_to_other_local_users_and_earn_coins_you_need_an_active_internet_connection_sell_price_1_coin_1mb"
                             android:textColor="@color/black"
                             android:textSize="@dimen/text_size_16" />
 
@@ -497,7 +497,7 @@
                             android:layout_marginTop="@dimen/margin_10"
                             android:layout_marginEnd="@dimen/margin_15"
                             android:layout_marginBottom="@dimen/margin_10"
-                            android:text="Buy data from nearby sellers. Data cost is 1 coin = 1MB."
+                            android:text="@string/buy_data_from_nearby_sellers_data_cost_is_1_coin_1mb"
                             android:textColor="@color/black"
                             android:textSize="@dimen/text_size_16" />
 
