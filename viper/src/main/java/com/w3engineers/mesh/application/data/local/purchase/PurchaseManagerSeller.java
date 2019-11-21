@@ -111,12 +111,14 @@ public class PurchaseManagerSeller extends PurchaseManager implements PayControl
         }
     }
 
+    private boolean isQueueing = false;
     private void checkMessageIsInProgressAndSend(String userAddress) {
         MeshLog.o("### attemp check ###");
         MeshLog.v("Message Queuing 2");
         try {
             BuyerPendingMessage buyerPendingMessage = databaseService.getBuyerPendingMessageByUser(PurchaseConstants.BUYER_PENDING_MESSAGE_STATUS.IN_PROGRESS, userAddress);
-            if (buyerPendingMessage == null) {
+            if (buyerPendingMessage == null && !isQueueing) {
+                isQueueing = true;
                 MeshLog.v("Message Queuing 3");
                 MeshLog.o("### no msg is in queue ###");
                 sendInternetMessageToBuyer(userAddress);
@@ -153,6 +155,7 @@ public class PurchaseManagerSeller extends PurchaseManager implements PayControl
             if (buyerPendingMessage != null) {
                 MeshLog.v("Message Queuing 5");
                 sentMessageInProgressState(buyerPendingMessage);
+                isQueueing = false;
                 processsQueue(buyerPendingMessage);
                 return true;
             } else {

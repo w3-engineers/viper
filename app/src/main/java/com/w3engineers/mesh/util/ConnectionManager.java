@@ -1,11 +1,13 @@
 package com.w3engineers.mesh.util;
 
 import android.content.Context;
+import android.os.Build;
 import android.os.RemoteException;
 import android.text.TextUtils;
 import android.widget.Toast;
 
 import com.w3engineers.ext.strom.util.Text;
+import com.w3engineers.ext.viper.BuildConfig;
 import com.w3engineers.ext.viper.ViperApp;
 import com.w3engineers.mesh.application.data.ApiEvent;
 import com.w3engineers.mesh.application.data.AppDataObserver;
@@ -277,7 +279,7 @@ public class ConnectionManager {
                 viperClient.sendMessage(userId, nodeId, uniqueId.toString(), userJson.getBytes(), false);
             } catch (Exception e) {
                 e.printStackTrace();
-                showToast();
+                showToast(e.getMessage());
             }
         }
 
@@ -314,7 +316,7 @@ public class ConnectionManager {
                 viperClient.sendMessage(userId, nodeId, messageId, userJson.getBytes(), true);
             } catch (Exception e) {
                 e.printStackTrace();
-                showToast();
+                showToast(e.getMessage());
             }
         }
     }
@@ -326,7 +328,7 @@ public class ConnectionManager {
             viperClient.sendMessage(userId, receiverId, messageModel.messageId, msgJson.getBytes(), true);
         } catch (Exception e) {
             e.printStackTrace();
-            showToast();
+            showToast(e.getMessage());
         }
     }
 
@@ -363,7 +365,7 @@ public class ConnectionManager {
             type = viperClient.getLinkTypeById(nodeId);
         } catch (Exception e) {
             e.printStackTrace();
-            showToast();
+            showToast(e.getMessage());
         }
 
         if (type == Link.Type.NA.getValue()) {
@@ -390,7 +392,7 @@ public class ConnectionManager {
                 return userId;
             } catch (Exception e) {
                 e.printStackTrace();
-                showToast();
+                showToast(e.getMessage());
                 return null;
             }
         } else {
@@ -415,11 +417,10 @@ public class ConnectionManager {
 
     }
 
-    private void showToast() {
-        HandlerUtil.postForeground(() ->
-                Toast.makeText(mContext,
-                        "TeleMesh Service is not running",
-                        Toast.LENGTH_LONG).show());
+    private void showToast(String msg) {
+        if (BuildConfig.DEBUG){
+            HandlerUtil.postForeground(() -> Toast.makeText(mContext, "TeleMesh Service is not running", Toast.LENGTH_LONG).show());
+        }
     }
 
 }
