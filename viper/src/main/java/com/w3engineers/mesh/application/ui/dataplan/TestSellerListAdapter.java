@@ -111,10 +111,12 @@ class TestSellerListAdapter extends BaseAdapter<Seller> {
             Context context = itemDataSellerBinding.userName.getContext();
             itemDataSellerBinding.userName.setText(seller.getName());
 
-            String usedDataInfo = String.format(context.getResources().getString(R.string.used_s), " " + convertTwoDigitString(seller.getUsedData()))
-                    + " " + String.format(context.getResources().getString(R.string.total_mb) , " " + convertTwoDigitString(seller.getPurchasedData()));
+            String usedDataInfo =  String.format(context.getResources().getString(R.string.used_s), " " + convertTwoDigitString(seller.getUsedData()));
+
+            String totalDataInfo = String.format(context.getResources().getString(R.string.total_purchase) , " " + convertTwoDigitString(seller.getPurchasedData()));
 
             itemDataSellerBinding.userUseAmount.setText(usedDataInfo);
+            itemDataSellerBinding.userTotalAmount.setText(totalDataInfo);
 
             itemDataSellerBinding.status.setText(seller.getBtnText());
             itemDataSellerBinding.status.setEnabled(seller.isBtnEnabled());

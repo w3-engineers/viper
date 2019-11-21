@@ -137,6 +137,7 @@
     <string name="to">To</string>
     <string name="used_s">Used: %sMB</string>
     <string name="total_mb">of %sMB</string>
+    <string name="total_purchase">Total %sMB</string>
 
     <string name="install_ts">Install Telemesh Service</string>
     <string name="need_ts">You need to install Telemesh service for user discovery</string>
