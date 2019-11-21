@@ -157,6 +157,7 @@ public class WalletActivity extends TelemeshBaseActivity implements WalletManage
         String result = String.format("%.6f", value);
         return result;
     }
+
     @Override
     public void onGiftResponse(boolean success, boolean isGifted, String message) {
 
@@ -271,19 +272,26 @@ public class WalletActivity extends TelemeshBaseActivity implements WalletManage
 
 
     private void openUrl() {
-        int networkType = walletManager.getMyEndpoint();
-        String networkUrl = null;
-        if (networkType == 1) { // ETH
-            networkUrl = ropstenUrl + walletManager.getMyAddress();
-        } else if (networkType == 2) { // ETC
-            networkUrl = kottyUrl + walletManager.getMyAddress();
-        }
-        if (networkUrl != null) {
-            Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(networkUrl));
-            browserIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-            startActivity(browserIntent);
+        int myRole = dataPlanManager.getDataPlanRole();
+
+        if (myRole == DataPlanConstants.USER_ROLE.DATA_SELLER || myRole == DataPlanConstants.USER_ROLE.INTERNET_USER) {
+
+            int networkType = walletManager.getMyEndpoint();
+            String networkUrl = null;
+            if (networkType == 1) { // ETH
+                networkUrl = ropstenUrl + walletManager.getMyAddress();
+            } else if (networkType == 2) { // ETC
+                networkUrl = kottyUrl + walletManager.getMyAddress();
+            }
+            if (networkUrl != null) {
+                Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(networkUrl));
+                browserIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                startActivity(browserIntent);
+            } else {
+                Toaster.showShort("No network selected");
+            }
         } else {
-            Toaster.showShort("No network selected");
+            Toaster.showShort("This feature only available for Seller and Internet user");
         }
     }
 
@@ -472,10 +480,10 @@ public class WalletActivity extends TelemeshBaseActivity implements WalletManage
                     payableDeposit = 0;
                 }
 
-                if (payableDeposit >= 10){
+                if (payableDeposit >= 10) {
                     performWithdrawBalance();
                 }
-                  mBinding.textViewPendingBalance.setText(totalPendingEarn == null ? "0" : convertSixrDigitString(totalPendingEarn));
+                mBinding.textViewPendingBalance.setText(totalPendingEarn == null ? "0" : convertSixrDigitString(totalPendingEarn));
             });
         }
     }
