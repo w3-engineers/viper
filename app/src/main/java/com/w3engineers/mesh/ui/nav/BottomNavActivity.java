@@ -40,6 +40,7 @@ public class BottomNavActivity extends AppCompatActivity implements UserConnecti
     private BaseFragment baseFragment;
     private ActivityCreateGroupBinding mBinding;
     private MenuItem myDataPlanMenuItem;
+    private MenuItem mWalletMenuItem;
     TextView connectedUser;
     BottomNavigationView navigation;
 
@@ -112,6 +113,10 @@ public class BottomNavActivity extends AppCompatActivity implements UserConnecti
                         @Override
                         public void run() {
                           if (myDataPlanMenuItem !=null){
+                              myDataPlanMenuItem.setEnabled(true);
+                          }
+
+                          if (mWalletMenuItem !=null){
                               myDataPlanMenuItem.setEnabled(true);
                           }
 
@@ -240,7 +245,9 @@ public class BottomNavActivity extends AppCompatActivity implements UserConnecti
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.menu_bottom_nav, menu);
         myDataPlanMenuItem = menu.getItem(0);
+        mWalletMenuItem = menu.getItem(1);
         myDataPlanMenuItem.setEnabled(walletLoadedSuccess);
+        mWalletMenuItem.setEnabled(walletLoadedSuccess);
 
 /*        msgSendingStatusMenuItem = menu.findItem(R.id.menu_msg_sending_status);
         myDataPlanMenuItem = menu.getItem(1);*/
