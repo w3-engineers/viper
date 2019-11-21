@@ -163,15 +163,17 @@ public class PurchaseManagerSeller extends PurchaseManager implements PayControl
                 processsQueue(buyerPendingMessage);
                 return true;
             } else {
+                isQueueing = false;
                 MeshLog.o("no pending message... ");
             }
         } catch (ExecutionException e) {
             MeshLog.o("Exception in send internet message (ExecutionException): " + e);
-            return false;
+//            return false;
         } catch (InterruptedException e) {
             MeshLog.o("Exception in send internet message(InterruptedException): " + e);
-            return false;
+//            return false;
         }
+        isQueueing = false;
         return false;
     }
 
