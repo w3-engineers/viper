@@ -377,7 +377,6 @@ public class TestDataPlanActivity extends TelemeshBaseActivity implements DataPl
             Seller seller = (Seller) view.getTag();
             onButtonClickListener(seller);
         }
-
     }
 
     @Override
@@ -395,6 +394,26 @@ public class TestDataPlanActivity extends TelemeshBaseActivity implements DataPl
     }
 
     @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.menu_wallet, menu);
+
+        return true;
+    }
+
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == R.id.menu_wallet) {
+            WalletManager.openActivity(this, null);
+        }else {
+            finish();
+        }
+
+        return false;
+    }
+
+        @Override
     public void onPurchaseFailed(String sellerAddress, String msg) {
         runOnUiThread(() -> {
             for (Seller item : getAdapter().getItems()) {
