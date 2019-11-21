@@ -163,6 +163,7 @@ public class PurchaseManagerSeller extends PurchaseManager implements PayControl
                 processsQueue(buyerPendingMessage);
                 return true;
             } else {
+                isQueueing = false;
                 MeshLog.o("no pending message... ");
             }
         } catch (ExecutionException e) {
