@@ -122,6 +122,10 @@ public class PurchaseManagerSeller extends PurchaseManager implements PayControl
                 sendInternetMessageToBuyer(userAddress);
             } else {
                 MeshLog.o("### message in queue ###");
+                if (buyerPendingMessage.updateTime < System.currentTimeMillis() - (10*000)){
+                    MeshLog.o("### resending qued message ###");
+                    resumeUserPendingMessage(userAddress);
+                }
             }
         } catch (ExecutionException e) {
             e.printStackTrace();
@@ -555,15 +559,14 @@ public class PurchaseManagerSeller extends PurchaseManager implements PayControl
 
                 } else {
                     payController.getDataManager().onPaymentGotForOutgoingMessage(true, buyerPendingMessage.owner, buyerPendingMessage.sender, buyerPendingMessage.msgId, buyerPendingMessage.msgData);
-
                 }
 
-            }else {
-                if (buyerPendingMessage.isIncomming) {
-                    checkMessageIsInProgressAndSend(buyerPendingMessage.owner);
-                } else {
-                    checkMessageIsInProgressAndSend(buyerPendingMessage.sender);
-                }
+            }
+
+            if (buyerPendingMessage.isIncomming) {
+                checkMessageIsInProgressAndSend(buyerPendingMessage.owner);
+            } else {
+                checkMessageIsInProgressAndSend(buyerPendingMessage.sender);
             }
 
         } catch (ExecutionException e) {
@@ -1298,13 +1301,13 @@ public class PurchaseManagerSeller extends PurchaseManager implements PayControl
 
                                 MeshLog.v("Message Queuing 15");
 
-                                if (buyerPendingMessage.isIncomming) {
+                                /*if (buyerPendingMessage.isIncomming) {
                                     payController.getDataManager().onPaymentGotForIncomingMessage(true, buyerPendingMessage.owner, buyerPendingMessage.sender, buyerPendingMessage.msgId, buyerPendingMessage.msgData);
 
                                 } else {
                                     payController.getDataManager().onPaymentGotForOutgoingMessage(true, buyerPendingMessage.owner, buyerPendingMessage.sender, buyerPendingMessage.msgId, buyerPendingMessage.msgData);
 
-                                }
+                                }*/
 
 
                                 try {
@@ -1361,12 +1364,12 @@ public class PurchaseManagerSeller extends PurchaseManager implements PayControl
                             databaseService.updateBuyerPendingMessage(buyerPendingMessage);
 
                             MeshLog.v("Message Queuing 20");
-                            if (buyerPendingMessage.isIncomming) {
+                            /*if (buyerPendingMessage.isIncomming) {
                                 payController.getDataManager().onPaymentGotForIncomingMessage(true, buyerPendingMessage.owner, buyerPendingMessage.sender, buyerPendingMessage.msgId, buyerPendingMessage.msgData);
                             } else {
                                 payController.getDataManager().onPaymentGotForOutgoingMessage(true, buyerPendingMessage.owner, buyerPendingMessage.sender, buyerPendingMessage.msgId, buyerPendingMessage.msgData);
                             }
-
+*/
 
                             try {
                                 JSONObject successJson = new JSONObject();
@@ -1405,6 +1408,8 @@ public class PurchaseManagerSeller extends PurchaseManager implements PayControl
 
     @Override
     public void onPayForMessageErrorReceived(String from, String msg_id, String errorText) {
+        MeshLog.v("onPayForMessageErrorReceived from buyer " + from + "  for message  " + msg_id + "  error  " + errorText);
+
         try {
             BuyerPendingMessage buyerPendingMessage = databaseService.getBuyerPendingMessageById(msg_id);
             buyerPendingMessage.status = PurchaseConstants.BUYER_PENDING_MESSAGE_STATUS.SENT_NOT_PAID;
@@ -1414,10 +1419,9 @@ public class PurchaseManagerSeller extends PurchaseManager implements PayControl
                 payController.getDataManager().onPaymentGotForIncomingMessage(false, buyerPendingMessage.owner, buyerPendingMessage.sender, buyerPendingMessage.msgId, buyerPendingMessage.msgData);
             } else {
                 payController.getDataManager().onPaymentGotForOutgoingMessage(false, buyerPendingMessage.owner, buyerPendingMessage.sender, buyerPendingMessage.msgId, buyerPendingMessage.msgData);
-
             }
         } catch (Exception e) {
-
+            e.printStackTrace();
         }
     }
 
@@ -1460,10 +1464,20 @@ public class PurchaseManagerSeller extends PurchaseManager implements PayControl
             buyerPendingMessage.status = PurchaseConstants.BUYER_PENDING_MESSAGE_STATUS.SENT_PAID;
             databaseService.updateBuyerPendingMessage(buyerPendingMessage);
             MeshLog.v("Message Queuing 24 " + msg_Id);
+
+
+            if (buyerPendingMessage.isIncomming) {
+                payController.getDataManager().onPaymentGotForIncomingMessage(true, buyerPendingMessage.owner, buyerPendingMessage.sender, buyerPendingMessage.msgId, buyerPendingMessage.msgData);
+            } else {
+                payController.getDataManager().onPaymentGotForOutgoingMessage(true, buyerPendingMessage.owner, buyerPendingMessage.sender, buyerPendingMessage.msgId, buyerPendingMessage.msgData);
+            }
+
             checkMessageIsInProgressAndSend(fromAddress);
         } catch (ExecutionException e) {
             e.printStackTrace();
         } catch (InterruptedException e) {
+            e.printStackTrace();
+        } catch (RemoteException e) {
             e.printStackTrace();
         }
     }
@@ -1938,28 +1952,6 @@ public class PurchaseManagerSeller extends PurchaseManager implements PayControl
         }catch (Exception ex){
             ex.printStackTrace();
         }
-    }
-
-
-
-
-    //*********************************************************//
-    //************************interface************************//
-    //*********************************************************//
-    public interface BuyerPendingMessageListener {
-        void onPaymentGotForIncomingMessage(boolean success, String owner, String sender, String msg_id, String msgData);
-
-        void onPaymentGotForOutgoingMessage(boolean success, String owner, String sender, String msg_id, String msgData);
-    }
-
-    /*public interface MyBalanceInfoListener {
-        void onBalanceInfoReceived(double ethBalance, double tknBalance);
-
-        void onBalanceErrorReceived(String msg);
-    }*/
-
-    public interface EtherRequestListener {
-        void onEtherRequestResponseReceived(boolean success, String msg);
     }
 
     public LiveData<Integer> getDifferentNetworkData(String myAddress, int endpoint) {

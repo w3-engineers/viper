@@ -12,6 +12,7 @@ import android.util.Log;
 
 
 import com.w3engineers.eth.util.helper.HandlerUtil;
+import com.w3engineers.mesh.R;
 import com.w3engineers.mesh.application.data.local.db.SharedPref;
 import com.w3engineers.mesh.application.data.local.helper.crypto.ECDSA;
 import com.w3engineers.mesh.util.Constant;
@@ -32,7 +33,7 @@ import java.nio.channels.FileChannel;
 
 public class WalletService {
     private Context mContext;
-    private final String walletSuffixDir = "wallet/";
+    private final String walletSuffixDir;
 //    public static final String PASSWORD = "123456789";
     private volatile Credentials mCredentials;
     private final String WALLET_ADDRESS = "wallet_address";
@@ -64,6 +65,7 @@ public class WalletService {
 
     private WalletService(Context context) {
         this.mContext = context;
+        walletSuffixDir = "wallet/" + mContext.getString(R.string.app_name);
     }
 
     public static WalletService getInstance(Context context) {
@@ -190,7 +192,7 @@ public class WalletService {
         HandlerUtil.postBackground(new Runnable() {
             @Override
             public void run() {
-                String savePtah = WalletService.getInstance(mContext).getWalletDirectory();
+                    String savePtah = WalletService.getInstance(mContext).getWalletDirectory();
                 copyFile(mContext, fileUri, savePtah);
 
                 if (isWalletExists()) {

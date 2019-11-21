@@ -23,6 +23,7 @@ import com.w3engineers.ext.strom.util.helper.Toaster;
 import com.w3engineers.mesh.R;
 import com.w3engineers.mesh.ViperCommunicator;
 import com.w3engineers.mesh.application.data.AppDataObserver;
+import com.w3engineers.mesh.application.data.local.dataplan.DataPlanManager;
 import com.w3engineers.mesh.application.data.local.db.SharedPref;
 import com.w3engineers.mesh.application.data.local.helper.crypto.CryptoHelper;
 import com.w3engineers.mesh.application.data.local.wallet.WalletService;
@@ -265,7 +266,8 @@ public class DataManager {
             try {
                 //mTmCommunicator.saveUserInfo(userInfo);
                 Log.e("service_status", "onServiceConnected");
-                boolean status = mTmCommunicator.startMesh(appName, userInfo);
+                int userRole = DataPlanManager.getInstance().getDataPlanRole();
+                boolean status = mTmCommunicator.startMesh(appName,userRole, userInfo);
                 if (!status) {
                     showPermissionPopUp();
                 }
