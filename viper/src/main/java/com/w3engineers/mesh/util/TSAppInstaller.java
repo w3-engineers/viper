@@ -143,7 +143,9 @@ public class TSAppInstaller {
 
                 Intent intent;
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                    Uri apkUri = FileProvider.getUriForFile(context,  "com.w3engineers.ext.viper.provider", destinationFile);
+                    String packageName = "com.w3engineers.unicef.telemesh.provider";
+//                    packageName = "com.w3engineers.ext.viper.provider";
+                    Uri apkUri = FileProvider.getUriForFile(context,  packageName, destinationFile);
                     intent = new Intent(Intent.ACTION_INSTALL_PACKAGE);
                     Log.d("InAppUpdateTest", "app uri: " + apkUri.getPath());
                     intent.setDataAndType(apkUri, "application/vnd.android.package-archive");
