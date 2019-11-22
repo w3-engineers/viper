@@ -255,7 +255,7 @@
                             android:paddingEnd="@dimen/padding_20"
                             android:paddingBottom="@dimen/padding_10"
                             android:text="@string/pending_balance"
-                            android:textColor="@color/colorAccent"
+                            android:textColor="@color/currency_text_color"
                             android:textSize="@dimen/text_size_15" />
 
 
