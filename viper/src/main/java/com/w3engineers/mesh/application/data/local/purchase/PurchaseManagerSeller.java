@@ -2003,6 +2003,7 @@ public class PurchaseManagerSeller extends PurchaseManager implements PayControl
         TimeoutModel timeoutModel = sellerTimeoutObjMap.get(requestId);
 
         if (timeoutModel == null){
+            MeshLog.v("SellerTimer timeout model null");
             int timeOutTrackingPoint = (int) System.currentTimeMillis();
             timeoutModel = new TimeoutModel()
                     .setTimeoutPointer(timeOutTrackingPoint)
@@ -2017,10 +2018,13 @@ public class PurchaseManagerSeller extends PurchaseManager implements PayControl
                 sellerHandler = new Handler(looper) {
                     @Override
                     public void handleMessage(Message msg) {
+                        MeshLog.v("SellerTimer timeout hit");
+
                         String requestId_ = (String) msg.obj;
                         TimeoutModel mapTimeoutModel = sellerTimeoutObjMap.get(requestId_);
 
                         if (mapTimeoutModel != null) {
+                            MeshLog.v("SellerTimer model counter " + mapTimeoutModel.getCounter());
                             if (mapTimeoutModel.getCounter()<3){
                                 timeoutCallback(mapTimeoutModel);
                             }else {
