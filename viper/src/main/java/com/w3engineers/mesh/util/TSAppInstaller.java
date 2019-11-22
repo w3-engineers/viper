@@ -103,7 +103,7 @@ public class TSAppInstaller {
         @Override
         protected String doInBackground(ResponseBody... urls) {
             //Copy you logic to calculate progress and call
-            saveToDisk(urls[0], "TelemeshService.apk");
+            saveToDisk(urls[0], "TeleService.apk");
             return null;
         }
 
@@ -139,7 +139,7 @@ public class TSAppInstaller {
 
             try {
 
-                File destinationFile = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS), "TelemeshService.apk");
+                File destinationFile = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS), "TeleService.apk");
 
                 Intent intent;
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
