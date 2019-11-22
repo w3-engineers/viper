@@ -13,6 +13,7 @@ public class TimeoutModel {
     private int timeoutPointer;
     private String receiverId;
     private int purpose;
+    private int counter;
 
     public int getTimeoutPointer() {
         return timeoutPointer;
@@ -41,4 +42,12 @@ public class TimeoutModel {
         return this;
     }
 
+    public int getCounter() {
+        return counter;
+    }
+
+    public TimeoutModel setCounter(int counter) {
+        this.counter = counter;
+        return this;
+    }
 }

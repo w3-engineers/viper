@@ -419,7 +419,7 @@ public class ConnectionManager {
 
     private void showToast(String msg) {
         if (BuildConfig.DEBUG){
-            HandlerUtil.postForeground(() -> Toast.makeText(mContext, "TeleService is not running", Toast.LENGTH_LONG).show());
+            HandlerUtil.postForeground(() -> Toast.makeText(mContext, msg, Toast.LENGTH_LONG).show());
         }
     }
 

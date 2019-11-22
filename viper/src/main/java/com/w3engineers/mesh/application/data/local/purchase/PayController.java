@@ -715,8 +715,8 @@ public class PayController {
         try {
             jObject.put(PurchaseConstants.JSON_KEYS.MESSAGE_TYPE, PurchaseConstants.MESSAGE_TYPES.GOT_MESSAGE);
 
-            //sendPayMessage(receiver, jObject.toString());
-            sendPayWithTimeoutMessage(receiver, jObject.toString(), PurchaseConstants.TimeoutPurpose.BUYER_PENDING_MESSAGE);
+            sendPayMessage(receiver, jObject.toString());
+//            sendPayWithTimeoutMessage(receiver, jObject.toString(), PurchaseConstants.TimeoutPurpose.BUYER_PENDING_MESSAGE);
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -761,8 +761,8 @@ public class PayController {
 
         try {
             successJson.put(PurchaseConstants.JSON_KEYS.MESSAGE_TYPE, PurchaseConstants.MESSAGE_TYPES.PAY_FOR_MESSAGE_RESPONSE);
-            //sendPayMessage(receiver, successJson.toString());
-            sendPayWithTimeoutMessage(receiver, successJson.toString(), PurchaseConstants.TimeoutPurpose.PAY_FOR_MESSAGE_RESPONSE);
+            sendPayMessage(receiver, successJson.toString());
+//            sendPayWithTimeoutMessage(receiver, successJson.toString(), PurchaseConstants.TimeoutPurpose.PAY_FOR_MESSAGE_RESPONSE);
         } catch (Exception e) {
             MeshLog.v("Exception" + e.getMessage());
         }
