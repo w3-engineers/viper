@@ -1,8 +1,13 @@
 package com.w3engineers.mesh.application.data.local.purchase;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.arch.lifecycle.LiveData;
 import android.content.Intent;
+import android.os.Handler;
+import android.os.HandlerThread;
+import android.os.Looper;
+import android.os.Message;
 import android.os.RemoteException;
 import android.text.TextUtils;
 
@@ -37,6 +42,7 @@ import java.math.BigInteger;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutionException;
 
 import io.reactivex.Observable;
@@ -128,7 +134,7 @@ public class PurchaseManagerSeller extends PurchaseManager implements PayControl
                 }
             } else {
                 MeshLog.o("### message in queue ###");
-                if (buyerPendingMessage.updateTime < System.currentTimeMillis() - (10*1000)){
+                if (buyerPendingMessage.updateTime < System.currentTimeMillis() - (15*1000)){
                     MeshLog.o("### resending qued message ###");
                     resumeUserPendingMessage(userAddress);
                 }
@@ -199,6 +205,8 @@ public class PurchaseManagerSeller extends PurchaseManager implements PayControl
                 jObject.put(PurchaseConstants.JSON_KEYS.MESSAGE_ID, msg_id);
                 jObject.put(PurchaseConstants.JSON_KEYS.IS_INCOMING, buyerPendingMessage.isIncomming);
 
+
+                setRequestTimeout(msg_id, owner, PurchaseConstants.TimeoutPurpose.BUYER_PENDING_MESSAGE);
                 payController.sendBuyerPendingMessageInfo(jObject, owner);
 
                 MeshLog.o("### msg in progress ## msg_id:" + buyerPendingMessage.msgId);
@@ -531,8 +539,6 @@ public class PurchaseManagerSeller extends PurchaseManager implements PayControl
         }
         payController.sendInitPurchaseOkay(jsonObject, buyerAddress);
     }
-
-
 
 
     //***************************************************//
@@ -1209,6 +1215,8 @@ public class PurchaseManagerSeller extends PurchaseManager implements PayControl
     public void onPayForMessageOkReceived(String from, String msg_id, String bps, double bps_balance, long open_block) {
         MeshLog.o("-- onPayForMessageOkReceived --");
         MeshLog.v("Message Queuing 10");
+
+        onPayMessageResponseReceived(from, msg_id);
         try {
             Purchase purchase = databaseService.getPurchaseByBlockNumber(open_block, from, ethService.getAddress());
             if (purchase != null) {
@@ -1329,12 +1337,16 @@ public class PurchaseManagerSeller extends PurchaseManager implements PayControl
                                     successJson.put(PurchaseConstants.JSON_KEYS.OPEN_BLOCK, open_block);
                                     successJson.put(PurchaseConstants.JSON_KEYS.DATA_SIZE, buyerPendingMessage.dataSize);
                                     successJson.put(PurchaseConstants.JSON_KEYS.MESSAGE_ID, msg_id);
+                                    String msg_receiver = "";
                                     if (buyerPendingMessage.isIncomming) {
-                                        payController.sendPayForMessageResponse(successJson, buyerPendingMessage.owner);
+                                        msg_receiver = buyerPendingMessage.owner;
                                     } else {
-                                        payController.sendPayForMessageResponse(successJson, buyerPendingMessage.sender);
-
+                                        msg_receiver = buyerPendingMessage.sender;
                                     }
+
+                                    setRequestTimeout(msg_id, msg_receiver, PurchaseConstants.TimeoutPurpose.PAY_FOR_MESSAGE_RESPONSE);
+                                    payController.sendPayForMessageResponse(successJson, msg_receiver);
+
                                 } catch (JSONException e) {
                                     //TODO what to do here
 //                                        MeshLog.p("onPayForMessageOkReceived EX " + e.getMessage());
@@ -1389,12 +1401,16 @@ public class PurchaseManagerSeller extends PurchaseManager implements PayControl
                                 successJson.put(PurchaseConstants.JSON_KEYS.OPEN_BLOCK, open_block);
                                 successJson.put(PurchaseConstants.JSON_KEYS.DATA_SIZE, buyerPendingMessage.dataSize);
                                 successJson.put(PurchaseConstants.JSON_KEYS.MESSAGE_ID, msg_id);
-                                if (buyerPendingMessage.isIncomming) {
-                                    payController.sendPayForMessageResponse(successJson, buyerPendingMessage.owner);
-                                } else {
-                                    payController.sendPayForMessageResponse(successJson, buyerPendingMessage.sender);
 
+                                String msg_receiver = "";
+                                if (buyerPendingMessage.isIncomming) {
+                                    msg_receiver = buyerPendingMessage.owner;
+                                } else {
+                                    msg_receiver = buyerPendingMessage.sender;
                                 }
+
+                                setRequestTimeout(msg_id, msg_receiver, PurchaseConstants.TimeoutPurpose.PAY_FOR_MESSAGE_RESPONSE);
+                                payController.sendPayForMessageResponse(successJson, msg_receiver);
                             } catch (JSONException e) {
                                 //TODO what to do here
 //                                        MeshLog.p("onPayForMessageOkReceived EX " + e.getMessage());
@@ -1418,7 +1434,7 @@ public class PurchaseManagerSeller extends PurchaseManager implements PayControl
     @Override
     public void onPayForMessageErrorReceived(String from, String msg_id, String errorText) {
         MeshLog.v("onPayForMessageErrorReceived from buyer " + from + "  for message  " + msg_id + "  error  " + errorText);
-
+        onPayMessageResponseReceived(from, msg_id);
         try {
             BuyerPendingMessage buyerPendingMessage = databaseService.getBuyerPendingMessageById(msg_id);
             buyerPendingMessage.status = PurchaseConstants.BUYER_PENDING_MESSAGE_STATUS.SENT_NOT_PAID;
@@ -1468,6 +1484,7 @@ public class PurchaseManagerSeller extends PurchaseManager implements PayControl
     public void onBuyerUpdateNotified(String msg_Id, String fromAddress) {
         MeshLog.v("Message Queuing 23");
         MeshLog.o("-- onBuyerUpdateNotified --");
+        onPayMessageResponseReceived(fromAddress, msg_Id);
         try {
             BuyerPendingMessage buyerPendingMessage = databaseService.getBuyerPendingMessageById(msg_Id);
             buyerPendingMessage.status = PurchaseConstants.BUYER_PENDING_MESSAGE_STATUS.SENT_PAID;
@@ -1511,15 +1528,12 @@ public class PurchaseManagerSeller extends PurchaseManager implements PayControl
 
     @Override
     public void timeoutCallback(TimeoutModel timeoutModel) {
-
         resumeUserPendingMessage(timeoutModel.getReceiverId());
     }
 
 
-
-
     //*********************************************************//
-    //******************EthereumServiceListener******************//
+    //*****************EthereumServiceListener*****************//
     //*********************************************************//
     @Override
     public void onBalanceApprovedLog(CustomToken.ApprovalEventResponse typedResponse) {
@@ -1970,5 +1984,80 @@ public class PurchaseManagerSeller extends PurchaseManager implements PayControl
             e.printStackTrace();
         }
         return null;
+    }
+
+
+
+    //*********************************************************//
+    //**********************SELLER TIMER***********************//
+    //*********************************************************//
+    private Handler sellerHandler;
+    private long sellerWaitingTime = 10 * 1000;
+    private ConcurrentHashMap<String, TimeoutModel> sellerTimeoutObjMap = new ConcurrentHashMap<>();
+
+    @SuppressLint("HandlerLeak")
+    private void setRequestTimeout(String requestId, String receiverId, int purpose) {
+
+        MeshLog.v("SellerTimer start " + requestId + " purpose " + purpose);
+
+        TimeoutModel timeoutModel = sellerTimeoutObjMap.get(requestId);
+
+        if (timeoutModel == null){
+            int timeOutTrackingPoint = (int) System.currentTimeMillis();
+            timeoutModel = new TimeoutModel()
+                    .setTimeoutPointer(timeOutTrackingPoint)
+                    .setPurpose(purpose)
+                    .setReceiverId(receiverId)
+                    .setCounter(1);
+
+            if (sellerHandler == null){
+                HandlerThread handlerThread = new HandlerThread("SellerHandlerThread");
+                handlerThread.start();
+                Looper looper = handlerThread.getLooper();
+                sellerHandler = new Handler(looper) {
+                    @Override
+                    public void handleMessage(Message msg) {
+                        String requestId_ = (String) msg.obj;
+                        TimeoutModel mapTimeoutModel = sellerTimeoutObjMap.get(requestId_);
+
+                        if (mapTimeoutModel != null) {
+                            if (mapTimeoutModel.getCounter()<3){
+                                timeoutCallback(mapTimeoutModel);
+                            }else {
+                                sellerTimeoutObjMap.remove(requestId_);
+                            }
+                        }
+                    }
+                };
+            }
+
+        } else {
+          timeoutModel.setCounter(timeoutModel.getCounter()+1);
+        }
+        sellerTimeoutObjMap.put(requestId, timeoutModel);
+        Message msg = sellerHandler.obtainMessage(timeoutModel.getTimeoutPointer(), requestId);
+        sellerHandler.sendMessageDelayed(msg, sellerWaitingTime);
+    }
+
+    private void onPayMessageResponseReceived(String sender, String messageId) {
+
+        MeshLog.v("onPayMessageResponseReceived s " + sender + " i " + messageId);
+        if (!TextUtils.isEmpty(messageId)) {
+
+            if (sellerTimeoutObjMap.containsKey(messageId)) {
+
+                TimeoutModel timeoutModel = sellerTimeoutObjMap.get(messageId);
+
+                if (timeoutModel != null) {
+
+                    int timeOutTrackingPoint = timeoutModel.getTimeoutPointer();
+                    if (sellerHandler != null && sellerHandler.hasMessages(timeOutTrackingPoint)) {
+                        MeshLog.v("SellerTimer gotResponse " + messageId + " purpose " + timeoutModel.getPurpose());
+                        sellerHandler.removeMessages(timeOutTrackingPoint);
+                        sellerTimeoutObjMap.remove(messageId);
+                    }
+                }
+            }
+        }
     }
 }
