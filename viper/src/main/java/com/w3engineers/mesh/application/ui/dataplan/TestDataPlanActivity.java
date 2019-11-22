@@ -24,7 +24,6 @@ import android.widget.EditText;
 import android.widget.RadioButton;
 import android.widget.Switch;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.w3engineers.ext.strom.util.helper.Toaster;
 import com.w3engineers.mesh.R;
@@ -39,14 +38,11 @@ import com.w3engineers.mesh.databinding.TestActivityDataPlanBinding;
 import com.w3engineers.mesh.util.DialogUtil;
 import com.w3engineers.mesh.util.MeshLog;
 import com.w3engineers.mesh.util.NotificationUtil;
-import com.w3engineers.mesh.util.lib.mesh.DataManager;
 import com.w3engineers.mesh.util.lib.mesh.HandlerUtil;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutionException;
 
 public class TestDataPlanActivity extends TelemeshBaseActivity implements DataPlanManager.DataPlanListener {
