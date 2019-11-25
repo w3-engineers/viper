@@ -61,11 +61,12 @@ public class WalletActivity extends TelemeshBaseActivity implements WalletManage
     private final String ropstenUrl = "https://ropsten.etherscan.io/address/";
     private final String kottyUrl = "https://explorer.eth.events/ethereum/ethereum/kotti/address/";
     private byte[] picture;
+    private final double minimumWithdrawAmount = 10.0;
 
-    private interface REQUEST_TYPE {
+    /*private interface REQUEST_TYPE {
         int ETHER = 1;
         int TOKEN = 2;
-    }
+    }*/
 
 
     @Override
@@ -296,7 +297,7 @@ public class WalletActivity extends TelemeshBaseActivity implements WalletManage
     }
 
 
-    private void showRequestAlert(String title, String msg, int type) {
+    /*private void showRequestAlert(String title, String msg, int type) {
 
         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
         alertDialogBuilder.setTitle(title);
@@ -324,9 +325,9 @@ public class WalletActivity extends TelemeshBaseActivity implements WalletManage
 
         AlertDialog alertDialog = alertDialogBuilder.create();
         alertDialog.show();
-    }
+    }*/
 
-    private void showAlertWithdraw() {
+   /* private void showAlertWithdraw() {
         LayoutInflater inflater = LayoutInflater.from(this);
         View promptView = inflater.inflate(R.layout.prompt_wallet_withdrow, null);
         PromptWalletWithdrowBinding promptBinding = PromptWalletWithdrowBinding.bind(promptView);
@@ -380,9 +381,9 @@ public class WalletActivity extends TelemeshBaseActivity implements WalletManage
         });
 
         alertDialog.show();
-    }
+    }*/
 
-    private void selectWithdrawOption(ConstraintLayout view) {
+   /* private void selectWithdrawOption(ConstraintLayout view) {
         view.setBackground(getResources().getDrawable(R.drawable.bg_withdraw_choice));
     }
 
@@ -403,7 +404,7 @@ public class WalletActivity extends TelemeshBaseActivity implements WalletManage
             window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
             window.setStatusBarColor(Color.TRANSPARENT);
         }
-    }
+    }*/
 
     private void refreshMyBalance() {
 
@@ -480,10 +481,11 @@ public class WalletActivity extends TelemeshBaseActivity implements WalletManage
                     payableDeposit = 0;
                 }
 
-                if (payableDeposit >= 10) {
+                mBinding.textViewPendingBalance.setText(totalPendingEarn == null ? "0" : convertSixrDigitString(totalPendingEarn));
+
+                if (payableDeposit >= minimumWithdrawAmount) {
                     performWithdrawBalance();
                 }
-                mBinding.textViewPendingBalance.setText(totalPendingEarn == null ? "0" : convertSixrDigitString(totalPendingEarn));
             });
         }
     }
@@ -516,13 +518,7 @@ public class WalletActivity extends TelemeshBaseActivity implements WalletManage
     }
 
     public void performWithdrawBalance() {
-        try {
-            walletManager.getAllOpenDrawableBlock();
-        } catch (ExecutionException e) {
-            e.printStackTrace();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+         walletManager.getAllOpenDrawableBlock();
     }
 
     public void setLastUpdated() {

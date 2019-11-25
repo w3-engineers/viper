@@ -14,6 +14,7 @@ import com.w3engineers.mesh.application.data.local.db.networkinfo.NetworkInfo;
 import com.w3engineers.mesh.application.data.local.db.purchase.Purchase;
 import com.w3engineers.mesh.application.data.local.db.purchase.PurchaseDao;
 import com.w3engineers.mesh.application.data.local.db.purchaserequests.PurchaseRequests;
+import com.w3engineers.mesh.application.data.local.purchase.PurchaseConstants;
 
 import java.util.List;
 import java.util.concurrent.Callable;
@@ -534,7 +535,6 @@ public class DatabaseService {
             }
         });
         return future.get();
-
     }
 
     public PurchaseRequests getPurchaseRequestByMessageId(String messageId) throws ExecutionException, InterruptedException {
@@ -567,11 +567,28 @@ public class DatabaseService {
         });
     }
 
+
+    public List<PurchaseRequests> getUserIncompleteRequests(String requesterAddress, int state, int endPoint) throws ExecutionException, InterruptedException {
+        Future<List<PurchaseRequests>> future = executor.submit(new Callable() {
+            @Override
+            public List<PurchaseRequests> call() {
+                List<PurchaseRequests> purchaseRequests = null;
+                try {
+                    purchaseRequests = db.purchaseRequestsDao().getIncompleteRequestsByRequesterAddress(requesterAddress, state, endPoint);
+                } catch (Exception e) {
+                    Log.e("error", e.toString());
+                }
+                return purchaseRequests;
+            }
+        });
+        return future.get();
+    }
+
     public DatausageDao getDatausageDao() {
         return db.datausageDao();
     }
 
-    public void insertMessage(Message message) {
+   /* public void insertMessage(Message message) {
         executor.submit(new Callable() {
             @Override
             public Integer call() {
@@ -583,9 +600,9 @@ public class DatabaseService {
                 return 0;
             }
         });
-    }
+    }*/
 
-    public void deleteMessage(String messageId) {
+   /* public void deleteMessage(String messageId) {
         executor.submit(new Callable() {
             @Override
             public Integer call() {
@@ -597,7 +614,7 @@ public class DatabaseService {
                 return 0;
             }
         });
-    }
+    }*/
 
     public List<Message> getAll() throws ExecutionException, InterruptedException {
         Future<List<Message>> future = executor.submit(new Callable() {
@@ -616,7 +633,7 @@ public class DatabaseService {
 
     }
 
-    public Message getMessageById(String msg_id) throws ExecutionException, InterruptedException {
+    /*public Message getMessageById(String msg_id) throws ExecutionException, InterruptedException {
         Future<Message> future = executor.submit(new Callable() {
             @Override
             public Message call() {
@@ -630,7 +647,7 @@ public class DatabaseService {
             }
         });
         return future.get();
-    }
+    }*/
 
 /*    public Message getPendingRequest(String receiverId) throws ExecutionException, InterruptedException {
         Future<Message> future = executor.submit(new Callable() {
@@ -649,7 +666,7 @@ public class DatabaseService {
     }*/
 
 
-    public List<Message> getPendingMessage(String receiverId) throws ExecutionException, InterruptedException {
+   /* public List<Message> getPendingMessage(String receiverId) throws ExecutionException, InterruptedException {
         Future<List<Message>> future = executor.submit(new Callable() {
             @Override
             public List<Message> call() {
@@ -664,7 +681,7 @@ public class DatabaseService {
         });
         return future.get();
 
-    }
+    }*/
 
 
     public void insertDataUsage(Datausage datausage) {

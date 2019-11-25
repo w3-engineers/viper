@@ -48,7 +48,11 @@ public interface PurchaseRequestsDao {
     @Query("SELECT * FROM purchaserequests WHERE buyer_address= :buyerAddress AND state=:state ORDER BY nonce ASC")
     List<PurchaseRequests> getCompletedRequest(String buyerAddress, int state);
 
+    @Query("SELECT * FROM purchaserequests WHERE requester_address= :requesterAddress AND state<=:state AND block_chain_endpoint= :endPoint")
+    List<PurchaseRequests> getIncompleteRequestsByRequesterAddress(String requesterAddress, int state, int endPoint);
+
     @Query("SELECT * FROM purchaserequests WHERE message_id= :messageId")
     PurchaseRequests getRequestByMessageId(String messageId);
+    //TODO create another method for seller pending request
 
 }
