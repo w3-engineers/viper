@@ -153,7 +153,7 @@ public class Util {
         return jsonObject.toString();
     }
 
-    public static boolean saveMessage(String senderId, String receiverId, String messageId, byte[] data, Context mContext) {
+/*    public static boolean saveMessage(String senderId, String receiverId, String messageId, byte[] data, Context mContext) {
         if (!senderId.equals(receiverId)) {
 
             Message message = null;
@@ -178,7 +178,7 @@ public class Util {
             }
         }
         return false;
-    }
+    }*/
 
     public static String getCurrencyTypeMessage(String message) {
         String currencyMode = getEndPointCurrency();

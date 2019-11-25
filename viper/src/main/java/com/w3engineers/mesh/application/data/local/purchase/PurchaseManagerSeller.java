@@ -231,8 +231,9 @@ public class PurchaseManagerSeller extends PurchaseManager implements PayControl
         }
     }
 
-    private boolean havePendingTransactionInBlockChain(List<PurchaseRequests> purchaseRequests, int endPointType) {
+    private boolean havePendingTransactionInBlockChain(String address, List<PurchaseRequests> purchaseRequests, int endPointType) {
         boolean pendingStatus = false;
+        boolean receivedStatus = false;
         try {
             if (purchaseRequests != null && purchaseRequests.size() > 0) {
 
@@ -269,14 +270,21 @@ public class PurchaseManagerSeller extends PurchaseManager implements PayControl
                             pendingStatus = true;
                         }
 
+                    } else{
+                        receivedStatus = true;
                     }
                 }
+            }
+
+            if (receivedStatus && !pendingStatus){
+                pickAndSubmitRequest(address);
             }
 
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return pendingStatus;
+
+        return pendingStatus || receivedStatus;
     }
 
     private void syncWithBuyer(String buyerAddress) {
@@ -413,7 +421,8 @@ public class PurchaseManagerSeller extends PurchaseManager implements PayControl
                 case PurchaseConstants.REQUEST_TYPES.WITHDRAW_CHANNEL:
 
                     if (walletListener != null) {
-                        walletListener.onRequestSubmitted(success, msg);
+
+//                        walletListener.onRequestSubmitted(success, msg);
                     }
 
                     break;
@@ -692,8 +701,8 @@ public class PurchaseManagerSeller extends PurchaseManager implements PayControl
         try {
 
             int endPointType = getEndpoint();
-            double token = EthereumServiceUtil.getInstance(mContext).getToken(endPointType);
-            double currency = EthereumServiceUtil.getInstance(mContext).getCurrency(endPointType);
+//            double token = EthereumServiceUtil.getInstance(mContext).getToken(endPointType);
+//            double currency = EthereumServiceUtil.getInstance(mContext).getCurrency(endPointType);
 
             if (InternetUtil.isNetworkConnected(mContext)) {
                 try {
@@ -742,25 +751,30 @@ public class PurchaseManagerSeller extends PurchaseManager implements PayControl
         return databaseService.getTotalOpenChannel(ethService.getAddress(), PurchaseConstants.CHANNEL_STATE.OPEN);
     }
 
-    public void getAllOpenDrawableBlock() throws ExecutionException, InterruptedException {
+    public void getAllOpenDrawableBlock() {
 
-        int endPointType = getEndpoint();
+        try {
+            int endPointType = getEndpoint();
+            List<PurchaseRequests> purchaseRequests = databaseService.getUserIncompleteRequests(ethService.getAddress(), PurchaseConstants.REQUEST_STATE.PENDING, endPointType);
 
-        List<Purchase> allOpenDrawablePurchaseList = databaseService.getAllOpenDrawableBlock(ethService.getAddress(),
-                PurchaseConstants.CHANNEL_STATE.OPEN, endPointType);
+            if (purchaseRequests != null && purchaseRequests.size() > 0) {
+                if (havePendingTransactionInBlockChain(ethService.getAddress(), purchaseRequests, endPointType)) {
+                    return;
+                }
+            }
 
-        if (allOpenDrawablePurchaseList != null && allOpenDrawablePurchaseList.size() > 0) {
 
-            Double ethBalance = ethService.getUserEthBalance(ethService.getAddress(), endPointType);
-            Integer nonce = ethService.getUserNonce(ethService.getAddress(), endPointType);
+            List<Purchase> allOpenDrawablePurchaseList = databaseService.getAllOpenDrawableBlock(ethService.getAddress(), PurchaseConstants.CHANNEL_STATE.OPEN, endPointType);
 
-            if (ethBalance != null && nonce != null && ethBalance > 0) {
+            if (allOpenDrawablePurchaseList != null && allOpenDrawablePurchaseList.size() > 0) {
 
-                for (Purchase purchase : allOpenDrawablePurchaseList) {
+                Double ethBalance = ethService.getUserEthBalance(ethService.getAddress(), endPointType);
+                Integer nonce = ethService.getUserNonce(ethService.getAddress(), endPointType);
 
-                    try {
-                        String signedMessage = ethService.withdraw(purchase.openBlockNumber, purchase.balance,
-                                purchase.balanceProof, nonce, purchase.blockChainEndpoint);
+                if (ethBalance != null && nonce != null && ethBalance > 0) {
+
+                    for (Purchase purchase : allOpenDrawablePurchaseList) {
+                        String signedMessage = ethService.withdraw(purchase.openBlockNumber, purchase.balance, purchase.balanceProof, nonce, purchase.blockChainEndpoint);
 
                         PurchaseRequests purchaseRequest = new PurchaseRequests();
                         purchaseRequest.buyerAddress = purchase.buyerAddress;
@@ -773,15 +787,14 @@ public class PurchaseManagerSeller extends PurchaseManager implements PayControl
                         purchaseRequest.blockChainEndpoint = purchase.blockChainEndpoint;
                         databaseService.insertPurchaseRequest(purchaseRequest);
                         nonce++;
-
-                    } catch (Exception e) {
-                        e.printStackTrace();
                     }
+                    pickAndSubmitRequest(ethService.getAddress());
+                } else {
+                    MeshLog.v("User can't withdraw, cause: balance or nonce error");
                 }
-                pickAndSubmitRequest(ethService.getAddress());
-            } else {
-                //TODO: Have to add a callback to notify user
             }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 
@@ -919,10 +932,11 @@ public class PurchaseManagerSeller extends PurchaseManager implements PayControl
     public void onPurchaseInitRequested(String from, int endPointType) {
         MeshLog.v("onPurchaseInitRequested: " + from);
         try {
-            List<PurchaseRequests> purchaseRequests = databaseService.getPendingRequestByUser(from, PurchaseConstants.REQUEST_STATE.PENDING);
+            List<PurchaseRequests> purchaseRequests = databaseService.getUserIncompleteRequests(from, PurchaseConstants.REQUEST_STATE.PENDING, endPointType);
+
             if (purchaseRequests != null && purchaseRequests.size() > 0) {
 
-                if (havePendingTransactionInBlockChain(purchaseRequests, endPointType)) {
+                if (havePendingTransactionInBlockChain(from, purchaseRequests, endPointType)) {
                     sendPurchaseInitError(from, "You already have " + purchaseRequests.size() + " pending requests.");
                 } else {
                     processPurchaseRequest(from, endPointType);
@@ -1775,7 +1789,6 @@ public class PurchaseManagerSeller extends PurchaseManager implements PayControl
         } catch (RemoteException e) {
             e.printStackTrace();
         }
-//        }
     }
 
     @Override
@@ -1809,12 +1822,8 @@ public class PurchaseManagerSeller extends PurchaseManager implements PayControl
 
                     Purchase purchase = databaseService.getPurchaseByBlockNumber(typedResponse._open_block_number.longValue(), typedResponse._sender_address, typedResponse._receiver_address);
                     purchase.withdrawnBalance = withdrawnBalance;
-                    // listener.onAllWithDrawnDone();
-                    databaseService.updatePurchase(purchase);
 
-                    if (walletListener != null) {
-                        walletListener.onRequestCompleted(true, "Balance withdrawn");
-                    }
+                    databaseService.updatePurchase(purchase);
 
                     pickAndSubmitRequest(purchaseRequests.requesterAddress);
 
@@ -1985,7 +1994,6 @@ public class PurchaseManagerSeller extends PurchaseManager implements PayControl
         }
         return null;
     }
-
 
 
     //*********************************************************//

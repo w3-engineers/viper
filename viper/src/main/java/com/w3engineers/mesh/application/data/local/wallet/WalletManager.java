@@ -194,9 +194,7 @@ public class WalletManager {
         return null;
     }
 
-    public void getAllOpenDrawableBlock() throws ExecutionException, InterruptedException {
-        //TODO there is a problem in the callback, for every request a callback is fired, but it should be at the end when all process are completed.
-
+    public void getAllOpenDrawableBlock() {
         PurchaseManagerSeller.getInstance().getAllOpenDrawableBlock();
     }
 
