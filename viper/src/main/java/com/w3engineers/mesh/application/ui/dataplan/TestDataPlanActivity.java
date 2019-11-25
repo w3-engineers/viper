@@ -134,6 +134,7 @@ public class TestDataPlanActivity extends TelemeshBaseActivity implements DataPl
     private void checkAndCloseMesh(int role) {
         if (mCurrentRole == role) {
             DataPlanManager.getInstance().closeMesh(DataPlanConstants.USER_ROLE.MESH_STOP);
+            mCurrentRole = DataPlanConstants.USER_ROLE.MESH_STOP;
         }
         expandableButtons[role].setTextColor(getResources().getColor(R.color.data_plan_unselected_text));
     }
