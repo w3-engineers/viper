@@ -183,9 +183,7 @@ public class WalletActivity extends TelemeshBaseActivity implements WalletManage
                             null, "OK", null);
                 }
             }
-
         });
-
     }
 
     @Override
@@ -207,7 +205,6 @@ public class WalletActivity extends TelemeshBaseActivity implements WalletManage
                 WalletActivity.this.refreshMyBalance();
             }
             Toaster.showLong(msg);
-
         });
     }
 

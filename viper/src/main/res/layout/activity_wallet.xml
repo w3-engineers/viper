@@ -184,7 +184,7 @@
                             android:layout_height="match_parent"
                             android:layout_marginBottom="@dimen/margin_15">
 
-                            <android.support.constraint.Guideline
+                            <!--                          <android.support.constraint.Guideline
                                 android:id="@+id/guideline"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
@@ -229,7 +229,52 @@
                                 android:textStyle="bold"
                                 app:layout_constraintBottom_toBottomOf="@+id/text_view_pending_title"
                                 app:layout_constraintStart_toEndOf="@+id/text_view_pending_balance"
-                                app:layout_constraintTop_toTopOf="@+id/text_view_pending_title" />
+                                app:layout_constraintTop_toTopOf="@+id/text_view_pending_title" />-->
+
+
+                            <TextView
+                                android:id="@+id/text_view_pending_title"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@string/pending_balance_point"
+                                android:textAllCaps="true"
+                                android:textColor="@color/white_light"
+                                android:textSize="@dimen/text_size_16"
+                                android:textStyle="bold"
+                                app:layout_constraintBottom_toBottomOf="parent"
+                                app:layout_constraintEnd_toStartOf="@+id/view3"
+                                app:layout_constraintHorizontal_bias="0.5"
+                                app:layout_constraintStart_toStartOf="parent"
+                                app:layout_constraintTop_toTopOf="parent" />
+
+                            <TextView
+                                android:id="@+id/text_view_pending_balance"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="0.0"
+                                android:textColor="@color/white"
+                                android:textSize="@dimen/text_size_22"
+                                android:textStyle="bold"
+                                app:layout_constraintBottom_toBottomOf="parent"
+                                app:layout_constraintStart_toEndOf="@+id/text_view_pending_title"
+                                app:layout_constraintEnd_toStartOf="@+id/view3"
+                                app:layout_constraintTop_toTopOf="parent"
+                                app:layout_constraintVertical_chainStyle="spread_inside" />
+
+                            <TextView
+                                android:id="@+id/view3"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@string/points_title"
+                                android:textColor="@color/white_light"
+                                android:textSize="@dimen/text_size_16"
+                                android:textStyle="bold"
+                                app:layout_constraintBottom_toBottomOf="parent"
+                                app:layout_constraintEnd_toEndOf="parent"
+                                app:layout_constraintHorizontal_bias="0.5"
+                                app:layout_constraintStart_toEndOf="@+id/text_view_pending_balance"
+                                app:layout_constraintTop_toTopOf="parent"
+                                app:layout_constraintVertical_chainStyle="packed" />
 
 
                         </android.support.constraint.ConstraintLayout>

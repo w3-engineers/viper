@@ -135,6 +135,7 @@ public class TestDataPlanActivity extends TelemeshBaseActivity implements DataPl
         if (mCurrentRole == role) {
             DataPlanManager.getInstance().closeMesh(DataPlanConstants.USER_ROLE.MESH_STOP);
         }
+        expandableButtons[role].setTextColor(getResources().getColor(R.color.data_plan_unselected_text));
     }
 
 
@@ -149,7 +150,6 @@ public class TestDataPlanActivity extends TelemeshBaseActivity implements DataPl
 //                                    "Switch On", Toast.LENGTH_SHORT).show();
                         } else {
 
-                            expandableButtons[mCurrentRole].setTextColor(getResources().getColor(R.color.data_plan_unselected_text));
                             checkAndCloseMesh(DataPlanConstants.USER_ROLE.MESH_USER);
 //                            Toast.makeText(TestDataPlanActivity.this,
 //                                    "Switch Off", Toast.LENGTH_SHORT).show();
@@ -166,7 +166,7 @@ public class TestDataPlanActivity extends TelemeshBaseActivity implements DataPl
 //                          Toast.makeText(TestDataPlanActivity.this,
 //                                    "Switch On", Toast.LENGTH_SHORT).show();
                         } else {
-                            expandableButtons[mCurrentRole].setTextColor(getResources().getColor(R.color.data_plan_unselected_text));
+
                             checkAndCloseMesh(DataPlanConstants.USER_ROLE.DATA_SELLER);
 //                            Toast.makeText(TestDataPlanActivity.this,
 //                                    "Switch Off", Toast.LENGTH_SHORT).show();
@@ -185,7 +185,6 @@ public class TestDataPlanActivity extends TelemeshBaseActivity implements DataPl
 //                            Toast.makeText(TestDataPlanActivity.this,
 //                                    "Switch On", Toast.LENGTH_SHORT).show();
                         } else {
-                            expandableButtons[mCurrentRole].setTextColor(getResources().getColor(R.color.data_plan_unselected_text));
                             checkAndCloseMesh(DataPlanConstants.USER_ROLE.DATA_BUYER);
 //                            Toast.makeText(TestDataPlanActivity.this,
 //                                    "Switch Off", Toast.LENGTH_SHORT).show();
@@ -202,7 +201,6 @@ public class TestDataPlanActivity extends TelemeshBaseActivity implements DataPl
 //                            Toast.makeText(TestDataPlanActivity.this,
 //                                    "Switch On", Toast.LENGTH_SHORT).show();
                         } else {
-                            expandableButtons[mCurrentRole].setTextColor(getResources().getColor(R.color.data_plan_unselected_text));
                             checkAndCloseMesh(DataPlanConstants.USER_ROLE.INTERNET_USER);
 //                            Toast.makeText(TestDataPlanActivity.this,
 //                                    "Switch Off", Toast.LENGTH_SHORT).show();
@@ -566,25 +564,24 @@ public class TestDataPlanActivity extends TelemeshBaseActivity implements DataPl
     private void dataPlanRadioClicked(int type) {
         if (mCurrentRole == type)
             return;
-
-        if (mCurrentRole != DataPlanConstants.USER_ROLE.MESH_STOP){
-            roleSwitches[mCurrentRole].setChecked(false);
-            expandableButtons[type].setTextColor(Color.argb(255, 0, 141, 255));
-        }
-
-
         setRoleTasks(mCurrentRole, type);
     }
 
 
-    private void setRoleTasks(int prev, int current) {
+    private void setRoleTasks(int prev, int newRole) {
 
         progressDialog.setMessage(getResources().getString(R.string.switching_role));
         progressDialog.setCancelable(false);
         progressDialog.show();
 
-        mCurrentRole = current;
+        mCurrentRole = newRole;
         viewModel.roleSwitch(mCurrentRole);
+
+
+        if (prev != DataPlanConstants.USER_ROLE.MESH_STOP){
+            roleSwitches[prev].setChecked(false);
+            expandableButtons[mCurrentRole].setTextColor(Color.argb(255, 0, 141, 255));
+        }
     }
 
     private void initRecyclerView() {
