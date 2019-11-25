@@ -122,7 +122,6 @@ public class TestDataPlanActivity extends TelemeshBaseActivity implements DataPl
 
         setClickListener(mBinding.buttonSave);
 
-
         DataPlanManager.getInstance().setDataPlanListener(this);
 
 
