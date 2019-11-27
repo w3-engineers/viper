@@ -139,15 +139,15 @@
     <string name="total_mb">of %sMB</string>
     <string name="total_purchase">Total %sMB</string>
 
-    <string name="install_ts">Install RightMesh Service</string>
-    <string name="need_ts">You need to install RightMesh Service for user discovery</string>
+    <string name="install_ts">Install TeleService</string>
+    <string name="need_ts">You need to install TeleService for user discovery</string>
 
     <string name="authority">com.w3engineers.mesh.provider</string>
 
     <string name="allow">Allow Now</string>
     <string name="later">Later</string>
     <string name="permission">Permission needed</string>
-    <string name="permission_message">Need to allow permission on RightMesh Service app to work properly. You can open the RightMesh Service app clicking on launcher icon or can give permission manually from setting</string>
+    <string name="permission_message">Need to allow permission on TeleService app to work properly. You can open the TeleService app clicking on launcher icon or can give permission manually from setting</string>
     <string name="pending_balance">Pending balance will be deposited to main balance after crossing <b>10</b> points.</string>
     <string name="points">Points</string>
     <string name="pending_balance_point">PENDING BALANCE</string>
