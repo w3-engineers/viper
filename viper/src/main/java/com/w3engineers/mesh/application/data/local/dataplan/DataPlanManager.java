@@ -20,7 +20,6 @@ import com.w3engineers.mesh.application.data.local.purchase.PayController;
 import com.w3engineers.mesh.application.data.local.purchase.PurchaseConstants;
 import com.w3engineers.mesh.application.data.local.purchase.PurchaseManagerBuyer;
 import com.w3engineers.mesh.application.data.local.purchase.PurchaseManagerSeller;
-import com.w3engineers.mesh.application.ui.dataplan.DataPlanActivity;
 import com.w3engineers.mesh.application.ui.dataplan.TestDataPlanActivity;
 import com.w3engineers.mesh.util.EthereumServiceUtil;
 import com.w3engineers.mesh.util.MeshLog;
@@ -174,9 +173,9 @@ public class DataPlanManager {
         return preferencesHelperDataplan.getSellFromDate();
     }
 
-    public long getSellToDate() {
-        return preferencesHelperDataplan.getSellToDate();
-    }
+//    public long getSellToDate() {
+//        return preferencesHelperDataplan.getSellToDate();
+//    }
 
     public long getSellDataAmount() {
         return preferencesHelperDataplan.getSellDataAmount();
@@ -194,16 +193,16 @@ public class DataPlanManager {
         preferencesHelperDataplan.setSellDataAmount(sharedData);
     }
 
-    public void setSellToDate(long toDate) {
-        preferencesHelperDataplan.setSellToDate(toDate);
+//    public void setSellToDate(long toDate) {
+//        preferencesHelperDataplan.setSellToDate(toDate);
+//    }
+
+    public long getUsedData(Context context, long fromDate) throws ExecutionException, InterruptedException {
+        return DatabaseService.getInstance(context).getDataUsageByDate(fromDate);
     }
 
-    public long getUsedData(Context context, long fromDate, long toDate) throws ExecutionException, InterruptedException {
-        return DatabaseService.getInstance(context).getDataUsageByDate(fromDate, toDate);
-    }
-
-    public LiveData<Long> getDataUsage(Context context, long fromDate, long toDate) {
-        return DatabaseService.getInstance(context).getDatausageDao().getDataUsage(fromDate, toDate);
+    public LiveData<Long> getDataUsage(Context context, long fromDate) {
+        return DatabaseService.getInstance(context).getDatausageDao().getDataUsage(fromDate);
     }
 
     public void closeAllActiveChannel() {

@@ -846,7 +846,7 @@ public class PurchaseManagerBuyer extends PurchaseManager implements PayControll
             if (dataPlanListener != null) {
                 dataPlanListener.onPurchaseFailed(sellerAddress, "Not enough balance");
             }
-
+            return;
         }
 
         try {

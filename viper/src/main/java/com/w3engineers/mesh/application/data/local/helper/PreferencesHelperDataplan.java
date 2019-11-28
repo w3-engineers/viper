@@ -68,12 +68,12 @@ public class PreferencesHelperDataplan {
         return SharedPref.readLong(SELL_FROM_DATE);
     }
 
-    public void setSellToDate(long value) {
-        SharedPref.write(SELL_TO_DATE, value);
-    }
-    public long getSellToDate() {
-        return SharedPref.readLong(SELL_TO_DATE);
-    }
+//    public void setSellToDate(long value) {
+//        SharedPref.write(SELL_TO_DATE, value);
+//    }
+//    public long getSellToDate() {
+//        return SharedPref.readLong(SELL_TO_DATE);
+//    }
 
     public void setChannelCreatedBlock(long value){
         SharedPref.write(CHANNEL_CREATED_LATEST_BLOCK, value);

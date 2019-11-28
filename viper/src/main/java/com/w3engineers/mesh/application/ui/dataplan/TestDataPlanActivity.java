@@ -56,7 +56,7 @@ public class TestDataPlanActivity extends TelemeshBaseActivity implements DataPl
     private Switch[] roleSwitches;
     private ExpandableButton[] expandableButtons;
 
-    private Calendar myCalendar;
+//    private Calendar myCalendar;
 
     private ProgressDialog progressDialog;
 
@@ -115,10 +115,9 @@ public class TestDataPlanActivity extends TelemeshBaseActivity implements DataPl
 
         progressDialog = new ProgressDialog(this);
         dataLimitModel = DataLimitModel.getInstance(getApplicationContext());
-        myCalendar = Calendar.getInstance();
+//        myCalendar = Calendar.getInstance();
         mCurrentRole = DataPlanManager.getInstance().getDataPlanRole();
         dataLimitModel.setInitialRole(mCurrentRole);
-        mBinding.setDataLimitModel(dataLimitModel);
 
         setClickListener(mBinding.buttonSave);
 
@@ -611,19 +610,19 @@ public class TestDataPlanActivity extends TelemeshBaseActivity implements DataPl
 
         setDataLimitEnabled(dataLimitModel.getDataLimited());
 
-        if (dataLimitModel.getFromDate() > 0) {
-            mBinding.fromDate.setText(sdf.format(dataLimitModel.getFromDate()));
-        } else {
-            mBinding.fromDate.setText(sdf.format(myCalendar.getTime()));
-            dataLimitModel.setFromDate(myCalendar.getTimeInMillis());
-        }
-        if (dataLimitModel.getToDate() > 0) {
-            MeshLog.v("todate " + sdf.format(dataLimitModel.getToDate()) + "  " + dataLimitModel.getToDate());
-            mBinding.toDate.setText(sdf.format(dataLimitModel.getToDate()));
-        } else {
-            mBinding.toDate.setText(sdf.format(myCalendar.getTime()));
-            dataLimitModel.setToDate(myCalendar.getTimeInMillis());
-        }
+//        if (dataLimitModel.getFromDate() > 0) {
+//            mBinding.fromDate.setText(sdf.format(dataLimitModel.getFromDate()));
+//        } else {
+//            mBinding.fromDate.setText(sdf.format(myCalendar.getTime()));
+//            dataLimitModel.setFromDate(myCalendar.getTimeInMillis());
+//        }
+//        if (dataLimitModel.getToDate() > 0) {
+//            MeshLog.v("todate " + sdf.format(dataLimitModel.getToDate()) + "  " + dataLimitModel.getToDate());
+//            mBinding.toDate.setText(sdf.format(dataLimitModel.getToDate()));
+//        } else {
+//            mBinding.toDate.setText(sdf.format(myCalendar.getTime()));
+////            dataLimitModel.setToDate(myCalendar.getTimeInMillis());
+//        }
 
 
         long sharedData = DataPlanManager.getInstance().getSellAmountData();
@@ -636,7 +635,7 @@ public class TestDataPlanActivity extends TelemeshBaseActivity implements DataPl
             mBinding.range.setText(amount + "");
         }
 
-        mBinding.fromDate.setEnabled(false);
+//        mBinding.fromDate.setEnabled(false);
 
         disableSaveButton();
     }
@@ -651,7 +650,7 @@ public class TestDataPlanActivity extends TelemeshBaseActivity implements DataPl
 
     private void setDataLimitEnabled(boolean value) {
         mBinding.range.setEnabled(value);
-        mBinding.toDate.setEnabled(value);
+//        mBinding.toDate.setEnabled(value);
     }
 
     private void setEventListener() {
@@ -676,33 +675,33 @@ public class TestDataPlanActivity extends TelemeshBaseActivity implements DataPl
             }
         });
 
-        DatePickerDialog.OnDateSetListener date = (view, year, monthOfYear, dayOfMonth) -> {
+//        DatePickerDialog.OnDateSetListener date = (view, year, monthOfYear, dayOfMonth) -> {
+//
+//            myCalendar.set(Calendar.YEAR, year);
+//            myCalendar.set(Calendar.MONTH, monthOfYear);
+//            myCalendar.set(Calendar.DAY_OF_MONTH, dayOfMonth);
+//            mBinding.toDate.setText(sdf.format(myCalendar.getTimeInMillis()));
+//            mBinding.fromDate.setText(sdf.format(System.currentTimeMillis()));
+//
+//            enableSaveButton();
+//        };
 
-            myCalendar.set(Calendar.YEAR, year);
-            myCalendar.set(Calendar.MONTH, monthOfYear);
-            myCalendar.set(Calendar.DAY_OF_MONTH, dayOfMonth);
-            mBinding.toDate.setText(sdf.format(myCalendar.getTimeInMillis()));
-            mBinding.fromDate.setText(sdf.format(System.currentTimeMillis()));
 
-            enableSaveButton();
-        };
-
-
-        mBinding.toDate.setOnClickListener(v -> {
-            if (dataLimitModel.getToDate() > myCalendar.getTimeInMillis() - 1000) {
-                myCalendar.setTimeInMillis(dataLimitModel.getToDate());
-            }
-
-            DatePickerDialog toDatePickerDialog = new DatePickerDialog(TestDataPlanActivity.this, date, myCalendar.get(Calendar.YEAR), myCalendar.get(Calendar.MONTH), myCalendar.get(Calendar.DAY_OF_MONTH));
-            toDatePickerDialog.getDatePicker().setMinDate(dataLimitModel.getFromDate() > System.currentTimeMillis() ? dataLimitModel.getFromDate() : System.currentTimeMillis());
-            toDatePickerDialog.show();
-        });
+//        mBinding.toDate.setOnClickListener(v -> {
+//            if (dataLimitModel.getToDate() > myCalendar.getTimeInMillis() - 1000) {
+//                myCalendar.setTimeInMillis(dataLimitModel.getToDate());
+//            }
+//
+//            DatePickerDialog toDatePickerDialog = new DatePickerDialog(TestDataPlanActivity.this, date, myCalendar.get(Calendar.YEAR), myCalendar.get(Calendar.MONTH), myCalendar.get(Calendar.DAY_OF_MONTH));
+//            toDatePickerDialog.getDatePicker().setMinDate(dataLimitModel.getFromDate() > System.currentTimeMillis() ? dataLimitModel.getFromDate() : System.currentTimeMillis());
+//            toDatePickerDialog.show();
+//        });
     }
 
     private void parseIntent() {
         Intent intent = getIntent();
-        if (intent.hasExtra(DataPlanActivity.class.getName())) {
-            if (intent.getBooleanExtra(DataPlanActivity.class.getName(), false)) {
+        if (intent.hasExtra(TestDataPlanActivity.class.getName())) {
+            if (intent.getBooleanExtra(TestDataPlanActivity.class.getName(), false)) {
                 NotificationUtil.removeSellerNotification(this);
                 showSellerWarningDialog(intent.getIntExtra(DataPlanConstants.IntentKeys.NUMBER_OF_ACTIVE_BUYER, 0));
             }
@@ -812,6 +811,9 @@ public class TestDataPlanActivity extends TelemeshBaseActivity implements DataPl
 
 //        mBinding.textViewDataLimitWarning.setVisibility(View.GONE);
         enableSaveButton();
+
+
+
     }
 
     public void onRadioLimitedButtonClicked(View view) {
@@ -842,77 +844,61 @@ public class TestDataPlanActivity extends TelemeshBaseActivity implements DataPl
     private void checkSharingLimit() {
 
         if (mBinding.limitTo.isChecked()) {
-
-            long from = 0l, to = 0l;
-            long tempSharedData = convertMegabytesToBytes(Integer.valueOf(mBinding.range.getText().toString()));
             try {
-                from = getDayWiseTimeStamp(sdf.parse(mBinding.fromDate.getText().toString()).getTime());
-                to = getDayWiseTimeStamp(sdf.parse(mBinding.toDate.getText().toString()).getTime()) + (24 * 60 * 60 * 1000 - 1000);
-            } catch (ParseException e) {
-                e.printStackTrace();
-            }
+                long from = dataLimitModel.getFromDate();
+                long sharedData = dataLimitModel.getSharedData();
 
-            if (to <= System.currentTimeMillis()) {
-                mBinding.dateError.setVisibility(View.VISIBLE);
-                mBinding.dateError.setText(getString(R.string.date_expired));
-
-            } else {
-                mBinding.dateError.setVisibility(View.INVISIBLE);
-                long usedData = 0;
-                try {
-                    usedData = DataPlanManager.getInstance().getUsedData(this, from, to);
-                } catch (ExecutionException e) {
-                    e.printStackTrace();
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-
-                if (tempSharedData <= usedData) {
-                    mBinding.dataLimitError.setVisibility(View.VISIBLE);
-                    mBinding.dataLimitError.setText(this.getString(R.string.data_lomit_larger_needed));
-
-                } else {
+                long tempSharedData = convertMegabytesToBytes(Integer.valueOf(mBinding.range.getText().toString()));
+                if (from == 0 || sharedData == 0){
                     mBinding.dataLimitError.setVisibility(View.INVISIBLE);
-                    dataLimitModel.setFromDate(from);
-                    dataLimitModel.setToDate(to);
+                    dataLimitModel.setFromDate(System.currentTimeMillis());
                     dataLimitModel.setSharedData(tempSharedData);
-
                     dataLimitModel.setDataLimited(true);
-
-                    if (dataLimitModel != null
-                            && dataLimitModel.getUsedData().getValue() != null
-                            && dataLimitModel.getSharedData().getValue() != null) {
-
-                        if (dataLimitModel.getUsedData().getValue() >= (dataLimitModel.getSharedData().getValue() - DataPlanConstants.SELLER_MINIMUM_WARNING_DATA)) {
-//                            mBinding.textViewDataLimitWarning.setVisibility(View.VISIBLE);
-                        } else {
-//                            mBinding.textViewDataLimitWarning.setVisibility(View.GONE);
-                        }
-                    } else {
-//                        mBinding.textViewDataLimitWarning.setVisibility(View.GONE);
-                    }
-
                     disableSaveButton();
+                } else {
+                    long usedData = DataPlanManager.getInstance().getUsedData(this, from);
+                    if (sharedData <= usedData){
+                        mBinding.dataLimitError.setVisibility(View.INVISIBLE);
+                        dataLimitModel.setFromDate(System.currentTimeMillis());
+                        dataLimitModel.setSharedData(tempSharedData);
+                        dataLimitModel.setDataLimited(true);
+                        disableSaveButton();
+                    }else {
+                        if (tempSharedData <= usedData) {
+                            mBinding.dataLimitError.setVisibility(View.VISIBLE);
+                            mBinding.dataLimitError.setText(this.getString(R.string.data_lomit_larger_needed));
+
+                        } else {
+                            mBinding.dataLimitError.setVisibility(View.INVISIBLE);
+                            dataLimitModel.setFromDate(System.currentTimeMillis());
+                            dataLimitModel.setSharedData(tempSharedData);
+                            dataLimitModel.setDataLimited(true);
+                            disableSaveButton();
+                        }
+                    }
                 }
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            } catch (ExecutionException e) {
+                e.printStackTrace();
             }
         } else {
             mBinding.dataLimitError.setVisibility(View.INVISIBLE);
-            mBinding.dateError.setVisibility(View.INVISIBLE);
-
             dataLimitModel.setDataLimited(false);
-
+            dataLimitModel.setFromDate(0);
+            dataLimitModel.setSharedData(0l);
             disableSaveButton();
         }
     }
 
-    public long getDayWiseTimeStamp(long timeStamp) {
-        Calendar cal = Calendar.getInstance();
-        cal.setTimeInMillis(timeStamp);
-        cal.set(Calendar.HOUR_OF_DAY, 0); //set hours to zero
-        cal.set(Calendar.MINUTE, 0); // set minutes to zero
-        cal.set(Calendar.SECOND, 0); //set seconds to zero
-        return (cal.getTimeInMillis() / 1000) * 1000;
-    }
+//    public long getDayWiseTimeStamp(long timeStamp) {
+//        Calendar cal = Calendar.getInstance();
+//        cal.setTimeInMillis(timeStamp);
+//        cal.set(Calendar.HOUR_OF_DAY, 0); //set hours to zero
+//        cal.set(Calendar.MINUTE, 0); // set minutes to zero
+//        cal.set(Calendar.SECOND, 0); //set seconds to zero
+//        return (cal.getTimeInMillis() / 1000) * 1000;
+//    }
 
 //    @Override
 //    public boolean onCreateOptionsMenu(Menu menu) {

@@ -1237,7 +1237,6 @@ public class PurchaseManagerSeller extends PurchaseManager implements PayControl
 
                 if (bps_balance > purchase.deposit) {
                     //TODO what to do here
-//                    MeshLog.p("onPayForMessageOkReceived bps balance is greater than deposit");
                 } else {
 
                     MeshLog.v("Message Queuing 11");
@@ -1268,14 +1267,14 @@ public class PurchaseManagerSeller extends PurchaseManager implements PayControl
 
                         if (preferencesHelperDataplan.getDataAmountMode() == DataPlanConstants.DATA_MODE.LIMITED) {
                             long fromDate = preferencesHelperDataplan.getSellFromDate();
-                            long toDate = preferencesHelperDataplan.getSellToDate();
+                            long toDate =System.currentTimeMillis();//preferencesHelperDataplan.getSellToDate();
                             long sharedData = preferencesHelperDataplan.getSellDataAmount();
 
                             MeshLog.v("Message Queuing 13");
 
                             long usedData = 0;
                             try {
-                                usedData = databaseService.getDataUsageByDate(fromDate, toDate);
+                                usedData = databaseService.getDataUsageByDate(fromDate);
                             } catch (ExecutionException e) {
                                 e.printStackTrace();
                             } catch (InterruptedException e) {
@@ -1323,23 +1322,11 @@ public class PurchaseManagerSeller extends PurchaseManager implements PayControl
                                 purchase.closingHash = closingHash;
                                 purchase.usedDataAmount = purchase.usedDataAmount + dataSizeMB;
                                 databaseService.updatePurchase(purchase);
-                                MeshLog.o("/*/*/*/*/*/*/*/*/ seller updated the database /*/*/*/*/*/*/*/");
-
-//                                buyerPendingMessage.status = PurchaseConstants.BUYER_PENDING_MESSAGE_STATUS.SENT_PAID;
 
                                 MeshLog.o("balancemismatchcheck3 " + bps_balance + "  " + purchase.usedDataAmount);
                                 databaseService.updateBuyerPendingMessage(buyerPendingMessage);
 
                                 MeshLog.v("Message Queuing 15");
-
-                                /*if (buyerPendingMessage.isIncomming) {
-                                    payController.getDataManager().onPaymentGotForIncomingMessage(true, buyerPendingMessage.owner, buyerPendingMessage.sender, buyerPendingMessage.msgId, buyerPendingMessage.msgData);
-
-                                } else {
-                                    payController.getDataManager().onPaymentGotForOutgoingMessage(true, buyerPendingMessage.owner, buyerPendingMessage.sender, buyerPendingMessage.msgId, buyerPendingMessage.msgData);
-
-                                }*/
-
 
                                 try {
                                     MeshLog.v("Message Queuing 18");
@@ -1391,20 +1378,11 @@ public class PurchaseManagerSeller extends PurchaseManager implements PayControl
                             purchase.closingHash = closingHash;
                             purchase.usedDataAmount = purchase.usedDataAmount + dataSizeMB;
                             databaseService.updatePurchase(purchase);
-                            MeshLog.o("/*/*/*/*/*/*/*/*/ seller updated the database /*/*/*/*/*/*/*/");
-
-//                            buyerPendingMessage.status = PurchaseConstants.BUYER_PENDING_MESSAGE_STATUS.SENT_PAID;
 
                             MeshLog.o("balancemismatchcheck3 " + bps_balance + "  " + purchase.usedDataAmount);
                             databaseService.updateBuyerPendingMessage(buyerPendingMessage);
 
                             MeshLog.v("Message Queuing 20");
-                            /*if (buyerPendingMessage.isIncomming) {
-                                payController.getDataManager().onPaymentGotForIncomingMessage(true, buyerPendingMessage.owner, buyerPendingMessage.sender, buyerPendingMessage.msgId, buyerPendingMessage.msgData);
-                            } else {
-                                payController.getDataManager().onPaymentGotForOutgoingMessage(true, buyerPendingMessage.owner, buyerPendingMessage.sender, buyerPendingMessage.msgId, buyerPendingMessage.msgData);
-                            }
-*/
 
                             try {
                                 JSONObject successJson = new JSONObject();
@@ -1427,7 +1405,7 @@ public class PurchaseManagerSeller extends PurchaseManager implements PayControl
                                 payController.sendPayForMessageResponse(successJson, msg_receiver);
                             } catch (JSONException e) {
                                 //TODO what to do here
-//                                        MeshLog.p("onPayForMessageOkReceived EX " + e.getMessage());
+//                                MeshLog.p("onPayForMessageOkReceived EX " + e.getMessage());
                             }
                         }
                     } else {

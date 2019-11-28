@@ -588,34 +588,6 @@ public class DatabaseService {
         return db.datausageDao();
     }
 
-   /* public void insertMessage(Message message) {
-        executor.submit(new Callable() {
-            @Override
-            public Integer call() {
-                try {
-                    db.messageDao().insertAll(message);
-                } catch (Exception e) {
-                    Log.e("error", e.toString());
-                }
-                return 0;
-            }
-        });
-    }*/
-
-   /* public void deleteMessage(String messageId) {
-        executor.submit(new Callable() {
-            @Override
-            public Integer call() {
-                try {
-                    db.messageDao().deleteByMessageById(messageId);
-                } catch (Exception e) {
-                    Log.e("error", e.toString());
-                }
-                return 0;
-            }
-        });
-    }*/
-
     public List<Message> getAll() throws ExecutionException, InterruptedException {
         Future<List<Message>> future = executor.submit(new Callable() {
             @Override
@@ -633,57 +605,6 @@ public class DatabaseService {
 
     }
 
-    /*public Message getMessageById(String msg_id) throws ExecutionException, InterruptedException {
-        Future<Message> future = executor.submit(new Callable() {
-            @Override
-            public Message call() {
-                Message message = null;
-                try {
-                    message = db.messageDao().getMessageById(msg_id);
-                } catch (Exception e) {
-                    Log.e("error", e.toString());
-                }
-                return message;
-            }
-        });
-        return future.get();
-    }*/
-
-/*    public Message getPendingRequest(String receiverId) throws ExecutionException, InterruptedException {
-        Future<Message> future = executor.submit(new Callable() {
-            @Override
-            public Message call() {
-                Message message = null;
-                try {
-                    message = db.messageDao().getPendingMessage(receiverId);
-                } catch (Exception e) {
-                    Log.e("error", e.toString());
-                }
-                return message;
-            }
-        });
-        return future.get();
-    }*/
-
-
-   /* public List<Message> getPendingMessage(String receiverId) throws ExecutionException, InterruptedException {
-        Future<List<Message>> future = executor.submit(new Callable() {
-            @Override
-            public List<Message> call() {
-                List<Message> messageList = null;
-                try {
-                    messageList = db.messageDao().getPendingMessage(receiverId);
-                } catch (Exception e) {
-                    Log.e("error", e.toString());
-                }
-                return messageList;
-            }
-        });
-        return future.get();
-
-    }*/
-
-
     public void insertDataUsage(Datausage datausage) {
         executor.submit(new Callable() {
             @Override
@@ -700,14 +621,14 @@ public class DatabaseService {
         });
     }
 
-    public long getDataUsageByDate(long fromDate, long toDate) throws ExecutionException, InterruptedException {
+    public long getDataUsageByDate(long fromDate) throws ExecutionException, InterruptedException {
 
         Future<Long> future = executor.submit(new Callable() {
             @Override
             public Long call() {
                 long dataSize = 0;
                 try {
-                    dataSize = db.datausageDao().getUsedData(fromDate, toDate);
+                    dataSize = db.datausageDao().getUsedData(fromDate);
                 } catch (Exception e) {
                     Log.e("error", e.toString());
                 }
