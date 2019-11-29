@@ -59,7 +59,7 @@ public class PayController {
     }
 
     public interface PayControllerListenerForBuyer {
-        void onInitPurchaseOkReceived(String sellerAddress, double ethBalance, double tokenBallance, int nonce, double allowance, int endPointType);
+        void onInitPurchaseOkReceived(String sellerAddress, double ethBalance, double tokenBallance, int nonce, double allowance, int endPointType, long sharedData);
 
         void onInitPurchaseErrorReceived(String sellerAddress, String msg);
 
@@ -242,9 +242,10 @@ public class PayController {
                         double tknB = ((Number) jsonObject.get("tkn")).doubleValue();
                         double allowance = ((Number) jsonObject.get("allowance")).doubleValue();
                         nonce = jsonObject.getInt("nonce");
+                        long sharedData = jsonObject.getLong(PurchaseConstants.INFO_KEYS.SHARED_DATA);
 
                         if (payControllerListenerForBuyer != null) {
-                            payControllerListenerForBuyer.onInitPurchaseOkReceived(fromAddress, ethB, tknB, nonce, allowance, endPointType);
+                            payControllerListenerForBuyer.onInitPurchaseOkReceived(fromAddress, ethB, tknB, nonce, allowance, endPointType, sharedData);
                         } else {
                             MeshLog.v("INIT_PURCHASE_OK Listener not found");
                         }

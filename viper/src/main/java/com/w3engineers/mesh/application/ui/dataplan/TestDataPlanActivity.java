@@ -494,6 +494,13 @@ public class TestDataPlanActivity extends TelemeshBaseActivity implements DataPl
     }
 
     @Override
+    public void onLimitFinished(boolean isFullyFinished, String message) {
+        mBinding.dataLimitError.setTextColor(isFullyFinished ? Color.RED : Color.argb(255, 255, 140, 0));
+        mBinding.dataLimitError.setText(message);
+        mBinding.dataLimitError.setVisibility(View.VISIBLE);
+    }
+
+    @Override
     public void onPurchaseCloseSuccess(String sellerAddress) {
         runOnUiThread(() -> {
             //TODO remove item if seller not connected
@@ -710,8 +717,8 @@ public class TestDataPlanActivity extends TelemeshBaseActivity implements DataPl
 
     private void showSellerWarningDialog(int activeBuyer) {
         long sharedData = DataPlanManager.getInstance().getSellAmountData();
-        DialogUtil.showConfirmationDialog(TestDataPlanActivity.this, "Data Limit exceed",
-                "Your data shared limit" + " " + sharedData + " " + "exceeded, there are" + " " + activeBuyer + " " + "active buyer." + "Do you want to enhance shared data limit? If not then all the active channel would be closed",
+        DialogUtil.showConfirmationDialog(TestDataPlanActivity.this, "Data Limit exceeded!",
+                "Your data shared limit" + " " + sharedData + " " + "exceeded, there are" + " " + activeBuyer + " " + "active buyer." + "Do you want to increase your shared data limit? If not then all the active channel will be closed",
                 getResources().getString(R.string.no),
                 getResources().getString(R.string.yes),
                 new DialogUtil.DialogButtonListener() {
@@ -865,8 +872,8 @@ public class TestDataPlanActivity extends TelemeshBaseActivity implements DataPl
                         disableSaveButton();
                     }else {
                         if (tempSharedData <= usedData) {
-                            mBinding.dataLimitError.setVisibility(View.VISIBLE);
                             mBinding.dataLimitError.setText(this.getString(R.string.data_lomit_larger_needed));
+                            mBinding.dataLimitError.setVisibility(View.VISIBLE);
 
                         } else {
                             mBinding.dataLimitError.setVisibility(View.INVISIBLE);

@@ -22,6 +22,7 @@ import com.w3engineers.mesh.application.data.local.purchase.PurchaseManagerBuyer
 import com.w3engineers.mesh.application.data.local.purchase.PurchaseManagerSeller;
 import com.w3engineers.mesh.application.ui.dataplan.TestDataPlanActivity;
 import com.w3engineers.mesh.util.EthereumServiceUtil;
+import com.w3engineers.mesh.util.MeshApp;
 import com.w3engineers.mesh.util.MeshLog;
 
 import java.io.ByteArrayOutputStream;
@@ -84,6 +85,8 @@ public class DataPlanManager {
 
         if (getDataPlanRole() == DataPlanConstants.USER_ROLE.DATA_BUYER) {
             PurchaseManagerBuyer.getInstance().setDataPlanListener(dataPlanListener);
+        } else if (getDataPlanRole() == DataPlanConstants.USER_ROLE.DATA_SELLER){
+            PurchaseManagerSeller.getInstance().setDataPlanListener(dataPlanListener);
         }
     }
 
@@ -113,6 +116,8 @@ public class DataPlanManager {
         void onTopUpFailed(String sellerAddress, String msg);
 
         void onRoleSwitchCompleted();
+
+        void onLimitFinished(boolean isFullyFinished, String message);
     }
 
     public void roleSwitch(int newRole) {
@@ -131,11 +136,15 @@ public class DataPlanManager {
         if (getDataPlanRole() == DataPlanConstants.USER_ROLE.DATA_BUYER) {
 
             PurchaseManagerBuyer.getInstance().setDataPlanListener(dataPlanListener);
+
+            PurchaseManagerSeller.getInstance().setDataPlanListener(null);
             PurchaseManagerSeller.getInstance().destroyObject();
+
 
             PurchaseManagerBuyer.getInstance().setPayControllerListener();
 
         } else if (getDataPlanRole() == DataPlanConstants.USER_ROLE.DATA_SELLER) {
+            PurchaseManagerSeller.getInstance().setDataPlanListener(dataPlanListener);
 
             PurchaseManagerBuyer.getInstance().setDataPlanListener(null);
             PurchaseManagerBuyer.getInstance().destroyObject();
@@ -191,6 +200,24 @@ public class DataPlanManager {
 
     public void setSellDataAmount(Long sharedData) {
         preferencesHelperDataplan.setSellDataAmount(sharedData);
+    }
+
+
+    public long getRemainingData(){
+        if (preferencesHelperDataplan.getDataAmountMode() == DataPlanConstants.DATA_MODE.LIMITED){
+            try {
+                long sharedData = preferencesHelperDataplan.getSellDataAmount();
+                long usedData = getUsedData(MeshApp.getContext(), preferencesHelperDataplan.getSellFromDate());
+                return sharedData - usedData;
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            } catch (ExecutionException e) {
+                e.printStackTrace();
+            }
+
+        }
+
+        return 0;
     }
 
 //    public void setSellToDate(long toDate) {

@@ -38,7 +38,6 @@ public class PurchaseManagerBuyer extends PurchaseManager implements PayControll
     private boolean isWarningShown;
     private String giftRequestedSeller = null;
 
-    private DataPlanManager.DataPlanListener dataPlanListener;
     private WalletManager.WalletListener walletListener;
     private String probableSellerId = null;
 
@@ -54,9 +53,7 @@ public class PurchaseManagerBuyer extends PurchaseManager implements PayControll
         return purchaseManagerBuyer;
     }
 
-    public void setDataPlanListener(DataPlanManager.DataPlanListener dataPlanListener) {
-        this.dataPlanListener = dataPlanListener;
-    }
+
 
 
 
@@ -593,11 +590,11 @@ public class PurchaseManagerBuyer extends PurchaseManager implements PayControll
                                     String signedMessage = ethService.close(purchase.sellerAddress, purchase.openBlockNumber,
                                             purchase.balance, purchase.balanceProof, purchase.closingHash, nonce, endPointType);
 
-                                    MeshLog.p("balanceproofcheck 5 " + purchase.sellerAddress);
-                                    MeshLog.p("balanceproofcheck 6 " + purchase.openBlockNumber);
-                                    MeshLog.p("balanceproofcheck 7 " + purchase.balance);
-                                    MeshLog.p("balanceproofcheck 8 " + purchase.balanceProof);
-                                    MeshLog.p("balanceproofcheck 9 " + purchase.closingHash);
+//                                    MeshLog.p("balanceproofcheck 5 " + purchase.sellerAddress);
+//                                    MeshLog.p("balanceproofcheck 6 " + purchase.openBlockNumber);
+//                                    MeshLog.p("balanceproofcheck 7 " + purchase.balance);
+//                                    MeshLog.p("balanceproofcheck 8 " + purchase.balanceProof);
+//                                    MeshLog.p("balanceproofcheck 9 " + purchase.closingHash);
 
 
                                     JSONObject cJson = new JSONObject();
@@ -669,7 +666,7 @@ public class PurchaseManagerBuyer extends PurchaseManager implements PayControll
 
                         if (pendingRequestNumber > 0) {
                             failedMessage = "You already have " + pendingRequestNumber + " pending requests.";
-                        } else if (sharedData > 0 && sharedData < totalDataAmount) {
+                        } else if (sharedData > 0 && sharedData < Util.convertMegabytesToBytes(totalDataAmount)){
                             failedMessage = "Seller does not have enough data to sell.";
                         } else if (ethBalance == 0) {
                             failedMessage = Util.getCurrencyTypeMessage("You do not have enough %s.");
@@ -836,8 +833,8 @@ public class PurchaseManagerBuyer extends PurchaseManager implements PayControll
 
     @Override
     public void onInitPurchaseOkReceived(String sellerAddress, double ethBalance, double tokenBallance,
-                                         int nonce, double allowance, int endPointType) {
-        MeshLog.v("onInitPurchaseOkReceived  " + sellerAddress + " " + ethBalance + " " + tokenBallance + " " + nonce + " " + allowance);
+                                         int nonce, double allowance, int endPointType, long sharedData) {
+        MeshLog.v("onInitPurchaseOkReceived  " + sellerAddress + " " + ethBalance + " " + tokenBallance + " " + nonce + " " + allowance + " " + sharedData);
 
         double totalPrice = totalDataAmount * PurchaseConstants.PRICE_PER_MB;
 
@@ -848,6 +845,16 @@ public class PurchaseManagerBuyer extends PurchaseManager implements PayControll
             }
             return;
         }
+
+        if (sharedData > 0 && sharedData < Util.convertMegabytesToBytes(totalDataAmount)){
+            setCurrentSellerWithStatus(sellerAddress, PurchaseConstants.SELLERS_BTN_TEXT.PURCHASE);
+            if (dataPlanListener != null) {
+                dataPlanListener.onPurchaseFailed(sellerAddress, "Seller does not have enough data to sell.");
+            }
+            return;
+        }
+
+
 
         try {
 

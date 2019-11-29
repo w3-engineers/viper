@@ -17,12 +17,15 @@ import com.w3engineers.eth.data.remote.EthereumService;
 import com.w3engineers.eth.util.helper.HandlerUtil;
 import com.w3engineers.eth.util.helper.InternetUtil;
 import com.w3engineers.mesh.application.data.local.DataPlanConstants;
+import com.w3engineers.mesh.application.data.local.dataplan.DataPlanManager;
 import com.w3engineers.mesh.application.data.local.db.buyerpendingmessage.BuyerPendingMessage;
 import com.w3engineers.mesh.application.data.local.db.datausage.Datausage;
 import com.w3engineers.mesh.application.data.local.db.purchase.Purchase;
 import com.w3engineers.mesh.application.data.local.db.purchaserequests.PurchaseRequests;
 import com.w3engineers.mesh.application.data.local.helper.PreferencesHelperDataplan;
 import com.w3engineers.mesh.application.data.local.wallet.WalletManager;
+import com.w3engineers.mesh.application.ui.dataplan.TestDataPlanActivity;
+import com.w3engineers.mesh.application.ui.util.ToastUtil;
 import com.w3engineers.mesh.util.Constant;
 import com.w3engineers.mesh.util.DialogUtil;
 import com.w3engineers.mesh.util.EthereumServiceUtil;
@@ -222,12 +225,12 @@ public class PurchaseManagerSeller extends PurchaseManager implements PayControl
         Double tokenBalance = ethService.getUserTokenBalance(from, endPointType);
         Double allowance = ethService.getUserTokenAllowance(from, endPointType);
         Integer nonce = ethService.getUserNonce(from, endPointType);
-
+        long remainingData = DataPlanManager.getInstance().getRemainingData();
 
         if (ethBalance == null || tokenBalance == null || nonce == null || allowance == null) {
             sendPurchaseInitError(from, "Network error, please try again later.");
         } else {
-            sendPurchaseInitOk(from, ethBalance, tokenBalance, nonce, allowance, endPointType);
+            sendPurchaseInitOk(from, ethBalance, tokenBalance, nonce, allowance, endPointType, remainingData);
         }
     }
 
@@ -530,7 +533,7 @@ public class PurchaseManagerSeller extends PurchaseManager implements PayControl
     }
 
     private void sendPurchaseInitOk(String buyerAddress, double ethBalance, double tokenBalance,
-                                    int nonce, double allowance, int endPointType) {
+                                    int nonce, double allowance, int endPointType, long remainingData) {
 
         MeshLog.v("sendPurchaseInitOk");
         JSONObject jsonObject = new JSONObject();
@@ -540,6 +543,7 @@ public class PurchaseManagerSeller extends PurchaseManager implements PayControl
             jsonObject.put("tkn", tokenBalance);
             jsonObject.put("nonce", nonce);
             jsonObject.put("allowance", allowance);
+            jsonObject.put(PurchaseConstants.INFO_KEYS.SHARED_DATA, remainingData);
 
             setEndPointInfoInJson(jsonObject, endPointType);
 
@@ -1144,7 +1148,8 @@ public class PurchaseManagerSeller extends PurchaseManager implements PayControl
                     switch (item) {
                         case PurchaseConstants.INFO_KEYS.SHARED_DATA:
                             try {
-                                infoJson.put(item, 0);
+                                long remainingData = DataPlanManager.getInstance().getRemainingData();
+                                infoJson.put(item, remainingData);
                             } catch (JSONException e) {
                                 e.printStackTrace();
                             }
@@ -1267,7 +1272,6 @@ public class PurchaseManagerSeller extends PurchaseManager implements PayControl
 
                         if (preferencesHelperDataplan.getDataAmountMode() == DataPlanConstants.DATA_MODE.LIMITED) {
                             long fromDate = preferencesHelperDataplan.getSellFromDate();
-                            long toDate =System.currentTimeMillis();//preferencesHelperDataplan.getSellToDate();
                             long sharedData = preferencesHelperDataplan.getSellDataAmount();
 
                             MeshLog.v("Message Queuing 13");
@@ -1281,24 +1285,56 @@ public class PurchaseManagerSeller extends PurchaseManager implements PayControl
                                 e.printStackTrace();
                             }
 
+                            if (usedData >= sharedData-buyerPendingMessage.dataSize){
+                                if (dataPlanListener != null){
+                                    dataPlanListener.onLimitFinished(true, "Data limit exceeded.");
+                                }
+
+                                Activity currentActivity = MeshApp.getCurrentActivity();
+                                if (currentActivity != null) {
+                                    int numberOfActiveBuyer = databaseService.getTotalNumberOfActiveBuyer(ethService.getAddress(), PurchaseConstants.CHANNEL_STATE.OPEN);
+                                    HandlerUtil.postForeground(() -> DialogUtil.showConfirmationDialog(currentActivity, "Data Limit exceeded!", "Your data shared limit" + " " + sharedData + " " + "exceeded, there are" + " " + numberOfActiveBuyer + " " + "active buyer." + "Do you want to increase your shared data limit? If not then all the active channel will be closed", "No, Thanks", "Ok", new DialogUtil.DialogButtonListener() {
+                                        @Override
+                                        public void onClickPositive() {
+                                            if (!(currentActivity instanceof TestDataPlanActivity)){
+                                                DataPlanManager.openActivity(currentActivity, 0);
+                                            }
+                                        }
+
+                                        @Override
+                                        public void onCancel() {
+
+                                        }
+
+                                        @Override
+                                        public void onClickNegative() {
+                                            closeAllActiveBuyerChannel();
+                                        }
+                                    }));
+                                } else {
+                                    int numberOfActiveBuyer = databaseService.getTotalNumberOfActiveBuyer(ethService.getAddress(), PurchaseConstants.CHANNEL_STATE.OPEN);
+                                    NotificationUtil.showSellerWarningNotification(mContext, "Data Limit exceeded!", "You need to take action.", numberOfActiveBuyer);
+                                }
+                                return;
+                            }
+
+
                             if (usedData >= (sharedData - Constant.SELLER_MINIMUM_WARNING_DATA)) {
+                                dataPlanListener.onLimitFinished(false, "Data limit almost exceeded.");
 
                                 try {
                                     int numberOfActiveBuyer = databaseService.getTotalNumberOfActiveBuyer(ethService.getAddress(), PurchaseConstants.CHANNEL_STATE.OPEN);
-
-                                    Intent i = new Intent("limit.usage.intent");
-                                    i.putExtra(Constant.IntentKeys.NUMBER_OF_ACTIVE_BUYER, numberOfActiveBuyer);
-
-                                    NotificationUtil.showSellerWarningNotification(mContext, "Data Limit exceed", "Your need to take action.", numberOfActiveBuyer);
+                                    NotificationUtil.showSellerWarningNotification(mContext, "Data Limit exceeded!", "You need to take action.", numberOfActiveBuyer);
 
                                 } catch (ExecutionException e) {
                                     e.printStackTrace();
                                 } catch (InterruptedException e) {
                                     e.printStackTrace();
                                 }
+                            }
 
 
-                            } else {
+
 
                                 MeshLog.v("Message Queuing 14");
 
@@ -1353,7 +1389,7 @@ public class PurchaseManagerSeller extends PurchaseManager implements PayControl
 //                                        MeshLog.p("onPayForMessageOkReceived EX " + e.getMessage());
                                 }
 
-                            }
+
                         } else {
 
                             MeshLog.v("Message Queuing 19");
