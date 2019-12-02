@@ -106,6 +106,7 @@ public class PayController {
                           double tokenBalance, int endPoint);
         void onProbableSellerDisconnected(String sellerId);
 
+        void onDisconnectedBySeller(String sellerAddress, String msg);
     }
 
     public void setBuyerListener(PayControllerListenerForBuyer listener1) {
@@ -560,12 +561,14 @@ public class PayController {
                             payControllerListenerForBuyer.giftResponse(isSuccessForGift, ethBalance, tknBalance, endPointType);
                         }
                         break;
+                    case PurchaseConstants.MESSAGE_TYPES.DISCONNECTED_BY_SELLER:
+                        msg = jsonObject.getString(PurchaseConstants.JSON_KEYS.MESSAGE_TEXT);
 
-                    case PurchaseConstants.MESSAGE_TYPES.CONNECT_BUYER:
-                        if (payControllerListenerForSeller != null) {
-                            payControllerListenerForSeller.onUserConnected(fromAddress);
+                        if (payControllerListenerForBuyer != null) {
+                            payControllerListenerForBuyer.onDisconnectedBySeller(fromAddress, msg);
                         }
                         break;
+
 
                     default:
                         break;
@@ -912,7 +915,7 @@ public class PayController {
             e.printStackTrace();
         }
         sendPayWithTimeoutMessage(receiver, jsonObject.toString(), purpose);
-//        sendPayMessage(receiver, jsonObject.toString());
+
     }
 
     public void sendBlockChainResponse(JSONObject jsonObject, String receiver) {
@@ -1000,10 +1003,10 @@ public class PayController {
         sendPayMessage(receiver, jo.toString());
     }
 
-    public void sendConnectBuyer(JSONObject jo, String receiver) {
-        MeshLog.p("sendConnectBuyer " + jo.toString());
+    public void sendDisconnectedBySeller(JSONObject jo, String receiver){
+        MeshLog.p("sendDisconnectedBySeller " + jo.toString());
         try {
-            jo.put(PurchaseConstants.JSON_KEYS.MESSAGE_TYPE, PurchaseConstants.MESSAGE_TYPES.CONNECT_BUYER);
+            jo.put(PurchaseConstants.JSON_KEYS.MESSAGE_TYPE, PurchaseConstants.MESSAGE_TYPES.DISCONNECTED_BY_SELLER);
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -1053,6 +1056,7 @@ public class PayController {
         timeoutMap.put(requestId, timeoutModel);
         handler.sendMessageDelayed(msg, delayTime);
     }
+
 }
 
 

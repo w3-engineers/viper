@@ -683,7 +683,7 @@ public class DataManager {
 
     }
 
-    public void onTransportInit(String nodeId, String publicKey, boolean success, String msg) {
+    private void onTransportInit(String nodeId, String publicKey, boolean success, String msg) {
 
         MeshLog.v("onTransportInit dtm " + nodeId);
         TransportInit transportInit = new TransportInit();
@@ -696,7 +696,7 @@ public class DataManager {
     }
 
 
-    public void onProbableSellerDisconnected(String sellerId) {
+    private void onProbableSellerDisconnected(String sellerId) {
 
         MeshLog.v("onProbableSellerDisconnected dtm " + sellerId);
         SellerRemoved sellerRemoved = new SellerRemoved();

@@ -58,7 +58,7 @@ public class DataLimitModel {
         DataPlanManager.getInstance().setSellFromDate(fromDate);
     }
 
-    public boolean getDataLimited(){
+    public boolean isDataLimited(){
         return isDataLimited;
     }
 

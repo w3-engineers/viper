@@ -456,8 +456,14 @@ public class PurchaseManagerBuyer extends PurchaseManager implements PayControll
                         jsonObject.put(PurchaseConstants.JSON_KEYS.MESSAGE_CHS, purchase.closingHash);
 
                         setEndPointInfoInJson(jsonObject, purchase.blockChainEndpoint);
-
                         payController.sendSyncMessageToSeller(jsonObject, purchase.sellerAddress);
+                    }else {
+                        JSONObject jsonObject = new JSONObject();
+                        jsonObject.put(PurchaseConstants.JSON_KEYS.MESSAME_FROM, ethService.getAddress());
+                        jsonObject.put(PurchaseConstants.JSON_KEYS.BUYER_ADDRESS, ethService.getAddress());
+                        jsonObject.put(PurchaseConstants.JSON_KEYS.SELLER_ADDRESS, address);
+
+                        payController.sendSyncMessageToSeller(jsonObject, address);
                     }
                 }
             }
@@ -800,10 +806,13 @@ public class PurchaseManagerBuyer extends PurchaseManager implements PayControll
     public void onProbableSellerDisconnected(String sellerId) {
         MeshLog.v("onProbableSellerDisconnected " + sellerId);
 
+        if (probableSellerId != null && probableSellerId.equalsIgnoreCase(sellerId)){
+            probableSellerId = null;
+        }
         try {
-            List<Purchase> myOpenPurcheses  = databaseService.getMyPurchasesWithState(ethService.getAddress(), PurchaseConstants.CHANNEL_STATE.OPEN);
+            List<Purchase> myOpenPurcheses  =  databaseService.getMyPurchasesWithState(ethService.getAddress(), PurchaseConstants.CHANNEL_STATE.OPEN);
             for (Purchase p : myOpenPurcheses){
-                if (payController.getDataManager().isUserConnected(p.sellerAddress) && p.totalDataAmount > p.usedDataAmount){
+                if (!sellerId.equalsIgnoreCase(p.sellerAddress) && payController.getDataManager().isUserConnected(p.sellerAddress) && p.totalDataAmount > p.usedDataAmount){
                     probableSellerId = p.sellerAddress;
 
                     JSONObject jsonObject = new JSONObject();
@@ -829,6 +838,30 @@ public class PurchaseManagerBuyer extends PurchaseManager implements PayControll
         } catch (Exception e){
             e.printStackTrace();
         }
+    }
+
+    @Override
+    public void onDisconnectedBySeller(String sellerAddress, String msg) {
+        try {
+            HandlerUtil.postForeground(new Runnable() {
+                @Override
+                public void run() {
+                    Toaster.showLong(msg);
+                }
+            });
+
+            if (payController.getDataManager().getCurrentSellerId().equalsIgnoreCase(sellerAddress)) {
+                payController.getDataManager().disconnectFromInternet();
+            }
+
+            if (probableSellerId != null && probableSellerId.equalsIgnoreCase(sellerAddress)){
+                onProbableSellerDisconnected(sellerAddress);
+            }
+
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        }
+
     }
 
     @Override
@@ -1200,7 +1233,10 @@ public class PurchaseManagerBuyer extends PurchaseManager implements PayControll
                 dataPlanListener.onPurchaseCloseSuccess(closingPurchase.sellerAddress);
             }
 
-            payController.getDataManager().disconnectFromInternet();
+            if (payController.getDataManager().getCurrentSellerId().equalsIgnoreCase(sellerAddress)) {
+                payController.getDataManager().disconnectFromInternet();
+                onProbableSellerDisconnected(sellerAddress);
+            }
 
         } catch (Exception e) {
             e.printStackTrace();

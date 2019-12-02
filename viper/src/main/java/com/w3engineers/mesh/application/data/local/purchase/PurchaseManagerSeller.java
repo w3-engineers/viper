@@ -16,6 +16,7 @@ import com.w3engineers.eth.contracts.RaidenMicroTransferChannels;
 import com.w3engineers.eth.data.remote.EthereumService;
 import com.w3engineers.eth.util.helper.HandlerUtil;
 import com.w3engineers.eth.util.helper.InternetUtil;
+import com.w3engineers.ext.strom.util.helper.Toaster;
 import com.w3engineers.mesh.application.data.local.DataPlanConstants;
 import com.w3engineers.mesh.application.data.local.dataplan.DataPlanManager;
 import com.w3engineers.mesh.application.data.local.db.buyerpendingmessage.BuyerPendingMessage;
@@ -77,6 +78,7 @@ public class PurchaseManagerSeller extends PurchaseManager implements PayControl
     public void setWalletListener(WalletManager.WalletListener walletListener) {
         this.walletListener = walletListener;
     }
+
 
     //***************************************************//
     //******************Private Methods******************//
@@ -429,7 +431,24 @@ public class PurchaseManagerSeller extends PurchaseManager implements PayControl
                     }
 
                     break;
-                //Todo set case for withdraw and close
+                case PurchaseConstants.REQUEST_TYPES.CLOSE_CHANNEL:
+                    if (!success) {
+                        try {
+                            Purchase purchase = databaseService.getPurchaseByState(PurchaseConstants.CHANNEL_STATE.CLOSING, purchaseRequest.buyerAddress, ethService.getAddress());
+
+                            if (purchase != null){
+                                purchase.state = PurchaseConstants.CHANNEL_STATE.OPEN;
+                                databaseService.updatePurchase(purchase);
+                                syncWithBuyer(purchaseRequest.buyerAddress);
+                            }
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        } catch (ExecutionException e) {
+                            e.printStackTrace();
+                        }
+
+
+                    }
                 default:
                     break;
             }
@@ -553,6 +572,20 @@ public class PurchaseManagerSeller extends PurchaseManager implements PayControl
         payController.sendInitPurchaseOkay(jsonObject, buyerAddress);
     }
 
+    private void sendDisconnectedBySeller(String buyerAddress){
+        try {
+            JSONObject jsonObject = new JSONObject();
+
+            jsonObject.put(PurchaseConstants.JSON_KEYS.MESSAME_FROM, ethService.getAddress());
+            jsonObject.put(PurchaseConstants.JSON_KEYS.MESSAGE_TEXT, "Seller does not have enough Data.");
+
+            payController.sendDisconnectedBySeller(jsonObject, buyerAddress);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
+
+
 
     //***************************************************//
     //******************Public Medthods******************//
@@ -628,6 +661,8 @@ public class PurchaseManagerSeller extends PurchaseManager implements PayControl
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
+        }else {
+            syncWithBuyer(buyerAddress);
         }
     }
 
@@ -817,11 +852,14 @@ public class PurchaseManagerSeller extends PurchaseManager implements PayControl
                     purchase.state = PurchaseConstants.CHANNEL_STATE.CLOSING;
                     databaseService.updatePurchase(purchase);
 
+                    payController.getDataManager().onBuyerDisconnected(purchase.buyerAddress);
+                    sendDisconnectedBySeller(purchase.buyerAddress);
 
-                    String signedMessage = ethService.close(purchase.sellerAddress, purchase.openBlockNumber,
-                            purchase.balance, purchase.balanceProof, purchase.closingHash, nonce, purchase.blockChainEndpoint);
+
+                    String signedMessage = ethService.close(purchase.sellerAddress, purchase.openBlockNumber, purchase.balance, purchase.balanceProof, purchase.closingHash, nonce, purchase.blockChainEndpoint);
 
                     PurchaseRequests purchaseRequest = new PurchaseRequests();
+                    purchaseRequest.requesterAddress = ethService.getAddress();
                     purchaseRequest.buyerAddress = purchase.buyerAddress;
                     purchaseRequest.requestType = PurchaseConstants.REQUEST_TYPES.CLOSE_CHANNEL;
                     purchaseRequest.signedMessage = signedMessage;
@@ -834,7 +872,17 @@ public class PurchaseManagerSeller extends PurchaseManager implements PayControl
                 }
                 pickAndSubmitRequest(ethService.getAddress());
             } else {
-                //TODO: Have to add a callback to notify user
+                for (Purchase purchase : activeChannelList) {
+                    payController.getDataManager().onBuyerDisconnected(purchase.buyerAddress);
+                    sendDisconnectedBySeller(purchase.buyerAddress);
+                }
+
+                HandlerUtil.postForeground(new Runnable() {
+                    @Override
+                    public void run() {
+                        Toaster.showLong("User does not have enough balance to clse the purchases.");
+                    }
+                });
             }
         } catch (ExecutionException e) {
             e.printStackTrace();
@@ -920,7 +968,6 @@ public class PurchaseManagerSeller extends PurchaseManager implements PayControl
         }
         return false;
     }
-
 
     private void sendGiftListener(boolean status, boolean isGifted, String message) {
         if (walletListener != null) {
@@ -1333,61 +1380,58 @@ public class PurchaseManagerSeller extends PurchaseManager implements PayControl
                                 }
                             }
 
+                            MeshLog.v("Message Queuing 14");
 
+                            Datausage datausage = new Datausage();
+                            datausage.dataByte = buyerPendingMessage.dataSize;
+                            datausage.purchaseId = purchase.pid;
+                            datausage.purpose = PurchaseConstants.DATA_USAGE_PURPOSE.MESSAGE;
+                            databaseService.insertDataUsage(datausage);
 
+                            String payer = "";
+                            if (buyerPendingMessage.isIncomming) {
+                                payer = buyerPendingMessage.owner;
+                            } else {
+                                payer = buyerPendingMessage.sender;
+                            }
 
-                                MeshLog.v("Message Queuing 14");
+                            String closingHash = ethService.getClosingHash(payer, open_block, bps_balance, purchase.blockChainEndpoint);
 
-                                Datausage datausage = new Datausage();
-                                datausage.dataByte = buyerPendingMessage.dataSize;
-                                datausage.purchaseId = purchase.pid;
-                                datausage.purpose = PurchaseConstants.DATA_USAGE_PURPOSE.MESSAGE;
-                                databaseService.insertDataUsage(datausage);
+                            purchase.balanceProof = bps;
+                            purchase.balance = bps_balance;
+                            purchase.closingHash = closingHash;
+                            purchase.usedDataAmount = purchase.usedDataAmount + dataSizeMB;
+                            databaseService.updatePurchase(purchase);
 
-                                String payer = "";
+                            MeshLog.o("balancemismatchcheck3 " + bps_balance + "  " + purchase.usedDataAmount);
+                            databaseService.updateBuyerPendingMessage(buyerPendingMessage);
+
+                            MeshLog.v("Message Queuing 15");
+
+                            try {
+                                MeshLog.v("Message Queuing 18");
+                                JSONObject successJson = new JSONObject();
+                                successJson.put(PurchaseConstants.JSON_KEYS.MESSAME_FROM, ethService.getAddress());
+                                successJson.put(PurchaseConstants.JSON_KEYS.MESSAGE_BPS, bps);
+                                successJson.put(PurchaseConstants.JSON_KEYS.BPS_BALANCE, bps_balance);
+                                successJson.put(PurchaseConstants.JSON_KEYS.MESSAGE_CHS, closingHash);
+                                successJson.put(PurchaseConstants.JSON_KEYS.OPEN_BLOCK, open_block);
+                                successJson.put(PurchaseConstants.JSON_KEYS.DATA_SIZE, buyerPendingMessage.dataSize);
+                                successJson.put(PurchaseConstants.JSON_KEYS.MESSAGE_ID, msg_id);
+                                String msg_receiver = "";
                                 if (buyerPendingMessage.isIncomming) {
-                                    payer = buyerPendingMessage.owner;
+                                    msg_receiver = buyerPendingMessage.owner;
                                 } else {
-                                    payer = buyerPendingMessage.sender;
+                                    msg_receiver = buyerPendingMessage.sender;
                                 }
 
-                                String closingHash = ethService.getClosingHash(payer, open_block, bps_balance, purchase.blockChainEndpoint);
+                                setRequestTimeout(msg_id, msg_receiver, PurchaseConstants.TimeoutPurpose.PAY_FOR_MESSAGE_RESPONSE);
+                                payController.sendPayForMessageResponse(successJson, msg_receiver);
 
-                                purchase.balanceProof = bps;
-                                purchase.balance = bps_balance;
-                                purchase.closingHash = closingHash;
-                                purchase.usedDataAmount = purchase.usedDataAmount + dataSizeMB;
-                                databaseService.updatePurchase(purchase);
-
-                                MeshLog.o("balancemismatchcheck3 " + bps_balance + "  " + purchase.usedDataAmount);
-                                databaseService.updateBuyerPendingMessage(buyerPendingMessage);
-
-                                MeshLog.v("Message Queuing 15");
-
-                                try {
-                                    MeshLog.v("Message Queuing 18");
-                                    JSONObject successJson = new JSONObject();
-                                    successJson.put(PurchaseConstants.JSON_KEYS.MESSAME_FROM, ethService.getAddress());
-                                    successJson.put(PurchaseConstants.JSON_KEYS.MESSAGE_BPS, bps);
-                                    successJson.put(PurchaseConstants.JSON_KEYS.BPS_BALANCE, bps_balance);
-                                    successJson.put(PurchaseConstants.JSON_KEYS.MESSAGE_CHS, closingHash);
-                                    successJson.put(PurchaseConstants.JSON_KEYS.OPEN_BLOCK, open_block);
-                                    successJson.put(PurchaseConstants.JSON_KEYS.DATA_SIZE, buyerPendingMessage.dataSize);
-                                    successJson.put(PurchaseConstants.JSON_KEYS.MESSAGE_ID, msg_id);
-                                    String msg_receiver = "";
-                                    if (buyerPendingMessage.isIncomming) {
-                                        msg_receiver = buyerPendingMessage.owner;
-                                    } else {
-                                        msg_receiver = buyerPendingMessage.sender;
-                                    }
-
-                                    setRequestTimeout(msg_id, msg_receiver, PurchaseConstants.TimeoutPurpose.PAY_FOR_MESSAGE_RESPONSE);
-                                    payController.sendPayForMessageResponse(successJson, msg_receiver);
-
-                                } catch (JSONException e) {
-                                    //TODO what to do here
+                            } catch (JSONException e) {
+                                //TODO what to do here
 //                                        MeshLog.p("onPayForMessageOkReceived EX " + e.getMessage());
-                                }
+                            }
 
 
                         } else {
@@ -1482,11 +1526,15 @@ public class PurchaseManagerSeller extends PurchaseManager implements PayControl
     public void onSynBuyerOKReceive(String from, String sellerAddress) {
         MeshLog.v("[Internet] buyer found in local");
         try {
-            payController.getDataManager().onBuyerConnected(from);
+            if (DataPlanManager.getInstance().getRemainingData() > 0){
+                payController.getDataManager().onBuyerConnected(from);
+                resumeUserPendingMessage(from);
+            } else {
+                sendDisconnectedBySeller(from);
+            }
         } catch (RemoteException e) {
             e.printStackTrace();
         }
-        resumeUserPendingMessage(from);
     }
 
     @Override
