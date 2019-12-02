@@ -784,16 +784,6 @@ public class PurchaseManagerBuyer extends PurchaseManager implements PayControll
             databaseService.updateCurrencyAndToken(endPoint, ethBalance, tokenBalance);
 
             sendGiftListener(status, true, "Congratulations!!!\nPoints have been added to your account.");
-
-//            HandlerUtil.postForeground(() -> Toast.makeText(mContext, "Congratulations!!!\nBalance has been added to your account.", Toast.LENGTH_LONG).show());
-            /*Activity currentActivity = MeshApp.getCurrentActivity();
-            if (currentActivity != null){
-                HandlerUtil.postForeground(() -> DialogUtil.showConfirmationDialog(currentActivity, "Gift Awarded!", "Congratulations!!!\nBalance has been added to your account.", null, "OK", null));
-            }else {
-                //TODO send notifications
-            }*/
-
-
         } else {
             sendGiftListener(status, true, "Failed");
             //TODO detect fail type
@@ -811,6 +801,8 @@ public class PurchaseManagerBuyer extends PurchaseManager implements PayControll
         }
         try {
             List<Purchase> myOpenPurcheses  =  databaseService.getMyPurchasesWithState(ethService.getAddress(), PurchaseConstants.CHANNEL_STATE.OPEN);
+
+            //TODO looping may arise if there are multiple sellers connected, and buyer has multiple purchases, and no seller can connect the buyer as they finish their shared data.
             for (Purchase p : myOpenPurcheses){
                 if (!sellerId.equalsIgnoreCase(p.sellerAddress) && payController.getDataManager().isUserConnected(p.sellerAddress) && p.totalDataAmount > p.usedDataAmount){
                     probableSellerId = p.sellerAddress;
@@ -818,7 +810,6 @@ public class PurchaseManagerBuyer extends PurchaseManager implements PayControll
                     JSONObject jsonObject = new JSONObject();
                     jsonObject.put(PurchaseConstants.JSON_KEYS.MESSAME_FROM, ethService.getAddress());
                     jsonObject.put(PurchaseConstants.JSON_KEYS.BUYER_ADDRESS, p.buyerAddress);
-
                     jsonObject.put(PurchaseConstants.JSON_KEYS.SELLER_ADDRESS, p.sellerAddress);
                     jsonObject.put(PurchaseConstants.JSON_KEYS.OPEN_BLOCK, p.openBlockNumber);
                     jsonObject.put(PurchaseConstants.JSON_KEYS.USED_DATA, p.usedDataAmount);
@@ -826,11 +817,9 @@ public class PurchaseManagerBuyer extends PurchaseManager implements PayControll
                     jsonObject.put(PurchaseConstants.JSON_KEYS.BPS_BALANCE, p.balance);
                     jsonObject.put(PurchaseConstants.JSON_KEYS.MESSAGE_BPS, p.balanceProof);
                     jsonObject.put(PurchaseConstants.JSON_KEYS.MESSAGE_CHS, p.closingHash);
-
                     setEndPointInfoInJson(jsonObject, p.blockChainEndpoint);
 
                     payController.sendSyncMessageToSeller(jsonObject, p.sellerAddress);
-
 
                     break;
                 }

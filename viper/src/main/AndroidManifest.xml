@@ -36,16 +36,7 @@
             android:enabled="true"
             android:exported="true"
             android:stopWithTask="false" />-->
-
-        <service android:name=".ClientLibraryService"
-            android:exported="true"
-            android:enabled="true">
-            <intent-filter>
-                <action android:name="service.viper" />
-            </intent-filter>
-        </service>
-
-      <!--  <provider
+        <!--  <provider
             android:authorities="@string/authority"
             android:name="android.support.v4.content.FileProvider"
             android:exported="false"
