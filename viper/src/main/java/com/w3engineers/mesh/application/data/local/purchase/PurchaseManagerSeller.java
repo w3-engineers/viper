@@ -2,6 +2,7 @@ package com.w3engineers.mesh.application.data.local.purchase;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.support.v7.app.AlertDialog;
 import android.arch.lifecycle.LiveData;
 import android.content.Intent;
 import android.os.Handler;
@@ -57,6 +58,7 @@ public class PurchaseManagerSeller extends PurchaseManager implements PayControl
 //    private BuyerPendingMessageListener buyerPendingMessageListener;
 
     private WalletManager.WalletListener walletListener;
+    private AlertDialog datalimitAlert = null;
 
     private PurchaseManagerSeller() {
         super();
@@ -1347,26 +1349,30 @@ public class PurchaseManagerSeller extends PurchaseManager implements PayControl
                                 }
 
                                 Activity currentActivity = MeshApp.getCurrentActivity();
-                                if (currentActivity != null) {
+                                if (currentActivity != null && (datalimitAlert == null || !datalimitAlert.isShowing())) {
                                     int numberOfActiveBuyer = databaseService.getTotalNumberOfActiveBuyer(ethService.getAddress(), PurchaseConstants.CHANNEL_STATE.OPEN);
-                                    HandlerUtil.postForeground(() -> DialogUtil.showConfirmationDialog(currentActivity, "Data Limit exceeded!", "Your data shared limit" + " " + Util.humanReadableByteCount(sharedData) + " " + "exceeded, there are" + " " + numberOfActiveBuyer + " " + "active buyer." + "Do you want to increase your shared data limit? If not then all the active channel will be closed", "No, Thanks", "Ok", new DialogUtil.DialogButtonListener() {
-                                        @Override
-                                        public void onClickPositive() {
-                                            if (!(currentActivity instanceof TestDataPlanActivity)){
-                                                DataPlanManager.openActivity(currentActivity, 0);
-                                            }
-                                        }
+                                     HandlerUtil.postForeground(() -> {
+                                         datalimitAlert = DialogUtil.showConfirmationDialog(currentActivity, "Data Limit exceeded!", "Your data shared limit" + " " + Util.humanReadableByteCount(sharedData) + " " + "exceeded, there are" + " " + numberOfActiveBuyer + " " + "active buyer." + "Do you want to increase your shared data limit? If not then all the active channel will be closed", "No, Thanks", "Ok", new DialogUtil.DialogButtonListener() {
+                                             @Override
+                                             public void onClickPositive() {
+                                                 datalimitAlert = null;
+                                                 if (!(currentActivity instanceof TestDataPlanActivity)) {
+                                                     DataPlanManager.openActivity(currentActivity, 0);
+                                                 }
+                                             }
 
-                                        @Override
-                                        public void onCancel() {
+                                             @Override
+                                             public void onCancel() {
+                                                 datalimitAlert = null;
+                                             }
 
-                                        }
-
-                                        @Override
-                                        public void onClickNegative() {
-                                            closeAllActiveBuyerChannel();
-                                        }
-                                    }));
+                                             @Override
+                                             public void onClickNegative() {
+                                                 datalimitAlert = null;
+                                                 closeAllActiveBuyerChannel();
+                                             }
+                                         });
+                                     });
                                 } else {
                                     int numberOfActiveBuyer = databaseService.getTotalNumberOfActiveBuyer(ethService.getAddress(), PurchaseConstants.CHANNEL_STATE.OPEN);
                                     NotificationUtil.showSellerWarningNotification(mContext, "Data Limit exceeded!", "You need to take action.", numberOfActiveBuyer);

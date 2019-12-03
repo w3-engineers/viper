@@ -5,6 +5,7 @@ import android.arch.lifecycle.LiveData;
 import android.os.RemoteException;
 import android.text.TextUtils;
 import android.widget.Toast;
+import android.support.v7.app.AlertDialog;
 
 import com.w3engineers.eth.util.helper.HandlerUtil;
 import com.w3engineers.ext.strom.util.helper.Toaster;
@@ -40,6 +41,7 @@ public class PurchaseManagerBuyer extends PurchaseManager implements PayControll
 
     private WalletManager.WalletListener walletListener;
     private String probableSellerId = null;
+    private AlertDialog datalimitAlert = null;
 
     private PurchaseManagerBuyer() {
         super();
@@ -1008,7 +1010,7 @@ public class PurchaseManagerBuyer extends PurchaseManager implements PayControll
                 if (totalBalance <= purchase.deposit) {
 
                     if (purchase.deposit - totalBalance < 0.5) {
-                        double remain = purchase.totalDataAmount - purchase.usedDataAmount;
+                      //  double remain = purchase.totalDataAmount - purchase.usedDataAmount;
                         if (!isWarningShown) {
                             NotificationUtil.showNotification(mContext, "Internet Usage", "Your purchased internet is almost finished");
                             isWarningShown = true;
@@ -1048,24 +1050,29 @@ public class PurchaseManagerBuyer extends PurchaseManager implements PayControll
                     payController.getDataManager().disconnectFromInternet();
 
 
+
                     Activity currentActivity = MeshApp.getCurrentActivity();
-                    if (currentActivity != null && !isIncoming) {
-                        HandlerUtil.postForeground(() -> DialogUtil.showConfirmationDialog(currentActivity, "Internet Usage Finished!", "Your current internet volume insufficient, please purchase again and continue messaging", "No, Thanks", "Ok", new DialogUtil.DialogButtonListener() {
-                            @Override
-                            public void onClickPositive() {
-                                DataPlanManager.openActivity(currentActivity, 0);
-                            }
+                    if (currentActivity != null && (datalimitAlert == null || !datalimitAlert.isShowing())) {
+                        HandlerUtil.postForeground(() -> {
+                            datalimitAlert  = DialogUtil.showConfirmationDialog(currentActivity, "Internet Usage Finished!", "Your current internet volume insufficient, please purchase again and continue messaging", "No, Thanks", "Ok", new DialogUtil.DialogButtonListener() {
+                                @Override
+                                public void onClickPositive() {
+                                    datalimitAlert = null;
+                                    DataPlanManager.openActivity(currentActivity, 0);
+                                }
 
-                            @Override
-                            public void onCancel() {
+                                @Override
+                                public void onCancel() {
+                                    datalimitAlert = null;
+                                }
 
-                            }
-
-                            @Override
-                            public void onClickNegative() {
-
-                            }
-                        }));
+                                @Override
+                                public void onClickNegative() {
+                                    datalimitAlert = null;
+                                    onProbableSellerDisconnected(fromAddress);
+                                }
+                            });
+                        });
                     }else {
                         NotificationUtil.showNotification(mContext, "Internet Usage Finished!", "Your current internet volume is insufficient, please purchase again and continue messaging");
                         if (dataPlanListener != null) {
@@ -1084,6 +1091,8 @@ public class PurchaseManagerBuyer extends PurchaseManager implements PayControll
                 payController.sendPayForMessageError(jo, fromAddress);
 
                 payController.getDataManager().disconnectFromInternet();
+
+                onProbableSellerDisconnected(fromAddress);
             }
         } catch (Exception e) {
             e.printStackTrace();
