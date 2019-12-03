@@ -105,15 +105,19 @@ public class PurchaseManagerSeller extends PurchaseManager implements PayControl
         }
     }
 
+    private void setMessagReceivedState(String userAddress) throws ExecutionException, InterruptedException {
+        BuyerPendingMessage buyerPendingMessage = databaseService.getBuyerPendingMessageByUser(PurchaseConstants.BUYER_PENDING_MESSAGE_STATUS.IN_PROGRESS, userAddress);
+        if (buyerPendingMessage != null) {
+            buyerPendingMessage.status = PurchaseConstants.BUYER_PENDING_MESSAGE_STATUS.RECEIVED;
+            databaseService.updateBuyerPendingMessage(buyerPendingMessage);
+
+        }
+    }
+
     private void resumeUserPendingMessage(String userAddress) {
         MeshLog.o("************** resume *******");
         try {
-            BuyerPendingMessage buyerPendingMessage = databaseService.getBuyerPendingMessageByUser(PurchaseConstants.BUYER_PENDING_MESSAGE_STATUS.IN_PROGRESS, userAddress);
-            if (buyerPendingMessage != null) {
-                buyerPendingMessage.status = PurchaseConstants.BUYER_PENDING_MESSAGE_STATUS.RECEIVED;
-                databaseService.updateBuyerPendingMessage(buyerPendingMessage);
-
-            }
+            setMessagReceivedState(userAddress);
             sendInternetMessageToBuyer(userAddress);
         } catch (ExecutionException e) {
             e.printStackTrace();
@@ -1362,6 +1366,8 @@ public class PurchaseManagerSeller extends PurchaseManager implements PayControl
                                     int numberOfActiveBuyer = databaseService.getTotalNumberOfActiveBuyer(ethService.getAddress(), PurchaseConstants.CHANNEL_STATE.OPEN);
                                     NotificationUtil.showSellerWarningNotification(mContext, "Data Limit exceeded!", "You need to take action.", numberOfActiveBuyer);
                                 }
+                                setMessagReceivedState(from);
+
                                 return;
                             }
 
@@ -1526,7 +1532,7 @@ public class PurchaseManagerSeller extends PurchaseManager implements PayControl
     public void onSynBuyerOKReceive(String from, String sellerAddress) {
         MeshLog.v("[Internet] buyer found in local");
         try {
-            if (DataPlanManager.getInstance().getRemainingData() > 0){
+            if (DataPlanManager.getInstance().getDataAmountMode() == DataPlanConstants.DATA_MODE.UNLIMITED || DataPlanManager.getInstance().getRemainingData() > 0){
                 payController.getDataManager().onBuyerConnected(from);
                 resumeUserPendingMessage(from);
             } else {
