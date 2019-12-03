@@ -39,6 +39,7 @@ import com.w3engineers.mesh.util.Constant;
 import com.w3engineers.mesh.util.DialogUtil;
 import com.w3engineers.mesh.util.MeshLog;
 import com.w3engineers.mesh.util.NotificationUtil;
+import com.w3engineers.mesh.util.Util;
 import com.w3engineers.mesh.util.lib.mesh.HandlerUtil;
 
 import java.text.ParseException;
@@ -631,7 +632,7 @@ public class TestDataPlanActivity extends TelemeshBaseActivity implements DataPl
         if (dataLimitModel.isDataLimited()){
 
             long remainingData = DataPlanManager.getInstance().getRemainingData();
-            if (remainingData <= 0){
+            if (remainingData <= Constant.SELLER_MINIMUM_ERROR_DATA){
                 showDatalimitError(this.getString(R.string.data_limit_error));
             } else if (remainingData < Constant.SELLER_MINIMUM_WARNING_DATA) {
                 showDatalimitWarning(this.getString(R.string.data_limit_warning));
@@ -721,26 +722,52 @@ public class TestDataPlanActivity extends TelemeshBaseActivity implements DataPl
     }
 
     private void showSellerWarningDialog(int activeBuyer) {
-        long sharedData = DataPlanManager.getInstance().getSellAmountData();
-        DialogUtil.showConfirmationDialog(TestDataPlanActivity.this, "Data Limit exceeded!",
-                "Your data shared limit" + " " + sharedData + " " + "exceeded, there are" + " " + activeBuyer + " " + "active buyer." + "Do you want to increase your shared data limit? If not then all the active channel will be closed",
-                getResources().getString(R.string.no),
-                getResources().getString(R.string.yes),
-                new DialogUtil.DialogButtonListener() {
-                    @Override
-                    public void onClickPositive() {
 
-                    }
+        if (dataLimitModel.isDataLimited()){
+            long remainingData = DataPlanManager.getInstance().getRemainingData();
+            if (remainingData <= Constant.SELLER_MINIMUM_ERROR_DATA){
+                long sharedData = DataPlanManager.getInstance().getSellAmountData();
 
-                    @Override
-                    public void onCancel() {
-                    }
+                DialogUtil.showConfirmationDialog(TestDataPlanActivity.this, "Data Limit exceeded!",
+                        "Your data shared limit" + " " + Util.humanReadableByteCount(sharedData) + " " + "exceeded, there are" + " " + activeBuyer + " " + "active buyer." + "Do you want to increase your shared data limit? If not then all the active channel will be closed",
+                        getResources().getString(R.string.no),
+                        getResources().getString(R.string.yes),
+                        new DialogUtil.DialogButtonListener() {
+                            @Override
+                            public void onClickPositive() {
 
-                    @Override
-                    public void onClickNegative() {
-                        DataPlanManager.getInstance().closeAllActiveChannel();
-                    }
-                });
+                            }
+
+                            @Override
+                            public void onCancel() {
+                            }
+
+                            @Override
+                            public void onClickNegative() {
+                                DataPlanManager.getInstance().closeAllActiveChannel();
+                            }
+                        });
+            }else if (remainingData <= Constant.SELLER_MINIMUM_WARNING_DATA){
+                DialogUtil.showConfirmationDialog(TestDataPlanActivity.this, "Data Limit almost exceeded!",
+                        "You have only" + " " + Util.humanReadableByteCount(remainingData) + " " + "remaining shared data, please increase limit before finishing all",
+                        null,
+                        getResources().getString(R.string.ok),
+                        new DialogUtil.DialogButtonListener() {
+                            @Override
+                            public void onClickPositive() {
+
+                            }
+
+                            @Override
+                            public void onCancel() {
+                            }
+
+                            @Override
+                            public void onClickNegative() {
+                            }
+                        });
+            }
+        }
     }
 
     public void onButtonClickListener(Seller item) {
@@ -871,18 +898,19 @@ public class TestDataPlanActivity extends TelemeshBaseActivity implements DataPl
                         dataLimitModel.setSharedData(tempSharedData);
                         dataLimitModel.setDataLimited(true);
                         disableSaveButton();
-
+                        DataPlanManager.resumeMessaging();
                         if (tempSharedData < Constant.SELLER_MINIMUM_WARNING_DATA){
                             showDatalimitWarning(this.getString(R.string.data_limit_warning));
                         }
                     } else {
                         long usedData = DataPlanManager.getInstance().getUsedData(this, from);
-                        if (sharedData <= usedData){
+                        if (sharedData <= (usedData + Constant.SELLER_MINIMUM_ERROR_DATA)){
                             mBinding.dataLimitError.setVisibility(View.INVISIBLE);
                             dataLimitModel.setFromDate(System.currentTimeMillis());
                             dataLimitModel.setSharedData(tempSharedData);
                             dataLimitModel.setDataLimited(true);
                             disableSaveButton();
+                            DataPlanManager.resumeMessaging();
                             if (tempSharedData < Constant.SELLER_MINIMUM_WARNING_DATA){
                                 showDatalimitWarning(this.getString(R.string.data_limit_warning));
                             }
@@ -894,6 +922,7 @@ public class TestDataPlanActivity extends TelemeshBaseActivity implements DataPl
                                 dataLimitModel.setSharedData(tempSharedData);
                                 dataLimitModel.setDataLimited(true);
                                 disableSaveButton();
+                                DataPlanManager.resumeMessaging();
                                 if (tempSharedData - usedData <Constant.SELLER_MINIMUM_WARNING_DATA){
                                     showDatalimitWarning(this.getString(R.string.data_limit_warning));
                                 }
@@ -912,6 +941,7 @@ public class TestDataPlanActivity extends TelemeshBaseActivity implements DataPl
             dataLimitModel.setFromDate(0);
             dataLimitModel.setSharedData(0l);
             disableSaveButton();
+            DataPlanManager.resumeMessaging();
         }
     }
 

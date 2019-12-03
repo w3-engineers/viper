@@ -43,6 +43,7 @@ import org.web3j.utils.Convert;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
@@ -1348,7 +1349,7 @@ public class PurchaseManagerSeller extends PurchaseManager implements PayControl
                                 Activity currentActivity = MeshApp.getCurrentActivity();
                                 if (currentActivity != null) {
                                     int numberOfActiveBuyer = databaseService.getTotalNumberOfActiveBuyer(ethService.getAddress(), PurchaseConstants.CHANNEL_STATE.OPEN);
-                                    HandlerUtil.postForeground(() -> DialogUtil.showConfirmationDialog(currentActivity, "Data Limit exceeded!", "Your data shared limit" + " " + sharedData + " " + "exceeded, there are" + " " + numberOfActiveBuyer + " " + "active buyer." + "Do you want to increase your shared data limit? If not then all the active channel will be closed", "No, Thanks", "Ok", new DialogUtil.DialogButtonListener() {
+                                    HandlerUtil.postForeground(() -> DialogUtil.showConfirmationDialog(currentActivity, "Data Limit exceeded!", "Your data shared limit" + " " + Util.humanReadableByteCount(sharedData) + " " + "exceeded, there are" + " " + numberOfActiveBuyer + " " + "active buyer." + "Do you want to increase your shared data limit? If not then all the active channel will be closed", "No, Thanks", "Ok", new DialogUtil.DialogButtonListener() {
                                         @Override
                                         public void onClickPositive() {
                                             if (!(currentActivity instanceof TestDataPlanActivity)){
@@ -2144,6 +2145,19 @@ public class PurchaseManagerSeller extends PurchaseManager implements PayControl
                     }
                 }
             }
+        }
+    }
+
+    public void resumeMessaging() {
+        try {
+            List<Purchase> purchases = databaseService.getAllActiveChannel(ethService.getAddress(), PurchaseConstants.CHANNEL_STATE.OPEN);
+            for (Purchase p : purchases){
+                if (payController.getDataManager().isUserConnected(p.buyerAddress)){
+                    checkMessageIsInProgressAndSend(p.buyerAddress);
+                }
+            }
+        } catch (Exception e){
+            e.printStackTrace();
         }
     }
 }

@@ -250,6 +250,21 @@ public class DatabaseService {
         return future.get();
     }
 
+    public List<Purchase> getAllActiveChannel(String address, int channelStatus) throws ExecutionException, InterruptedException {
+
+        Future<List<Purchase>> future = executor.submit((Callable) () -> {
+            List<Purchase> purchaselist = null;
+            try {
+                purchaselist = db.purchaseDao().getAllActiveChannel(address, channelStatus);
+            } catch (Exception e) {
+                Log.e("error", e.toString());
+            }
+            return purchaselist;
+        });
+        return future.get();
+    }
+
+
 
     public List<Purchase> getAllOpenDrawableBlock(String address, int channelStatus, int endPointType) throws ExecutionException, InterruptedException {
 

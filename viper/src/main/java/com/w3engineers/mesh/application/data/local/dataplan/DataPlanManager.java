@@ -80,6 +80,10 @@ public class DataPlanManager {
         return b;
     }
 
+    public static void resumeMessaging() {
+        PurchaseManagerSeller.getInstance().resumeMessaging();
+    }
+
     public void setDataPlanListener(DataPlanListener dataPlanListener) {
         this.dataPlanListener = dataPlanListener;
 

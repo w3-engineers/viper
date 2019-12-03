@@ -37,6 +37,7 @@ public class Constant {
     public static String KEY_NETWORK_PREFIX = "mesh_network_prefix";
 
     public static long SELLER_MINIMUM_WARNING_DATA = 512*1024; // The format is byte
+    public static long SELLER_MINIMUM_ERROR_DATA = 5*1024; // The format is byte
     public static String AUTO_IMAGE_CAPTURE = "auto_image_capture";
 
 
