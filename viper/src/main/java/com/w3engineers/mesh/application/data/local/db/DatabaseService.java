@@ -588,7 +588,7 @@ public class DatabaseService {
         return db.datausageDao();
     }
 
-    public List<Message> getAll() throws ExecutionException, InterruptedException {
+/*    public List<Message> getAll() throws ExecutionException, InterruptedException {
         Future<List<Message>> future = executor.submit(new Callable() {
             @Override
             public List<Message> call() {
@@ -603,7 +603,7 @@ public class DatabaseService {
         });
         return future.get();
 
-    }
+    }*/
 
     public void insertDataUsage(Datausage datausage) {
         executor.submit(new Callable() {

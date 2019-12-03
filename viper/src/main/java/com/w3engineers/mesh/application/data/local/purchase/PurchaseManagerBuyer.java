@@ -1045,6 +1045,7 @@ public class PurchaseManagerBuyer extends PurchaseManager implements PayControll
                     jo.put(PurchaseConstants.JSON_KEYS.MESSAGE_TEXT, "User does not have enough purchased balance.");
                     jo.put(PurchaseConstants.JSON_KEYS.MESSAGE_ID, msg_id);
                     payController.sendPayForMessageError(jo, fromAddress);
+                    payController.getDataManager().disconnectFromInternet();
 
 
                     Activity currentActivity = MeshApp.getCurrentActivity();
@@ -1081,6 +1082,8 @@ public class PurchaseManagerBuyer extends PurchaseManager implements PayControll
                 jo.put(PurchaseConstants.JSON_KEYS.MESSAGE_ID, msg_id);
 
                 payController.sendPayForMessageError(jo, fromAddress);
+
+                payController.getDataManager().disconnectFromInternet();
             }
         } catch (Exception e) {
             e.printStackTrace();

@@ -602,7 +602,7 @@ public class PurchaseManagerSeller extends PurchaseManager implements PayControl
 
     @Override
     public void buyerInternetMessageReceived(String sender, String owner, String msg_id, String msgData, long dataSize, boolean isIncomming) {
-        MeshLog.v("Message Queuing 1");
+        MeshLog.v("Message Queuing  1  " + msg_id);
         try {
             BuyerPendingMessage buyerPendingMessage = databaseService.getBuyerPendingMessageById(msg_id);
             if (buyerPendingMessage == null) {
@@ -625,7 +625,11 @@ public class PurchaseManagerSeller extends PurchaseManager implements PayControl
                 } else {
                     payController.getDataManager().onPaymentGotForOutgoingMessage(true, buyerPendingMessage.owner, buyerPendingMessage.sender, buyerPendingMessage.msgId, buyerPendingMessage.msgData);
                 }
+            }
 
+            if (buyerPendingMessage.status == PurchaseConstants.BUYER_PENDING_MESSAGE_STATUS.SENT_NOT_PAID){
+                buyerPendingMessage.status = PurchaseConstants.BUYER_PENDING_MESSAGE_STATUS.RECEIVED;
+                databaseService.updateBuyerPendingMessage(buyerPendingMessage);
             }
 
             if (buyerPendingMessage.isIncomming) {
@@ -1523,6 +1527,8 @@ public class PurchaseManagerSeller extends PurchaseManager implements PayControl
             } else {
                 payController.getDataManager().onPaymentGotForOutgoingMessage(false, buyerPendingMessage.owner, buyerPendingMessage.sender, buyerPendingMessage.msgId, buyerPendingMessage.msgData);
             }
+
+            payController.getDataManager().onBuyerDisconnected(from);
         } catch (Exception e) {
             e.printStackTrace();
         }
