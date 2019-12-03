@@ -632,17 +632,25 @@ public class TestDataPlanActivity extends TelemeshBaseActivity implements DataPl
 
             long remainingData = DataPlanManager.getInstance().getRemainingData();
             if (remainingData <= 0){
-                mBinding.dataLimitError.setTextColor(Color.RED);
-                mBinding.dataLimitError.setText("Data limit exceeded.");
-                mBinding.dataLimitError.setVisibility(View.VISIBLE);
-            } else if (remainingData <= Constant.SELLER_MINIMUM_WARNING_DATA) {
-                mBinding.dataLimitError.setTextColor(Color.argb(255, 255, 140, 0));
-                mBinding.dataLimitError.setText("Data limit almost exceeded.");
-                mBinding.dataLimitError.setVisibility(View.VISIBLE);
+                showDatalimitError(this.getString(R.string.data_limit_error));
+            } else if (remainingData < Constant.SELLER_MINIMUM_WARNING_DATA) {
+                showDatalimitWarning(this.getString(R.string.data_limit_warning));
             }
         }
 
         disableSaveButton();
+    }
+
+    private void showDatalimitWarning(String msg){
+        mBinding.dataLimitError.setTextColor(Color.argb(255, 255, 140, 0));
+        mBinding.dataLimitError.setText(msg);
+        mBinding.dataLimitError.setVisibility(View.VISIBLE);
+    }
+
+    private void showDatalimitError(String msg){
+        mBinding.dataLimitError.setTextColor(Color.RED);
+        mBinding.dataLimitError.setText(msg);
+        mBinding.dataLimitError.setVisibility(View.VISIBLE);
     }
 
     public double convertBytesToMegabytes(long bytes) {
@@ -853,31 +861,43 @@ public class TestDataPlanActivity extends TelemeshBaseActivity implements DataPl
                 long sharedData = dataLimitModel.getSharedData();
 
                 long tempSharedData = convertMegabytesToBytes(Integer.valueOf(mBinding.range.getText().toString()));
-                if (from == 0 || sharedData == 0){
-                    mBinding.dataLimitError.setVisibility(View.INVISIBLE);
-                    dataLimitModel.setFromDate(System.currentTimeMillis());
-                    dataLimitModel.setSharedData(tempSharedData);
-                    dataLimitModel.setDataLimited(true);
-                    disableSaveButton();
+
+                if (tempSharedData <= 0){
+                    showDatalimitError(this.getString(R.string.data_limit_validation_text));
                 } else {
-                    long usedData = DataPlanManager.getInstance().getUsedData(this, from);
-                    if (sharedData <= usedData){
+                    if (from == 0 || sharedData == 0){
                         mBinding.dataLimitError.setVisibility(View.INVISIBLE);
                         dataLimitModel.setFromDate(System.currentTimeMillis());
                         dataLimitModel.setSharedData(tempSharedData);
                         dataLimitModel.setDataLimited(true);
                         disableSaveButton();
-                    }else {
-                        if (tempSharedData <= usedData) {
-                            mBinding.dataLimitError.setText(this.getString(R.string.data_lomit_larger_needed));
-                            mBinding.dataLimitError.setVisibility(View.VISIBLE);
 
-                        } else {
+                        if (tempSharedData < Constant.SELLER_MINIMUM_WARNING_DATA){
+                            showDatalimitWarning(this.getString(R.string.data_limit_warning));
+                        }
+                    } else {
+                        long usedData = DataPlanManager.getInstance().getUsedData(this, from);
+                        if (sharedData <= usedData){
                             mBinding.dataLimitError.setVisibility(View.INVISIBLE);
                             dataLimitModel.setFromDate(System.currentTimeMillis());
                             dataLimitModel.setSharedData(tempSharedData);
                             dataLimitModel.setDataLimited(true);
                             disableSaveButton();
+                            if (tempSharedData < Constant.SELLER_MINIMUM_WARNING_DATA){
+                                showDatalimitWarning(this.getString(R.string.data_limit_warning));
+                            }
+                        }else {
+                            if (tempSharedData <= usedData) {
+                                showDatalimitError(this.getString(R.string.data_limit_larger_needed));
+                            } else {
+                                mBinding.dataLimitError.setVisibility(View.INVISIBLE);
+                                dataLimitModel.setSharedData(tempSharedData);
+                                dataLimitModel.setDataLimited(true);
+                                disableSaveButton();
+                                if (tempSharedData - usedData <Constant.SELLER_MINIMUM_WARNING_DATA){
+                                    showDatalimitWarning(this.getString(R.string.data_limit_warning));
+                                }
+                            }
                         }
                     }
                 }
