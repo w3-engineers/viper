@@ -9,8 +9,6 @@ import android.view.WindowManager;
 
 import com.w3engineers.mesh.R;
 
-import java.util.concurrent.ConcurrentHashMap;
-
 
 public class DialogUtil {
     static ProgressDialog progressDialog;
