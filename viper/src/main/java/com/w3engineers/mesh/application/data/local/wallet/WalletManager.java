@@ -352,7 +352,7 @@ public class WalletManager {
                 }
                 @Override
                 public void onErrorOccurred(String message) {
-
+                    listener.onError(message);
                 }
             });
         }
