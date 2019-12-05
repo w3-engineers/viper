@@ -267,7 +267,7 @@ public class DataManager {
                 //mTmCommunicator.saveUserInfo(userInfo);
                 Log.e("service_status", "onServiceConnected");
                 int userRole = DataPlanManager.getInstance().getDataPlanRole();
-                boolean status = mTmCommunicator.startMesh(appName, userRole, userInfo);
+                boolean status = mTmCommunicator.startMesh(appName, userRole, userInfo, mSsid);
                 if (!status) {
                     showPermissionPopUp();
                 }
@@ -644,10 +644,24 @@ public class DataManager {
         }
 
         try {
-            mTmCommunicator.restartMesh(newRole);
+            mTmCommunicator.restartMesh(newRole, mSsid);
         } catch (RemoteException e) {
             e.printStackTrace();
         }
+    }
+
+    public void destroyMeshService() {
+        try {
+            if (mTmCommunicator != null) {
+                mTmCommunicator.destroyService();
+            }
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void resetCommunicator() {
+        mTmCommunicator = null;
     }
 
 

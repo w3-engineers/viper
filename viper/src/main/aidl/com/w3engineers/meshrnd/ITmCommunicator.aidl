@@ -7,7 +7,7 @@ interface ITmCommunicator {
    void onStartForeground(in boolean isNeeded);
    void sendData(in String senderId, in String receiverId, in String messageId, in byte[] data, in boolean isNotificationNeeded);
    int  getLinkTypeById(in String nodeID);
-   boolean startMesh(in String ssid,in int existingRole, in UserInfo userInfo);
+   boolean startMesh(in String ssid,in int existingRole, in UserInfo userInfo, in String networkSSID);
    String getUserId();
    void saveDiscoveredUserInfo(String userId, String userName);
    void saveUserInfo(in UserInfo userInfo);
@@ -22,9 +22,10 @@ interface ITmCommunicator {
    boolean isUserConnected(in String address);
    void onBuyerConnected(in String address);
    void onBuyerDisconnected(in String address);
-   void restartMesh(in int newRole);
+   void restartMesh(in int newRole, in String networkSSID);
    String getUserPublicKey(in String address);
    void disconnectFromInternet();
    String getCurrentSellerId();
    String getUserNameByAddress(in String address);
+   void destroyService();
 }

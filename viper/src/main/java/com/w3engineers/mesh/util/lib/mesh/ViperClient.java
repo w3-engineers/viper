@@ -245,6 +245,16 @@ public class ViperClient {
         DataManager.on().restartMesh(currentRole);
     }
 
+    public void destroyMeshService() {
+        DataManager.on().stopService();
+        DataManager.on().destroyMeshService();
+        DataManager.on().resetCommunicator();
+    }
+
+    public void resetViperInstance() {
+        mViperClient = null;
+    }
+
     public void saveDiscoveredUserInfo(String userId, String userName) throws RemoteException {
         DataManager.on().saveDiscoveredUserInfo(userId, userName);
     }
