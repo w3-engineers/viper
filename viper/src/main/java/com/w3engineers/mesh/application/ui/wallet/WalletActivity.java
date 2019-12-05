@@ -36,6 +36,7 @@ import com.w3engineers.mesh.application.ui.dataplan.TestDataPlanActivity;
 import com.w3engineers.mesh.databinding.ActivityWalletBinding;
 import com.w3engineers.mesh.databinding.PromptWalletWithdrowBinding;
 import com.w3engineers.mesh.util.DialogUtil;
+import com.w3engineers.mesh.util.MeshLog;
 import com.w3engineers.mesh.util.lib.mesh.HandlerUtil;
 
 import java.text.Format;
@@ -180,7 +181,11 @@ public class WalletActivity extends TelemeshBaseActivity implements WalletManage
                 if (isGifted) {
 
                 } else {
-                    DialogUtil.showConfirmationDialog(WalletActivity.this, "Gift Awarded!", message,
+
+                    String failedMessage = "Sorry, due to some reasons you are not eligible to be awarded.";
+                    MeshLog.e(message);
+
+                    DialogUtil.showConfirmationDialog(WalletActivity.this, "Gift Award Failed!", failedMessage,
                             null, "OK", null);
                 }
             }

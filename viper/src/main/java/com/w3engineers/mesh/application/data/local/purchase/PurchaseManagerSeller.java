@@ -1507,7 +1507,7 @@ public class PurchaseManagerSeller extends PurchaseManager implements PayControl
                         }
                     } else {
                         MeshLog.v("-- balance error! --");
-                        //TODO what to do here
+                        syncWithBuyer(from);
 //                        MeshLog.p("onPayForMessageOkReceived price is not correct");
                     }
                 }
