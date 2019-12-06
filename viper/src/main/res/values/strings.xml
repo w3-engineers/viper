@@ -42,13 +42,17 @@
     <string name="set_data_limit_properly">*set data limit properly</string>
     <string name="switching_role">Switching your role, please be patient.</string>
     <string name="my_wallet">My Wallet</string>
-    <string name="data_lomit_larger_needed">Data limit must be larger than used data</string>
+    <string name="data_limit_larger_needed">Data limit must be larger than used data</string>
+    <string name="data_limit_warning">Data limit almost exceeded.</string>
+    <string name="data_limit_error">Data limit exceeded.</string>
+    <string name="data_limit_validation_text">Data limit must be greater then zero.</string>
+
     <string name="date_expired">*date expired</string>
     <string name="data_limit_must_be_larger_than_used_data">*data limit must be larger than used data</string>
 
     <string name="txt_data_use_statistics">Data Uses Statistics</string>
     <string name="txt_description_back">back</string>
-    <string name="txt_balance">Balance</string>
+    <string name="txt_balance">CURRENT BALANCE</string>
     <string name="txt_eth">ETH</string>
     <string name="txt_tmesh">TMESH</string>
     <string name="txt_mb">MB</string>
@@ -101,6 +105,7 @@
     <string name="history">History</string>
     <string name="close">Close</string>
     <string name="withdraw">Withdraw</string>
+    <string name="refresh">Refresh</string>
     <string name="mesh_view_text">Mesh User in the default settings. You are able to communicate with your local peers without any internet connection.\n\nTo share your internet data to local network, choose Data Seller.\n\nTo view available shared internet options, choose Data Buyer.</string>
     <string name="unlimited">Unlimited</string>
     <string name="limited">Limit to</string>
@@ -133,20 +138,31 @@
     <string name="transferred_total"><![CDATA[<b>%sMB</b> transferred total <b>%sMB</b>]]></string>
     <string name="date_range">Date Range</string>
     <string name="from">From</string>
-    <string name="to">to</string>
+    <string name="to">To</string>
     <string name="used_s">Used: %sMB</string>
     <string name="total_mb">of %sMB</string>
+    <string name="total_purchase">Total %sMB</string>
 
-    <string name="install_ts">Install Telemesh Service</string>
-    <string name="need_ts">You need to install Telemesh service for user discovery</string>
+    <string name="install_ts">Install TeleService</string>
+    <string name="need_ts">You need to install TeleService for user discovery</string>
 
     <string name="authority">com.w3engineers.mesh.provider</string>
 
     <string name="allow">Allow Now</string>
     <string name="later">Later</string>
     <string name="permission">Permission needed</string>
-    <string name="permission_message">Need to allow permission on Telemesh service app to work properly. You can open the Telemesh service app clicking on launcher icon or can give permission manually from setting</string>
+    <string name="permission_message">Need to allow permission on TeleService app to work properly. You can open the TeleService app clicking on launcher icon or can give permission manually from setting</string>
+    <string name="pending_balance">Pending balance will be deposited to main balance after crossing <b>10</b> points.</string>
+    <string name="points">Points</string>
+    <string name="pending_balance_point">PENDING BALANCE</string>
+    <string name="view_transactions">VIEW TRANSACTIONS</string>
 
+    <string name="copy_address">Copy address</string>
+    <string name="export_my_profile">EXPORT MY PROFILE</string>
+    <string name="save">Save</string>
+    <string name="points_title">POINTS</string>
+    <string name="sell_your_data_to_other_local_users_and_earn_coins_you_need_an_active_internet_connection_sell_price_1_coin_1mb">Sell your data to other local users and earn points. You need an active internet connection. Sell price 1 point = 1MB.</string>
+    <string name="buy_data_from_nearby_sellers_data_cost_is_1_coin_1mb">Buy data from nearby sellers. Data cost is 1 point = 1MB.</string>
 
 
 </resources>

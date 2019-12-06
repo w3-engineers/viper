@@ -160,4 +160,7 @@ public class NearbyFragment extends BaseFragment implements ItemClickListener<Us
       //  ConnectionManager.on().sendMessage(model.getUserId(), messageModel);
         ChatDataProvider.On().insertMessage(messageModel, model);
     }
+
+    public void onWalletLoaded() {
+    }
 }

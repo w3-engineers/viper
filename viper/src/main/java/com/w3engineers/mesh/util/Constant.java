@@ -36,7 +36,8 @@ public class Constant {
 
     public static String KEY_NETWORK_PREFIX = "mesh_network_prefix";
 
-    public static long SELLER_MINIMUM_WARNING_DATA = 1024; // The format is byte
+    public static long SELLER_MINIMUM_WARNING_DATA = 512*1024; // The format is byte
+    public static long SELLER_MINIMUM_ERROR_DATA = 5*1024; // The format is byte
     public static String AUTO_IMAGE_CAPTURE = "auto_image_capture";
 
 
@@ -81,6 +82,7 @@ public class Constant {
 
     public interface PreferenceKeys {
         String ADDRESS = "eth_address";
+        String PUBLIC_KEY = "public_key";
         String ADDRESS_BITMAP = "address_bitmap";
         String AUTH_USER_NAME = "AUTH_USER_NAME";
         String AUTH_PASSWORD = "AUTH_PASSWORD";

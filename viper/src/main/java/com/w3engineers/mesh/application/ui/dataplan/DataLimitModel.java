@@ -11,27 +11,26 @@ public class DataLimitModel {
 
     private boolean isDataLimited;
     private long fromDate;
-    private long toDate;
     private int mInitialRole;
     private int numberOfDay = 7;
 
     private LiveData<Long> usedData;
-    private MutableLiveData<Long> sharedData = new MutableLiveData<>();
+    private long sharedData = 0;
     private static DataLimitModel dataLimitModelObj;
 
     public DataLimitModel(Context context){
 
         isDataLimited = DataPlanManager.getInstance().getDataAmountMode() == 1;
         fromDate = DataPlanManager.getInstance().getSellFromDate();
-        toDate = DataPlanManager.getInstance().getSellToDate();
-        sharedData.postValue(DataPlanManager.getInstance().getSellDataAmount());
+
+        sharedData = DataPlanManager.getInstance().getSellDataAmount();
 
         if (!isDataLimited){
-            long toDate1 = System.currentTimeMillis();
-            long fromDate1 = toDate1 - (numberOfDay*24*60*60*1000);
-            usedData = DataPlanManager.getInstance().getDataUsage(context, fromDate1, toDate1);
+            long toDate = System.currentTimeMillis();
+            long fromDate1 = toDate - (numberOfDay*24*60*60*1000);
+            usedData = DataPlanManager.getInstance().getDataUsage(context, fromDate1);
         } else {
-            usedData = DataPlanManager.getInstance().getDataUsage(context, fromDate, toDate);
+            usedData = DataPlanManager.getInstance().getDataUsage(context, fromDate);
         }
     }
 
@@ -42,7 +41,7 @@ public class DataLimitModel {
         return dataLimitModelObj;
     }
 
-    public MutableLiveData<Long> getSharedData() {
+    public long getSharedData() {
         return sharedData;
     }
 
@@ -59,7 +58,7 @@ public class DataLimitModel {
         DataPlanManager.getInstance().setSellFromDate(fromDate);
     }
 
-    public boolean getDataLimited(){
+    public boolean isDataLimited(){
         return isDataLimited;
     }
 
@@ -69,17 +68,17 @@ public class DataLimitModel {
     }
 
     public void setSharedData(Long sharedData) {
-        this.sharedData.setValue(sharedData);
+        this.sharedData = sharedData;
         DataPlanManager.getInstance().setSellDataAmount(sharedData);
     }
 
-    public long getToDate() {
-        return toDate;
-    }
-    public void setToDate(long toDate) {
-        this.toDate = toDate;
-        DataPlanManager.getInstance().setSellToDate(toDate);
-    }
+//    public long getToDate() {
+//        return toDate;
+//    }
+//    public void setToDate(long toDate) {
+//        this.toDate = toDate;
+//        DataPlanManager.getInstance().setSellToDate(toDate);
+//    }
 
     public int getNumberOfDay(){
         return numberOfDay;

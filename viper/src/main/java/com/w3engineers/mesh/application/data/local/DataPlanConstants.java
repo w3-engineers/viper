@@ -5,10 +5,11 @@ public interface DataPlanConstants {
     long SELLER_MINIMUM_WARNING_DATA = 1024;
 
     interface USER_ROLE {
-        int  MESH_USER = 0;
+        int MESH_USER = 0;
         int DATA_SELLER = 1;
         int DATA_BUYER = 2;
         int INTERNET_USER = 3;
+        int MESH_STOP = 4;
     }
 
     interface DATA_MODE{

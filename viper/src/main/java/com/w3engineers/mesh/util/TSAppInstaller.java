@@ -15,8 +15,10 @@ import android.view.LayoutInflater;
 import android.widget.Toast;
 
 import com.w3engineers.ext.strom.App;
+import com.w3engineers.ext.strom.util.helper.Toaster;
 import com.w3engineers.mesh.R;
 import com.w3engineers.mesh.databinding.DialogServiceAppInstallProgressBinding;
+import com.w3engineers.mesh.util.lib.mesh.HandlerUtil;
 import com.w3engineers.mesh.util.lib.remote.RetrofitInterface;
 import com.w3engineers.mesh.util.lib.remote.RetrofitService;
 
@@ -64,8 +66,6 @@ public class TSAppInstaller {
                 if (response.isSuccessful()) {
                     Log.d(TAG, "Got response body");
 
-                    //Toast.makeText(TeleMeshApplication.getContext(), "Downloading...", Toast.LENGTH_SHORT).show();
-
                     downloadZipFileTask = new DownloadZipFileTask(context);
                     downloadZipFileTask.execute(response.body());
 
@@ -77,6 +77,7 @@ public class TSAppInstaller {
             @Override
             public void onFailure(Call<ResponseBody> call, Throwable t) {
                 t.printStackTrace();
+                closeDialog(t.getMessage());
                 Log.e(TAG, t.getMessage());
                 //   isAppUpdating = false;
                 //  InAppUpdate.getInstance(App.getContext()).setAppUpdateProcess(false);
@@ -102,7 +103,7 @@ public class TSAppInstaller {
         @Override
         protected String doInBackground(ResponseBody... urls) {
             //Copy you logic to calculate progress and call
-            saveToDisk(urls[0], "TelemeshService.apk");
+            saveToDisk(urls[0], "TeleService.apk");
             return null;
         }
 
@@ -111,7 +112,7 @@ public class TSAppInstaller {
             Log.d("API123", progress[0].second + " ");
 
             if (progress[0].first == 100) {
-                Toast.makeText(App.getContext(), "File downloaded successfully", Toast.LENGTH_SHORT).show();
+                Toaster.showShort("File downloaded successfully");
             }
 
 
@@ -124,10 +125,7 @@ public class TSAppInstaller {
             }
 
             if (progress[0].first == -1) {
-                Toast.makeText(App.getContext(), "Download failed", Toast.LENGTH_SHORT).show();
-                if (dialog.isShowing()) {
-                    dialog.dismiss();
-                }
+                closeDialog("Download failed");
             }
 
         }
@@ -139,30 +137,37 @@ public class TSAppInstaller {
         @Override
         protected void onPostExecute(String result) {
 
-            File destinationFile = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS), "TelemeshService.apk");
+            try {
 
-            if (dialog.isShowing()) {
-                dialog.dismiss();
+                File destinationFile = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS), "TeleService.apk");
+
+                Intent intent;
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                    String packageName = "com.w3engineers.unicef.telemesh.provider";
+//                    packageName = "com.w3engineers.ext.viper.provider";
+                    Uri apkUri = FileProvider.getUriForFile(context,  packageName, destinationFile);
+                    intent = new Intent(Intent.ACTION_INSTALL_PACKAGE);
+                    Log.d("InAppUpdateTest", "app uri: " + apkUri.getPath());
+                    intent.setDataAndType(apkUri, "application/vnd.android.package-archive");
+                    intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                    Log.d("InAppUpdateTest", "app install process start");
+                } else {
+                    Uri apkUri = Uri.fromFile(destinationFile);
+                    intent = new Intent(Intent.ACTION_VIEW);
+                    intent.setDataAndType(apkUri, "application/vnd.android.package-archive");
+                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                }
+
+                closeDialog("Download completed");
+                context.startActivity(intent);
+
+            } catch (Exception e) {
+                e.printStackTrace();
+                closeDialog(e.getMessage());
             }
 
-            Intent intent;
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                Uri apkUri = FileProvider.getUriForFile(context,  "com.w3engineers.ext.viper.provider", destinationFile);
-                intent = new Intent(Intent.ACTION_INSTALL_PACKAGE);
-                Log.d("InAppUpdateTest", "app uri: " + apkUri.getPath());
-                intent.setDataAndType(apkUri, "application/vnd.android.package-archive");
-                intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-                Log.d("InAppUpdateTest", "app install process start");
-            } else {
-                Uri apkUri = Uri.fromFile(destinationFile);
-                intent = new Intent(Intent.ACTION_VIEW);
-                intent.setDataAndType(apkUri, "application/vnd.android.package-archive");
-                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-            }
 
-            context.startActivity(intent);
-
-        //    isAppUpdating = false;
+            //    isAppUpdating = false;
             //    InAppUpdate.getInstance(App.getContext()).setAppUpdateProcess(false);
         }
     }
@@ -201,9 +206,7 @@ public class TSAppInstaller {
                 e.printStackTrace();
                 Pair<Integer, Long> pairs = new Pair<>(-1, Long.valueOf(-1));
                 downloadZipFileTask.doProgress(pairs);
-                if (dialog.isShowing()) {
-                    dialog.dismiss();
-                }
+                closeDialog("Failed to save the file!");
                 Log.d(TAG, "Failed to save the file!");
                 return;
             } finally {
@@ -212,6 +215,7 @@ public class TSAppInstaller {
             }
         } catch (IOException e) {
             e.printStackTrace();
+            closeDialog("Failed to save the file!");
             Log.d(TAG, "Failed to save the file!");
             return;
         }
@@ -226,5 +230,14 @@ public class TSAppInstaller {
         dialog = builder.create();
         dialog.setCancelable(false);
         dialog.show();
+    }
+
+    private static void closeDialog(String message) {
+        HandlerUtil.postForeground(()-> {
+            Toaster.showShort(message);
+            if (dialog.isShowing()) {
+                dialog.dismiss();
+            }
+        });
     }
 }

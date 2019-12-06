@@ -71,7 +71,7 @@
             android:paddingStart="@dimen/padding_25"
             android:paddingEnd="@dimen/padding_25"
             android:text="Create User"
-            android:textColor="@color/White"
+            android:textColor="@color/white"
             app:layout_constraintRight_toRightOf="parent"
             app:layout_constraintTop_toBottomOf="@id/edit_text_name_layout" />
 

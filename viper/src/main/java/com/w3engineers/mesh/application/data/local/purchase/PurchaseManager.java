@@ -6,6 +6,7 @@ import android.content.Context;
 import com.w3engineers.eth.data.helper.PreferencesHelperPaylib;
 import com.w3engineers.eth.data.remote.EthereumService;
 import com.w3engineers.mesh.application.data.local.DataPlanConstants;
+import com.w3engineers.mesh.application.data.local.dataplan.DataPlanManager;
 import com.w3engineers.mesh.application.data.local.db.DatabaseService;
 import com.w3engineers.mesh.application.data.local.db.networkinfo.NetworkInfo;
 import com.w3engineers.mesh.application.data.local.helper.PreferencesHelperDataplan;
@@ -29,6 +30,7 @@ public class PurchaseManager {
     protected PreferencesHelperDataplan preferencesHelperDataplan;
     protected PreferencesHelperPaylib preferencesHelperPaylib;
     private static PurchaseManager purchaseManager;
+    protected DataPlanManager.DataPlanListener dataPlanListener;
 
     PurchaseManager(){
         payController = PayController.getInstance();
@@ -102,5 +104,9 @@ public class PurchaseManager {
             e.printStackTrace();
         }
         return null;
+    }
+
+    public void setDataPlanListener(DataPlanManager.DataPlanListener dataPlanListener) {
+        this.dataPlanListener = dataPlanListener;
     }
 }

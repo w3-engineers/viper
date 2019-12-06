@@ -4,8 +4,8 @@
         <rotate>
             <shape android:shape="rectangle">
                 <gradient
-                    android:endColor="@color/colorGradientPrimary"
-                    android:startColor="@color/colorGradientStart"/>
+                    android:endColor="@color/colorPrimaryDark"
+                    android:startColor="@color/colorPrimaryDark"/>
 
             </shape>
         </rotate>

@@ -14,6 +14,7 @@ import com.w3engineers.mesh.application.data.local.db.networkinfo.NetworkInfo;
 import com.w3engineers.mesh.application.data.local.db.purchase.Purchase;
 import com.w3engineers.mesh.application.data.local.db.purchase.PurchaseDao;
 import com.w3engineers.mesh.application.data.local.db.purchaserequests.PurchaseRequests;
+import com.w3engineers.mesh.application.data.local.purchase.PurchaseConstants;
 
 import java.util.List;
 import java.util.concurrent.Callable;
@@ -248,6 +249,21 @@ public class DatabaseService {
         });
         return future.get();
     }
+
+    public List<Purchase> getAllActiveChannel(String address, int channelStatus) throws ExecutionException, InterruptedException {
+
+        Future<List<Purchase>> future = executor.submit((Callable) () -> {
+            List<Purchase> purchaselist = null;
+            try {
+                purchaselist = db.purchaseDao().getAllActiveChannel(address, channelStatus);
+            } catch (Exception e) {
+                Log.e("error", e.toString());
+            }
+            return purchaselist;
+        });
+        return future.get();
+    }
+
 
 
     public List<Purchase> getAllOpenDrawableBlock(String address, int channelStatus, int endPointType) throws ExecutionException, InterruptedException {
@@ -534,7 +550,6 @@ public class DatabaseService {
             }
         });
         return future.get();
-
     }
 
     public PurchaseRequests getPurchaseRequestByMessageId(String messageId) throws ExecutionException, InterruptedException {
@@ -567,39 +582,28 @@ public class DatabaseService {
         });
     }
 
+
+    public List<PurchaseRequests> getUserIncompleteRequests(String requesterAddress, int state, int endPoint) throws ExecutionException, InterruptedException {
+        Future<List<PurchaseRequests>> future = executor.submit(new Callable() {
+            @Override
+            public List<PurchaseRequests> call() {
+                List<PurchaseRequests> purchaseRequests = null;
+                try {
+                    purchaseRequests = db.purchaseRequestsDao().getIncompleteRequestsByRequesterAddress(requesterAddress, state, endPoint);
+                } catch (Exception e) {
+                    Log.e("error", e.toString());
+                }
+                return purchaseRequests;
+            }
+        });
+        return future.get();
+    }
+
     public DatausageDao getDatausageDao() {
         return db.datausageDao();
     }
 
-    public void insertMessage(Message message) {
-        executor.submit(new Callable() {
-            @Override
-            public Integer call() {
-                try {
-                    db.messageDao().insertAll(message);
-                } catch (Exception e) {
-                    Log.e("error", e.toString());
-                }
-                return 0;
-            }
-        });
-    }
-
-    public void deleteMessage(String messageId) {
-        executor.submit(new Callable() {
-            @Override
-            public Integer call() {
-                try {
-                    db.messageDao().deleteByMessageById(messageId);
-                } catch (Exception e) {
-                    Log.e("error", e.toString());
-                }
-                return 0;
-            }
-        });
-    }
-
-    public List<Message> getAll() throws ExecutionException, InterruptedException {
+/*    public List<Message> getAll() throws ExecutionException, InterruptedException {
         Future<List<Message>> future = executor.submit(new Callable() {
             @Override
             public List<Message> call() {
@@ -614,58 +618,7 @@ public class DatabaseService {
         });
         return future.get();
 
-    }
-
-    public Message getMessageById(String msg_id) throws ExecutionException, InterruptedException {
-        Future<Message> future = executor.submit(new Callable() {
-            @Override
-            public Message call() {
-                Message message = null;
-                try {
-                    message = db.messageDao().getMessageById(msg_id);
-                } catch (Exception e) {
-                    Log.e("error", e.toString());
-                }
-                return message;
-            }
-        });
-        return future.get();
-    }
-
-/*    public Message getPendingRequest(String receiverId) throws ExecutionException, InterruptedException {
-        Future<Message> future = executor.submit(new Callable() {
-            @Override
-            public Message call() {
-                Message message = null;
-                try {
-                    message = db.messageDao().getPendingMessage(receiverId);
-                } catch (Exception e) {
-                    Log.e("error", e.toString());
-                }
-                return message;
-            }
-        });
-        return future.get();
     }*/
-
-
-    public List<Message> getPendingMessage(String receiverId) throws ExecutionException, InterruptedException {
-        Future<List<Message>> future = executor.submit(new Callable() {
-            @Override
-            public List<Message> call() {
-                List<Message> messageList = null;
-                try {
-                    messageList = db.messageDao().getPendingMessage(receiverId);
-                } catch (Exception e) {
-                    Log.e("error", e.toString());
-                }
-                return messageList;
-            }
-        });
-        return future.get();
-
-    }
-
 
     public void insertDataUsage(Datausage datausage) {
         executor.submit(new Callable() {
@@ -683,14 +636,14 @@ public class DatabaseService {
         });
     }
 
-    public long getDataUsageByDate(long fromDate, long toDate) throws ExecutionException, InterruptedException {
+    public long getDataUsageByDate(long fromDate) throws ExecutionException, InterruptedException {
 
         Future<Long> future = executor.submit(new Callable() {
             @Override
             public Long call() {
                 long dataSize = 0;
                 try {
-                    dataSize = db.datausageDao().getUsedData(fromDate, toDate);
+                    dataSize = db.datausageDao().getUsedData(fromDate);
                 } catch (Exception e) {
                     Log.e("error", e.toString());
                 }

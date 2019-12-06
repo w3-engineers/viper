@@ -51,6 +51,9 @@ public interface PurchaseDao {
     @Query("SELECT * FROM purchase WHERE seller_address = :myID AND state = :channelStatus AND block_chain_endpoint = :endPointType")
     List<Purchase> getAllActiveChannel(String myID, int channelStatus, int endPointType);
 
+    @Query("SELECT * FROM purchase WHERE seller_address = :myID AND state = :channelStatus")
+    List<Purchase> getAllActiveChannel(String myID, int channelStatus);
+
     @Update
     void updatePurchase(Purchase purchase);
 

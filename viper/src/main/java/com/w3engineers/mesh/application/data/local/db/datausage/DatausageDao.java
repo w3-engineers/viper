@@ -9,15 +9,11 @@ import android.arch.persistence.room.Update;
 
 @Dao
 public interface DatausageDao {
-    @Query("SELECT SUM(data_in_byte) FROM Datausage WHERE date >= :fromDate AND date <= :toDate")
-    public abstract LiveData<Long> getDataUsage(long fromDate, long toDate);
+    @Query("SELECT SUM(data_in_byte) FROM Datausage WHERE date >= :fromDate")
+    public abstract LiveData<Long> getDataUsage(long fromDate);
 
-    @Query("SELECT SUM(data_in_byte) FROM Datausage WHERE purchase_id = :pid")
-    public long getDataUsage(int pid);
-
-    @Query("SELECT SUM(data_in_byte) FROM Datausage WHERE date >= :fromDate AND date <= :toDate")
-    public Long getUsedData(long fromDate, long toDate);
-
+    @Query("SELECT SUM(data_in_byte) FROM Datausage WHERE date >= :fromDate")
+    public Long getUsedData(long fromDate);
 
     @Update
     void updatePurchase(Datausage datausage);

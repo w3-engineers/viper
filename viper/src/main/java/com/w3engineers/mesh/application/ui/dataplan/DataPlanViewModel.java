@@ -52,21 +52,20 @@ class DataPlanViewModel extends BaseRxAndroidViewModel {
                         }
                     }
 
-                    if (onlineNotPurchased.size() > 0) {
-                        finalList.add(getLabelSeller(DataPlanConstants.SELLER_LABEL.ONLINE_NOT_PURCHASED));
-                        finalList.addAll(onlineNotPurchased);
-                    }
-
                     if (onlinePurchased.size() > 0) {
-                        finalList.add(getLabelSeller(DataPlanConstants.SELLER_LABEL.ONLINE_PURCHASED));
+//                        finalList.add(getLabelSeller(DataPlanConstants.SELLER_LABEL.ONLINE_PURCHASED));
                         finalList.addAll(onlinePurchased);
                     }
 
-                    if (offlinePurchased.size() > 0) {
-                        finalList.add(getLabelSeller(DataPlanConstants.SELLER_LABEL.OFFLINE_PURCHASED));
-                        finalList.addAll(offlinePurchased);
+                    if (onlineNotPurchased.size() > 0) {
+//                        finalList.add(getLabelSeller(DataPlanConstants.SELLER_LABEL.ONLINE_NOT_PURCHASED));
+                        finalList.addAll(onlineNotPurchased);
                     }
 
+                    if (offlinePurchased.size() > 0) {
+//                        finalList.add(getLabelSeller(DataPlanConstants.SELLER_LABEL.OFFLINE_PURCHASED));
+                        finalList.addAll(offlinePurchased);
+                    }
                     allSellers.postValue(finalList);
 
                 }, Throwable::printStackTrace));

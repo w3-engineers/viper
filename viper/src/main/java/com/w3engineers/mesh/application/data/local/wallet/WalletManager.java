@@ -1,16 +1,19 @@
 package com.w3engineers.mesh.application.data.local.wallet;
 
+import android.app.ProgressDialog;
 import android.arch.lifecycle.LiveData;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.net.Uri;
 import android.os.AsyncTask;
+import android.text.TextUtils;
 import android.util.Base64;
 
 import com.google.zxing.WriterException;
 import com.w3engineers.mesh.application.data.local.DataPlanConstants;
-import com.w3engineers.mesh.application.data.local.db.SharedPref;
 import com.w3engineers.mesh.application.data.local.dataplan.DataPlanManager;
+import com.w3engineers.mesh.application.data.local.db.SharedPref;
 import com.w3engineers.mesh.application.data.local.db.networkinfo.NetworkInfo;
 import com.w3engineers.mesh.application.data.local.helper.PreferencesHelperDataplan;
 import com.w3engineers.mesh.application.data.local.purchase.PurchaseManager;
@@ -35,12 +38,19 @@ public class WalletManager {
     private PreferencesHelperDataplan preferencesHelperDataplan;
     private DataPlanManager dataPlanManager;
     private WalletListener walletListener;
+    private ProgressDialog dialog;
 
 
-    public static void openActivity(Context context){
+    public static void openActivity(Context context, byte[] picture){
         Intent intent = new Intent(context, WalletActivity.class);
+        if(picture != null) {
+            intent.putExtra("picture", picture);
+        }
         context.startActivity(intent);
     }
+
+
+
 
     public static WalletManager getInstance(){
         if (walletManager == null){
@@ -184,9 +194,7 @@ public class WalletManager {
         return null;
     }
 
-    public void getAllOpenDrawableBlock() throws ExecutionException, InterruptedException {
-        //TODO there is a problem in the callback, for every request a callback is fired, but it should be at the end when all process are completed.
-
+    public void getAllOpenDrawableBlock() {
         PurchaseManagerSeller.getInstance().getAllOpenDrawableBlock();
     }
 
@@ -199,15 +207,28 @@ public class WalletManager {
         void onErrorOccurred(String message);
     }
 
-    public void readWallet(Context context, WaletListener listener) {
+    public interface WalletLoadListener {
+        void onWalletLoaded(String walletAddress, String publicKey);
+        void onError(String message);
+    }
+
+    public interface WalletCreateListener {
+        void onWalletCreated(String walletAddress, String publicKey);
+        void onError(String message);
+    }
+
+    public interface WalletImportListener {
+        void onWalletImported(String walletAddress, String publicKey);
+        void onError(String message);
+    }
+
+    public void readWallet(Context context, String password, WaletListener listener) {
         WalletService mWalletService =  WalletService.getInstance(context);
 
-        mWalletService.createOrLoadWallet(WalletService.PASSWORD, new WalletService.Listener() {
+        mWalletService.createOrLoadWallet(password, new WalletService.WalletLoadListener() {
             @Override
             public void onWalletLoaded(String walletAddress, String publicKey) {
                 MeshLog.i(" WalletManager loaded succesful");
-
-                listener.onWalletLoaded(walletAddress, publicKey);
 
                 if (!walletAddress.equalsIgnoreCase(SharedPref.read(Constant.PreferenceKeys.ADDRESS))){
 
@@ -219,9 +240,7 @@ public class WalletManager {
                             try {
                                 // Getting QR-Code as Bitmap
                                 Bitmap bitmap = qrgEncoder.encodeAsBitmap();
-
                                 String bitmapAddress = bitMapToString(bitmap);
-
                                 SharedPref.write(Constant.PreferenceKeys.ADDRESS_BITMAP, bitmapAddress);
 
                             } catch (WriterException e) {
@@ -230,6 +249,8 @@ public class WalletManager {
                         }
                     });
                 }
+
+                listener.onWalletLoaded(walletAddress, publicKey);
             }
 
             @Override
@@ -239,6 +260,169 @@ public class WalletManager {
             }
         });
     }
+
+    /**
+     * This api is used to create wallet
+     * @param context
+     * @param password
+     * @param listener
+     */
+    public void createWallet(Context context, String password, WalletCreateListener listener){
+        if (TextUtils.isEmpty(password)){
+            listener.onError("Password cant be empty");
+        }else if (password.length() < 8){
+            listener.onError("Password can't be smaller then 8 character");
+        }else {
+            WalletService mWalletService =  WalletService.getInstance(context);
+            mWalletService.createWallet(password, new WalletService.WalletCreateListener() {
+                @Override
+                public void onWalletCreated(String walletAddress, String publicKey) {
+
+                    if (!walletAddress.equalsIgnoreCase(SharedPref.read(Constant.PreferenceKeys.ADDRESS))){
+
+                        AsyncTask.execute(new Runnable() {
+                            @Override
+                            public void run() {
+                                SharedPref.write(Constant.PreferenceKeys.ADDRESS, walletAddress);
+                                QRGEncoder qrgEncoder = new QRGEncoder(walletAddress, null, QRGContents.Type.TEXT, 300);
+                                try {
+                                    // Getting QR-Code as Bitmap
+                                    Bitmap bitmap = qrgEncoder.encodeAsBitmap();
+                                    String bitmapAddress = bitMapToString(bitmap);
+                                    SharedPref.write(Constant.PreferenceKeys.ADDRESS_BITMAP, bitmapAddress);
+
+                                } catch (WriterException e) {
+
+                                }
+                            }
+                        });
+                    }
+
+                    listener.onWalletCreated(walletAddress, publicKey);
+                }
+
+                @Override
+                public void onError(String message) {
+                  listener.onError(message);
+                }
+            });
+        }
+    }
+
+    /**
+     * This api is used to load wallet
+     * @param context
+     * @param password
+     * @param listener
+     */
+
+    public void loadWallet(Context context, String password, WalletLoadListener listener){
+        if (TextUtils.isEmpty(password)){
+            listener.onError("Password cant be empty");
+        }else if (password.length() < 8){
+            listener.onError("Password can't be smaller then 8 character");
+        }else {
+            WalletService mWalletService =  WalletService.getInstance(context);
+
+            mWalletService.loadWallet(password, new WalletService.WalletLoadListener() {
+                @Override
+                public void onWalletLoaded(String walletAddress, String publicKey) {
+
+                    if (!walletAddress.equalsIgnoreCase(SharedPref.read(Constant.PreferenceKeys.ADDRESS))){
+
+                        AsyncTask.execute(new Runnable() {
+                            @Override
+                            public void run() {
+                                SharedPref.write(Constant.PreferenceKeys.ADDRESS, walletAddress);
+                                QRGEncoder qrgEncoder = new QRGEncoder(walletAddress, null, QRGContents.Type.TEXT, 300);
+                                try {
+                                    // Getting QR-Code as Bitmap
+                                    Bitmap bitmap = qrgEncoder.encodeAsBitmap();
+                                    String bitmapAddress = bitMapToString(bitmap);
+                                    SharedPref.write(Constant.PreferenceKeys.ADDRESS_BITMAP, bitmapAddress);
+
+                                } catch (WriterException e) {
+
+                                }
+                            }
+                        });
+                    }
+
+                    listener.onWalletLoaded(walletAddress, publicKey);
+                }
+                @Override
+                public void onErrorOccurred(String message) {
+                    listener.onError(message);
+                }
+            });
+        }
+    }
+
+    /**
+     * This api is used to import wallet
+     * @param context
+     * @param password
+     * @param fileUri
+     * @param listener
+     */
+    public void importWallet(Context context, String password, Uri fileUri, WalletImportListener listener){
+        if (TextUtils.isEmpty(password)){
+            listener.onError("Password cant be empty");
+        }else if (password.length() < 8){
+            listener.onError("Password can't be smaller then 8 character");
+        }else {
+            WalletService mWalletService =  WalletService.getInstance(context);
+
+            mWalletService.importWallet(password, fileUri, new WalletService.WalletImportListener() {
+                @Override
+                public void onWalletImported(String walletAddress, String publicKey) {
+                    listener.onWalletImported(walletAddress, publicKey);
+
+                    if (!walletAddress.equalsIgnoreCase(SharedPref.read(Constant.PreferenceKeys.ADDRESS))){
+
+                        AsyncTask.execute(new Runnable() {
+                            @Override
+                            public void run() {
+                                SharedPref.write(Constant.PreferenceKeys.ADDRESS, walletAddress);
+                                QRGEncoder qrgEncoder = new QRGEncoder(walletAddress, null, QRGContents.Type.TEXT, 300);
+                                try {
+                                    // Getting QR-Code as Bitmap
+                                    Bitmap bitmap = qrgEncoder.encodeAsBitmap();
+                                    String bitmapAddress = bitMapToString(bitmap);
+                                    SharedPref.write(Constant.PreferenceKeys.ADDRESS_BITMAP, bitmapAddress);
+
+                                } catch (WriterException e) {
+
+                                }
+                            }
+                        });
+                    }
+                }
+
+                @Override
+                public void onError(String message) {
+                    listener.onError(message);
+                }
+            });
+        }
+    }
+
+
+
+    private void showProgress(Context activity, boolean isNeeded) {
+        if (isNeeded) {
+            dialog = new ProgressDialog(activity);
+            dialog.setMessage("Copying please wait...");
+            dialog.show();
+        } else {
+            if (dialog != null) {
+                dialog.dismiss();
+            }
+        }
+    }
+
+
+
     /**
      * @param bitmap
      * @return converting bitmap and return a string

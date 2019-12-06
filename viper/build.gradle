@@ -1,6 +1,5 @@
 plugins {
     id 'com.android.library'
-    id 'com.github.dcendents.android-maven'
 }
 group = 'com.github.w3-engineers'
 
@@ -46,6 +45,7 @@ android {
     dataBinding {
         enabled = true
     }
+
 }
 
 
@@ -82,4 +82,9 @@ dependencies {
     // Retrofit & OkHttp
     implementation 'com.squareup.retrofit2:retrofit:2.5.0'
     implementation 'com.squareup.retrofit2:converter-gson:2.5.0'
+    implementation 'de.hdodenhof:circleimageview:3.0.1'
+
+    implementation 'com.makeramen:roundedimageview:2.3.0'
+    implementation 'lib.kashif:folderpicker:2.4'
+
 }

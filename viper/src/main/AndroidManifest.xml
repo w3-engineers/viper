@@ -9,30 +9,34 @@
         <activity
             android:name=".application.ui.wallet.WalletActivity"
             android:label="@string/title_activity_wallet"
+            android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar"/>
+
+
         <activity
-            android:name="com.w3engineers.mesh.application.ui.dataplan.DataPlanActivity"
+            android:name="com.w3engineers.mesh.application.ui.dataplan.TestDataPlanActivity"
             android:label="@string/title_activity_data_plan"
+            android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar" />
 
         <activity
             android:name="com.w3engineers.mesh.application.ui.premission.PermissionActivity" />
+
+        <activity
+            android:name="com.w3engineers.mesh.application.ui.meshlog.MeshLogHistoryActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name="com.w3engineers.mesh.application.ui.meshlog.MeshLogDetailsActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.NoActionBar" />
 
 <!--        <service
             android:name="com.w3engineers.mesh.application.data.local.service.MeshService"
             android:enabled="true"
             android:exported="true"
             android:stopWithTask="false" />-->
-
-        <service android:name=".ClientLibraryService"
-            android:exported="true"
-            android:enabled="true">
-            <intent-filter>
-                <action android:name="service.viper" />
-            </intent-filter>
-        </service>
-
-      <!--  <provider
+        <!--  <provider
             android:authorities="@string/authority"
             android:name="android.support.v4.content.FileProvider"
             android:exported="false"
