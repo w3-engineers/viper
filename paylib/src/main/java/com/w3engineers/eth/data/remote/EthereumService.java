@@ -117,6 +117,8 @@ public class EthereumService implements BlockRequest.BlockTransactionObserver, E
     }
 
     public void setCredential(Credentials credential) {
+
+        Log.v("MeshLog" , "getCredentials setCredential eth service " + credential);
         this.credentials = credential;
 //        Log.i(TAG, "privatekey: " + credential.getEcKeyPair().getPrivateKey().toString(16));
 //        Log.i(TAG, "address: " + credential.getAddress());
@@ -127,6 +129,8 @@ public class EthereumService implements BlockRequest.BlockTransactionObserver, E
     }
 
     public void saveAddress(String address) {
+        Log.v("MeshLog" , "getCredentials save address " + address);
+
         PreferencesHelperPaylib.onInstance(mContext).saveAddress(address);
     }
 

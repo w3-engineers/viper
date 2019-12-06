@@ -175,6 +175,7 @@ public class BlockRequest {
         });
         return future.get();
     }
+
     public String getBalanceProof(String receiver, long blockNumber, double balance) {
         List<String> labels = Arrays.asList(
                 "string message_id",
@@ -350,6 +351,11 @@ public class BlockRequest {
             @Override
             public Double call() {
                 try {
+
+                     String gasPrice = web3j.ethGasPrice().sendAsync().get().getGasPrice().toString();
+                     Log.v(TAG, "gasPrice " + gasPrice);
+
+
                     EthGetBalance ethGetBalance = web3j.ethGetBalance(address, DefaultBlockParameterName.LATEST).sendAsync().get();
                     if (ethGetBalance != null) {
                         double ethValue = getETHorTOKEN(ethGetBalance.getBalance());
@@ -433,6 +439,7 @@ public class BlockRequest {
         Log.i(TAG, "tokenValue: " + tokenValue.doubleValue());
         return tokenValue.doubleValue();
     }
+
     //    public void verifyClosingHashSignature(final String sender, final int blockNumber, final int balance, final String closingSig, final VerifyClosingHash listener) {
 //        executor.execute(new Runnable() {
 //            @Override

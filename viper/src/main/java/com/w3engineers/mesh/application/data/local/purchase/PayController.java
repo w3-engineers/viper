@@ -158,6 +158,7 @@ public class PayController {
     }
 
     public Credentials getCredentials() {
+        MeshLog.v("getCredentials paycontroller");
         return WalletService.getInstance(MeshApp.getContext()).getCredentials();
     }
 
