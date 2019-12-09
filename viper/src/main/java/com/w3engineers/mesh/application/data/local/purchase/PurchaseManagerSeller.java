@@ -146,7 +146,7 @@ public class PurchaseManagerSeller extends PurchaseManager implements PayControl
                 }
             } else {
                 MeshLog.o("### message in queue ###");
-                if (buyerPendingMessage.updateTime < System.currentTimeMillis() - (15*1000)){
+                if (buyerPendingMessage.updateTime < System.currentTimeMillis() - (sellerWaitingTime + 5000)){
                     MeshLog.o("### resending qued message ###");
                     resumeUserPendingMessage(userAddress);
                 }
@@ -2081,7 +2081,7 @@ public class PurchaseManagerSeller extends PurchaseManager implements PayControl
     //**********************SELLER TIMER***********************//
     //*********************************************************//
     private Handler sellerHandler;
-    private long sellerWaitingTime = 10 * 1000;
+    private long sellerWaitingTime = 15 * 1000;
     private ConcurrentHashMap<String, TimeoutModel> sellerTimeoutObjMap = new ConcurrentHashMap<>();
 
     @SuppressLint("HandlerLeak")
