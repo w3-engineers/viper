@@ -39,7 +39,7 @@ public class EthereumServiceUtil implements EthereumService.NetworkInfoCallback 
 
     private EthereumServiceUtil(Context context) {
         databaseService = DatabaseService.getInstance(context);
-        populateDb(context);
+//        populateDb(context);
         ethereumService = EthereumService.getInstance(context, this,
                 SharedPref.read(Constant.PreferenceKeys.GIFT_DONATE_LINK));
     }
@@ -142,7 +142,7 @@ public class EthereumServiceUtil implements EthereumService.NetworkInfoCallback 
                     ni.tokenAmount = token_amount;
                     ni.tokenSymbol = token_symbol;
 
-                    databaseService.insertNetworkInfo(ni);
+                    insertNetworkInfo(ni);
                 }
             }
 
@@ -150,6 +150,15 @@ public class EthereumServiceUtil implements EthereumService.NetworkInfoCallback 
             e.printStackTrace();
         }
     }
+
+    public void insertNetworkInfo(NetworkInfo networkInfo) {
+        try {
+            databaseService.insertNetworkInfo(networkInfo);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
     private static String getValue(String tag, Element element) {
         NodeList nodeList = element.getElementsByTagName(tag).item(0).getChildNodes();
         Node node = nodeList.item(0);
