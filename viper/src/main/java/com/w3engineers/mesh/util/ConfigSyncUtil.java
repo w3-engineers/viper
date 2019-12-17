@@ -14,8 +14,11 @@ import android.os.AsyncTask;
 import android.text.TextUtils;
 
 import com.google.gson.Gson;
+import com.w3engineers.mesh.application.data.AppDataObserver;
 import com.w3engineers.mesh.application.data.local.db.SharedPref;
 import com.w3engineers.mesh.application.data.local.db.networkinfo.NetworkInfo;
+import com.w3engineers.mesh.application.data.local.helper.PreferencesHelperDataplan;
+import com.w3engineers.mesh.application.data.model.ConfigSyncEvent;
 import com.w3engineers.models.ConfigurationCommand;
 import com.w3engineers.models.Network;
 
@@ -31,6 +34,7 @@ import java.net.URL;
 public class ConfigSyncUtil {
 
     private static ConfigSyncUtil configSyncUtil = null;
+    private ConfigSyncCallback configSyncCallback;
 
     static {
         configSyncUtil = new ConfigSyncUtil();
@@ -40,21 +44,31 @@ public class ConfigSyncUtil {
 
     }
 
-    public ConfigSyncUtil getInstance() {
+    public static ConfigSyncUtil getInstance() {
         return configSyncUtil;
     }
 
-    public void startConfigurationSync() {
+    public interface ConfigSyncCallback {
+        void configSynced(boolean isUpdate, ConfigurationCommand configurationCommand);
+    }
 
+    public void setConfigSyncCallback(ConfigSyncCallback configSyncCallback) {
+        this.configSyncCallback = configSyncCallback;
+    }
+
+    public void startConfigurationSync(Context context, boolean isMeshStartTime) {
+        new ConfigurationTask(context, isMeshStartTime).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
     }
 
     @SuppressLint("StaticFieldLeak")
     private class ConfigurationTask extends AsyncTask<String, Void, String> {
 
         private Context context;
+        private boolean isMeshStartTime;
 
-        public ConfigurationTask(Context context) {
+        public ConfigurationTask(Context context, boolean isMeshStartTime) {
             this.context = context;
+            this.isMeshStartTime = isMeshStartTime;
         }
 
         @Override
@@ -104,11 +118,11 @@ public class ConfigSyncUtil {
         protected void onPostExecute(String s) {
             super.onPostExecute(s);
 
-            processConfigJson(context, s);
+            processConfigJson(context, s, isMeshStartTime);
         }
     }
 
-    private void processConfigJson(Context context, String configData) {
+    private void processConfigJson(Context context, String configData, boolean isMeshStartTime) {
 
         ConfigurationCommand configurationCommand;
 
@@ -119,15 +133,26 @@ public class ConfigSyncUtil {
             configurationCommand = new Gson().fromJson(configData, ConfigurationCommand.class);
         }
 
-        if (configurationCommand != null) {
+        int configVersion = PreferencesHelperDataplan.on().getConfigVersion();
+
+        ConfigSyncEvent configSyncEvent = new ConfigSyncEvent();
+
+        if (configurationCommand != null && configVersion < configurationCommand.getConfigVersionCode()) {
+
+            PreferencesHelperDataplan.on().setConfigVersion(configurationCommand.getConfigVersionCode());
+            PreferencesHelperDataplan.on().setPerMbTokenValue(configurationCommand.getTokenPerMb());
 
             for (Network network : configurationCommand.getNetwork()) {
                 EthereumServiceUtil.getInstance(context).insertNetworkInfo(new NetworkInfo().toNetworkInfo(network));
             }
 
-
-
+            configSyncEvent.setUpdate(true);
+        } else {
+            configSyncEvent.setUpdate(false);
         }
+        configSyncEvent.setMeshStartTime(isMeshStartTime);
+        configSyncEvent.setConfigurationCommand(configurationCommand);
+        AppDataObserver.on().sendObserverData(configSyncEvent);
     }
 
     private String loadJSONFromAsset(Context context) {

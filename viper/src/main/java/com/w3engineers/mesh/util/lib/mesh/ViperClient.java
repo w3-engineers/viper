@@ -88,6 +88,8 @@ public class ViperClient {
         SharedPref.write(Constant.PreferenceKeys.APP_DOWNLOAD_LINK, downloadLink);
         SharedPref.write(Constant.PreferenceKeys.GIFT_DONATE_LINK, giftUrl);
 
+        DataManager.on().startMeshService();
+
         return this;
     }
 
