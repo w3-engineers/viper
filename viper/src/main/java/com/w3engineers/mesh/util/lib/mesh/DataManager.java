@@ -25,6 +25,7 @@ import com.w3engineers.mesh.application.data.ApiEvent;
 import com.w3engineers.mesh.application.data.AppDataObserver;
 import com.w3engineers.mesh.application.data.local.dataplan.DataPlanManager;
 import com.w3engineers.mesh.application.data.local.db.SharedPref;
+import com.w3engineers.mesh.application.data.local.helper.PreferencesHelperDataplan;
 import com.w3engineers.mesh.application.data.local.helper.crypto.CryptoHelper;
 import com.w3engineers.mesh.application.data.local.wallet.WalletService;
 import com.w3engineers.mesh.application.data.model.ConfigSyncEvent;
@@ -281,6 +282,10 @@ public class DataManager {
                 //mTmCommunicator.saveUserInfo(userInfo);
                 Log.e("service_status", "onServiceConnected");
                 int userRole = DataPlanManager.getInstance().getDataPlanRole();
+
+                int configVersion = PreferencesHelperDataplan.on().getConfigVersion();
+                userInfo.setConfigVersion(configVersion);
+
                 boolean status = mTmCommunicator.startMesh(appName, userRole, userInfo, mSsid);
                 if (!status) {
                     showPermissionPopUp();
@@ -535,6 +540,7 @@ public class DataManager {
             userInfoEvent.setAvatar(userInfo.getAvatar());
             userInfoEvent.setUserName(userInfo.getUserName());
             userInfoEvent.setRegTime(userInfo.getRegTime());
+            userInfoEvent.setConfigVersion(userInfo.getConfigVersion());
             userInfoEvent.setSync(userInfo.isSync());
 
             AppDataObserver.on().sendObserverData(userInfoEvent);

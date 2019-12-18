@@ -8,6 +8,7 @@ public class UserInfo implements Parcelable {
     private int avatar;
     private String userName;
     private long regTime;
+    private int configVersion;
     private boolean isSync;
     private String publicKey;
     private String packageName;
@@ -68,6 +69,13 @@ public class UserInfo implements Parcelable {
         isSync = sync;
     }
 
+    public int getConfigVersion() {
+        return configVersion;
+    }
+
+    public void setConfigVersion(int configVersion) {
+        this.configVersion = configVersion;
+    }
 
     public UserInfo(){
 
@@ -78,6 +86,7 @@ public class UserInfo implements Parcelable {
         avatar = in.readInt();
         userName = in.readString();
         regTime = in.readLong();
+        configVersion = in.readInt();
         isSync = in.readByte() != 0;
         publicKey = in.readString();
         packageName = in.readString();
@@ -106,6 +115,7 @@ public class UserInfo implements Parcelable {
         dest.writeInt(avatar);
         dest.writeString(userName);
         dest.writeLong(regTime);
+        dest.writeInt(configVersion);
         dest.writeByte((byte) (isSync ? 1 : 0));
         dest.writeString(publicKey);
         dest.writeString(packageName);
