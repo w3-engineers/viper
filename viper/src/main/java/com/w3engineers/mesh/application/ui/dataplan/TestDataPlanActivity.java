@@ -1,6 +1,5 @@
 package com.w3engineers.mesh.application.ui.dataplan;
 
-import android.app.DatePickerDialog;
 import android.app.ProgressDialog;
 import android.arch.lifecycle.ViewModel;
 import android.arch.lifecycle.ViewModelProvider;
@@ -37,14 +36,11 @@ import com.w3engineers.mesh.application.ui.util.ExpandableButton;
 import com.w3engineers.mesh.databinding.TestActivityDataPlanBinding;
 import com.w3engineers.mesh.util.Constant;
 import com.w3engineers.mesh.util.DialogUtil;
-import com.w3engineers.mesh.util.MeshLog;
 import com.w3engineers.mesh.util.NotificationUtil;
 import com.w3engineers.mesh.util.Util;
 import com.w3engineers.mesh.util.lib.mesh.HandlerUtil;
 
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
 import java.util.concurrent.ExecutionException;
 
 public class TestDataPlanActivity extends TelemeshBaseActivity implements DataPlanManager.DataPlanListener {

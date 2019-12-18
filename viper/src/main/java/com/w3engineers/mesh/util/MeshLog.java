@@ -1,8 +1,10 @@
 package com.w3engineers.mesh.util;
 
 import android.content.Intent;
+import android.os.Build;
 import android.util.Log;
 
+import com.w3engineers.mesh.BuildConfig;
 import com.w3engineers.mesh.util.lib.mesh.DataManager;
 
 import java.text.SimpleDateFormat;
@@ -98,10 +100,11 @@ public class MeshLog {
 
     private static void writeText(String text, boolean isAppend) {
 
-        Intent intent = new Intent("com.w3engineers.meshrnd.DEBUG_MESSAGE");
-        intent.putExtra("value", text);
-        MeshApp.getContext().sendBroadcast(intent);
-
-        DataManager.on().writeLogIntoTxtFile(text, isAppend);
+        if (BuildConfig.DEBUG){
+            Intent intent = new Intent("com.w3engineers.meshrnd.DEBUG_MESSAGE");
+            intent.putExtra("value", text);
+            MeshApp.getContext().sendBroadcast(intent);
+            DataManager.on().writeLogIntoTxtFile(text, isAppend);
+        }
     }
 }
