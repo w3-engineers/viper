@@ -24,6 +24,7 @@ public class PreferencesHelperDataplan {
     private static final String GIFT_ENDPOINT_TYPE = "gift_end_point_type";
     private static final String ETHER_REQUEST_TIME = "ether_request_time";
     private static final String CONFIG_VERSION = "CONFIG_VERSION";
+    private static final String TOKEN_GUIDE_VERSION = "TOKEN_GUIDE_VERSION";
     private static final String PER_MB_TKN_VALUE = "PER_MB_TKN_VALUE";
 //    private static final String CURRENCY_MODE = "currency_mode";
 
@@ -171,5 +172,13 @@ public class PreferencesHelperDataplan {
 
     public int getConfigVersion() {
         return SharedPref.readInt(CONFIG_VERSION, -1);
+    }
+
+    public void setTokenGuideVersion(int configVersion) {
+        SharedPref.write(TOKEN_GUIDE_VERSION, configVersion);
+    }
+
+    public int getTokenGuideVersion() {
+        return SharedPref.readInt(TOKEN_GUIDE_VERSION, -1);
     }
 }

@@ -139,6 +139,7 @@ public class ConfigSyncUtil {
         }
 
         int configVersion = PreferencesHelperDataplan.on().getConfigVersion();
+        int tokenGuideVersion = PreferencesHelperDataplan.on().getTokenGuideVersion();
 
         ConfigSyncEvent configSyncEvent = new ConfigSyncEvent();
 
@@ -155,9 +156,15 @@ public class ConfigSyncUtil {
         } else {
             configSyncEvent.setUpdate(false);
         }
+
         configSyncEvent.setMeshStartTime(isMeshStartTime);
         configSyncEvent.setConfigurationCommand(configurationCommand);
         AppDataObserver.on().sendObserverData(configSyncEvent);
+
+
+        if (configurationCommand != null && tokenGuideVersion < configurationCommand.getTokenGuideVersion()) {
+            new DownloadGuidelineContent(context).execute();
+        }
     }
 
     public void updateConfigCommandFile(Context context, ConfigurationCommand configurationCommand) {

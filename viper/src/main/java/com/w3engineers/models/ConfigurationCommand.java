@@ -108,6 +108,14 @@ public class ConfigurationCommand implements Parcelable {
         this.network = network;
     }
 
+    public Integer getTokenGuideVersion() {
+        return tokenGuideVersion;
+    }
+
+    public void setTokenGuideVersion(Integer tokenGuideVersion) {
+        this.tokenGuideVersion = tokenGuideVersion;
+    }
+
     @Override
     public int describeContents() {
         return 0;
