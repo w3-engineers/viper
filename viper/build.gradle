@@ -19,9 +19,9 @@ android {
     }
     buildTypes {
         release {
-            debuggable true
+            debuggable false
             minifyEnabled true
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
 
             /*buildConfigField 'String', 'AUTH_USER_NAME', System.getenv('AUTH_USER_NAME').equals(null) ? AUTH_USER_NAME : System.getenv('AUTH_USER_NAME')
             buildConfigField 'String', 'AUTH_PASSWORD', System.getenv('AUTH_PASSWORD').equals(null) ? AUTH_PASSWORD : System.getenv('AUTH_PASSWORD')
@@ -67,11 +67,11 @@ dependencies {
     debugImplementation 'com.awesomedroidapps:inappstoragereader:1.0.2'
     api deps.strom_remote
     api project(path: ':paylib')
-    implementation "io.reactivex.rxjava2:rxandroid:2.1.0"
+    implementation "io.reactivex.rxjava2:rxandroid:2.1.1"
     implementation "android.arch.persistence.room:rxjava2:1.1.1"
     annotationProcessor 'android.arch.persistence.room:compiler:1.1.1'
     implementation 'android.arch.persistence.room:runtime:1.1.1'
-    implementation "android.arch.lifecycle:reactivestreams:1.0.0-beta2"
+    implementation "android.arch.lifecycle:reactivestreams:1.1.1"
     implementation 'androidmads.library.qrgenearator:QRGenearator:1.0.3'
     implementation('org.web3j:core:4.2.0-android') {
         exclude group: 'org.bouncycastle'
@@ -80,8 +80,8 @@ dependencies {
     implementation 'com.snatik:storage:2.1.0'
 
     // Retrofit & OkHttp
-    implementation 'com.squareup.retrofit2:retrofit:2.5.0'
-    implementation 'com.squareup.retrofit2:converter-gson:2.5.0'
+    implementation 'com.squareup.retrofit2:retrofit:2.6.0'
+    implementation 'com.squareup.retrofit2:converter-gson:2.6.0'
     implementation 'de.hdodenhof:circleimageview:3.0.1'
 
     implementation 'com.makeramen:roundedimageview:2.3.0'

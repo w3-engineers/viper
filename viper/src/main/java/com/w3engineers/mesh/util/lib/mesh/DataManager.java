@@ -19,6 +19,7 @@ import android.text.TextUtils;
 import android.util.Log;
 
 import com.w3engineers.ext.strom.util.helper.Toaster;
+import com.w3engineers.mesh.BuildConfig;
 import com.w3engineers.mesh.R;
 import com.w3engineers.mesh.ViperCommunicator;
 import com.w3engineers.mesh.application.data.ApiEvent;
@@ -348,11 +349,13 @@ public class DataManager {
 
         @Override
         public void onReceiveLog(String text) throws RemoteException {
-            Intent intent = new Intent("com.w3engineers.meshrnd.DEBUG_MESSAGE");
-            intent.putExtra("value", text);
-            MeshApp.getContext().sendBroadcast(intent);
+            if (BuildConfig.DEBUG){
+                Intent intent = new Intent("com.w3engineers.meshrnd.DEBUG_MESSAGE");
+                intent.putExtra("value", text);
+                MeshApp.getContext().sendBroadcast(intent);
 
-            DataManager.this.writeLogIntoTxtFile(text, true);
+                DataManager.this.writeLogIntoTxtFile(text, true);
+            }
         }
 
         @Override
@@ -741,36 +744,34 @@ public class DataManager {
 
 
     public void writeLogIntoTxtFile(String text, boolean isAppend) {
+            try {
+                String sdCard = Constant.Directory.PARENT_DIRECTORY + Constant.Directory.MESH_LOG;
+                File directory = new File(sdCard);
+                if (!directory.exists()) {
+                    directory.mkdirs();
+                }
+                if (Constant.CURRENT_LOG_FILE_NAME == null) {
+                    Constant.CURRENT_LOG_FILE_NAME = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss", Locale.getDefault()).format(new Date()) + ".txt";
+                }
+                File file = new File(directory, Constant.CURRENT_LOG_FILE_NAME);
+                if (!file.exists()) {
+                    file.createNewFile();
+                }
+                FileOutputStream fOut = new FileOutputStream(file, isAppend);
 
-        try {
+                OutputStreamWriter osw = new
+                        OutputStreamWriter(fOut);
 
-            String sdCard = Constant.Directory.PARENT_DIRECTORY + Constant.Directory.MESH_LOG;
-            File directory = new File(sdCard);
-            if (!directory.exists()) {
-                directory.mkdirs();
+                osw.write("\n" + text);
+                //  osw.append(text)
+                osw.flush();
+                osw.close();
+
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            } catch (IOException ioe) {
+                ioe.printStackTrace();
             }
-            if (Constant.CURRENT_LOG_FILE_NAME == null) {
-                Constant.CURRENT_LOG_FILE_NAME = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss", Locale.getDefault()).format(new Date()) + ".txt";
-            }
-            File file = new File(directory, Constant.CURRENT_LOG_FILE_NAME);
-            if (!file.exists()) {
-                file.createNewFile();
-            }
-            FileOutputStream fOut = new FileOutputStream(file, isAppend);
 
-            OutputStreamWriter osw = new
-                    OutputStreamWriter(fOut);
-
-
-            osw.write("\n" + text);
-            //  osw.append(text)
-            osw.flush();
-            osw.close();
-
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (IOException ioe) {
-            ioe.printStackTrace();
-        }
     }
 }
