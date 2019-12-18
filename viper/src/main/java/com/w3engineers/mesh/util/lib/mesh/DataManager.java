@@ -330,11 +330,13 @@ public class DataManager {
 
         @Override
         public void onReceiveLog(String text) throws RemoteException {
-            Intent intent = new Intent("com.w3engineers.meshrnd.DEBUG_MESSAGE");
-            intent.putExtra("value", text);
-            MeshApp.getContext().sendBroadcast(intent);
+            if (BuildConfig.DEBUG){
+                Intent intent = new Intent("com.w3engineers.meshrnd.DEBUG_MESSAGE");
+                intent.putExtra("value", text);
+                MeshApp.getContext().sendBroadcast(intent);
 
-            DataManager.this.writeLogIntoTxtFile(text, true);
+                DataManager.this.writeLogIntoTxtFile(text, true);
+            }
         }
 
         @Override
@@ -722,7 +724,6 @@ public class DataManager {
 
 
     public void writeLogIntoTxtFile(String text, boolean isAppend) {
-        if (BuildConfig.DEBUG) {
             try {
                 String sdCard = Constant.Directory.PARENT_DIRECTORY + Constant.Directory.MESH_LOG;
                 File directory = new File(sdCard);
@@ -751,6 +752,6 @@ public class DataManager {
             } catch (IOException ioe) {
                 ioe.printStackTrace();
             }
-        }
+
     }
 }
