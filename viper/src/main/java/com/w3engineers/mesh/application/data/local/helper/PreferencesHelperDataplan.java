@@ -23,6 +23,8 @@ public class PreferencesHelperDataplan {
     private static final String GIFT_TOKEN_TRANX_HASH = "requested_token_hash";
     private static final String GIFT_ENDPOINT_TYPE = "gift_end_point_type";
     private static final String ETHER_REQUEST_TIME = "ether_request_time";
+    private static final String CONFIG_VERSION = "CONFIG_VERSION";
+    private static final String PER_MB_TKN_VALUE = "PER_MB_TKN_VALUE";
 //    private static final String CURRENCY_MODE = "currency_mode";
 
 
@@ -155,4 +157,19 @@ public class PreferencesHelperDataplan {
         SharedPref.write(ETHER_REQUEST_TIME+endpoint, time);
     }
 
+    public void setPerMbTokenValue(float value) {
+        SharedPref.write(PER_MB_TKN_VALUE, "" + value);
+    }
+
+    public float getPerMbTokenValue() {
+        return Float.valueOf(SharedPref.read(PER_MB_TKN_VALUE, "" + PurchaseConstants.PRICE_PER_MB));
+    }
+
+    public void setConfigVersion(int configVersion) {
+        SharedPref.write(CONFIG_VERSION, configVersion);
+    }
+
+    public int getConfigVersion() {
+        return SharedPref.readInt(CONFIG_VERSION, -1);
+    }
 }

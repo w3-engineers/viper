@@ -659,7 +659,7 @@ public class PurchaseManagerSeller extends PurchaseManager implements PayControl
                 Purchase purchase = databaseService.getPurchaseByBlockNumber(blockNumber, buyerAddress, ethService.getAddress());
 
                 if (purchase == null) {
-                    double deposit = totalDataAmount * PurchaseConstants.PRICE_PER_MB;
+                    double deposit = totalDataAmount * PreferencesHelperDataplan.on().getPerMbTokenValue();
                     databaseService.insertPurchase(buyerAddress, sellerAddress, totalDataAmount,
                             usedDataAmount, blockNumber, deposit, bps, balance, chs, 0.0,
                             PurchaseConstants.CHANNEL_STATE.OPEN, endPointType);
@@ -1310,7 +1310,7 @@ public class PurchaseManagerSeller extends PurchaseManager implements PayControl
                     double addedBalance = bps_balance - previousBalance;
 
                     double dataSizeMB = Util.convertBytesToMegabytes(buyerPendingMessage.dataSize);
-                    double dataPrice = PurchaseConstants.PRICE_PER_MB * dataSizeMB;
+                    double dataPrice = PreferencesHelperDataplan.on().getPerMbTokenValue() * dataSizeMB;
 
 
                     if (addedBalance >= dataPrice) {
@@ -1717,7 +1717,7 @@ public class PurchaseManagerSeller extends PurchaseManager implements PayControl
 
                     databaseService.updatePurchaseRequest(purchaseRequests);
 
-                    double purchasedData = deposit / PurchaseConstants.PRICE_PER_MB;
+                    double purchasedData = deposit / PreferencesHelperDataplan.on().getPerMbTokenValue();
                     databaseService.insertPurchase(buyerAddress, ethService.getAddress(), purchasedData, 0,
                             purchaseRequests.trxBlock, deposit, "", 0, "", 0,
                             PurchaseConstants.CHANNEL_STATE.OPEN, purchaseRequests.blockChainEndpoint);
@@ -1769,7 +1769,7 @@ public class PurchaseManagerSeller extends PurchaseManager implements PayControl
                     Purchase topuppedPurchase = databaseService.getPurchaseByBlockNumber(typedResponse._open_block_number.longValue(), typedResponse._sender_address, typedResponse._receiver_address);
 
                     topuppedPurchase.deposit = topuppedPurchase.deposit + addedDeposit;
-                    double totalData = topuppedPurchase.deposit / PurchaseConstants.PRICE_PER_MB;
+                    double totalData = topuppedPurchase.deposit / PreferencesHelperDataplan.on().getPerMbTokenValue();
                     topuppedPurchase.totalDataAmount = totalData;
 
 
