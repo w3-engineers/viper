@@ -155,6 +155,21 @@ public class ConfigSyncUtil {
         AppDataObserver.on().sendObserverData(configSyncEvent);
     }
 
+    public void updateConfigCommandFile(Context context, ConfigurationCommand configurationCommand) {
+
+        int configVersion = PreferencesHelperDataplan.on().getConfigVersion();
+
+        if (configurationCommand != null && configVersion < configurationCommand.getConfigVersionCode()) {
+
+            PreferencesHelperDataplan.on().setConfigVersion(configurationCommand.getConfigVersionCode());
+            PreferencesHelperDataplan.on().setPerMbTokenValue(configurationCommand.getTokenPerMb());
+
+            for (Network network : configurationCommand.getNetwork()) {
+                EthereumServiceUtil.getInstance(context).insertNetworkInfo(new NetworkInfo().toNetworkInfo(network));
+            }
+        }
+    }
+
     private String loadJSONFromAsset(Context context) {
         String json = null;
         try {

@@ -32,16 +32,16 @@ public class Network implements Parcelable {
     private String channelAddress;
     @SerializedName("gas_price")
     @Expose
-    private Integer gasPrice;
+    private long gasPrice;
     @SerializedName("gas_limit")
     @Expose
-    private Integer gasLimit;
+    private long gasLimit;
     @SerializedName("token_amount")
     @Expose
-    private Integer tokenAmount;
+    private double tokenAmount;
     @SerializedName("currency_amount")
     @Expose
-    private Integer currencyAmount;
+    private double currencyAmount;
 
     protected Network(Parcel in) {
         if (in.readByte() == 0) {
@@ -55,26 +55,10 @@ public class Network implements Parcelable {
         tokenSymbol = in.readString();
         tokenAddress = in.readString();
         channelAddress = in.readString();
-        if (in.readByte() == 0) {
-            gasPrice = null;
-        } else {
-            gasPrice = in.readInt();
-        }
-        if (in.readByte() == 0) {
-            gasLimit = null;
-        } else {
-            gasLimit = in.readInt();
-        }
-        if (in.readByte() == 0) {
-            tokenAmount = null;
-        } else {
-            tokenAmount = in.readInt();
-        }
-        if (in.readByte() == 0) {
-            currencyAmount = null;
-        } else {
-            currencyAmount = in.readInt();
-        }
+        gasPrice = in.readLong();
+        gasLimit = in.readLong();
+        tokenAmount = in.readDouble();
+        currencyAmount = in.readDouble();
     }
 
     public static final Creator<Network> CREATOR = new Creator<Network>() {
@@ -145,35 +129,35 @@ public class Network implements Parcelable {
         this.channelAddress = channelAddress;
     }
 
-    public Integer getGasPrice() {
+    public long getGasPrice() {
         return gasPrice;
     }
 
-    public void setGasPrice(Integer gasPrice) {
+    public void setGasPrice(long gasPrice) {
         this.gasPrice = gasPrice;
     }
 
-    public Integer getGasLimit() {
+    public long getGasLimit() {
         return gasLimit;
     }
 
-    public void setGasLimit(Integer gasLimit) {
+    public void setGasLimit(long gasLimit) {
         this.gasLimit = gasLimit;
     }
 
-    public Integer getTokenAmount() {
+    public double getTokenAmount() {
         return tokenAmount;
     }
 
-    public void setTokenAmount(Integer tokenAmount) {
+    public void setTokenAmount(double tokenAmount) {
         this.tokenAmount = tokenAmount;
     }
 
-    public Integer getCurrencyAmount() {
+    public double getCurrencyAmount() {
         return currencyAmount;
     }
 
-    public void setCurrencyAmount(Integer currencyAmount) {
+    public void setCurrencyAmount(double currencyAmount) {
         this.currencyAmount = currencyAmount;
     }
 
@@ -196,29 +180,9 @@ public class Network implements Parcelable {
         parcel.writeString(tokenSymbol);
         parcel.writeString(tokenAddress);
         parcel.writeString(channelAddress);
-        if (gasPrice == null) {
-            parcel.writeByte((byte) 0);
-        } else {
-            parcel.writeByte((byte) 1);
-            parcel.writeInt(gasPrice);
-        }
-        if (gasLimit == null) {
-            parcel.writeByte((byte) 0);
-        } else {
-            parcel.writeByte((byte) 1);
-            parcel.writeInt(gasLimit);
-        }
-        if (tokenAmount == null) {
-            parcel.writeByte((byte) 0);
-        } else {
-            parcel.writeByte((byte) 1);
-            parcel.writeInt(tokenAmount);
-        }
-        if (currencyAmount == null) {
-            parcel.writeByte((byte) 0);
-        } else {
-            parcel.writeByte((byte) 1);
-            parcel.writeInt(currencyAmount);
-        }
+        parcel.writeLong(gasPrice);
+        parcel.writeLong(gasLimit);
+        parcel.writeDouble(tokenAmount);
+        parcel.writeDouble(currencyAmount);
     }
 }
