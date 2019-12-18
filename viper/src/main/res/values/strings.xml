@@ -163,6 +163,7 @@
     <string name="points_title">POINTS</string>
     <string name="sell_your_data_to_other_local_users_and_earn_coins_you_need_an_active_internet_connection_sell_price_1_coin_1mb">Sell your data to other local users and earn points. You need an active internet connection. Sell price 1 point = 1MB.</string>
     <string name="buy_data_from_nearby_sellers_data_cost_is_1_coin_1mb">Buy data from nearby sellers. Data cost is 1 point = 1MB.</string>
+    <string name="token_guideline">Token Guideline</string>
 
 
 </resources>

@@ -33,6 +33,7 @@ import com.w3engineers.mesh.application.data.local.dataplan.DataPlanManager;
 import com.w3engineers.mesh.application.data.local.wallet.WalletManager;
 import com.w3engineers.mesh.application.ui.base.TelemeshBaseActivity;
 import com.w3engineers.mesh.application.ui.dataplan.TestDataPlanActivity;
+import com.w3engineers.mesh.application.ui.tokenguide.TokenGuidelineActivity;
 import com.w3engineers.mesh.databinding.ActivityWalletBinding;
 import com.w3engineers.mesh.databinding.PromptWalletWithdrowBinding;
 import com.w3engineers.mesh.util.DialogUtil;
@@ -102,6 +103,7 @@ public class WalletActivity extends TelemeshBaseActivity implements WalletManage
 
         walletManager.setWalletListener(this);
         mBinding.buttonViewTransaction.setOnClickListener(this);
+        mBinding.tvBalanceLastUpdated.setOnClickListener(this);
 
         setClickListener(mBinding.opBack, mBinding.imgMyAddress, mBinding.tmeshBlock, mBinding.imgRefresh);
 
@@ -270,6 +272,8 @@ public class WalletActivity extends TelemeshBaseActivity implements WalletManage
             openUrl();
         } else if (v.getId() == R.id.img_refresh) {
             refreshBalance();
+        } else if (v.getId() == R.id.tv_balance_last_updated) {
+            startActivity(new Intent(WalletActivity.this, TokenGuidelineActivity.class));
         }
     }
 
@@ -520,7 +524,7 @@ public class WalletActivity extends TelemeshBaseActivity implements WalletManage
     }
 
     public void performWithdrawBalance() {
-         walletManager.getAllOpenDrawableBlock();
+        walletManager.getAllOpenDrawableBlock();
     }
 
     public void setLastUpdated() {
