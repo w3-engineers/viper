@@ -163,7 +163,7 @@ public class ConfigSyncUtil {
 
 
         if (configurationCommand != null && tokenGuideVersion < configurationCommand.getTokenGuideVersion()) {
-            new DownloadGuidelineContent(context).execute();
+            new DownloadGuidelineContent(context).execute("point_guide.json");
         }
     }
 
