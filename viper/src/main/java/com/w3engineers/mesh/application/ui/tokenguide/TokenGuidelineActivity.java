@@ -10,11 +10,13 @@ import com.w3engineers.mesh.application.data.BaseServiceLocator;
 import com.w3engineers.mesh.application.ui.base.TelemeshBaseActivity;
 import com.w3engineers.mesh.application.ui.util.FileStoreUtil;
 import com.w3engineers.mesh.databinding.ActivityTokenGuidelineBinding;
+import com.w3engineers.models.TokenGuideLine;
 
 public class TokenGuidelineActivity extends TelemeshBaseActivity {
 
     private ActivityTokenGuidelineBinding mBinding;
     private TokenGuidelineAdapter mAdapter;
+    private TokenGuideLine tokenGuideLine;
 
     @Override
     protected int getLayoutId() {
@@ -25,6 +27,7 @@ public class TokenGuidelineActivity extends TelemeshBaseActivity {
     protected void startUI() {
         super.startUI();
         mBinding = (ActivityTokenGuidelineBinding) getViewDataBinding();
+        tokenGuideLine = FileStoreUtil.getGuideline(this);
 
         initView();
     }
@@ -54,9 +57,20 @@ public class TokenGuidelineActivity extends TelemeshBaseActivity {
         }
 
         loadWebView();
+
+        if (tokenGuideLine != null) {
+            mBinding.textViewTitle.setText(tokenGuideLine.getTitle());
+            mAdapter.addItem(tokenGuideLine.getLinkList());
+        }
     }
 
     private void loadWebView() {
-        mBinding.webView.loadUrl(FileStoreUtil.getWebFile());
+        //mBinding.webView.loadUrl(FileStoreUtil.getWebFile());
+        if (tokenGuideLine != null) {
+            mBinding.webView.loadData(tokenGuideLine.getContent(), "text/html", "UTF-8");
+        } else {
+            String data = "<p style=\"text-align: center;\"><strong>No Internet. Please try again.</strong></p>";
+            mBinding.webView.loadData(data, "text/html", "UTF-8");
+        }
     }
 }

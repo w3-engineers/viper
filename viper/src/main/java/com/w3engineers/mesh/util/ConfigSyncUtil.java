@@ -19,8 +19,13 @@ import com.w3engineers.mesh.application.data.local.db.SharedPref;
 import com.w3engineers.mesh.application.data.local.db.networkinfo.NetworkInfo;
 import com.w3engineers.mesh.application.data.local.helper.PreferencesHelperDataplan;
 import com.w3engineers.mesh.application.data.model.ConfigSyncEvent;
+import com.w3engineers.mesh.application.ui.util.FileStoreUtil;
 import com.w3engineers.models.ConfigurationCommand;
 import com.w3engineers.models.Network;
+import com.w3engineers.models.TokenGuideLine;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -170,5 +175,73 @@ public class ConfigSyncUtil {
         }
         return json;
 
+    }
+
+    private void processGuidelineJson(Context context, String guidelineJson) {
+        TokenGuideLine tokenGuideLine = new Gson().fromJson(guidelineJson, TokenGuideLine.class);
+
+        FileStoreUtil.writeTokenGuideline(context, guidelineJson);
+
+        // writing html file but now off
+        //FileStoreUtil.writeWebFile(context, tokenGuideLine.getContent());
+    }
+
+    // Todo call this class if config version is low
+    private class DownloadGuidelineContent extends AsyncTask<String, Void, String> {
+        private Context context;
+
+        public DownloadGuidelineContent(Context context) {
+            this.context = context;
+        }
+
+        @Override
+        protected String doInBackground(String... params) {
+            HttpURLConnection connection = null;
+            BufferedReader reader = null;
+            try {
+                URL url = new URL(params[0]);
+                connection = (HttpURLConnection) url.openConnection();
+
+                String userName = SharedPref.read(Constant.PreferenceKeys.AUTH_USER_NAME);
+                String userPass = SharedPref.read(Constant.PreferenceKeys.AUTH_PASSWORD);
+
+                Authenticator.setDefault(new Authenticator() {
+                    protected PasswordAuthentication getPasswordAuthentication() {
+                        return new PasswordAuthentication(userName, userPass.toCharArray());
+                    }
+                });
+
+                connection.connect();
+                InputStream stream = connection.getInputStream();
+                reader = new BufferedReader(new InputStreamReader(stream));
+                StringBuffer buffer = new StringBuffer();
+                String line = "";
+                while ((line = reader.readLine()) != null) {
+                    buffer.append(line + "\n");
+                }
+                return buffer.toString();
+            } catch (IOException e) {
+                e.printStackTrace();
+            } finally {
+                if (connection != null) {
+                    connection.disconnect();
+                }
+                try {
+                    if (reader != null) {
+                        reader.close();
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(String s) {
+            super.onPostExecute(s);
+
+            processGuidelineJson(context, s);
+        }
     }
 }
