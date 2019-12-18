@@ -57,7 +57,9 @@ public class ConfigSyncUtil {
     }
 
     public void startConfigurationSync(Context context, boolean isMeshStartTime) {
-        new ConfigurationTask(context, isMeshStartTime).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+        String downloadLink = SharedPref.read(Constant.PreferenceKeys.APP_DOWNLOAD_LINK) + "configuration.json";
+        new ConfigurationTask(context, isMeshStartTime, downloadLink)
+                .executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
     }
 
     @SuppressLint("StaticFieldLeak")
@@ -65,10 +67,12 @@ public class ConfigSyncUtil {
 
         private Context context;
         private boolean isMeshStartTime;
+        private String serverUrl;
 
-        public ConfigurationTask(Context context, boolean isMeshStartTime) {
+        public ConfigurationTask(Context context, boolean isMeshStartTime, String url) {
             this.context = context;
             this.isMeshStartTime = isMeshStartTime;
+            this.serverUrl = url;
         }
 
         @Override
@@ -76,7 +80,7 @@ public class ConfigSyncUtil {
             HttpURLConnection connection = null;
             BufferedReader reader = null;
             try {
-                URL url = new URL(params[0]);
+                URL url = new URL(serverUrl);
                 connection = (HttpURLConnection) url.openConnection();
 
                 String userName = SharedPref.read(Constant.PreferenceKeys.AUTH_USER_NAME);
