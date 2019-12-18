@@ -28,7 +28,7 @@ public class TokenGuidelineAdapter extends BaseAdapter<String> {
     class TokenGuidelineVH extends BaseViewHolder<String> {
         ItemLinkBinding binding;
 
-        public TokenGuidelineVH(ViewDataBinding viewDataBinding) {
+        TokenGuidelineVH(ViewDataBinding viewDataBinding) {
             super(viewDataBinding);
         }
 
