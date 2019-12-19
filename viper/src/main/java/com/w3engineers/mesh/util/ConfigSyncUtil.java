@@ -146,6 +146,8 @@ public class ConfigSyncUtil {
         if (configurationCommand != null && tokenGuideVersion < configurationCommand.getTokenGuideVersion()) {
             String downloadLink = SharedPref.read(Constant.PreferenceKeys.APP_DOWNLOAD_LINK) + "point_guide.json";
             new DownloadGuidelineContent(context).execute(downloadLink);
+
+            PreferencesHelperDataplan.on().setTokenGuideVersion(configurationCommand.getTokenGuideVersion());
         }
 
         if (configurationCommand != null && configVersion < configurationCommand.getConfigVersionCode()) {
