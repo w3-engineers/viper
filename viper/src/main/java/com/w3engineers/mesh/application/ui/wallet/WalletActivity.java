@@ -542,9 +542,19 @@ public class WalletActivity extends TelemeshBaseActivity implements WalletManage
             Log.e("Wallet_info", "Wallet info received from ");
             if (walletInfo != null) {
                 //mBinding.tvEthBalance.setText(convertTwoDigitString(walletInfo.currencyAmount));
+
                 mBinding.textViewPointValue.setText(convertTwoDigitString(walletInfo.tokenAmount));
 
                 int dataShareMode = dataPlanManager.getDataPlanRole();
+
+                Intent intent = new Intent(WalletActivity.this, TokenGuidelineActivity.class);
+                if (walletInfo.tokenAmount == 0) {
+                    intent.putExtra(TokenGuidelineActivity.class.getName(), true);
+                    startActivity(intent);
+                } else if (walletInfo.currencyAmount == 0) {
+                    intent.putExtra(TokenGuidelineActivity.class.getName(), false);
+                    startActivity(intent);
+                }
 
                 if (dataShareMode == DataPlanConstants.USER_ROLE.DATA_SELLER || dataShareMode == DataPlanConstants.USER_ROLE.DATA_BUYER) {
 

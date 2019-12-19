@@ -17,7 +17,7 @@ import java.io.OutputStreamWriter;
 public class FileStoreUtil {
 
     private static String FILE_NAME = "index.html";
-    private static String GUIDELINE_FILE_NAME = "guideline.text";
+    private static String GUIDELINE_FILE_NAME = "guideline.txt";
     private static String CHILD_PATH = "/Telemesh/web/";
 
     private static Storage storage;
