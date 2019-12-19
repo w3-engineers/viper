@@ -196,6 +196,26 @@ public class ViperClient {
         return DataManager.on().getUserId();
     }
 
+    public void saveUserInfo(String walletAddress, int avatar, long regTime, boolean isSync, String usersName, String publicKey, String packageName) {
+
+        try {
+            UserInfo userInfo = new UserInfo();
+
+            userInfo.setAddress(walletAddress);
+            userInfo.setAvatar(avatar);
+            userInfo.setRegTime(regTime);
+            userInfo.setSync(isSync);
+            userInfo.setUserName(usersName);
+            userInfo.setPublicKey(publicKey);
+            userInfo.setPackageName(packageName);
+
+            DataManager.on().saveUserInfo(userInfo);
+
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        }
+    }
+
 /*    public void createWallet() {
         WalletManager.getInstance().readWallet(mContext, WalletService.getInstance(mContext).PASSWORD, new WalletManager.WaletListener() {
             @Override

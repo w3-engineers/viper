@@ -259,7 +259,7 @@ public class WalletActivity extends TelemeshBaseActivity implements WalletManage
         } else if (v.getId() == R.id.img_refresh) {
             refreshBalance();
         } else if (v.getId() == R.id.tv_balance_last_updated) {
-            startActivity(new Intent(WalletActivity.this, PointGuidelineActivity.class));
+            //startActivity(new Intent(WalletActivity.this, PointGuidelineActivity.class));
         }
     }
 

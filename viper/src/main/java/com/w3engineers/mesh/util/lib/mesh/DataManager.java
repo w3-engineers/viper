@@ -441,6 +441,12 @@ public class DataManager {
 
     public void saveUserInfo(UserInfo userInfo) throws RemoteException {
         if (mTmCommunicator != null) {
+
+            int configVersion = PreferencesHelperDataplan.on().getConfigVersion();
+            userInfo.setConfigVersion(configVersion);
+
+            this.userInfo = userInfo;
+
             mTmCommunicator.saveUserInfo(userInfo);
         }
     }
