@@ -147,6 +147,11 @@ public class ConfigSyncUtil {
 
         ConfigSyncEvent configSyncEvent = new ConfigSyncEvent();
 
+        if (configurationCommand != null && tokenGuideVersion < configurationCommand.getTokenGuideVersion()) {
+            String downloadLink = SharedPref.read(Constant.PreferenceKeys.APP_DOWNLOAD_LINK) + "point_guide.json";
+            new DownloadGuidelineContent(context).execute(downloadLink);
+        }
+
         if (configurationCommand != null && configVersion < configurationCommand.getConfigVersionCode()) {
 
             PreferencesHelperDataplan.on().setConfigVersion(configurationCommand.getConfigVersionCode());
@@ -165,10 +170,6 @@ public class ConfigSyncUtil {
         configSyncEvent.setConfigurationCommand(configurationCommand);
         AppDataObserver.on().sendObserverData(configSyncEvent);
 
-
-        if (configurationCommand != null && tokenGuideVersion < configurationCommand.getTokenGuideVersion()) {
-            new DownloadGuidelineContent(context).execute("point_guide.json");
-        }
     }
 
     public void updateConfigCommandFile(Context context, ConfigurationCommand configurationCommand) {
@@ -204,15 +205,13 @@ public class ConfigSyncUtil {
     }
 
     private void processGuidelineJson(Context context, String guidelineJson) {
-        TokenGuideLine tokenGuideLine = new Gson().fromJson(guidelineJson, TokenGuideLine.class);
+        //TokenGuideLine tokenGuideLine = new Gson().fromJson(guidelineJson, TokenGuideLine.class);
 
         FileStoreUtil.writeTokenGuideline(context, guidelineJson);
-
         // writing html file but now off
         //FileStoreUtil.writeWebFile(context, tokenGuideLine.getContent());
     }
 
-    // Todo call this class if config version is low
     private class DownloadGuidelineContent extends AsyncTask<String, Void, String> {
         private Context context;
 

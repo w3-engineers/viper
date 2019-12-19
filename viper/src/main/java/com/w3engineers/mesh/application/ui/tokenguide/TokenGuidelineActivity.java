@@ -4,6 +4,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.view.MenuItem;
+import android.view.View;
 
 import com.w3engineers.mesh.R;
 import com.w3engineers.mesh.application.data.BaseServiceLocator;
@@ -21,6 +22,11 @@ public class TokenGuidelineActivity extends TelemeshBaseActivity {
     @Override
     protected int getLayoutId() {
         return R.layout.activity_token_guideline;
+    }
+
+    @Override
+    protected int statusBarColor() {
+        return R.color.colorPrimaryDark;
     }
 
     @Override
@@ -45,7 +51,18 @@ public class TokenGuidelineActivity extends TelemeshBaseActivity {
         return super.onOptionsItemSelected(item);
     }
 
+    @Override
+    public void onClick(View view) {
+        super.onClick(view);
+        if (view.getId() == R.id.op_back) {
+            finish();
+        }
+    }
+
     private void initView() {
+
+        setClickListener(mBinding.opBack);
+
         mBinding.recyclerViewLink.setHasFixedSize(true);
         mBinding.recyclerViewLink.setLayoutManager(new LinearLayoutManager(this));
         mAdapter = new TokenGuidelineAdapter();
