@@ -10,11 +10,12 @@ import com.w3engineers.mesh.R;
 import com.w3engineers.mesh.application.ui.base.BaseAdapter;
 import com.w3engineers.mesh.application.ui.base.BaseViewHolder;
 import com.w3engineers.mesh.databinding.ItemLinkBinding;
+import com.w3engineers.models.PointLink;
 
-public class TokenGuidelineAdapter extends BaseAdapter<String> {
+public class PointGuidelineAdapter extends BaseAdapter<PointLink> {
 
     @Override
-    public boolean isEqual(String left, String right) {
+    public boolean isEqual(PointLink left, PointLink right) {
         return false;
     }
 
@@ -25,7 +26,7 @@ public class TokenGuidelineAdapter extends BaseAdapter<String> {
         return new TokenGuidelineVH(binding);
     }
 
-    class TokenGuidelineVH extends BaseViewHolder<String> {
+    class TokenGuidelineVH extends BaseViewHolder<PointLink> {
         ItemLinkBinding binding;
 
         TokenGuidelineVH(ViewDataBinding viewDataBinding) {
@@ -33,15 +34,17 @@ public class TokenGuidelineAdapter extends BaseAdapter<String> {
         }
 
         @Override
-        public void bind(String item, ViewDataBinding viewDataBinding) {
+        public void bind(PointLink item, ViewDataBinding viewDataBinding) {
             binding = (ItemLinkBinding) viewDataBinding;
 
-            binding.textViewLink.setText(item);
+            binding.textViewLink.setText(item.getHeader());
+
+            setClickListener(binding.getRoot());
         }
 
         @Override
         public void onClick(View v) {
-
+            mItemClickListener.onItemClick(v, getItem(getAdapterPosition()));
         }
     }
 }

@@ -18,10 +18,12 @@ import com.w3engineers.mesh.application.data.local.wallet.WalletManager;
 import com.w3engineers.mesh.application.data.local.wallet.WalletService;
 import com.w3engineers.mesh.application.data.model.WalletLoaded;
 import com.w3engineers.mesh.application.ui.premission.PermissionActivity;
+import com.w3engineers.mesh.application.ui.util.FileStoreUtil;
 import com.w3engineers.mesh.util.ConfigSyncUtil;
 import com.w3engineers.mesh.util.Constant;
 import com.w3engineers.mesh.util.MeshLog;
 import com.w3engineers.models.ConfigurationCommand;
+import com.w3engineers.models.PointGuideLine;
 import com.w3engineers.models.UserInfo;
 
 import java.util.List;
@@ -269,5 +271,13 @@ public class ViperClient {
 
     public void sendConfigForUpdate(ConfigurationCommand configurationCommand) {
         ConfigSyncUtil.getInstance().updateConfigCommandFile(mContext, configurationCommand);
+    }
+
+    public PointGuideLine requestPointGuideline() {
+        return FileStoreUtil.getGuideline(mContext);
+    }
+
+    public void sendPointGuidelineForUpdate(String guideLine) {
+        FileStoreUtil.writeTokenGuideline(mContext, guideLine);
     }
 }

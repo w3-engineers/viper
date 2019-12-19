@@ -6,24 +6,12 @@ import android.arch.lifecycle.ViewModel;
 import android.arch.lifecycle.ViewModelProvider;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
-import android.graphics.Color;
 import android.net.Uri;
-import android.os.Build;
 import android.support.annotation.NonNull;
-import android.support.constraint.ConstraintLayout;
-import android.support.v7.app.AlertDialog;
-import android.text.Spannable;
-import android.text.SpannableStringBuilder;
 import android.text.TextUtils;
-import android.text.method.LinkMovementMethod;
-import android.text.style.ForegroundColorSpan;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.Window;
-import android.view.WindowManager;
 
 import com.w3engineers.ext.strom.util.helper.Toaster;
 import com.w3engineers.mesh.R;
@@ -33,9 +21,8 @@ import com.w3engineers.mesh.application.data.local.dataplan.DataPlanManager;
 import com.w3engineers.mesh.application.data.local.wallet.WalletManager;
 import com.w3engineers.mesh.application.ui.base.TelemeshBaseActivity;
 import com.w3engineers.mesh.application.ui.dataplan.TestDataPlanActivity;
-import com.w3engineers.mesh.application.ui.tokenguide.TokenGuidelineActivity;
+import com.w3engineers.mesh.application.ui.tokenguide.PointGuidelineActivity;
 import com.w3engineers.mesh.databinding.ActivityWalletBinding;
-import com.w3engineers.mesh.databinding.PromptWalletWithdrowBinding;
 import com.w3engineers.mesh.util.DialogUtil;
 import com.w3engineers.mesh.util.MeshLog;
 import com.w3engineers.mesh.util.lib.mesh.HandlerUtil;
@@ -43,7 +30,6 @@ import com.w3engineers.mesh.util.lib.mesh.HandlerUtil;
 import java.text.Format;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.concurrent.ExecutionException;
 
 
 public class WalletActivity extends TelemeshBaseActivity implements WalletManager.WalletListener {
@@ -273,7 +259,7 @@ public class WalletActivity extends TelemeshBaseActivity implements WalletManage
         } else if (v.getId() == R.id.img_refresh) {
             refreshBalance();
         } else if (v.getId() == R.id.tv_balance_last_updated) {
-            startActivity(new Intent(WalletActivity.this, TokenGuidelineActivity.class));
+            startActivity(new Intent(WalletActivity.this, PointGuidelineActivity.class));
         }
     }
 
@@ -547,12 +533,12 @@ public class WalletActivity extends TelemeshBaseActivity implements WalletManage
 
                 int dataShareMode = dataPlanManager.getDataPlanRole();
 
-                Intent intent = new Intent(WalletActivity.this, TokenGuidelineActivity.class);
+                Intent intent = new Intent(WalletActivity.this, PointGuidelineActivity.class);
                 if (walletInfo.tokenAmount == 0) {
-                    intent.putExtra(TokenGuidelineActivity.class.getName(), true);
+                    intent.putExtra(PointGuidelineActivity.class.getName(), true);
                     startActivity(intent);
                 } else if (walletInfo.currencyAmount == 0) {
-                    intent.putExtra(TokenGuidelineActivity.class.getName(), false);
+                    intent.putExtra(PointGuidelineActivity.class.getName(), false);
                     startActivity(intent);
                 }
 

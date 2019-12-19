@@ -22,10 +22,6 @@ import com.w3engineers.mesh.application.data.model.ConfigSyncEvent;
 import com.w3engineers.mesh.application.ui.util.FileStoreUtil;
 import com.w3engineers.models.ConfigurationCommand;
 import com.w3engineers.models.Network;
-import com.w3engineers.models.TokenGuideLine;
-
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -205,7 +201,7 @@ public class ConfigSyncUtil {
     }
 
     private void processGuidelineJson(Context context, String guidelineJson) {
-        //TokenGuideLine tokenGuideLine = new Gson().fromJson(guidelineJson, TokenGuideLine.class);
+        //PointGuideLine tokenGuideLine = new Gson().fromJson(guidelineJson, PointGuideLine.class);
 
         FileStoreUtil.writeTokenGuideline(context, guidelineJson);
         // writing html file but now off

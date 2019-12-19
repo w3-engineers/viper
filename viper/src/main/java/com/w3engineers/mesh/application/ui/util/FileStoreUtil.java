@@ -5,7 +5,7 @@ import android.os.Environment;
 
 import com.google.gson.Gson;
 import com.snatik.storage.Storage;
-import com.w3engineers.models.TokenGuideLine;
+import com.w3engineers.models.PointGuideLine;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -68,7 +68,7 @@ public class FileStoreUtil {
         }
     }
 
-    public static TokenGuideLine getGuideline(Context context) {
+    public static PointGuideLine getGuideline(Context context) {
         storage = new Storage(context);
         String path = storage.getExternalStorageDirectory() + CHILD_PATH;
         File file = new File(path);
@@ -89,7 +89,7 @@ public class FileStoreUtil {
             e.printStackTrace();
         }
 
-        return new Gson().fromJson(text.toString(), TokenGuideLine.class);
+        return new Gson().fromJson(text.toString(), PointGuideLine.class);
     }
 
     public static String getWebFile() {

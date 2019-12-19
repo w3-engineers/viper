@@ -1,27 +1,27 @@
 package com.w3engineers.mesh.application.ui.tokenguide;
 
 import android.content.Intent;
-import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
+import android.net.Uri;
 import android.support.v7.widget.LinearLayoutManager;
 import android.view.MenuItem;
 import android.view.View;
-import android.webkit.WebChromeClient;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
 import com.w3engineers.mesh.R;
 import com.w3engineers.mesh.application.data.BaseServiceLocator;
+import com.w3engineers.mesh.application.ui.base.ItemClickListener;
 import com.w3engineers.mesh.application.ui.base.TelemeshBaseActivity;
 import com.w3engineers.mesh.application.ui.util.FileStoreUtil;
 import com.w3engineers.mesh.databinding.ActivityTokenGuidelineBinding;
-import com.w3engineers.models.TokenGuideLine;
+import com.w3engineers.models.PointGuideLine;
+import com.w3engineers.models.PointLink;
 
-public class TokenGuidelineActivity extends TelemeshBaseActivity {
+public class PointGuidelineActivity extends TelemeshBaseActivity implements ItemClickListener<PointLink> {
 
     private ActivityTokenGuidelineBinding mBinding;
-    private TokenGuidelineAdapter mAdapter;
-    private TokenGuideLine tokenGuideLine;
+    private PointGuidelineAdapter mAdapter;
+    private PointGuideLine tokenGuideLine;
 
     private boolean isTokenZero;
 
@@ -65,6 +65,14 @@ public class TokenGuidelineActivity extends TelemeshBaseActivity {
         }
     }
 
+    @Override
+    public void onItemClick(View view, PointLink item) {
+        Uri uri = Uri.parse(item.getLink());
+        Intent intent = new Intent(Intent.ACTION_VIEW, uri);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        startActivity(intent);
+    }
+
     private void initView() {
 
         setClickListener(mBinding.opBack);
@@ -73,7 +81,8 @@ public class TokenGuidelineActivity extends TelemeshBaseActivity {
 
         mBinding.recyclerViewLink.setHasFixedSize(true);
         mBinding.recyclerViewLink.setLayoutManager(new LinearLayoutManager(this));
-        mAdapter = new TokenGuidelineAdapter();
+        mAdapter = new PointGuidelineAdapter();
+        mAdapter.setItemClickListener(this);
         mBinding.recyclerViewLink.setAdapter(mAdapter);
 
         if (getSupportActionBar() != null) {
@@ -88,15 +97,15 @@ public class TokenGuidelineActivity extends TelemeshBaseActivity {
         if (tokenGuideLine != null) {
             mBinding.textViewTitle.setText(tokenGuideLine.getTitle());
             if (isTokenZero) {
-                mAdapter.addItem(tokenGuideLine.getLinkList());
+                mAdapter.addItem(tokenGuideLine.getPointLinks());
             }
         }
     }
 
     private void parseIntent() {
         Intent intent = getIntent();
-        if (intent.hasExtra(TokenGuidelineActivity.class.getName())) {
-            isTokenZero = intent.getBooleanExtra(TokenGuidelineActivity.class.getName(), false);
+        if (intent.hasExtra(PointGuidelineActivity.class.getName())) {
+            isTokenZero = intent.getBooleanExtra(PointGuidelineActivity.class.getName(), false);
         }
     }
 

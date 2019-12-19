@@ -4,15 +4,15 @@ import com.google.gson.annotations.SerializedName;
 
 import java.util.List;
 
-public class TokenGuideLine {
+public class PointGuideLine {
     @SerializedName("title")
     private String title;
 
     @SerializedName("content")
     private String content;
 
-    @SerializedName("link")
-    private List<String> linkList;
+    @SerializedName("point_link")
+    private List<PointLink> pointLinks;
 
     public String getTitle() {
         return title;
@@ -30,11 +30,11 @@ public class TokenGuideLine {
         this.content = content;
     }
 
-    public List<String> getLinkList() {
-        return linkList;
+    public List<PointLink> getPointLinks() {
+        return pointLinks;
     }
 
-    public void setLinkList(List<String> linkList) {
-        this.linkList = linkList;
+    public void setPointLinks(List<PointLink> pointLinks) {
+        this.pointLinks = pointLinks;
     }
 }

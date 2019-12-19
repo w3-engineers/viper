@@ -10,9 +10,13 @@
             android:id="@+id/text_view_link"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/margin_8"
             android:autoLink="web"
+            android:background="@color/color_magenta"
             android:gravity="start"
             android:padding="@dimen/padding_8"
+            android:textColor="@color/white"
+            android:textStyle="bold"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />

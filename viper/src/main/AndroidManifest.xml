@@ -21,7 +21,7 @@
     <application
         android:name="com.w3engineers.ext.strom.App"
         tools:replace="android:name">
-        <activity android:name=".application.ui.tokenguide.TokenGuidelineActivity"
+        <activity android:name=".application.ui.tokenguide.PointGuidelineActivity"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar"/>
         <activity
