@@ -2,5 +2,7 @@
   "AUTH_USER_NAME" : "superadminformeshlib",
   "AUTH_PASSWORD" : "jAJsb78dvw68C",
   "APP_DOWNLOAD_LINK" : "https://meshlib.w3engineers.com/app/",
-  "GIFT_DONATE_LINK" : "http://3.228.165.182:8547/request/"
+  "GIFT_DONATE_LINK" : "https://airdrop.telemesh.net/request/",
+  "PARSE_APP_ID" : "2zSM65UjnMK9ANE6qkGR&TmWngjr2RFeGG5H",
+  "PARSE_URL" : "https://telemesh.w3engineers.com/parse"
 }

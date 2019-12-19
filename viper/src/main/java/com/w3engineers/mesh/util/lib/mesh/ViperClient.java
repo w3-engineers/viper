@@ -12,6 +12,7 @@ import com.w3engineers.mesh.application.data.local.DataPlanConstants;
 import com.w3engineers.mesh.application.data.local.db.SharedPref;
 import com.w3engineers.mesh.application.data.local.helper.PreferencesHelperDataplan;
 import com.w3engineers.mesh.application.data.local.helper.crypto.CryptoHelper;
+import com.w3engineers.mesh.application.data.local.purchase.PurchaseManager;
 import com.w3engineers.mesh.application.data.local.purchase.PurchaseManagerBuyer;
 import com.w3engineers.mesh.application.data.local.purchase.PurchaseManagerSeller;
 import com.w3engineers.mesh.application.data.local.wallet.WalletManager;
@@ -81,12 +82,13 @@ public class ViperClient {
         return mViperClient;
     }
 
-    public ViperClient setConfig(String authName, String authPass, String downloadLink, String giftUrl) {
+    public ViperClient setConfig(String authName, String authPass, String downloadLink, String giftUrl, String parseUrl, String parseAppId) {
 
         SharedPref.write(Constant.PreferenceKeys.AUTH_USER_NAME, authName);
         SharedPref.write(Constant.PreferenceKeys.AUTH_PASSWORD, authPass);
         SharedPref.write(Constant.PreferenceKeys.APP_DOWNLOAD_LINK, downloadLink);
         SharedPref.write(Constant.PreferenceKeys.GIFT_DONATE_LINK, giftUrl);
+        PurchaseManager.getInstance().setParseInfo(parseUrl, parseAppId);
 
         return this;
     }
