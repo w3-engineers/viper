@@ -85,3 +85,7 @@ lint/tmp/
 
 viper/src/main/assets/
 app/src/main/assets/
+/assets/*
+
+**config.json
+app/src/main/assets/blockchainnetworkinfo.xml
