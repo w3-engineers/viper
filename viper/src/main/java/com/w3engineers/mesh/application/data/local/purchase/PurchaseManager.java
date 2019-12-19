@@ -109,4 +109,8 @@ public class PurchaseManager {
     public void setDataPlanListener(DataPlanManager.DataPlanListener dataPlanListener) {
         this.dataPlanListener = dataPlanListener;
     }
+
+    public void setParseInfo(String parseUrl, String parseAppId) {
+        ethService.setParseInfo(parseUrl, parseAppId);
+    }
 }
