@@ -12,6 +12,7 @@ import com.w3engineers.mesh.R;
 
 public class DialogUtil {
     static ProgressDialog progressDialog;
+    static AlertDialog alertDialog;
 
     public static AlertDialog showConfirmationDialog(Context context,
                                               String title,
@@ -19,7 +20,6 @@ public class DialogUtil {
                                               String negativeText,
                                               String positiveText,
                                               final DialogButtonListener listener) {
-        AlertDialog alertDialog = null;
         try {
             AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(context, R.style.DefaultAlertDialogStyle);
             alertDialogBuilder.setTitle(Html.fromHtml("<b>" + title + "</b>"));
@@ -98,6 +98,16 @@ public class DialogUtil {
             e.printStackTrace();
         }
 
+    }
+
+    public static void dismissDialog() {
+        if (alertDialog != null) {
+            try {
+                alertDialog.dismiss();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     public static void dismissLoadingProgress() {
