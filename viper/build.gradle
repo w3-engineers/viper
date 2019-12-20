@@ -87,4 +87,6 @@ dependencies {
     implementation 'com.makeramen:roundedimageview:2.3.0'
     implementation 'lib.kashif:folderpicker:2.4'
 
+    api project(path: ':wallet_gen')
+
 }

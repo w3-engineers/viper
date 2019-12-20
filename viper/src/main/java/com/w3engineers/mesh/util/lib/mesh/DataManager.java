@@ -17,7 +17,6 @@ import android.os.IBinder;
 import android.os.RemoteException;
 import android.text.TextUtils;
 import android.util.Log;
-import android.widget.Toast;
 
 import com.w3engineers.ext.strom.util.helper.Toaster;
 import com.w3engineers.mesh.BuildConfig;
@@ -27,7 +26,6 @@ import com.w3engineers.mesh.application.data.AppDataObserver;
 import com.w3engineers.mesh.application.data.local.dataplan.DataPlanManager;
 import com.w3engineers.mesh.application.data.local.db.SharedPref;
 import com.w3engineers.mesh.application.data.local.helper.crypto.CryptoHelper;
-import com.w3engineers.mesh.application.data.local.wallet.WalletService;
 import com.w3engineers.mesh.application.data.model.DataAckEvent;
 import com.w3engineers.mesh.application.data.model.DataEvent;
 import com.w3engineers.mesh.application.data.model.PayMessage;
@@ -46,6 +44,7 @@ import com.w3engineers.mesh.util.TSAppInstaller;
 import com.w3engineers.mesh.util.Util;
 import com.w3engineers.meshrnd.ITmCommunicator;
 import com.w3engineers.models.UserInfo;
+import com.w3engineers.walleter.wallet.WalletService;
 
 import java.io.File;
 import java.io.FileNotFoundException;

@@ -19,13 +19,12 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.w3engineers.ext.strom.util.helper.Toaster;
 import com.w3engineers.mesh.R;
 import com.w3engineers.mesh.application.data.local.db.SharedPref;
-import com.w3engineers.mesh.application.data.local.wallet.WalletService;
 import com.w3engineers.mesh.util.Constant;
+import com.w3engineers.walleter.wallet.WalletService;
 
 import java.io.File;
 import java.io.FileInputStream;
