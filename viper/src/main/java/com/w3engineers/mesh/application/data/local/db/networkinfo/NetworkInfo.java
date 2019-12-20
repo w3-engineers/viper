@@ -7,6 +7,7 @@ import android.arch.persistence.room.PrimaryKey;
 import android.support.annotation.NonNull;
 
 import com.w3engineers.eth.data.helper.model.PayLibNetworkInfo;
+import com.w3engineers.models.Network;
 
 
 import java.util.ArrayList;
@@ -62,6 +63,25 @@ public class NetworkInfo extends WalletInfo{
 
         tokenAmount = payLibNetworkInfo.tokenAmount;
         currencyAmount = payLibNetworkInfo.currencyAmount;
+        return this;
+    }
+
+    public NetworkInfo toNetworkInfo(Network network) {
+        networkType = network.getNetworkType();
+        networkName = network.getNetworkName();
+        networkUrl = network.getNetworkUrl();
+
+        currencySymbol = network.getCurrencySymbol();
+        tokenSymbol = network.getTokenSymbol();
+        tokenAddress = network.getTokenAddress();
+
+        channelAddress = network.getChannelAddress();
+        gasPrice = network.getGasPrice();
+        gasLimit = network.getGasLimit();
+
+        tokenAmount = network.getTokenAmount();
+        currencyAmount = network.getCurrencyAmount();
+
         return this;
     }
 
