@@ -1,12 +1,10 @@
 package com.w3engineers.mesh.util.lib.mesh;
 
-import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
 import android.os.RemoteException;
 import android.text.TextUtils;
 
-import com.w3engineers.ext.strom.util.helper.PermissionUtil;
 import com.w3engineers.mesh.application.data.AppDataObserver;
 import com.w3engineers.mesh.application.data.local.DataPlanConstants;
 import com.w3engineers.mesh.application.data.local.db.SharedPref;
@@ -15,8 +13,6 @@ import com.w3engineers.mesh.application.data.local.helper.crypto.CryptoHelper;
 import com.w3engineers.mesh.application.data.local.purchase.PurchaseManager;
 import com.w3engineers.mesh.application.data.local.purchase.PurchaseManagerBuyer;
 import com.w3engineers.mesh.application.data.local.purchase.PurchaseManagerSeller;
-import com.w3engineers.mesh.application.data.local.wallet.WalletManager;
-import com.w3engineers.mesh.application.data.local.wallet.WalletService;
 import com.w3engineers.mesh.application.data.model.WalletLoaded;
 import com.w3engineers.mesh.application.ui.premission.PermissionActivity;
 import com.w3engineers.mesh.application.ui.util.FileStoreUtil;
@@ -26,6 +22,7 @@ import com.w3engineers.mesh.util.MeshLog;
 import com.w3engineers.models.ConfigurationCommand;
 import com.w3engineers.models.PointGuideLine;
 import com.w3engineers.models.UserInfo;
+import com.w3engineers.walleter.wallet.WalletService;
 
 import java.util.List;
 

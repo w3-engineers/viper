@@ -23,10 +23,10 @@ import com.w3engineers.mesh.application.ui.wallet.WalletActivity;
 import com.w3engineers.mesh.util.Constant;
 import com.w3engineers.mesh.util.MeshLog;
 import com.w3engineers.mesh.util.Util;
+import com.w3engineers.walleter.wallet.WalletService;
 
 import java.io.ByteArrayOutputStream;
 import java.util.List;
-import java.util.concurrent.ExecutionException;
 
 import androidmads.library.qrgenearator.QRGContents;
 import androidmads.library.qrgenearator.QRGEncoder;

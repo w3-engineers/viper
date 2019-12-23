@@ -17,7 +17,6 @@ import com.w3engineers.mesh.ui.nav.BottomNavActivity;
 import com.w3engineers.mesh.util.Constant;
 import com.w3engineers.mesh.util.PermissionUtil;
 
-
 import java.util.UUID;
 
 public class CreateUserActivity extends AppCompatActivity implements View.OnClickListener {
