@@ -25,6 +25,7 @@ buildscript {
 }
 
 allprojects {
+    apply plugin: 'com.github.dcendents.android-maven'
     repositories {
         jcenter()
         google()
@@ -46,6 +47,6 @@ subprojects {
     }
 }
 
-task clean(type: Delete) {
+/*task clean(type: Delete) {
     delete rootProject.buildDir
-}
+}*/
