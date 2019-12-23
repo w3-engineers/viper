@@ -245,7 +245,7 @@ public class DataManager {
     }
 
     private void launchServiceApp() {
-        Intent intent = mContext.getPackageManager().getLaunchIntentForPackage("com.w3engineers.meshrnd");
+        Intent intent = mContext.getPackageManager().getLaunchIntentForPackage("com.w3engineers.meshservice");
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         mContext.startActivity(intent);
     }
@@ -261,7 +261,7 @@ public class DataManager {
             intent.setAction("service.viper_server");
 
             /*From 5.0 annonymous intent calls are suspended so replacing with server app's package name*/
-            intent.setPackage("com.w3engineers.meshrnd");
+            intent.setPackage("com.w3engineers.meshservice");
             // binding to remote service
             return mContext.bindService(intent, serviceConnection, Service.BIND_AUTO_CREATE);
         } else {
@@ -350,7 +350,7 @@ public class DataManager {
         @Override
         public void onReceiveLog(String text) throws RemoteException {
             if (BuildConfig.DEBUG){
-                Intent intent = new Intent("com.w3engineers.meshrnd.DEBUG_MESSAGE");
+                Intent intent = new Intent("com.w3engineers.meshservice.DEBUG_MESSAGE");
                 intent.putExtra("value", text);
                 MeshApp.getContext().sendBroadcast(intent);
 
