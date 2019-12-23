@@ -8,6 +8,7 @@ Proprietary and confidential
 ============================================================================
 */
 
+import com.w3engineers.mesh.application.data.model.ConfigSyncEvent;
 import com.w3engineers.mesh.application.data.model.DataAckEvent;
 import com.w3engineers.mesh.application.data.model.DataEvent;
 import com.w3engineers.mesh.application.data.model.Event;
@@ -40,6 +41,7 @@ public interface ApiEvent {
     Class WALLET_LOADED = WalletLoaded.class;
 
     Class USER_INFO = UserInfoEvent.class;
+    Class CONFIG_SYNC = ConfigSyncEvent.class;
 
     Disposable startObserver(Class event, Consumer<? extends Event> next);
 

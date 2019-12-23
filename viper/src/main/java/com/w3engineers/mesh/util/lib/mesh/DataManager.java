@@ -17,17 +17,19 @@ import android.os.IBinder;
 import android.os.RemoteException;
 import android.text.TextUtils;
 import android.util.Log;
-import android.widget.Toast;
 
 import com.w3engineers.ext.strom.util.helper.Toaster;
 import com.w3engineers.mesh.BuildConfig;
 import com.w3engineers.mesh.R;
 import com.w3engineers.mesh.ViperCommunicator;
+import com.w3engineers.mesh.application.data.ApiEvent;
 import com.w3engineers.mesh.application.data.AppDataObserver;
 import com.w3engineers.mesh.application.data.local.dataplan.DataPlanManager;
 import com.w3engineers.mesh.application.data.local.db.SharedPref;
+import com.w3engineers.mesh.application.data.local.helper.PreferencesHelperDataplan;
 import com.w3engineers.mesh.application.data.local.helper.crypto.CryptoHelper;
 import com.w3engineers.mesh.application.data.local.wallet.WalletService;
+import com.w3engineers.mesh.application.data.model.ConfigSyncEvent;
 import com.w3engineers.mesh.application.data.model.DataAckEvent;
 import com.w3engineers.mesh.application.data.model.DataEvent;
 import com.w3engineers.mesh.application.data.model.PayMessage;
@@ -38,6 +40,7 @@ import com.w3engineers.mesh.application.data.model.SellerRemoved;
 import com.w3engineers.mesh.application.data.model.TransportInit;
 import com.w3engineers.mesh.application.data.model.UserInfoEvent;
 import com.w3engineers.mesh.application.data.remote.model.BuyerPendingMessage;
+import com.w3engineers.mesh.util.ConfigSyncUtil;
 import com.w3engineers.mesh.util.Constant;
 import com.w3engineers.mesh.util.DialogUtil;
 import com.w3engineers.mesh.util.MeshApp;
@@ -105,8 +108,20 @@ public class DataManager {
         context.startService(mIntent);
 
         context.bindService(mIntent, clientServiceConnection, Service.BIND_AUTO_CREATE);*/
+    }
 
-        checkAndBindService();
+    public void startMeshService() {
+        AppDataObserver.on().startObserver(ApiEvent.CONFIG_SYNC, event -> {
+            ConfigSyncEvent configSyncEvent = (ConfigSyncEvent) event;
+
+            if (configSyncEvent != null) {
+                if (configSyncEvent.isMeshStartTime()) {
+                    checkAndBindService();
+                }
+            }
+        });
+
+        ConfigSyncUtil.getInstance().startConfigurationSync(mContext, true);
     }
 
 
@@ -268,6 +283,10 @@ public class DataManager {
                 //mTmCommunicator.saveUserInfo(userInfo);
                 Log.e("service_status", "onServiceConnected");
                 int userRole = DataPlanManager.getInstance().getDataPlanRole();
+
+                int configVersion = PreferencesHelperDataplan.on().getConfigVersion();
+                userInfo.setConfigVersion(configVersion);
+
                 boolean status = mTmCommunicator.startMesh(appName, userRole, userInfo, mSsid);
                 if (!status) {
                     showPermissionPopUp();
@@ -422,6 +441,12 @@ public class DataManager {
 
     public void saveUserInfo(UserInfo userInfo) throws RemoteException {
         if (mTmCommunicator != null) {
+
+            int configVersion = PreferencesHelperDataplan.on().getConfigVersion();
+            userInfo.setConfigVersion(configVersion);
+
+            this.userInfo = userInfo;
+
             mTmCommunicator.saveUserInfo(userInfo);
         }
     }
@@ -524,6 +549,7 @@ public class DataManager {
             userInfoEvent.setAvatar(userInfo.getAvatar());
             userInfoEvent.setUserName(userInfo.getUserName());
             userInfoEvent.setRegTime(userInfo.getRegTime());
+            userInfoEvent.setConfigVersion(userInfo.getConfigVersion());
             userInfoEvent.setSync(userInfo.isSync());
 
             AppDataObserver.on().sendObserverData(userInfoEvent);

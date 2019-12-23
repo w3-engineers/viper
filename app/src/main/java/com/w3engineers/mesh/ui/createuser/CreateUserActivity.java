@@ -1,27 +1,20 @@
 package com.w3engineers.mesh.ui.createuser;
 
 import android.Manifest;
-import android.app.Activity;
 import android.content.Intent;
 import android.databinding.DataBindingUtil;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
-import com.w3engineers.eth.data.remote.EthereumService;
 import com.w3engineers.ext.viper.R;
 import com.w3engineers.ext.viper.databinding.ActivityCreateUserBinding;
 import com.w3engineers.mesh.application.data.local.db.SharedPref;
-import com.w3engineers.mesh.application.data.local.wallet.WalletManager;
-import com.w3engineers.mesh.application.data.local.wallet.WalletService;
 import com.w3engineers.mesh.ui.nav.BottomNavActivity;
 import com.w3engineers.mesh.util.Constant;
-import com.w3engineers.mesh.util.MeshLog;
 import com.w3engineers.mesh.util.PermissionUtil;
 
 

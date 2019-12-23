@@ -29,6 +29,7 @@ import com.w3engineers.mesh.R;
 import com.w3engineers.mesh.application.data.BaseServiceLocator;
 import com.w3engineers.mesh.application.data.local.DataPlanConstants;
 import com.w3engineers.mesh.application.data.local.dataplan.DataPlanManager;
+import com.w3engineers.mesh.application.data.local.helper.PreferencesHelperDataplan;
 import com.w3engineers.mesh.application.data.local.model.Seller;
 import com.w3engineers.mesh.application.data.local.wallet.WalletManager;
 import com.w3engineers.mesh.application.ui.base.TelemeshBaseActivity;
@@ -624,6 +625,10 @@ public class TestDataPlanActivity extends TelemeshBaseActivity implements DataPl
             int amount = (int) convertBytesToMegabytes(sharedData);
             mBinding.range.setText(amount + "");
         }
+
+        float dataPerMb = PreferencesHelperDataplan.on().getPerMbTokenValue();
+        mBinding.sellDataTextView.setText(String.format(getResources().getString(R.string.sell_your_data_info), dataPerMb + ""));
+        mBinding.buyDataTextView.setText(String.format(getResources().getString(R.string.buy_data_info), dataPerMb + ""));
 
         if (dataLimitModel.isDataLimited()){
 

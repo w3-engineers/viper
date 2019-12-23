@@ -1,8 +1,6 @@
 package com.w3engineers.mesh.util;
 
 import android.content.Context;
-import android.os.Build;
-import android.os.RemoteException;
 import android.text.TextUtils;
 import android.widget.Toast;
 
@@ -38,7 +36,7 @@ import java.util.Map;
 import java.util.UUID;
 
 public class ConnectionManager {
-    private static final String NETWORK_PREFIX = "ifli";
+    private static final String NETWORK_PREFIX = "arif";
     private static final String APP_NAME = "viper";
     private static ConnectionManager mConnectionManager;
     private ViperClient viperClient;
@@ -79,10 +77,12 @@ public class ConnectionManager {
                 String AUTH_PASSWORD = jsonObject.optString("AUTH_PASSWORD");
                 String APP_DOWNLOAD_LINK = jsonObject.optString("APP_DOWNLOAD_LINK");
                 String GIFT_DONATE_LINK = jsonObject.optString("GIFT_DONATE_LINK");
+                String PARSE_APP_ID = jsonObject.optString("PARSE_APP_ID");
+                String PARSE_URL = jsonObject.optString("PARSE_URL");
 
                 viperClient = ViperClient.on(mContext, APP_NAME, "com.w3engineers.ext.viper", NETWORK_PREFIX, SharedPref.read(Constant.KEY_USER_NAME),
                         SharedPref.read(Constant.PreferenceKeys.ADDRESS), SharedPref.read(Constant.PreferenceKeys.PUBLIC_KEY), 1, System.currentTimeMillis(), true)
-                        .setConfig(AUTH_USER_NAME, AUTH_PASSWORD, APP_DOWNLOAD_LINK, GIFT_DONATE_LINK);
+                        .setConfig(AUTH_USER_NAME, AUTH_PASSWORD, APP_DOWNLOAD_LINK, GIFT_DONATE_LINK, PARSE_URL, PARSE_APP_ID);
 
             }
 
