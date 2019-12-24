@@ -4,8 +4,8 @@ import android.content.Context;
 import android.net.Network;
 import android.util.Log;
 
-import com.w3engineers.eth.contracts.CustomToken;
 import com.w3engineers.eth.contracts.RaidenMicroTransferChannels;
+import com.w3engineers.eth.contracts.TmeshToken;
 
 import org.reactivestreams.Subscription;
 import org.web3j.abi.FunctionEncoder;
@@ -119,8 +119,8 @@ public class BlockRequest {
         }
     }
 
-    public CustomToken loadCustomToken() {
-        return CustomToken.load(tokenAddress, web3j, credentials, contractGasProvider);
+    public TmeshToken loadTmeshToken() {
+        return TmeshToken.load(tokenAddress, web3j, credentials, contractGasProvider);
     }
 
     public RaidenMicroTransferChannels loadChannelManager() {
@@ -134,9 +134,9 @@ public class BlockRequest {
         Future<Double> future = callableExecutor.submit(new Callable() {
             @Override
             public Double call() {
-                CustomToken customToken = loadCustomToken();
+                TmeshToken tmeshToken = loadTmeshToken();
                 try {
-                    BigInteger allowance = customToken.allowance(owner, channelAddress).send();
+                    BigInteger allowance = tmeshToken.allowance(owner, channelAddress).send();
                     if (allowance != null) {
                         double tokenValue = getETHorTOKEN(allowance);
                         return tokenValue;
@@ -324,9 +324,9 @@ public class BlockRequest {
         Future<Double> future = callableExecutor.submit(new Callable() {
             @Override
             public Double call() {
-                CustomToken customToken = loadCustomToken();
+                TmeshToken tmeshToken = loadTmeshToken();
                 try {
-                    BigInteger balance = customToken.balanceOf(address).send();
+                    BigInteger balance = tmeshToken.balanceOf(address).send();
                     if (balance != null) {
                         double tokenValue = getETHorTOKEN(balance);
                         return tokenValue;
@@ -449,7 +449,7 @@ public class BlockRequest {
 //    }
 
     public interface BlockTransactionObserver {
-        void onBalanceApprovedLog(CustomToken.ApprovalEventResponse typedResponse);
+        void onBalanceApprovedLog(TmeshToken.ApprovalEventResponse typedResponse);
 
         void onChannelCreatedLog(RaidenMicroTransferChannels.ChannelCreatedEventResponse typedResponse);
 
@@ -459,9 +459,9 @@ public class BlockRequest {
 
         void onChannelWithdrawnLog(RaidenMicroTransferChannels.ChannelWithdrawEventResponse typedResponse);
 
-        void onTokenMintedLog(CustomToken.MintedEventResponse typedResponse);
+        void onTokenMintedLog(TmeshToken.MintedEventResponse typedResponse);
 
-        void onTokenTransferredLog(CustomToken.TransferEventResponse typedResponse);
+        void onTokenTransferredLog(TmeshToken.TransferEventResponse typedResponse);
 
     }
 
@@ -474,9 +474,9 @@ public class BlockRequest {
                 @Override
                 public Integer call() {
                     try {
-                        CustomToken customToken = loadCustomToken();
+                        TmeshToken tmeshToken = loadTmeshToken();
 
-                        balanceApproveObserver = (Subscription) customToken.approvalEventFlowable(DefaultBlockParameter.valueOf(BigInteger.valueOf(blockNumber)), DefaultBlockParameterName.LATEST).subscribe(log -> {
+                        balanceApproveObserver = (Subscription) tmeshToken.approvalEventFlowable(DefaultBlockParameter.valueOf(BigInteger.valueOf(blockNumber)), DefaultBlockParameterName.LATEST).subscribe(log -> {
                             Log.i(TAG, "approvalEventFlowable: " + log.log.getTransactionHash());
                             if (transactionObserver != null) {
                                 transactionObserver.onBalanceApprovedLog(log);
@@ -503,9 +503,9 @@ public class BlockRequest {
                 @Override
                 public Integer call() {
                     try {
-                        CustomToken customToken = loadCustomToken();
+                        TmeshToken tmeshToken = loadTmeshToken();
 
-                        tokenMintedObserver = (Subscription) customToken.mintedEventFlowable(DefaultBlockParameter.valueOf(BigInteger.valueOf(blockNumber)), DefaultBlockParameterName.LATEST).subscribe(log -> {
+                        tokenMintedObserver = (Subscription) tmeshToken.mintedEventFlowable(DefaultBlockParameter.valueOf(BigInteger.valueOf(blockNumber)), DefaultBlockParameterName.LATEST).subscribe(log -> {
                             Log.i(TAG, "mintedEventFlowable: " + log.log.getTransactionHash());
                             if (transactionObserver != null) {
                                 transactionObserver.onTokenMintedLog(log);
@@ -532,9 +532,9 @@ public class BlockRequest {
                 @Override
                 public Integer call() {
                     try {
-                        CustomToken customToken = loadCustomToken();
+                        TmeshToken tmeshToken = loadTmeshToken();
 
-                        tokenTransferredObserver = (Subscription) customToken.transferEventFlowable(DefaultBlockParameter.valueOf(BigInteger.valueOf(blockNumber)), DefaultBlockParameterName.LATEST).subscribe(log -> {
+                        tokenTransferredObserver = (Subscription) tmeshToken.transferEventFlowable(DefaultBlockParameter.valueOf(BigInteger.valueOf(blockNumber)), DefaultBlockParameterName.LATEST).subscribe(log -> {
                             Log.i(TAG, "transferredEventFlowable: " + log.log.getTransactionHash());
                             if (transactionObserver != null) {
                                 transactionObserver.onTokenTransferredLog(log);
@@ -663,7 +663,7 @@ public class BlockRequest {
         Log.i(TAG, "approve: " + value + " " + nonce);
 
         final Function approveFunc = new Function(
-                CustomToken.FUNC_APPROVE,
+                TmeshToken.FUNC_APPROVE,
                 Arrays.<Type>asList(new Address(channelAddress),
                         new Uint256(getWeiValue(value))),
                 Collections.<TypeReference<?>>emptyList());

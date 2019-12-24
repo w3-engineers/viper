@@ -146,7 +146,7 @@ public class WalletManager {
         }
     }
 
-    public void sendEtherRequest() {
+   /* public void sendEtherRequest() {
         PreferencesHelperDataplan preferencesHelperDataplan = PreferencesHelperDataplan.on();
 
         if (dataPlanManager.getDataPlanRole() == DataPlanConstants.USER_ROLE.DATA_SELLER) {
@@ -161,7 +161,7 @@ public class WalletManager {
                 walletListener.onEtherRequestResponse(false, "This feature is available only for data seller and data buyer.");
             }
         }
-    }
+    }*/
 
     public void sendTokenRequest() {
 

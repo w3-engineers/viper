@@ -77,12 +77,12 @@ public class TestDataPlanActivity extends TelemeshBaseActivity implements DataPl
     }
 
     @Override
-    protected BaseServiceLocator getServiceLocator() {
+    public BaseServiceLocator a() {
         return null;
     }
 
     @Override
-    protected void startUI() {
+    public void startUI() {
         mBinding = (TestActivityDataPlanBinding) getViewDataBinding();
 
         setTitle();
@@ -352,7 +352,7 @@ public class TestDataPlanActivity extends TelemeshBaseActivity implements DataPl
     }
 
     @Override
-    protected void onResume() {
+    public void onResume() {
         super.onResume();
         if (DataPlanManager.getInstance().getDataPlanRole() == DataPlanConstants.USER_ROLE.DATA_BUYER) {
             prepareSellerData();

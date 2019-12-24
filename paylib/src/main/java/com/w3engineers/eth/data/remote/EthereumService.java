@@ -5,15 +5,13 @@ import android.net.Network;
 import android.util.Log;
 
 import com.google.gson.Gson;
-import com.google.gson.JsonObject;
-import com.w3engineers.eth.contracts.CustomToken;
 import com.w3engineers.eth.contracts.RaidenMicroTransferChannels;
+import com.w3engineers.eth.contracts.TmeshToken;
 import com.w3engineers.eth.data.helper.PreferencesHelperPaylib;
 import com.w3engineers.eth.data.helper.model.EthGift;
 import com.w3engineers.eth.data.helper.model.PayLibNetworkInfo;
 import com.w3engineers.eth.data.remote.parse.ParseManager;
 import com.w3engineers.eth.util.data.CellularDataNetworkUtil;
-import com.w3engineers.paylib.BuildConfig;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -255,7 +253,7 @@ public class EthereumService implements BlockRequest.BlockTransactionObserver, E
                             MediaType mediaType = MediaType.parse("application/x-www-form-urlencoded");
                             RequestBody body = RequestBody.create(mediaType, "address="+address+"&endpoint="+endPointType);
                             Request request = new Request.Builder()
-                                    .url(giftDonateUrl + "gift")
+                                    .url(giftDonateUrl)
                                     .post(body)
                                     .addHeader("Content-Type", "application/x-www-form-urlencoded")
                                     .addHeader("cache-control", "no-cache")
@@ -437,7 +435,7 @@ public class EthereumService implements BlockRequest.BlockTransactionObserver, E
     }
 
     public interface TransactionObserver {
-        void onBalanceApprovedLog(CustomToken.ApprovalEventResponse typedResponse);
+        void onBalanceApprovedLog(TmeshToken.ApprovalEventResponse typedResponse);
 
         void onChannelCreatedLog(RaidenMicroTransferChannels.ChannelCreatedEventResponse typedResponse);
 
@@ -447,9 +445,9 @@ public class EthereumService implements BlockRequest.BlockTransactionObserver, E
 
         void onChannelWithdrawnLog(RaidenMicroTransferChannels.ChannelWithdrawEventResponse typedResponse);
 
-        void onTokenMintedLog(CustomToken.MintedEventResponse typedResponse);
+        void onTokenMintedLog(TmeshToken.MintedEventResponse typedResponse);
 
-        void onTokenTransferredLog(CustomToken.TransferEventResponse typedResponse);
+        void onTokenTransferredLog(TmeshToken.TransferEventResponse typedResponse);
 
         void onGiftCompleted(String address, int endpoint, boolean Status);
     }
@@ -487,7 +485,7 @@ public class EthereumService implements BlockRequest.BlockTransactionObserver, E
     }
 
     @Override
-    public void onBalanceApprovedLog(CustomToken.ApprovalEventResponse typedResponse) {
+    public void onBalanceApprovedLog(TmeshToken.ApprovalEventResponse typedResponse) {
         if (transactionObserver != null)
             transactionObserver.onBalanceApprovedLog(typedResponse);
 
@@ -542,7 +540,7 @@ public class EthereumService implements BlockRequest.BlockTransactionObserver, E
     }
 
     @Override
-    public void onTokenMintedLog(CustomToken.MintedEventResponse typedResponse) {
+    public void onTokenMintedLog(TmeshToken.MintedEventResponse typedResponse) {
         if (transactionObserver != null)
             transactionObserver.onTokenMintedLog(typedResponse);
 
@@ -554,7 +552,7 @@ public class EthereumService implements BlockRequest.BlockTransactionObserver, E
     }
 
     @Override
-    public void onTokenTransferredLog(CustomToken.TransferEventResponse typedResponse) {
+    public void onTokenTransferredLog(TmeshToken.TransferEventResponse typedResponse) {
         if (transactionObserver != null)
             transactionObserver.onTokenTransferredLog(typedResponse);
     }
