@@ -36,7 +36,7 @@ public class PointGuidelineActivity extends TelemeshBaseActivity implements Item
     }
 
     @Override
-    protected void startUI() {
+    public void startUI() {
         super.startUI();
         mBinding = (ActivityTokenGuidelineBinding) getViewDataBinding();
         tokenGuideLine = FileStoreUtil.getGuideline(this);
@@ -45,7 +45,7 @@ public class PointGuidelineActivity extends TelemeshBaseActivity implements Item
     }
 
     @Override
-    protected BaseServiceLocator getServiceLocator() {
+    public BaseServiceLocator a() {
         return null;
     }
 

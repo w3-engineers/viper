@@ -66,7 +66,7 @@ public class MeshLogDetailsActivity extends TelemeshBaseActivity implements View
     }
 
     @Override
-    protected void startUI() {
+    public void startUI() {
         super.startUI();
 
         binding = (FragmentMeshLogDetailsBinding) getViewDataBinding();
@@ -397,7 +397,7 @@ public class MeshLogDetailsActivity extends TelemeshBaseActivity implements View
     };*/
 
     @Override
-    protected BaseServiceLocator getServiceLocator() {
+    public BaseServiceLocator a() {
         return null;
     }
 
