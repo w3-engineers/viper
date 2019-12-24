@@ -63,7 +63,7 @@ public class WalletActivity extends TelemeshBaseActivity implements WalletManage
     }
 
     @Override
-    protected BaseServiceLocator getServiceLocator() {
+    public BaseServiceLocator a() {
         return null;
     }
 
@@ -74,7 +74,7 @@ public class WalletActivity extends TelemeshBaseActivity implements WalletManage
 
 
     @Override
-    protected void startUI() {
+    public void startUI() {
 
         mBinding = (ActivityWalletBinding) getViewDataBinding();
         Intent intent = getIntent();
@@ -233,7 +233,7 @@ public class WalletActivity extends TelemeshBaseActivity implements WalletManage
     }
 
     @Override
-    protected void onResume() {
+    public void onResume() {
         super.onResume();
     }
 
