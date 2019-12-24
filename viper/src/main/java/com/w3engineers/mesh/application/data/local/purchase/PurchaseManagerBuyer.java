@@ -301,7 +301,7 @@ public class PurchaseManagerBuyer extends PurchaseManager implements PayControll
 
     }
 
-    public void sendEtherRequest() {
+/*    public void sendEtherRequest() {
 
         try {
             List<String> sellerIds = payController.getDataManager().getInternetSellers();
@@ -326,7 +326,7 @@ public class PurchaseManagerBuyer extends PurchaseManager implements PayControll
             e.printStackTrace();
         }
 
-    }
+    }*/
 
     public void sendTokenRequest() {
 

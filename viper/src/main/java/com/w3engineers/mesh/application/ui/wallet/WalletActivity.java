@@ -405,11 +405,11 @@ public class WalletActivity extends TelemeshBaseActivity implements WalletManage
         walletManager.refreshMyBalance();
     }
 
-    private void sendEtherRequest() {
+    /*private void sendEtherRequest() {
         setDialogLoadingTimer("Sending request, please wait.");
 
         walletManager.sendEtherRequest();
-    }
+    }*/
 
     private void sendTokenRequest() {
         setDialogLoadingTimer("Sending request, please wait.");
