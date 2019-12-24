@@ -123,7 +123,7 @@ public class ConfigSyncUtil {
         protected void onPostExecute(String s) {
             super.onPostExecute(s);
 
-            processConfigJson(context, null, isMeshStartTime);
+            processConfigJson(context, s, isMeshStartTime);
         }
     }
 
