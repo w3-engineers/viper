@@ -535,13 +535,15 @@ public class WalletActivity extends TelemeshBaseActivity implements WalletManage
 
                 if (dataShareMode == DataPlanConstants.USER_ROLE.DATA_SELLER || dataShareMode == DataPlanConstants.USER_ROLE.DATA_BUYER) {
 
-                    Intent intent = new Intent(WalletActivity.this, PointGuidelineActivity.class);
-                    if (walletInfo.tokenAmount == 0) {
-                        intent.putExtra(PointGuidelineActivity.class.getName(), true);
-                        startActivity(intent);
-                    } else if (walletInfo.currencyAmount == 0) {
-                        intent.putExtra(PointGuidelineActivity.class.getName(), false);
-                        startActivity(intent);
+                    if (walletManager.isGiftGot()) {
+                        Intent intent = new Intent(WalletActivity.this, PointGuidelineActivity.class);
+                        if (walletInfo.tokenAmount == 0) {
+                            intent.putExtra(PointGuidelineActivity.class.getName(), true);
+                            startActivity(intent);
+                        } else if (walletInfo.currencyAmount == 0) {
+                            intent.putExtra(PointGuidelineActivity.class.getName(), false);
+                            startActivity(intent);
+                        }
                     }
                 }
 
