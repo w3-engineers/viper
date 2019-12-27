@@ -152,7 +152,7 @@
     <string name="later">Later</string>
     <string name="permission">Permission needed</string>
     <string name="permission_message">Need to allow permission on TeleService app to work properly. You can open the TeleService app clicking on launcher icon or can give permission manually from setting</string>
-    <string name="pending_balance">Pending balance will be deposited to main balance after crossing <b>10</b> points.</string>
+    <string name="pending_balance">Pending Balance will be Deposited to Main balance after crossing <b>10</b> Points.</string>
     <string name="points">Points</string>
     <string name="pending_balance_point">PENDING BALANCE</string>
     <string name="view_transactions">VIEW TRANSACTIONS</string>
