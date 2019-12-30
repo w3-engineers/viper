@@ -27,6 +27,18 @@ public class ConfigurationCommand implements Parcelable {
     @Expose
     private Integer tokenGuideVersion;
 
+    @SerializedName("GIFT_DONATE_LINK")
+    @Expose
+    private String giftDonateLink;
+
+    @SerializedName("max_point_for_rmesh")
+    @Expose
+    private long maxPointForRmesh;
+
+    @SerializedName("rmesh_per_token")
+    @Expose
+    private float rmeshPerToken;
+
     @SerializedName("network")
     @Expose
     private List<Network> network = null;
@@ -53,6 +65,11 @@ public class ConfigurationCommand implements Parcelable {
         } else {
             tokenGuideVersion = in.readInt();
         }
+
+        giftDonateLink = in.readString();
+        maxPointForRmesh = in.readLong();
+        rmeshPerToken = in.readFloat();
+
         network = in.createTypedArrayList(Network.CREATOR);
     }
 
@@ -116,6 +133,30 @@ public class ConfigurationCommand implements Parcelable {
         this.tokenGuideVersion = tokenGuideVersion;
     }
 
+    public String getGiftDonateLink() {
+        return giftDonateLink;
+    }
+
+    public void setGiftDonateLink(String giftDonateLink) {
+        this.giftDonateLink = giftDonateLink;
+    }
+
+    public long getMaxPointForRmesh() {
+        return maxPointForRmesh;
+    }
+
+    public void setMaxPointForRmesh(long maxPointForRmesh) {
+        this.maxPointForRmesh = maxPointForRmesh;
+    }
+
+    public float getRmeshPerToken() {
+        return rmeshPerToken;
+    }
+
+    public void setRmeshPerToken(float rmeshPerToken) {
+        this.rmeshPerToken = rmeshPerToken;
+    }
+
     @Override
     public int describeContents() {
         return 0;
@@ -148,6 +189,11 @@ public class ConfigurationCommand implements Parcelable {
             parcel.writeByte((byte) 1);
             parcel.writeInt(tokenGuideVersion);
         }
+
+        parcel.writeString(giftDonateLink);
+        parcel.writeLong(maxPointForRmesh);
+        parcel.writeFloat(rmeshPerToken);
+
         parcel.writeTypedList(network);
     }
 }

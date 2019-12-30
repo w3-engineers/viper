@@ -155,6 +155,11 @@ public class ConfigSyncUtil {
             PreferencesHelperDataplan.on().setConfigVersion(configurationCommand.getConfigVersionCode());
             PreferencesHelperDataplan.on().setPerMbTokenValue(configurationCommand.getTokenPerMb());
 
+            PreferencesHelperDataplan.on().setMaxPointForRmesh(configurationCommand.getMaxPointForRmesh());
+            PreferencesHelperDataplan.on().setRmeshPerPoint(configurationCommand.getRmeshPerToken());
+            SharedPref.write(Constant.PreferenceKeys.GIFT_DONATE_LINK, configurationCommand.getGiftDonateLink());
+
+
             for (Network network : configurationCommand.getNetwork()) {
                 EthereumServiceUtil.getInstance(context).insertNetworkInfo(new NetworkInfo().toNetworkInfo(network));
             }
@@ -178,6 +183,10 @@ public class ConfigSyncUtil {
 
             PreferencesHelperDataplan.on().setConfigVersion(configurationCommand.getConfigVersionCode());
             PreferencesHelperDataplan.on().setPerMbTokenValue(configurationCommand.getTokenPerMb());
+
+            PreferencesHelperDataplan.on().setMaxPointForRmesh(configurationCommand.getMaxPointForRmesh());
+            PreferencesHelperDataplan.on().setRmeshPerPoint(configurationCommand.getRmeshPerToken());
+            SharedPref.write(Constant.PreferenceKeys.GIFT_DONATE_LINK, configurationCommand.getGiftDonateLink());
 
             for (Network network : configurationCommand.getNetwork()) {
                 EthereumServiceUtil.getInstance(context).insertNetworkInfo(new NetworkInfo().toNetworkInfo(network));
