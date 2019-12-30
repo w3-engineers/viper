@@ -36,7 +36,7 @@ import java.util.Map;
 import java.util.UUID;
 
 public class ConnectionManager {
-    private static final String NETWORK_PREFIX = "arif";
+    private static final String NETWORK_PREFIX = "here";
     private static final String APP_NAME = "viper";
     private static ConnectionManager mConnectionManager;
     private ViperClient viperClient;
@@ -61,6 +61,7 @@ public class ConnectionManager {
         mContext = context;
         discoverUserMap = Collections.synchronizedMap(new HashMap());
         requestUserInfoList = Collections.synchronizedMap(new HashMap<>());
+
         startAllObserver();
     }
 
@@ -386,6 +387,10 @@ public class ConnectionManager {
             return "BT MESH";
         } else if (type == Link.Type.INTERNET.getValue()) {
             return "Internet";
+        }else if(type == Link.Type.HB.getValue()){
+            return "HB";
+        }else if(type == Link.Type.HB_MESH.getValue()){
+            return "HBMESH";
         }
         return "P2P";
     }

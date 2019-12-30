@@ -25,20 +25,31 @@ public interface Link {
      * Connection link type
      * for ui level recognize
      */
+    /*
+        int WiFi = 1;
+        int BT = 2;
+        int WifiMesh = 3;
+        int BtMesh = 4;
+        int INTERNET = 5;
+        int HB = 8;
+        int HB_MESH = 9;
+     */
     enum Type {
         NA(0),
         WIFI(1),
         BT(2),
         WIFI_MESH(3),
         BT_MESH(4),
-        INTERNET(5);
+        INTERNET(5),
+        HB(8),
+        HB_MESH(9);
         private int type;
 
-        Type(int value){
+        Type(int value) {
             this.type = value;
         }
 
-        public int getValue(){
+        public int getValue() {
             return type;
         }
     }
@@ -71,6 +82,7 @@ public interface Link {
     default int sendFrame(String senderId, String receiverId, String messageId, byte[] frameData) {
         return -1;
     }
+
     /**
      * Link type provider
      *
