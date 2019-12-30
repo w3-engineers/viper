@@ -24,6 +24,7 @@ import com.w3engineers.models.PointGuideLine;
 import com.w3engineers.models.UserInfo;
 import com.w3engineers.walleter.wallet.WalletService;
 
+
 import java.util.List;
 
 public class ViperClient {
@@ -83,12 +84,12 @@ public class ViperClient {
         return mViperClient;
     }
 
-    public ViperClient setConfig(String authName, String authPass, String downloadLink, String giftUrl, String parseUrl, String parseAppId) {
+    public ViperClient setConfig(String authName, String authPass, String downloadLink, String parseUrl, String parseAppId) {
 
         SharedPref.write(Constant.PreferenceKeys.AUTH_USER_NAME, authName);
         SharedPref.write(Constant.PreferenceKeys.AUTH_PASSWORD, authPass);
         SharedPref.write(Constant.PreferenceKeys.APP_DOWNLOAD_LINK, downloadLink);
-        SharedPref.write(Constant.PreferenceKeys.GIFT_DONATE_LINK, giftUrl);
+//        SharedPref.write(Constant.PreferenceKeys.GIFT_DONATE_LINK, giftUrl);
         PurchaseManager.getInstance().setParseInfo(parseUrl, parseAppId);
 
         DataManager.on().startMeshService();

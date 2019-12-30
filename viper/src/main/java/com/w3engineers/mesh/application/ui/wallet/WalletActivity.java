@@ -405,11 +405,11 @@ public class WalletActivity extends TelemeshBaseActivity implements WalletManage
         walletManager.refreshMyBalance();
     }
 
-    private void sendEtherRequest() {
+    /*private void sendEtherRequest() {
         setDialogLoadingTimer("Sending request, please wait.");
 
         walletManager.sendEtherRequest();
-    }
+    }*/
 
     private void sendTokenRequest() {
         setDialogLoadingTimer("Sending request, please wait.");
@@ -535,13 +535,15 @@ public class WalletActivity extends TelemeshBaseActivity implements WalletManage
 
                 if (dataShareMode == DataPlanConstants.USER_ROLE.DATA_SELLER || dataShareMode == DataPlanConstants.USER_ROLE.DATA_BUYER) {
 
-                    Intent intent = new Intent(WalletActivity.this, PointGuidelineActivity.class);
-                    if (walletInfo.tokenAmount == 0) {
-                        intent.putExtra(PointGuidelineActivity.class.getName(), true);
-                        startActivity(intent);
-                    } else if (walletInfo.currencyAmount == 0) {
-                        intent.putExtra(PointGuidelineActivity.class.getName(), false);
-                        startActivity(intent);
+                    if (walletManager.isGiftGot()) {
+                        Intent intent = new Intent(WalletActivity.this, PointGuidelineActivity.class);
+                        if (walletInfo.tokenAmount == 0) {
+                            intent.putExtra(PointGuidelineActivity.class.getName(), true);
+                            startActivity(intent);
+                        } else if (walletInfo.currencyAmount == 0) {
+                            intent.putExtra(PointGuidelineActivity.class.getName(), false);
+                            startActivity(intent);
+                        }
                     }
                 }
 

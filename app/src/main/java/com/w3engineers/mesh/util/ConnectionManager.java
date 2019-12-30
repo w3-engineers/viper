@@ -69,7 +69,7 @@ public class ConnectionManager {
             String jsonData = loadJSONFromAsset(mContext);
             if (!TextUtils.isEmpty(jsonData)) {
 
-                JSONObject jsonObject = new JSONObject(jsonData);
+//                JSONObject jsonObject = new JSONObject(jsonData);
 
                 String AUTH_USER_NAME = jsonObject.optString("AUTH_USER_NAME");
                 String AUTH_PASSWORD = jsonObject.optString("AUTH_PASSWORD");
@@ -84,15 +84,15 @@ public class ConnectionManager {
                 String PARSE_APP_ID = BuildConfig.PARSE_APP_ID;
                 String PARSE_URL = BuildConfig.PARSE_URL;
 
-                String GIFT_DONATE_LINK = jsonObject.optString("GIFT_DONATE_LINK");*/
+//                String GIFT_DONATE_LINK = jsonObject.optString("GIFT_DONATE_LINK");
 
                 viperClient = ViperClient.on(mContext, APP_NAME, "com.w3engineers.ext.viper", NETWORK_PREFIX, SharedPref.read(Constant.KEY_USER_NAME),
                         SharedPref.read(Constant.PreferenceKeys.ADDRESS), SharedPref.read(Constant.PreferenceKeys.PUBLIC_KEY), 1, System.currentTimeMillis(), true)
-                        .setConfig(AUTH_USER_NAME, AUTH_PASSWORD, FILE_REPO_LINK, GIFT_DONATE_LINK, PARSE_URL, PARSE_APP_ID);
+                        .setConfig(AUTH_USER_NAME, AUTH_PASSWORD, FILE_REPO_LINK/*, GIFT_DONATE_LINK*/, PARSE_URL, PARSE_APP_ID);
 
             }
 
-        } catch (JSONException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
