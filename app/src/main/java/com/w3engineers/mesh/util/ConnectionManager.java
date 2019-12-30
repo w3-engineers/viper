@@ -69,12 +69,11 @@ public class ConnectionManager {
             String jsonData = loadJSONFromAsset(mContext);
             if (!TextUtils.isEmpty(jsonData)) {
 
-//                JSONObject jsonObject = new JSONObject(jsonData);
+                JSONObject jsonObject = new JSONObject(jsonData);
 
                 String AUTH_USER_NAME = jsonObject.optString("AUTH_USER_NAME");
                 String AUTH_PASSWORD = jsonObject.optString("AUTH_PASSWORD");
                 String FILE_REPO_LINK = jsonObject.optString("FILE_REPO_LINK");
-                String GIFT_DONATE_LINK = jsonObject.optString("GIFT_DONATE_LINK");
                 String PARSE_APP_ID = jsonObject.optString("PARSE_APP_ID");
                 String PARSE_URL = jsonObject.optString("PARSE_URL");
 
@@ -82,7 +81,7 @@ public class ConnectionManager {
                 String AUTH_PASSWORD = BuildConfig.AUTH_PASSWORD;
                 String FILE_REPO_LINK = BuildConfig.FILE_REPO_LINK;
                 String PARSE_APP_ID = BuildConfig.PARSE_APP_ID;
-                String PARSE_URL = BuildConfig.PARSE_URL;
+                String PARSE_URL = BuildConfig.PARSE_URL;*/
 
 //                String GIFT_DONATE_LINK = jsonObject.optString("GIFT_DONATE_LINK");
 
