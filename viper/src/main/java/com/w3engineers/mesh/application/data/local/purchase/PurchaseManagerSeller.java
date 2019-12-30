@@ -4,7 +4,6 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.support.v7.app.AlertDialog;
 import android.arch.lifecycle.LiveData;
-import android.content.Intent;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.Looper;
@@ -12,8 +11,8 @@ import android.os.Message;
 import android.os.RemoteException;
 import android.text.TextUtils;
 
-import com.w3engineers.eth.contracts.CustomToken;
 import com.w3engineers.eth.contracts.RaidenMicroTransferChannels;
+import com.w3engineers.eth.contracts.TmeshToken;
 import com.w3engineers.eth.data.remote.EthereumService;
 import com.w3engineers.eth.util.helper.HandlerUtil;
 import com.w3engineers.eth.util.helper.InternetUtil;
@@ -27,7 +26,6 @@ import com.w3engineers.mesh.application.data.local.db.purchaserequests.PurchaseR
 import com.w3engineers.mesh.application.data.local.helper.PreferencesHelperDataplan;
 import com.w3engineers.mesh.application.data.local.wallet.WalletManager;
 import com.w3engineers.mesh.application.ui.dataplan.TestDataPlanActivity;
-import com.w3engineers.mesh.application.ui.util.ToastUtil;
 import com.w3engineers.mesh.util.Constant;
 import com.w3engineers.mesh.util.DialogUtil;
 import com.w3engineers.mesh.util.EthereumServiceUtil;
@@ -44,7 +42,6 @@ import org.web3j.utils.Convert;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
@@ -659,7 +656,7 @@ public class PurchaseManagerSeller extends PurchaseManager implements PayControl
                 Purchase purchase = databaseService.getPurchaseByBlockNumber(blockNumber, buyerAddress, ethService.getAddress());
 
                 if (purchase == null) {
-                    double deposit = totalDataAmount * PurchaseConstants.PRICE_PER_MB;
+                    double deposit = totalDataAmount * PreferencesHelperDataplan.on().getPerMbTokenValue();
                     databaseService.insertPurchase(buyerAddress, sellerAddress, totalDataAmount,
                             usedDataAmount, blockNumber, deposit, bps, balance, chs, 0.0,
                             PurchaseConstants.CHANNEL_STATE.OPEN, endPointType);
@@ -720,7 +717,7 @@ public class PurchaseManagerSeller extends PurchaseManager implements PayControl
         }
     }
 
-    public void sendEtherRequest() {
+   /* public void sendEtherRequest() {
         if (InternetUtil.isNetworkConnected(mContext)) {
             int endpointType = getEndpoint();
             ethService.requestEther(ethService.getAddress(), endpointType, new EthereumService.ReqEther() {
@@ -744,7 +741,7 @@ public class PurchaseManagerSeller extends PurchaseManager implements PayControl
                 walletListener.onEtherRequestResponse(false, "No internet found on this device.");
             }
         }
-    }
+    }*/
 
     public void sendTokenRequest() {
 
@@ -1310,7 +1307,7 @@ public class PurchaseManagerSeller extends PurchaseManager implements PayControl
                     double addedBalance = bps_balance - previousBalance;
 
                     double dataSizeMB = Util.convertBytesToMegabytes(buyerPendingMessage.dataSize);
-                    double dataPrice = PurchaseConstants.PRICE_PER_MB * dataSizeMB;
+                    double dataPrice = PreferencesHelperDataplan.on().getPerMbTokenValue() * dataSizeMB;
 
 
                     if (addedBalance >= dataPrice) {
@@ -1631,7 +1628,7 @@ public class PurchaseManagerSeller extends PurchaseManager implements PayControl
     //*****************EthereumServiceListener*****************//
     //*********************************************************//
     @Override
-    public void onBalanceApprovedLog(CustomToken.ApprovalEventResponse typedResponse) {
+    public void onBalanceApprovedLog(TmeshToken.ApprovalEventResponse typedResponse) {
         MeshLog.v("onBalanceApprovedLog " + typedResponse._owner + " " + typedResponse._value.toString() + " data " + typedResponse.log.getData());
         String buyerAddress = typedResponse._owner;
 
@@ -1717,7 +1714,7 @@ public class PurchaseManagerSeller extends PurchaseManager implements PayControl
 
                     databaseService.updatePurchaseRequest(purchaseRequests);
 
-                    double purchasedData = deposit / PurchaseConstants.PRICE_PER_MB;
+                    double purchasedData = deposit / PreferencesHelperDataplan.on().getPerMbTokenValue();
                     databaseService.insertPurchase(buyerAddress, ethService.getAddress(), purchasedData, 0,
                             purchaseRequests.trxBlock, deposit, "", 0, "", 0,
                             PurchaseConstants.CHANNEL_STATE.OPEN, purchaseRequests.blockChainEndpoint);
@@ -1769,7 +1766,7 @@ public class PurchaseManagerSeller extends PurchaseManager implements PayControl
                     Purchase topuppedPurchase = databaseService.getPurchaseByBlockNumber(typedResponse._open_block_number.longValue(), typedResponse._sender_address, typedResponse._receiver_address);
 
                     topuppedPurchase.deposit = topuppedPurchase.deposit + addedDeposit;
-                    double totalData = topuppedPurchase.deposit / PurchaseConstants.PRICE_PER_MB;
+                    double totalData = topuppedPurchase.deposit / PreferencesHelperDataplan.on().getPerMbTokenValue();
                     topuppedPurchase.totalDataAmount = totalData;
 
 
@@ -1923,7 +1920,7 @@ public class PurchaseManagerSeller extends PurchaseManager implements PayControl
     }
 
     @Override
-    public void onTokenMintedLog(CustomToken.MintedEventResponse typedResponse) {
+    public void onTokenMintedLog(TmeshToken.MintedEventResponse typedResponse) {
         MeshLog.v("onTokenMinted " + typedResponse._to + " " + typedResponse._num.toString());
 
         preferencesHelperDataplan.setTokenMintedBlock(typedResponse.log.getBlockNumber().longValue());
@@ -2022,7 +2019,7 @@ public class PurchaseManagerSeller extends PurchaseManager implements PayControl
     }
 
     @Override
-    public void onTokenTransferredLog(CustomToken.TransferEventResponse typedResponse) {
+    public void onTokenTransferredLog(TmeshToken.TransferEventResponse typedResponse) {
         MeshLog.v("onTokenTransferredLog " + typedResponse.log.getTransactionHash());
 
     }

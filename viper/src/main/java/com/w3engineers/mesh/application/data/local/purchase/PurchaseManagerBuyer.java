@@ -301,7 +301,7 @@ public class PurchaseManagerBuyer extends PurchaseManager implements PayControll
 
     }
 
-    public void sendEtherRequest() {
+/*    public void sendEtherRequest() {
 
         try {
             List<String> sellerIds = payController.getDataManager().getInternetSellers();
@@ -326,7 +326,7 @@ public class PurchaseManagerBuyer extends PurchaseManager implements PayControll
             e.printStackTrace();
         }
 
-    }
+    }*/
 
     public void sendTokenRequest() {
 
@@ -656,7 +656,7 @@ public class PurchaseManagerBuyer extends PurchaseManager implements PayControll
             case PurchaseConstants.INFO_PURPOSES.TOPUP_CHANNEL:
                 try {
                     String failedMessage = null;
-                    double dataPrice = totalDataAmount * PurchaseConstants.PRICE_PER_MB;
+                    double dataPrice = totalDataAmount * PreferencesHelperDataplan.on().getPerMbTokenValue();
                     if (!infoJson.has(PurchaseConstants.INFO_KEYS.ETH_BALANCE) || !infoJson.has(PurchaseConstants.INFO_KEYS.TKN_BALANCE)
                             || !infoJson.has(PurchaseConstants.INFO_KEYS.NONCE) || !infoJson.has(PurchaseConstants.INFO_KEYS.ALOWANCE)){
                         failedMessage = "Can't reach network, please try again later.";
@@ -860,7 +860,7 @@ public class PurchaseManagerBuyer extends PurchaseManager implements PayControll
                                          int nonce, double allowance, int endPointType, long sharedData) {
         MeshLog.v("onInitPurchaseOkReceived  " + sellerAddress + " " + ethBalance + " " + tokenBallance + " " + nonce + " " + allowance + " " + sharedData);
 
-        double totalPrice = totalDataAmount * PurchaseConstants.PRICE_PER_MB;
+        double totalPrice = totalDataAmount * PreferencesHelperDataplan.on().getPerMbTokenValue();
 
         if (ethBalance == 0 || tokenBallance < totalPrice) {
             setCurrentSellerWithStatus(sellerAddress, PurchaseConstants.SELLERS_BTN_TEXT.PURCHASE);
@@ -973,7 +973,7 @@ public class PurchaseManagerBuyer extends PurchaseManager implements PayControll
         try {
             Purchase purchase = databaseService.getPurchaseByBlockNumber(openBlock, ethService.getAddress(), from);
             if (purchase == null) {
-                double totalDta = deposit / PurchaseConstants.PRICE_PER_MB;
+                double totalDta = deposit / PreferencesHelperDataplan.on().getPerMbTokenValue();
                 databaseService.insertPurchase(ethService.getAddress(), from, totalDta, 0, openBlock, deposit, "",
                         0, "", 0, PurchaseConstants.CHANNEL_STATE.OPEN, endPointType);
 
@@ -1005,7 +1005,7 @@ public class PurchaseManagerBuyer extends PurchaseManager implements PayControll
             Purchase purchase = databaseService.getPurchaseByState(PurchaseConstants.CHANNEL_STATE.OPEN, ethService.getAddress(), fromAddress);
             if (purchase != null) {
                 double dataSizeMb = Util.convertBytesToMegabytes(dataSize);
-                double dataPrice = PurchaseConstants.PRICE_PER_MB * dataSizeMb;
+                double dataPrice = PreferencesHelperDataplan.on().getPerMbTokenValue() * dataSizeMb;
                 double totalBalance = purchase.balance + dataPrice;
                 if (totalBalance <= purchase.deposit) {
 
@@ -1175,7 +1175,7 @@ public class PurchaseManagerBuyer extends PurchaseManager implements PayControll
 
                     if (purchase.totalDataAmount != totalDataAmount) {
                         purchase.totalDataAmount = totalDataAmount;
-                        double deposit = totalDataAmount * PurchaseConstants.PRICE_PER_MB;
+                        double deposit = totalDataAmount * PreferencesHelperDataplan.on().getPerMbTokenValue();
                         purchase.deposit = deposit;
 
                     }
@@ -1185,7 +1185,7 @@ public class PurchaseManagerBuyer extends PurchaseManager implements PayControll
 
             } else {
 
-                double deposit = totalDataAmount * PurchaseConstants.PRICE_PER_MB;
+                double deposit = totalDataAmount * PreferencesHelperDataplan.on().getPerMbTokenValue();
                 try {
                     databaseService.insertPurchase(buyerAddress, sellerAddress, totalDataAmount,
                             usedDataAmount, blockNumber, deposit, bps, balance, chs, 0.0,
@@ -1249,7 +1249,7 @@ public class PurchaseManagerBuyer extends PurchaseManager implements PayControll
 
         try {
             Purchase topupPurchase = databaseService.getPurchaseByBlockNumber(openBlock, ethService.getAddress(), fromAddress);
-            double totalData = topupPurchase.deposit / PurchaseConstants.PRICE_PER_MB;
+            double totalData = topupPurchase.deposit / PreferencesHelperDataplan.on().getPerMbTokenValue();
 
             topupPurchase.deposit = deposit;
             topupPurchase.totalDataAmount = totalData;

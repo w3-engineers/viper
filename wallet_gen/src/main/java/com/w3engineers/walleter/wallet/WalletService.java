@@ -1,37 +1,29 @@
-package com.w3engineers.mesh.application.data.local.wallet;
+package com.w3engineers.walleter.wallet;
 
-import android.app.ProgressDialog;
 import android.content.Context;
-import android.content.Intent;
 import android.net.Uri;
-import android.os.Build;
-import android.os.Environment;
-import android.support.v4.content.FileProvider;
+import android.os.Handler;
+import android.os.HandlerThread;
 import android.text.TextUtils;
 import android.util.Log;
 
-
-import com.w3engineers.eth.util.helper.HandlerUtil;
-import com.w3engineers.mesh.R;
-import com.w3engineers.mesh.application.data.local.db.SharedPref;
-import com.w3engineers.mesh.application.data.local.helper.crypto.ECDSA;
-import com.w3engineers.mesh.util.Constant;
-import com.w3engineers.mesh.util.MeshLog;
+import com.w3engineers.ext.strom.util.helper.data.local.SharedPref;
+import com.w3engineers.walleter.R;
+import com.w3engineers.walleter.wallet.helper.crypto.ECDSA;
 
 import org.web3j.crypto.Credentials;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.nio.channels.FileChannel;
 
 public class WalletService {
+
+    private final String TAG = getClass().getSimpleName();
+
     private Context mContext;
     private final String walletSuffixDir;
 //    public static final String PASSWORD = "123456789";
@@ -41,7 +33,12 @@ public class WalletService {
     private final String PUBLIC_KEY = "public_key";
     private final String PRIVATE_KEY = "private_key";
     private final String WALLET_PASSWORD_KEY = "wallet_pass_key";
+    private final String KEY_USER_ID = "mesh_id";
     private static WalletService walletService;
+
+    private SharedPref mSharedPref;
+    private Handler mHandler;
+    private HandlerThread mHandlerThread;
 
 
     public interface WalletLoadListener {
@@ -64,6 +61,12 @@ public class WalletService {
 
 
     private WalletService(Context context) {
+        mSharedPref = SharedPref.getSharedPref(context);
+
+        mHandlerThread = new HandlerThread("wallet_thread", Thread.MAX_PRIORITY);
+        mHandlerThread.start();
+        mHandler = new Handler(mHandlerThread.getLooper());
+
         this.mContext = context;
         walletSuffixDir = "wallet/" + mContext.getString(R.string.app_name);
     }
@@ -87,7 +90,7 @@ public class WalletService {
             for (File f : list) {
                 String name = f.getName();
                 if (name.endsWith(".json")) {
-                    SharedPref.write(WALLET_FILE_NAME, name);
+                    mSharedPref.write(WALLET_FILE_NAME, name);
                     isWalletExists = true;
                     break;
                 }
@@ -98,23 +101,23 @@ public class WalletService {
     }
 
     public void createOrLoadWallet(final String password, final WalletLoadListener listener) {
-        SharedPref.write(WALLET_PASSWORD_KEY, password);
-        HandlerUtil.postBackground(() -> {
-            String existAddress = SharedPref.read(WALLET_ADDRESS);
+        mSharedPref.write(WALLET_PASSWORD_KEY, password);
+        mHandler.post(() -> {
+            String existAddress = mSharedPref.read(WALLET_ADDRESS);
             if (!TextUtils.isEmpty(existAddress)) {
-                MeshLog.i(" Ethereum address already exist");
-                listener.onWalletLoaded(existAddress, SharedPref.read(PUBLIC_KEY));
+                Log.i(TAG, " Ethereum address already exist");
+                listener.onWalletLoaded(existAddress, mSharedPref.read(PUBLIC_KEY));
                 initCredential();
                 return;
             }
 
             if (isWalletExists()) {
-                String keyStoreFileName = SharedPref.read(WALLET_FILE_NAME);
+                String keyStoreFileName = mSharedPref.read(WALLET_FILE_NAME);
                 loadWalletFromKeystore(password, keyStoreFileName);
 
                 if (mCredentials != null) {
 
-                    listener.onWalletLoaded(mCredentials.getAddress(), SharedPref.read(PUBLIC_KEY));
+                    listener.onWalletLoaded(mCredentials.getAddress(), mSharedPref.read(PUBLIC_KEY));
 
                 } else {
                     listener.onErrorOccurred("WalletManager credential load failed");
@@ -128,7 +131,7 @@ public class WalletService {
 
                     if (mCredentials != null) {
 
-                        listener.onWalletLoaded(mCredentials.getAddress(), SharedPref.read(PUBLIC_KEY));
+                        listener.onWalletLoaded(mCredentials.getAddress(), mSharedPref.read(PUBLIC_KEY));
 
 
                     } else {
@@ -148,7 +151,7 @@ public class WalletService {
         if (isWalletExists()) {
             deleteExistsWallet();
         }
-        SharedPref.write(WALLET_PASSWORD_KEY, password);
+        mSharedPref.write(WALLET_PASSWORD_KEY, password);
 
         String keyStoreFileName = Web3jWalletHelper.onInstance(mContext).createWallet(password, walletSuffixDir);
 
@@ -157,7 +160,7 @@ public class WalletService {
             loadWalletFromKeystore(password, keyStoreFileName);
 
             if (mCredentials != null) {
-                listener.onWalletCreated(mCredentials.getAddress(), SharedPref.read(PUBLIC_KEY));
+                listener.onWalletCreated(mCredentials.getAddress(), mSharedPref.read(PUBLIC_KEY));
             } else {
                 listener.onError("Wallet creation failed");
             }
@@ -169,12 +172,12 @@ public class WalletService {
 
     public void loadWallet(String password, WalletLoadListener listener) {
         if (isWalletExists()) {
-            SharedPref.write(WALLET_PASSWORD_KEY, password);
-            String keyStoreFileName = SharedPref.read(WALLET_FILE_NAME);
+            mSharedPref.write(WALLET_PASSWORD_KEY, password);
+            String keyStoreFileName = mSharedPref.read(WALLET_FILE_NAME);
             loadWalletFromKeystore(password, keyStoreFileName);
 
             if (mCredentials != null) {
-                listener.onWalletLoaded(mCredentials.getAddress(), SharedPref.read(PUBLIC_KEY));
+                listener.onWalletLoaded(mCredentials.getAddress(), mSharedPref.read(PUBLIC_KEY));
             } else {
                 listener.onErrorOccurred("Wallet load failed");
             }
@@ -189,19 +192,19 @@ public class WalletService {
             deleteExistsWallet();
         }
 
-        HandlerUtil.postBackground(new Runnable() {
+        mHandler.post(new Runnable() {
             @Override
             public void run() {
                     String savePtah = WalletService.getInstance(mContext).getWalletDirectory();
                 copyFile(mContext, fileUri, savePtah);
 
                 if (isWalletExists()) {
-                    SharedPref.write(WALLET_PASSWORD_KEY, password);
-                    String keyStoreFileName = SharedPref.read(WALLET_FILE_NAME);
+                    mSharedPref.write(WALLET_PASSWORD_KEY, password);
+                    String keyStoreFileName = mSharedPref.read(WALLET_FILE_NAME);
                     loadWalletFromKeystore(password, keyStoreFileName);
 
                     if (mCredentials != null) {
-                        listener.onWalletImported(mCredentials.getAddress(), SharedPref.read(PUBLIC_KEY));
+                        listener.onWalletImported(mCredentials.getAddress(), mSharedPref.read(PUBLIC_KEY));
                     } else {
                         listener.onError("Wallet import failed");
                     }
@@ -275,23 +278,23 @@ public class WalletService {
     private void loadWalletFromKeystore(String password, String keyStoreFileName) {
         mCredentials = Web3jWalletHelper.onInstance(mContext).getWallet(password, walletSuffixDir, keyStoreFileName);
         if (mCredentials != null){
-            SharedPref.write(WALLET_ADDRESS, mCredentials.getAddress());
-            SharedPref.write(Constant.KEY_USER_ID, mCredentials.getAddress());
-            //SharedPref.write(PUBLIC_KEY, mCredentials.getEcKeyPair().getPublicKey().toString(16));
-            SharedPref.write(Constant.KEY_USER_ID, mCredentials.getAddress());
-            SharedPref.write(PRIVATE_KEY, mCredentials.getEcKeyPair().getPrivateKey().toString(16));
-            SharedPref.write(PUBLIC_KEY, ECDSA.getHexEncodedPoint(SharedPref.read(PRIVATE_KEY)));
+            mSharedPref.write(WALLET_ADDRESS, mCredentials.getAddress());
+            mSharedPref.write(KEY_USER_ID, mCredentials.getAddress());
+            //mSharedPref.write(PUBLIC_KEY, mCredentials.getEcKeyPair().getPublicKey().toString(16));
+            mSharedPref.write(KEY_USER_ID, mCredentials.getAddress());
+            mSharedPref.write(PRIVATE_KEY, mCredentials.getEcKeyPair().getPrivateKey().toString(16));
+            mSharedPref.write(PUBLIC_KEY, ECDSA.getHexEncodedPoint(mSharedPref.read(PRIVATE_KEY)));
 
-            MeshLog.e("publickey::" + ECDSA.getHexEncodedPoint(SharedPref.read(PRIVATE_KEY)) + "\n" + "Length " + ECDSA.getHexEncodedPoint(SharedPref.read(PRIVATE_KEY)).length());
+            Log.e(TAG, "publickey::" + ECDSA.getHexEncodedPoint(mSharedPref.read(PRIVATE_KEY)) + "\n" + "Length " + ECDSA.getHexEncodedPoint(mSharedPref.read(PRIVATE_KEY)).length());
         }
     }
 
     public Credentials getCredentials() {
         if (mCredentials == null) {
-            String privateKey = SharedPref.read(PRIVATE_KEY);
+            String privateKey = mSharedPref.read(PRIVATE_KEY);
             if (TextUtils.isEmpty(privateKey)) {
-                String keyStoreFileNmae = SharedPref.read(WALLET_FILE_NAME);
-                String password = SharedPref.read(WALLET_PASSWORD_KEY);
+                String keyStoreFileNmae = mSharedPref.read(WALLET_FILE_NAME);
+                String password = mSharedPref.read(WALLET_PASSWORD_KEY);
 
                 loadWalletFromKeystore(password, keyStoreFileNmae);
             } else {
@@ -312,7 +315,7 @@ public class WalletService {
     }
 
     public String getPrivateKey() {
-        String privateKey = SharedPref.read(PRIVATE_KEY);
+        String privateKey = mSharedPref.read(PRIVATE_KEY);
         return privateKey;
     }
 

@@ -38,7 +38,7 @@ public class MeshLogHistoryActivity extends TelemeshBaseActivity implements Item
     }
 
     @Override
-    protected void startUI() {
+    public void startUI() {
         super.startUI();
 
         mBinding = (ActivityMeshLogHistoryBinding) getViewDataBinding();
@@ -97,7 +97,7 @@ public class MeshLogHistoryActivity extends TelemeshBaseActivity implements Item
     }
 
     @Override
-    protected BaseServiceLocator getServiceLocator() {
+    public BaseServiceLocator a() {
         return null;
     }
 }

@@ -1,6 +1,5 @@
 package com.w3engineers.mesh.application.ui.dataplan;
 
-import android.app.DatePickerDialog;
 import android.app.ProgressDialog;
 import android.arch.lifecycle.ViewModel;
 import android.arch.lifecycle.ViewModelProvider;
@@ -30,6 +29,7 @@ import com.w3engineers.mesh.R;
 import com.w3engineers.mesh.application.data.BaseServiceLocator;
 import com.w3engineers.mesh.application.data.local.DataPlanConstants;
 import com.w3engineers.mesh.application.data.local.dataplan.DataPlanManager;
+import com.w3engineers.mesh.application.data.local.helper.PreferencesHelperDataplan;
 import com.w3engineers.mesh.application.data.local.model.Seller;
 import com.w3engineers.mesh.application.data.local.wallet.WalletManager;
 import com.w3engineers.mesh.application.ui.base.TelemeshBaseActivity;
@@ -37,14 +37,11 @@ import com.w3engineers.mesh.application.ui.util.ExpandableButton;
 import com.w3engineers.mesh.databinding.TestActivityDataPlanBinding;
 import com.w3engineers.mesh.util.Constant;
 import com.w3engineers.mesh.util.DialogUtil;
-import com.w3engineers.mesh.util.MeshLog;
 import com.w3engineers.mesh.util.NotificationUtil;
 import com.w3engineers.mesh.util.Util;
 import com.w3engineers.mesh.util.lib.mesh.HandlerUtil;
 
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
 import java.util.concurrent.ExecutionException;
 
 public class TestDataPlanActivity extends TelemeshBaseActivity implements DataPlanManager.DataPlanListener {
@@ -80,12 +77,12 @@ public class TestDataPlanActivity extends TelemeshBaseActivity implements DataPl
     }
 
     @Override
-    protected BaseServiceLocator getServiceLocator() {
+    public BaseServiceLocator a() {
         return null;
     }
 
     @Override
-    protected void startUI() {
+    public void startUI() {
         mBinding = (TestActivityDataPlanBinding) getViewDataBinding();
 
         setTitle();
@@ -355,7 +352,7 @@ public class TestDataPlanActivity extends TelemeshBaseActivity implements DataPl
     }
 
     @Override
-    protected void onResume() {
+    public void onResume() {
         super.onResume();
         if (DataPlanManager.getInstance().getDataPlanRole() == DataPlanConstants.USER_ROLE.DATA_BUYER) {
             prepareSellerData();
@@ -628,6 +625,10 @@ public class TestDataPlanActivity extends TelemeshBaseActivity implements DataPl
             int amount = (int) convertBytesToMegabytes(sharedData);
             mBinding.range.setText(amount + "");
         }
+
+        float dataPerMb = PreferencesHelperDataplan.on().getPerMbTokenValue();
+        mBinding.sellDataTextView.setText(String.format(getResources().getString(R.string.sell_your_data_info), dataPerMb + ""));
+        mBinding.buyDataTextView.setText(String.format(getResources().getString(R.string.buy_data_info), dataPerMb + ""));
 
         if (dataLimitModel.isDataLimited()){
 

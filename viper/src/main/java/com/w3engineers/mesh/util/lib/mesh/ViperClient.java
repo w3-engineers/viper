@@ -1,26 +1,29 @@
 package com.w3engineers.mesh.util.lib.mesh;
 
-import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
 import android.os.RemoteException;
 import android.text.TextUtils;
 
-import com.w3engineers.ext.strom.util.helper.PermissionUtil;
 import com.w3engineers.mesh.application.data.AppDataObserver;
 import com.w3engineers.mesh.application.data.local.DataPlanConstants;
 import com.w3engineers.mesh.application.data.local.db.SharedPref;
 import com.w3engineers.mesh.application.data.local.helper.PreferencesHelperDataplan;
 import com.w3engineers.mesh.application.data.local.helper.crypto.CryptoHelper;
+import com.w3engineers.mesh.application.data.local.purchase.PurchaseManager;
 import com.w3engineers.mesh.application.data.local.purchase.PurchaseManagerBuyer;
 import com.w3engineers.mesh.application.data.local.purchase.PurchaseManagerSeller;
-import com.w3engineers.mesh.application.data.local.wallet.WalletManager;
-import com.w3engineers.mesh.application.data.local.wallet.WalletService;
 import com.w3engineers.mesh.application.data.model.WalletLoaded;
 import com.w3engineers.mesh.application.ui.premission.PermissionActivity;
+import com.w3engineers.mesh.application.ui.util.FileStoreUtil;
+import com.w3engineers.mesh.util.ConfigSyncUtil;
 import com.w3engineers.mesh.util.Constant;
 import com.w3engineers.mesh.util.MeshLog;
+import com.w3engineers.models.ConfigurationCommand;
+import com.w3engineers.models.PointGuideLine;
 import com.w3engineers.models.UserInfo;
+import com.w3engineers.walleter.wallet.WalletService;
+
 
 import java.util.List;
 
@@ -81,12 +84,15 @@ public class ViperClient {
         return mViperClient;
     }
 
-    public ViperClient setConfig(String authName, String authPass, String downloadLink, String giftUrl) {
+    public ViperClient setConfig(String authName, String authPass, String downloadLink, String parseUrl, String parseAppId) {
 
         SharedPref.write(Constant.PreferenceKeys.AUTH_USER_NAME, authName);
         SharedPref.write(Constant.PreferenceKeys.AUTH_PASSWORD, authPass);
         SharedPref.write(Constant.PreferenceKeys.APP_DOWNLOAD_LINK, downloadLink);
-        SharedPref.write(Constant.PreferenceKeys.GIFT_DONATE_LINK, giftUrl);
+//        SharedPref.write(Constant.PreferenceKeys.GIFT_DONATE_LINK, giftUrl);
+        PurchaseManager.getInstance().setParseInfo(parseUrl, parseAppId);
+
+        DataManager.on().startMeshService();
 
         return this;
     }
@@ -190,6 +196,26 @@ public class ViperClient {
         return DataManager.on().getUserId();
     }
 
+    public void saveUserInfo(String walletAddress, int avatar, long regTime, boolean isSync, String usersName, String publicKey, String packageName) {
+
+        try {
+            UserInfo userInfo = new UserInfo();
+
+            userInfo.setAddress(walletAddress);
+            userInfo.setAvatar(avatar);
+            userInfo.setRegTime(regTime);
+            userInfo.setSync(isSync);
+            userInfo.setUserName(usersName);
+            userInfo.setPublicKey(publicKey);
+            userInfo.setPackageName(packageName);
+
+            DataManager.on().saveUserInfo(userInfo);
+
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        }
+    }
+
 /*    public void createWallet() {
         WalletManager.getInstance().readWallet(mContext, WalletService.getInstance(mContext).PASSWORD, new WalletManager.WaletListener() {
             @Override
@@ -263,4 +289,15 @@ public class ViperClient {
         return DataManager.on().getInternetSellers();
     }
 
+    public void sendConfigForUpdate(ConfigurationCommand configurationCommand) {
+        ConfigSyncUtil.getInstance().updateConfigCommandFile(mContext, configurationCommand);
+    }
+
+    public PointGuideLine requestPointGuideline() {
+        return FileStoreUtil.getGuideline(mContext);
+    }
+
+    public void sendPointGuidelineForUpdate(String guideLine) {
+        FileStoreUtil.writeTokenGuideline(mContext, guideLine);
+    }
 }

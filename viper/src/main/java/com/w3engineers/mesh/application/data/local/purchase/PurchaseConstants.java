@@ -53,6 +53,7 @@ public interface PurchaseConstants {
     }
 
     double PRICE_PER_MB = 1.0;
+    double RMESH_PER_POINT = 1.0;
     double BUY_TOKEN_ETHER_VALUE = 0.1;
 
     interface CHANNEL_STATE {

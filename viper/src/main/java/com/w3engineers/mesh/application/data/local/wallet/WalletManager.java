@@ -16,6 +16,7 @@ import com.w3engineers.mesh.application.data.local.dataplan.DataPlanManager;
 import com.w3engineers.mesh.application.data.local.db.SharedPref;
 import com.w3engineers.mesh.application.data.local.db.networkinfo.NetworkInfo;
 import com.w3engineers.mesh.application.data.local.helper.PreferencesHelperDataplan;
+import com.w3engineers.mesh.application.data.local.purchase.PurchaseConstants;
 import com.w3engineers.mesh.application.data.local.purchase.PurchaseManager;
 import com.w3engineers.mesh.application.data.local.purchase.PurchaseManagerBuyer;
 import com.w3engineers.mesh.application.data.local.purchase.PurchaseManagerSeller;
@@ -23,10 +24,10 @@ import com.w3engineers.mesh.application.ui.wallet.WalletActivity;
 import com.w3engineers.mesh.util.Constant;
 import com.w3engineers.mesh.util.MeshLog;
 import com.w3engineers.mesh.util.Util;
+import com.w3engineers.walleter.wallet.WalletService;
 
 import java.io.ByteArrayOutputStream;
 import java.util.List;
-import java.util.concurrent.ExecutionException;
 
 import androidmads.library.qrgenearator.QRGContents;
 import androidmads.library.qrgenearator.QRGEncoder;
@@ -146,7 +147,7 @@ public class WalletManager {
         }
     }
 
-    public void sendEtherRequest() {
+   /* public void sendEtherRequest() {
         PreferencesHelperDataplan preferencesHelperDataplan = PreferencesHelperDataplan.on();
 
         if (dataPlanManager.getDataPlanRole() == DataPlanConstants.USER_ROLE.DATA_SELLER) {
@@ -161,6 +162,10 @@ public class WalletManager {
                 walletListener.onEtherRequestResponse(false, "This feature is available only for data seller and data buyer.");
             }
         }
+    }*/
+
+    public boolean isGiftGot() {
+        return preferencesHelperDataplan.getEtherRequestStatus(getMyEndpoint()) == PurchaseConstants.GIFT_REQUEST_STATE.GOT_GIFT_ETHER;
     }
 
     public void sendTokenRequest() {

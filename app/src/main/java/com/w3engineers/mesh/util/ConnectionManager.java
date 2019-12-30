@@ -1,8 +1,6 @@
 package com.w3engineers.mesh.util;
 
 import android.content.Context;
-import android.os.Build;
-import android.os.RemoteException;
 import android.text.TextUtils;
 import android.widget.Toast;
 
@@ -38,7 +36,7 @@ import java.util.Map;
 import java.util.UUID;
 
 public class ConnectionManager {
-    private static final String NETWORK_PREFIX = "ifli";
+    private static final String NETWORK_PREFIX = "arif";
     private static final String APP_NAME = "viper";
     private static ConnectionManager mConnectionManager;
     private ViperClient viperClient;
@@ -69,24 +67,32 @@ public class ConnectionManager {
     public void startViper(){
         try {
             String jsonData = loadJSONFromAsset(mContext);
-
             if (!TextUtils.isEmpty(jsonData)) {
 
+//                JSONObject jsonObject = new JSONObject(jsonData);
 
-                JSONObject jsonObject = new JSONObject(jsonData);
-
-                String AUTH_USER_NAME = jsonObject.optString("AUTH_USER_NAME");
+/*                String AUTH_USER_NAME = jsonObject.optString("AUTH_USER_NAME");
                 String AUTH_PASSWORD = jsonObject.optString("AUTH_PASSWORD");
                 String APP_DOWNLOAD_LINK = jsonObject.optString("APP_DOWNLOAD_LINK");
                 String GIFT_DONATE_LINK = jsonObject.optString("GIFT_DONATE_LINK");
+                String PARSE_APP_ID = jsonObject.optString("PARSE_APP_ID");
+                String PARSE_URL = jsonObject.optString("PARSE_URL");*/
+
+                String AUTH_USER_NAME = BuildConfig.AUTH_USER_NAME;
+                String AUTH_PASSWORD = BuildConfig.AUTH_PASSWORD;
+                String FILE_REPO_LINK = BuildConfig.FILE_REPO_LINK;
+                String PARSE_APP_ID = BuildConfig.PARSE_APP_ID;
+                String PARSE_URL = BuildConfig.PARSE_URL;
+
+//                String GIFT_DONATE_LINK = jsonObject.optString("GIFT_DONATE_LINK");
 
                 viperClient = ViperClient.on(mContext, APP_NAME, "com.w3engineers.ext.viper", NETWORK_PREFIX, SharedPref.read(Constant.KEY_USER_NAME),
                         SharedPref.read(Constant.PreferenceKeys.ADDRESS), SharedPref.read(Constant.PreferenceKeys.PUBLIC_KEY), 1, System.currentTimeMillis(), true)
-                        .setConfig(AUTH_USER_NAME, AUTH_PASSWORD, APP_DOWNLOAD_LINK, GIFT_DONATE_LINK);
+                        .setConfig(AUTH_USER_NAME, AUTH_PASSWORD, FILE_REPO_LINK/*, GIFT_DONATE_LINK*/, PARSE_URL, PARSE_APP_ID);
 
             }
 
-        } catch (JSONException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }

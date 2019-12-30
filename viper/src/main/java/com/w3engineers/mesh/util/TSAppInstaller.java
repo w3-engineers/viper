@@ -12,9 +12,7 @@ import android.support.v4.content.FileProvider;
 import android.util.Log;
 import android.util.Pair;
 import android.view.LayoutInflater;
-import android.widget.Toast;
 
-import com.w3engineers.ext.strom.App;
 import com.w3engineers.ext.strom.util.helper.Toaster;
 import com.w3engineers.mesh.R;
 import com.w3engineers.mesh.databinding.DialogServiceAppInstallProgressBinding;
@@ -143,8 +141,7 @@ public class TSAppInstaller {
 
                 Intent intent;
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                    String packageName = "com.w3engineers.unicef.telemesh.provider";
-//                    packageName = "com.w3engineers.ext.viper.provider";
+                    String packageName = context.getPackageName() + ".provider";
                     Uri apkUri = FileProvider.getUriForFile(context,  packageName, destinationFile);
                     intent = new Intent(Intent.ACTION_INSTALL_PACKAGE);
                     Log.d("InAppUpdateTest", "app uri: " + apkUri.getPath());

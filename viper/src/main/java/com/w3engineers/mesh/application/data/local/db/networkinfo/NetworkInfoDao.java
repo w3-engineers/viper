@@ -22,7 +22,7 @@ public interface NetworkInfoDao {
     @Query("SELECT * FROM NetworkInfo")
     Flowable<List<NetworkInfo>> getAllNetworkInfo();
 
-    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     void insertAll(NetworkInfo... networkInfos);
 
     @Delete

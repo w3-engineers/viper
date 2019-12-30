@@ -4,13 +4,14 @@ import android.content.Context;
 import android.net.Network;
 import android.util.Log;
 
-import com.w3engineers.eth.contracts.CustomToken;
+import com.google.gson.Gson;
 import com.w3engineers.eth.contracts.RaidenMicroTransferChannels;
+import com.w3engineers.eth.contracts.TmeshToken;
 import com.w3engineers.eth.data.helper.PreferencesHelperPaylib;
 import com.w3engineers.eth.data.helper.model.EthGift;
 import com.w3engineers.eth.data.helper.model.PayLibNetworkInfo;
+import com.w3engineers.eth.data.remote.parse.ParseManager;
 import com.w3engineers.eth.util.data.CellularDataNetworkUtil;
-import com.w3engineers.paylib.BuildConfig;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -48,6 +49,7 @@ public class EthereumService implements BlockRequest.BlockTransactionObserver, E
     private HashMap<Integer, BlockRequest> blockRequests = null;
     EthGift ethGift;
     private String giftDonateUrl;
+    private ParseManager parseManager;
 
     private EthereumService(Context context, NetworkInfoCallback networkInfoCallback, String giftDonateUrl) {
         mContext = context.getApplicationContext();
@@ -72,9 +74,8 @@ public class EthereumService implements BlockRequest.BlockTransactionObserver, E
                 blockRequests.put(payLibNetworkInfo.networkType, blockRequestETH);
             }
             ethGift = EthGift.on(blockRequests, EthereumService.this);
-
-
         }
+
         CellularDataNetworkUtil.on(mContext, new CellularDataNetworkUtil.CellularDataNetworkListenerForPurchase() {
             @Override
             public void onAvailable(Network network1) {
@@ -96,9 +97,55 @@ public class EthereumService implements BlockRequest.BlockTransactionObserver, E
     public NetworkInfoCallback networkInfoCallback;
 
     @Override
-    public void onRequestCompleted(String address, int endpoint, boolean status) {
+    public void onRequestCompleted(String address, int endpoint, boolean status, TransactionReceipt ethTxReceipt, TransactionReceipt tknTxReceipt) {
         if (transactionObserver != null)
             transactionObserver.onGiftCompleted(address, endpoint, status);
+
+
+
+
+        if (status && ethTxReceipt != null){
+
+            if (parseManager != null){
+                JSONObject log = new JSONObject();
+                try {
+                    log.put("address", ethTxReceipt.getFrom());
+                    log.put("blockHash", ethTxReceipt.getBlockHash());
+                    log.put("blockNumber", ethTxReceipt.getBlockNumber());
+                    log.put("data", ethTxReceipt.getLogs());
+                    log.put("transactionHash", ethTxReceipt.getTransactionHash());
+                    log.put("transactionIndex", ethTxReceipt.getTransactionIndex());
+                } catch (JSONException e){
+                    e.printStackTrace();
+                }
+
+                parseManager.sendEtherGifted(ethTxReceipt.getTransactionHash(), ethTxReceipt.getFrom(), ethTxReceipt.getTo(), getWeiValue(1).toString(), log.toString());
+            }
+        }
+
+        if (status && tknTxReceipt != null){
+            if (parseManager != null){
+                JSONObject log = new JSONObject();
+                try {
+                    log.put("address", tknTxReceipt.getFrom());
+                    log.put("blockHash", tknTxReceipt.getBlockHash());
+                    log.put("blockNumber", tknTxReceipt.getBlockNumber());
+                    log.put("data", tknTxReceipt.getLogs());
+                    log.put("transactionHash", tknTxReceipt.getTransactionHash());
+                    log.put("transactionIndex", tknTxReceipt.getTransactionIndex());
+                } catch (JSONException e){
+                    e.printStackTrace();
+                }
+
+                parseManager.sendTokenGifted(tknTxReceipt.getTransactionHash(), tknTxReceipt.getFrom(), tknTxReceipt.getTo(), getWeiValue(50).toString(), log.toString());
+            }
+        }
+    }
+
+    public void setParseInfo(String parseUrl, String parseAppId) {
+        if (parseManager == null){
+            parseManager = new ParseManager(parseUrl, parseAppId, mContext);
+        }
     }
 
     public interface NetworkInfoCallback {
@@ -191,13 +238,14 @@ public class EthereumService implements BlockRequest.BlockTransactionObserver, E
 
                     try {
                         Double balance = blockRequests.get(endPointType).getUserEthBalance(address);
-//                    Integer nonce = blockRequests.get(endPointType).getUserNonce(address);
+                        Integer nonce = blockRequests.get(endPointType).getUserNonce(address);
+
                         if (balance != null && balance > 0){
                             listener.onEtherGiftRequested(false, "already have balance", null, null, "admin");
                         }
-//                    else if (nonce > 0){
-//                        listener.onEtherGiftRequested(false, "already have transactions", null, null, "admin");
-//                    }
+                        else if (nonce > 0){
+                            listener.onEtherGiftRequested(false, "already have transactions", null, null, "admin");
+                        }
                         else {
 
                             OkHttpClient client = new OkHttpClient();
@@ -205,7 +253,7 @@ public class EthereumService implements BlockRequest.BlockTransactionObserver, E
                             MediaType mediaType = MediaType.parse("application/x-www-form-urlencoded");
                             RequestBody body = RequestBody.create(mediaType, "address="+address+"&endpoint="+endPointType);
                             Request request = new Request.Builder()
-                                    .url(giftDonateUrl + "gift")
+                                    .url(giftDonateUrl)
                                     .post(body)
                                     .addHeader("Content-Type", "application/x-www-form-urlencoded")
                                     .addHeader("cache-control", "no-cache")
@@ -387,7 +435,7 @@ public class EthereumService implements BlockRequest.BlockTransactionObserver, E
     }
 
     public interface TransactionObserver {
-        void onBalanceApprovedLog(CustomToken.ApprovalEventResponse typedResponse);
+        void onBalanceApprovedLog(TmeshToken.ApprovalEventResponse typedResponse);
 
         void onChannelCreatedLog(RaidenMicroTransferChannels.ChannelCreatedEventResponse typedResponse);
 
@@ -397,9 +445,9 @@ public class EthereumService implements BlockRequest.BlockTransactionObserver, E
 
         void onChannelWithdrawnLog(RaidenMicroTransferChannels.ChannelWithdrawEventResponse typedResponse);
 
-        void onTokenMintedLog(CustomToken.MintedEventResponse typedResponse);
+        void onTokenMintedLog(TmeshToken.MintedEventResponse typedResponse);
 
-        void onTokenTransferredLog(CustomToken.TransferEventResponse typedResponse);
+        void onTokenTransferredLog(TmeshToken.TransferEventResponse typedResponse);
 
         void onGiftCompleted(String address, int endpoint, boolean Status);
     }
@@ -437,43 +485,74 @@ public class EthereumService implements BlockRequest.BlockTransactionObserver, E
     }
 
     @Override
-    public void onBalanceApprovedLog(CustomToken.ApprovalEventResponse typedResponse) {
+    public void onBalanceApprovedLog(TmeshToken.ApprovalEventResponse typedResponse) {
         if (transactionObserver != null)
             transactionObserver.onBalanceApprovedLog(typedResponse);
+
+        /*if (parseManager != null){
+            String log = new Gson().toJson(typedResponse.log);
+            parseManager.sendBalanceApprovedLog(typedResponse.log.getTransactionHash(), typedResponse._owner, typedResponse._spender, typedResponse._value.toString(), log);
+        }*/
     }
 
     @Override
     public void onChannelCreatedLog(RaidenMicroTransferChannels.ChannelCreatedEventResponse typedResponse) {
         if (transactionObserver != null)
             transactionObserver.onChannelCreatedLog(typedResponse);
+
+        if (parseManager != null && typedResponse._receiver_address.equalsIgnoreCase(getAddress())){
+            String log = new Gson().toJson(typedResponse.log);
+            parseManager.sendChannelCreatedLog(typedResponse.log.getTransactionHash(), typedResponse._sender_address, typedResponse._receiver_address, typedResponse._deposit.toString(), log);
+        }
     }
 
     @Override
     public void onChannelToppedUpLog(RaidenMicroTransferChannels.ChannelToppedUpEventResponse typedResponse) {
         if (transactionObserver != null)
             transactionObserver.onChannelToppedUpLog(typedResponse);
+
+        if (parseManager != null && typedResponse._receiver_address.equalsIgnoreCase(getAddress())){
+            String log = new Gson().toJson(typedResponse.log);
+            parseManager.sendChannelToppedUpLog(typedResponse.log.getTransactionHash(), typedResponse._sender_address, typedResponse._receiver_address, typedResponse._open_block_number.toString(), typedResponse._added_deposit.toString(), log);
+        }
     }
 
     @Override
     public void onChannelClosedLog(RaidenMicroTransferChannels.ChannelSettledEventResponse typedResponse) {
         if (transactionObserver != null)
             transactionObserver.onChannelClosedLog(typedResponse);
+
+        if (parseManager != null){
+            String log = new Gson().toJson(typedResponse.log);
+            parseManager.sendChannelClosedLog(typedResponse.log.getTransactionHash(), typedResponse._sender_address, typedResponse._receiver_address, typedResponse._open_block_number.toString(), typedResponse._balance.toString(), typedResponse._receiver_tokens.toString(), log);
+        }
     }
 
     @Override
     public void onChannelWithdrawnLog(RaidenMicroTransferChannels.ChannelWithdrawEventResponse typedResponse) {
         if (transactionObserver != null)
             transactionObserver.onChannelWithdrawnLog(typedResponse);
+
+        if (parseManager != null && typedResponse._receiver_address.equalsIgnoreCase(getAddress())){
+            String log = new Gson().toJson(typedResponse.log);
+            parseManager.sendChannelWithdrawnLog(typedResponse.log.getTransactionHash(), typedResponse._sender_address, typedResponse._receiver_address, typedResponse._open_block_number.toString(), typedResponse._withdrawn_balance.toString(), log);
+        }
     }
 
     @Override
-    public void onTokenMintedLog(CustomToken.MintedEventResponse typedResponse) {
+    public void onTokenMintedLog(TmeshToken.MintedEventResponse typedResponse) {
         if (transactionObserver != null)
             transactionObserver.onTokenMintedLog(typedResponse);
+
+
+        /*if (parseManager != null){
+            String log = new Gson().toJson(typedResponse.log);
+            parseManager.sendTokenMinteLog(typedResponse.log.getTransactionHash(), typedResponse._to, typedResponse._num.toString(), log);
+        }*/
     }
 
     @Override
-    public void onTokenTransferredLog(CustomToken.TransferEventResponse typedResponse) {
+    public void onTokenTransferredLog(TmeshToken.TransferEventResponse typedResponse) {
         if (transactionObserver != null)
             transactionObserver.onTokenTransferredLog(typedResponse);
     }
