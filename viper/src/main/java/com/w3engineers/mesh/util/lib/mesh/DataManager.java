@@ -774,7 +774,6 @@ public class DataManager {
     private void onServiceUpdateNeeded(boolean isNeeded){
         ServiceUpdate serviceUpdate = new ServiceUpdate();
         serviceUpdate.isNeeded = isNeeded;
-
         AppDataObserver.on().sendObserverData(serviceUpdate);
     }
 

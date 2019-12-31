@@ -156,7 +156,7 @@ public class ConnectionManager {
 
         AppDataObserver.on().startObserver(ApiEvent.SERVICE_UPDATE, event -> {
             ServiceUpdate serviceUpdate = (ServiceUpdate) event;
-            MeshLog.e("need_update" + "Service update needed:" + serviceUpdate.isNeeded);
+            MeshLog.e("Service update needed:" + serviceUpdate.isNeeded);
         });
 
 
