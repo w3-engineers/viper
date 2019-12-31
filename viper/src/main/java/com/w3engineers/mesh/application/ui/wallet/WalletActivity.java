@@ -95,6 +95,8 @@ public class WalletActivity extends TelemeshBaseActivity implements WalletManage
 
         setCurrencyAndTokenObserver();
 
+        initUI();
+
         dialog = new ProgressDialog(WalletActivity.this);
 
         if (dataPlanManager.getDataPlanRole() == DataPlanConstants.USER_ROLE.DATA_BUYER) {
@@ -123,6 +125,17 @@ public class WalletActivity extends TelemeshBaseActivity implements WalletManage
         });
 
         //  mBinding.currency.setOnClickListener(this);
+    }
+
+    private void initUI() {
+        if (walletManager.isWalletRmeshAvailable()) {
+            mBinding.rmeshPointInfo.setVisibility(View.VISIBLE);
+            float rmeshValue = walletManager.getRmeshPerPoint() * walletManager.maxPointForRmesh();
+            String data = String.format(getResources().getString(R.string.token_balance), "" + rmeshValue, "" + walletManager.maxPointForRmesh());
+            mBinding.rmeshPointInfo.setText(data);
+        } else {
+            mBinding.rmeshPointInfo.setVisibility(View.GONE);
+        }
     }
 
 

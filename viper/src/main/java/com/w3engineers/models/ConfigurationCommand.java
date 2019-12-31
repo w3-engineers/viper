@@ -15,17 +15,17 @@ public class ConfigurationCommand implements Parcelable {
     private String configVersionName;
     @SerializedName("config_version_code")
     @Expose
-    private Integer configVersionCode;
+    private int configVersionCode;
     @SerializedName("token_per_mb")
     @Expose
-    private Float tokenPerMb;
+    private float tokenPerMb;
     @SerializedName("default_network_type")
     @Expose
-    private Integer defaultNetworkType;
+    private int defaultNetworkType;
 
     @SerializedName("token_guide_version")
     @Expose
-    private Integer tokenGuideVersion;
+    private int tokenGuideVersion;
 
     @SerializedName("GIFT_DONATE_LINK")
     @Expose
@@ -39,36 +39,41 @@ public class ConfigurationCommand implements Parcelable {
     @Expose
     private float rmeshPerToken;
 
+    @SerializedName("wallet_rmesh_available")
+    @Expose
+    private boolean walletRmeshAvailable;
+
+    @SerializedName("rmesh_info_text")
+    @Expose
+    private String rmeshInfoText;
+
+    @SerializedName("rmesh_owner_address")
+    @Expose
+    private String rmeshOwnerAddress;
+
+    @SerializedName("main_net_network_type")
+    @Expose
+    private int mainNetNetworkType;
+
     @SerializedName("network")
     @Expose
     private List<Network> network = null;
 
     protected ConfigurationCommand(Parcel in) {
         configVersionName = in.readString();
-        if (in.readByte() == 0) {
-            configVersionCode = null;
-        } else {
-            configVersionCode = in.readInt();
-        }
-        if (in.readByte() == 0) {
-            tokenPerMb = null;
-        } else {
-            tokenPerMb = in.readFloat();
-        }
-        if (in.readByte() == 0) {
-            defaultNetworkType = null;
-        } else {
-            defaultNetworkType = in.readInt();
-        }
-        if (in.readByte() == 0) {
-            tokenGuideVersion = null;
-        } else {
-            tokenGuideVersion = in.readInt();
-        }
+        configVersionCode = in.readInt();
+        tokenPerMb = in.readFloat();
+        defaultNetworkType = in.readInt();
+        tokenGuideVersion = in.readInt();
 
         giftDonateLink = in.readString();
         maxPointForRmesh = in.readLong();
         rmeshPerToken = in.readFloat();
+
+        walletRmeshAvailable = in.readByte() != 0;
+        rmeshInfoText = in.readString();
+        rmeshOwnerAddress = in.readString();
+        mainNetNetworkType = in.readInt();
 
         network = in.createTypedArrayList(Network.CREATOR);
     }
@@ -157,6 +162,38 @@ public class ConfigurationCommand implements Parcelable {
         this.rmeshPerToken = rmeshPerToken;
     }
 
+    public boolean isWalletRmeshAvailable() {
+        return walletRmeshAvailable;
+    }
+
+    public void setWalletRmeshAvailable(boolean walletRmeshAvailable) {
+        this.walletRmeshAvailable = walletRmeshAvailable;
+    }
+
+    public String getRmeshInfoText() {
+        return rmeshInfoText;
+    }
+
+    public void setRmeshInfoText(String rmeshInfoText) {
+        this.rmeshInfoText = rmeshInfoText;
+    }
+
+    public String getRmeshOwnerAddress() {
+        return rmeshOwnerAddress;
+    }
+
+    public void setRmeshOwnerAddress(String rmeshOwnerAddress) {
+        this.rmeshOwnerAddress = rmeshOwnerAddress;
+    }
+
+    public int getMainNetNetworkType() {
+        return mainNetNetworkType;
+    }
+
+    public void setMainNetNetworkType(int mainNetNetworkType) {
+        this.mainNetNetworkType = mainNetNetworkType;
+    }
+
     @Override
     public int describeContents() {
         return 0;
@@ -165,34 +202,19 @@ public class ConfigurationCommand implements Parcelable {
     @Override
     public void writeToParcel(Parcel parcel, int i) {
         parcel.writeString(configVersionName);
-        if (configVersionCode == null) {
-            parcel.writeByte((byte) 0);
-        } else {
-            parcel.writeByte((byte) 1);
-            parcel.writeInt(configVersionCode);
-        }
-        if (tokenPerMb == null) {
-            parcel.writeByte((byte) 0);
-        } else {
-            parcel.writeByte((byte) 1);
-            parcel.writeFloat(tokenPerMb);
-        }
-        if (defaultNetworkType == null) {
-            parcel.writeByte((byte) 0);
-        } else {
-            parcel.writeByte((byte) 1);
-            parcel.writeInt(defaultNetworkType);
-        }
-        if (tokenGuideVersion == null) {
-            parcel.writeByte((byte) 0);
-        } else {
-            parcel.writeByte((byte) 1);
-            parcel.writeInt(tokenGuideVersion);
-        }
+        parcel.writeInt(configVersionCode);
+        parcel.writeFloat(tokenPerMb);
+        parcel.writeInt(defaultNetworkType);
+        parcel.writeInt(tokenGuideVersion);
 
         parcel.writeString(giftDonateLink);
         parcel.writeLong(maxPointForRmesh);
         parcel.writeFloat(rmeshPerToken);
+
+        parcel.writeByte((byte) (walletRmeshAvailable ? 1 : 0));
+        parcel.writeString(rmeshInfoText);
+        parcel.writeString(rmeshOwnerAddress);
+        parcel.writeInt(mainNetNetworkType);
 
         parcel.writeTypedList(network);
     }
