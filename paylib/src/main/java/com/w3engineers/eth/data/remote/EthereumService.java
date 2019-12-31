@@ -95,6 +95,10 @@ public class EthereumService implements BlockRequest.BlockTransactionObserver, E
         }).initMobileDataNetworkRequest();
     }
 
+    public void setGIftDonateUrl(String giftUrl) {
+        this.giftDonateUrl = giftUrl;
+    }
+
     public NetworkInfoCallback networkInfoCallback;
 
     @Override

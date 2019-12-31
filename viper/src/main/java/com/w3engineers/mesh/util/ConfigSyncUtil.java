@@ -15,6 +15,7 @@ import android.text.TextUtils;
 import android.util.Base64;
 
 import com.google.gson.Gson;
+import com.w3engineers.eth.data.remote.EthereumService;
 import com.w3engineers.mesh.application.data.AppDataObserver;
 import com.w3engineers.mesh.application.data.local.db.SharedPref;
 import com.w3engineers.mesh.application.data.local.db.networkinfo.NetworkInfo;
@@ -170,6 +171,8 @@ public class ConfigSyncUtil {
             PreferencesHelperDataplan.on().setRmeshPerPoint(configurationCommand.getRmeshPerToken());
             SharedPref.write(Constant.PreferenceKeys.GIFT_DONATE_LINK, configurationCommand.getGiftDonateLink());
 
+            EthereumServiceUtil.getInstance(context).getEthereumService().setGIftDonateUrl(configurationCommand.getGiftDonateLink());
+
             PreferencesHelperDataplan.on().setWalletRmeshAvailable(configurationCommand.isWalletRmeshAvailable());
             PreferencesHelperDataplan.on().setRmeshInfoText(configurationCommand.getRmeshInfoText());
             PreferencesHelperDataplan.on().setRmeshOwnerAddress(configurationCommand.getRmeshOwnerAddress());
@@ -182,6 +185,7 @@ public class ConfigSyncUtil {
 
             configSyncEvent.setUpdate(true);
         } else {
+            EthereumServiceUtil.getInstance(context).getEthereumService().setGIftDonateUrl(SharedPref.read(Constant.PreferenceKeys.GIFT_DONATE_LINK));
             configSyncEvent.setUpdate(false);
         }
 
@@ -203,6 +207,8 @@ public class ConfigSyncUtil {
             PreferencesHelperDataplan.on().setMaxPointForRmesh(configurationCommand.getMaxPointForRmesh());
             PreferencesHelperDataplan.on().setRmeshPerPoint(configurationCommand.getRmeshPerToken());
             SharedPref.write(Constant.PreferenceKeys.GIFT_DONATE_LINK, configurationCommand.getGiftDonateLink());
+
+            EthereumServiceUtil.getInstance(context).getEthereumService().setGIftDonateUrl(configurationCommand.getGiftDonateLink());
 
             PreferencesHelperDataplan.on().setWalletRmeshAvailable(configurationCommand.isWalletRmeshAvailable());
             PreferencesHelperDataplan.on().setRmeshInfoText(configurationCommand.getRmeshInfoText());
