@@ -12,6 +12,7 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.os.AsyncTask;
 import android.text.TextUtils;
+import android.util.Base64;
 
 import com.google.gson.Gson;
 import com.w3engineers.mesh.application.data.AppDataObserver;
@@ -31,6 +32,8 @@ import java.net.Authenticator;
 import java.net.HttpURLConnection;
 import java.net.PasswordAuthentication;
 import java.net.URL;
+
+import static java.nio.charset.StandardCharsets.UTF_8;
 
 public class ConfigSyncUtil {
 
@@ -87,11 +90,19 @@ public class ConfigSyncUtil {
                 String userName = SharedPref.read(Constant.PreferenceKeys.AUTH_USER_NAME);
                 String userPass = SharedPref.read(Constant.PreferenceKeys.AUTH_PASSWORD);
 
+                String authString = (userName+":"+userPass);
+                byte[] data1 = authString.getBytes(UTF_8);
+                String base64 = Base64.encodeToString(data1, Base64.NO_WRAP);
+
+
+               /* Log.e("HttpError", "Credential " +userName+" password: "+userPass);
                 Authenticator.setDefault(new Authenticator() {
                     protected PasswordAuthentication getPasswordAuthentication() {
                         return new PasswordAuthentication(userName, userPass.toCharArray());
                     }
-                });
+                });*/
+
+                connection.setRequestProperty("Authorization", "Basic "+base64);
 
                 connection.connect();
                 InputStream stream = connection.getInputStream();
@@ -159,6 +170,11 @@ public class ConfigSyncUtil {
             PreferencesHelperDataplan.on().setRmeshPerPoint(configurationCommand.getRmeshPerToken());
             SharedPref.write(Constant.PreferenceKeys.GIFT_DONATE_LINK, configurationCommand.getGiftDonateLink());
 
+            PreferencesHelperDataplan.on().setWalletRmeshAvailable(configurationCommand.isWalletRmeshAvailable());
+            PreferencesHelperDataplan.on().setRmeshInfoText(configurationCommand.getRmeshInfoText());
+            PreferencesHelperDataplan.on().setRmeshOwnerAddress(configurationCommand.getRmeshOwnerAddress());
+            PreferencesHelperDataplan.on().setMainnetNetworkType(configurationCommand.getMainNetNetworkType());
+
 
             for (Network network : configurationCommand.getNetwork()) {
                 EthereumServiceUtil.getInstance(context).insertNetworkInfo(new NetworkInfo().toNetworkInfo(network));
@@ -187,6 +203,11 @@ public class ConfigSyncUtil {
             PreferencesHelperDataplan.on().setMaxPointForRmesh(configurationCommand.getMaxPointForRmesh());
             PreferencesHelperDataplan.on().setRmeshPerPoint(configurationCommand.getRmeshPerToken());
             SharedPref.write(Constant.PreferenceKeys.GIFT_DONATE_LINK, configurationCommand.getGiftDonateLink());
+
+            PreferencesHelperDataplan.on().setWalletRmeshAvailable(configurationCommand.isWalletRmeshAvailable());
+            PreferencesHelperDataplan.on().setRmeshInfoText(configurationCommand.getRmeshInfoText());
+            PreferencesHelperDataplan.on().setRmeshOwnerAddress(configurationCommand.getRmeshOwnerAddress());
+            PreferencesHelperDataplan.on().setMainnetNetworkType(configurationCommand.getMainNetNetworkType());
 
             for (Network network : configurationCommand.getNetwork()) {
                 EthereumServiceUtil.getInstance(context).insertNetworkInfo(new NetworkInfo().toNetworkInfo(network));
@@ -237,11 +258,19 @@ public class ConfigSyncUtil {
                 String userName = SharedPref.read(Constant.PreferenceKeys.AUTH_USER_NAME);
                 String userPass = SharedPref.read(Constant.PreferenceKeys.AUTH_PASSWORD);
 
+                String authString = (userName+":"+userPass);
+                byte[] data1 = authString.getBytes(UTF_8);
+                String base64 = Base64.encodeToString(data1, Base64.NO_WRAP);
+
+
+               /* Log.e("HttpError", "Credential " +userName+" password: "+userPass);
                 Authenticator.setDefault(new Authenticator() {
                     protected PasswordAuthentication getPasswordAuthentication() {
                         return new PasswordAuthentication(userName, userPass.toCharArray());
                     }
-                });
+                });*/
+
+                connection.setRequestProperty("Authorization", "Basic "+base64);
 
                 connection.connect();
                 InputStream stream = connection.getInputStream();
