@@ -361,7 +361,7 @@ public class DataManager {
 
         @Override
         public void onReceiveLog(String text) throws RemoteException {
-            if (BuildConfig.DEBUG){
+            if (BuildConfig.DEBUG) {
                 Intent intent = new Intent("com.w3engineers.meshservice.DEBUG_MESSAGE");
                 intent.putExtra("value", text);
                 MeshApp.getContext().sendBroadcast(intent);
@@ -762,34 +762,34 @@ public class DataManager {
 
 
     public void writeLogIntoTxtFile(String text, boolean isAppend) {
-            try {
-                String sdCard = Constant.Directory.PARENT_DIRECTORY + Constant.Directory.MESH_LOG;
-                File directory = new File(sdCard);
-                if (!directory.exists()) {
-                    directory.mkdirs();
-                }
-                if (Constant.CURRENT_LOG_FILE_NAME == null) {
-                    Constant.CURRENT_LOG_FILE_NAME = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss", Locale.getDefault()).format(new Date()) + ".txt";
-                }
-                File file = new File(directory, Constant.CURRENT_LOG_FILE_NAME);
-                if (!file.exists()) {
-                    file.createNewFile();
-                }
-                FileOutputStream fOut = new FileOutputStream(file, isAppend);
-
-                OutputStreamWriter osw = new
-                        OutputStreamWriter(fOut);
-
-                osw.write("\n" + text);
-                //  osw.append(text)
-                osw.flush();
-                osw.close();
-
-            } catch (FileNotFoundException e) {
-                e.printStackTrace();
-            } catch (IOException ioe) {
-                ioe.printStackTrace();
+        try {
+            String sdCard = Constant.Directory.PARENT_DIRECTORY + Constant.Directory.MESH_LOG;
+            File directory = new File(sdCard);
+            if (!directory.exists()) {
+                directory.mkdirs();
             }
+            if (Constant.CURRENT_LOG_FILE_NAME == null) {
+                Constant.CURRENT_LOG_FILE_NAME = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss", Locale.getDefault()).format(new Date()) + ".txt";
+            }
+            File file = new File(directory, Constant.CURRENT_LOG_FILE_NAME);
+            if (!file.exists()) {
+                file.createNewFile();
+            }
+            FileOutputStream fOut = new FileOutputStream(file, isAppend);
+
+            OutputStreamWriter osw = new
+                    OutputStreamWriter(fOut);
+
+            osw.write("\n" + text);
+            //  osw.append(text)
+            osw.flush();
+            osw.close();
+
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException ioe) {
+            ioe.printStackTrace();
+        }
 
     }
 }
