@@ -28,6 +28,11 @@ public class PreferencesHelperDataplan {
     private static final String PER_MB_TKN_VALUE = "PER_MB_TKN_VALUE";
     private static final String MAX_POINT_FOR_RMESH = "MAX_POINT_FOR_RMESH";
     private static final String RMESH_PER_POINT = "RMESH_PER_POINT";
+
+    private static final String WALLET_RMESH_AVAILABLE = "WALLET_RMESH_AVAILABLE";
+    private static final String RMESH_INFO_TEXT = "RMESH_INFO_TEXT";
+    private static final String RMESH_OWNER_ADDRESS = "RMESH_OWNER_ADDRESS";
+    private static final String MAINNET_NETWORK_TYPE = "MAINNET_NETWORK_TYPE";
 //    private static final String CURRENCY_MODE = "currency_mode";
 
 
@@ -198,5 +203,37 @@ public class PreferencesHelperDataplan {
 
     public float getRmeshPerPoint() {
         return Float.valueOf(SharedPref.read(RMESH_PER_POINT, "" + PurchaseConstants.RMESH_PER_POINT));
+    }
+
+    public void setWalletRmeshAvailable(boolean isEnable) {
+        SharedPref.write(WALLET_RMESH_AVAILABLE, isEnable);
+    }
+
+    public boolean getWalletRmeshAvailable() {
+        return SharedPref.readBoolean(WALLET_RMESH_AVAILABLE, false);
+    }
+
+    public void setRmeshInfoText(String infoText) {
+        SharedPref.write(RMESH_INFO_TEXT, infoText);
+    }
+
+    public String getRmeshInfoText() {
+        return SharedPref.read(RMESH_INFO_TEXT);
+    }
+
+    public void setRmeshOwnerAddress(String ownerAddress) {
+        SharedPref.write(RMESH_OWNER_ADDRESS, ownerAddress);
+    }
+
+    public String getRmeshOwnerAddress() {
+        return SharedPref.read(RMESH_OWNER_ADDRESS);
+    }
+
+    public void setMainnetNetworkType(int value) {
+        SharedPref.write(MAINNET_NETWORK_TYPE, value);
+    }
+
+    public int getMainnetNetworkType() {
+        return SharedPref.readInt(MAINNET_NETWORK_TYPE);
     }
 }

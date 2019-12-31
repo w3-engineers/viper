@@ -13,6 +13,7 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.net.Uri;
 import android.os.IBinder;
 import android.os.RemoteException;
 import android.text.TextUtils;
@@ -36,6 +37,7 @@ import com.w3engineers.mesh.application.data.model.PayMessageAck;
 import com.w3engineers.mesh.application.data.model.PeerAdd;
 import com.w3engineers.mesh.application.data.model.PeerRemoved;
 import com.w3engineers.mesh.application.data.model.SellerRemoved;
+import com.w3engineers.mesh.application.data.model.ServiceUpdate;
 import com.w3engineers.mesh.application.data.model.TransportInit;
 import com.w3engineers.mesh.application.data.model.UserInfoEvent;
 import com.w3engineers.mesh.application.data.remote.model.BuyerPendingMessage;
@@ -187,7 +189,8 @@ public class DataManager {
                 new DialogUtil.DialogButtonListener() {
                     @Override
                     public void onClickPositive() {
-                        checkConnectionAndStartDownload();
+//                        checkConnectionAndStartDownload();
+                        gotoPlayStore();
                         isAlreadyToPlayStore = true;
                     }
 
@@ -201,6 +204,16 @@ public class DataManager {
                         isAlreadyToPlayStore = false;
                     }
                 });
+    }
+
+    private void gotoPlayStore() {
+        final String appPackageName = "com.w3engineers.meshservice";
+        //final String appPackageName = "com.w3engineers.banglabrowser";
+        try {
+            mContext.startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=" + appPackageName)));
+        } catch (android.content.ActivityNotFoundException anfe) {
+            mContext.startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://play.google.com/store/apps/details?id=" + appPackageName)));
+        }
     }
 
     private void checkConnectionAndStartDownload() {
@@ -349,13 +362,13 @@ public class DataManager {
 
         @Override
         public void onReceiveLog(String text) throws RemoteException {
-            if (BuildConfig.DEBUG){
+            if (BuildConfig.DEBUG) {
                 Intent intent = new Intent("com.w3engineers.meshservice.DEBUG_MESSAGE");
                 intent.putExtra("value", text);
                 MeshApp.getContext().sendBroadcast(intent);
-
-                DataManager.this.writeLogIntoTxtFile(text, true);
             }
+
+            DataManager.this.writeLogIntoTxtFile(text, true);
         }
 
         @Override
@@ -391,6 +404,11 @@ public class DataManager {
         @Override
         public void onProbableSellerDisconnected(String sellerId) throws RemoteException {
             DataManager.this.onProbableSellerDisconnected(sellerId);
+        }
+
+        @Override
+        public void onServiceUpdateNeeded(boolean isNeeded) throws RemoteException {
+          DataManager.this.onServiceUpdateNeeded(isNeeded);
         }
     };
 
@@ -748,36 +766,42 @@ public class DataManager {
         AppDataObserver.on().sendObserverData(sellerRemoved);
     }
 
+    private void onServiceUpdateNeeded(boolean isNeeded){
+        ServiceUpdate serviceUpdate = new ServiceUpdate();
+        serviceUpdate.isNeeded = isNeeded;
+        AppDataObserver.on().sendObserverData(serviceUpdate);
+    }
+
 
     public void writeLogIntoTxtFile(String text, boolean isAppend) {
-            try {
-                String sdCard = Constant.Directory.PARENT_DIRECTORY + Constant.Directory.MESH_LOG;
-                File directory = new File(sdCard);
-                if (!directory.exists()) {
-                    directory.mkdirs();
-                }
-                if (Constant.CURRENT_LOG_FILE_NAME == null) {
-                    Constant.CURRENT_LOG_FILE_NAME = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss", Locale.getDefault()).format(new Date()) + ".txt";
-                }
-                File file = new File(directory, Constant.CURRENT_LOG_FILE_NAME);
-                if (!file.exists()) {
-                    file.createNewFile();
-                }
-                FileOutputStream fOut = new FileOutputStream(file, isAppend);
-
-                OutputStreamWriter osw = new
-                        OutputStreamWriter(fOut);
-
-                osw.write("\n" + text);
-                //  osw.append(text)
-                osw.flush();
-                osw.close();
-
-            } catch (FileNotFoundException e) {
-                e.printStackTrace();
-            } catch (IOException ioe) {
-                ioe.printStackTrace();
+        try {
+            String sdCard = Constant.Directory.PARENT_DIRECTORY + Constant.Directory.MESH_LOG;
+            File directory = new File(sdCard);
+            if (!directory.exists()) {
+                directory.mkdirs();
             }
+            if (Constant.CURRENT_LOG_FILE_NAME == null) {
+                Constant.CURRENT_LOG_FILE_NAME = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss", Locale.getDefault()).format(new Date()) + ".txt";
+            }
+            File file = new File(directory, Constant.CURRENT_LOG_FILE_NAME);
+            if (!file.exists()) {
+                file.createNewFile();
+            }
+            FileOutputStream fOut = new FileOutputStream(file, isAppend);
+
+            OutputStreamWriter osw = new
+                    OutputStreamWriter(fOut);
+
+            osw.write("\n" + text);
+            //  osw.append(text)
+            osw.flush();
+            osw.close();
+
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException ioe) {
+            ioe.printStackTrace();
+        }
 
     }
 }

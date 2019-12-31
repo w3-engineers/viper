@@ -412,7 +412,17 @@ public class WalletManager {
         }
     }
 
+    public boolean isWalletRmeshAvailable() {
+        return PreferencesHelperDataplan.on().getWalletRmeshAvailable();
+    }
 
+    public long maxPointForRmesh() {
+        return PreferencesHelperDataplan.on().getMaxPointForRmesh();
+    }
+
+    public float getRmeshPerPoint() {
+        return PreferencesHelperDataplan.on().getRmeshPerPoint();
+    }
 
     private void showProgress(Context activity, boolean isNeeded) {
         if (isNeeded) {
