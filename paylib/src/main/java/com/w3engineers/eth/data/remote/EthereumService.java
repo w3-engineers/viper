@@ -51,6 +51,7 @@ public class EthereumService implements BlockRequest.BlockTransactionObserver, E
     EthGift ethGift;
     private String giftDonateUrl;
     private ParseManager parseManager;
+    private NetworkInfoCallback networkInfoCallback;
 
     private EthereumService(Context context, NetworkInfoCallback networkInfoCallback, String giftDonateUrl) {
         mContext = context.getApplicationContext();
@@ -60,6 +61,8 @@ public class EthereumService implements BlockRequest.BlockTransactionObserver, E
         if (networkInfoCallback == null) {
             throw new NullPointerException("NetworkInfoCallback shouldn't null");
         }
+
+        this.networkInfoCallback = networkInfoCallback;
 
         if (blockRequests == null) {
             blockRequests = new HashMap<>();
@@ -97,9 +100,50 @@ public class EthereumService implements BlockRequest.BlockTransactionObserver, E
 
     public void setGIftDonateUrl(String giftUrl) {
         this.giftDonateUrl = giftUrl;
+
+
+        if (blockRequests == null || blockRequests.isEmpty()) {
+            blockRequests = new HashMap<>();
+
+            List<PayLibNetworkInfo> payLibNetworkInfos = networkInfoCallback.getNetworkInfo();
+
+            for (PayLibNetworkInfo payLibNetworkInfo : payLibNetworkInfos) {
+                BlockRequest blockRequestETH = new BlockRequest(payLibNetworkInfo.tokenAddress,
+                        payLibNetworkInfo.channelAddress,
+                        payLibNetworkInfo.networkUrl, mContext,
+                        payLibNetworkInfo.gasPrice, payLibNetworkInfo.gasLimit, EthereumService.this);
+
+                blockRequests.put(payLibNetworkInfo.networkType, blockRequestETH);
+            }
+            ethGift = EthGift.on(blockRequests, EthereumService.this);
+        }
+
+
+        if (network == null){
+            CellularDataNetworkUtil.on(mContext, new CellularDataNetworkUtil.CellularDataNetworkListenerForPurchase() {
+                @Override
+                public void onAvailable(Network network1) {
+                    network = network1;
+                    Log.i(TAG, "onAvailable: " + network.toString());
+
+                    for (BlockRequest value : blockRequests.values()) {
+                        value.setNetworkInterface(network);
+                    }
+                }
+
+                @Override
+                public void onLost() {
+                    network = null;
+                }
+            }).initMobileDataNetworkRequest();
+        }else {
+            for (BlockRequest value : blockRequests.values()) {
+                value.setNetworkInterface(network);
+            }
+        }
     }
 
-    public NetworkInfoCallback networkInfoCallback;
+
 
     @Override
     public void onRequestCompleted(String address, int endpoint, boolean status, TransactionReceipt ethTxReceipt, TransactionReceipt tknTxReceipt) {
