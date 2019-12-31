@@ -26,22 +26,22 @@ public class MeshLog {
     }
 
     public static void clearLog() {
-        if (BuildConfig.DEBUG){
+        if (BuildConfig.DEBUG) {
             writeText("", false);
         }
     }
 
 
     public static void p(String msg) {
-        if (BuildConfig.DEBUG){
-            String m = addTimeWithType(PAYMENT, msg);
+        String m = addTimeWithType(PAYMENT, msg);
+        if (BuildConfig.DEBUG) {
             e(TAG, m);
-            writeText(m, true);
         }
+        writeText(m, true);
     }
 
     public static void o(String msg) {
-        if (BuildConfig.DEBUG){
+        if (BuildConfig.DEBUG) {
             p(msg);
 //        e(TAG, msg);
 //        writeText(msg, true);
@@ -49,52 +49,53 @@ public class MeshLog {
     }
 
     public static void k(String msg) {
-        if (BuildConfig.DEBUG){
-            String m = addTimeWithType(SPECIAL, msg);
+        String m = addTimeWithType(SPECIAL, msg);
+        if (BuildConfig.DEBUG) {
             e(TAG, m);
-            writeText(m, true);
         }
+        writeText(m, true);
     }
 
     public static void v(String msg) {
-        if (BuildConfig.DEBUG){
-            String m = addTimeWithType(SPECIAL, msg);
+        String m = addTimeWithType(SPECIAL, msg);
+        if (BuildConfig.DEBUG) {
             v(TAG, m);
-            writeText(m, true);
         }
+        writeText(m, true);
     }
 
     public static void mm(String msg) {
-        if (BuildConfig.DEBUG){
-            String m = addTimeWithType(SPECIAL, msg);
+        String m = addTimeWithType(SPECIAL, msg);
+        if (BuildConfig.DEBUG) {
             e(TAG, m);
-            writeText(m, true);
         }
+        writeText(m, true);
     }
 
     public static void i(String msg) {
-        if (BuildConfig.DEBUG){
-            String m = addTimeWithType(INFO, msg);
+        String m = addTimeWithType(INFO, msg);
+        if (BuildConfig.DEBUG) {
             i(TAG, m);
-            writeText(m, true);
         }
+        writeText(m, true);
     }
 
 
     public static void e(String msg) {
-        if (BuildConfig.DEBUG){
-            String m = addTimeWithType(ERROR, msg);
+        String m = addTimeWithType(ERROR, msg);
+        if (BuildConfig.DEBUG) {
             e(TAG, m);
-            writeText(m, true);
         }
+        writeText(m, true);
     }
 
     public static void w(String msg) {
-        if (BuildConfig.DEBUG){
-            String m = addTimeWithType(PAYMENT, msg);
+        String m = addTimeWithType(PAYMENT, msg);
+        if (BuildConfig.DEBUG) {
             w(TAG, m);
-            writeText(m, true);
         }
+
+        writeText(m, true);
     }
 
     private static void v(String tag, String msg) {
@@ -115,9 +116,9 @@ public class MeshLog {
 
 
     private static void writeText(String text, boolean isAppend) {
-            Intent intent = new Intent("com.w3engineers.meshrnd.DEBUG_MESSAGE");
-            intent.putExtra("value", text);
-            MeshApp.getContext().sendBroadcast(intent);
-            DataManager.on().writeLogIntoTxtFile(text, isAppend);
+        Intent intent = new Intent("com.w3engineers.meshrnd.DEBUG_MESSAGE");
+        intent.putExtra("value", text);
+        MeshApp.getContext().sendBroadcast(intent);
+        DataManager.on().writeLogIntoTxtFile(text, isAppend);
     }
 }
