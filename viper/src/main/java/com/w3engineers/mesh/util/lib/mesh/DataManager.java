@@ -366,9 +366,9 @@ public class DataManager {
                 Intent intent = new Intent("com.w3engineers.meshservice.DEBUG_MESSAGE");
                 intent.putExtra("value", text);
                 MeshApp.getContext().sendBroadcast(intent);
-
-                DataManager.this.writeLogIntoTxtFile(text, true);
             }
+
+            DataManager.this.writeLogIntoTxtFile(text, true);
         }
 
         @Override
