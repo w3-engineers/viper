@@ -243,7 +243,7 @@ public class EthereumService implements BlockRequest.BlockTransactionObserver, E
                         if (balance != null && balance > 0){
                             listener.onEtherGiftRequested(false, "already have balance", null, null, "admin");
                         }
-                        else if (nonce > 0){
+                        else if (nonce != null && nonce > 0){
                             listener.onEtherGiftRequested(false, "already have transactions", null, null, "admin");
                         }
                         else {
