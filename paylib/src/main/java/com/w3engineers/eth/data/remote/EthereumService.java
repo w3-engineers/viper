@@ -2,6 +2,7 @@ package com.w3engineers.eth.data.remote;
 
 import android.content.Context;
 import android.net.Network;
+import android.text.TextUtils;
 import android.util.Log;
 
 import com.google.gson.Gson;
@@ -246,6 +247,9 @@ public class EthereumService implements BlockRequest.BlockTransactionObserver, E
                         else if (nonce != null && nonce > 0){
                             listener.onEtherGiftRequested(false, "already have transactions", null, null, "admin");
                         }
+                        else if (TextUtils.isEmpty(giftDonateUrl)){
+                            listener.onEtherGiftRequested(false, "configuration error, please try again later", null, null, "system");
+                        }
                         else {
 
                             OkHttpClient client = new OkHttpClient();
@@ -291,6 +295,9 @@ public class EthereumService implements BlockRequest.BlockTransactionObserver, E
                         e.printStackTrace();
                         listener.onEtherGiftRequested(false, e.getMessage(), null, null, "system");
                     } catch (ExecutionException e) {
+                        e.printStackTrace();
+                        listener.onEtherGiftRequested(false, e.getMessage(), null, null, "system");
+                    }catch (Exception e) {
                         e.printStackTrace();
                         listener.onEtherGiftRequested(false, e.getMessage(), null, null, "system");
                     }
