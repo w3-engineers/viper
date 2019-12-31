@@ -17,6 +17,7 @@ import com.w3engineers.mesh.application.data.model.PayMessageAck;
 import com.w3engineers.mesh.application.data.model.PeerAdd;
 import com.w3engineers.mesh.application.data.model.PeerRemoved;
 import com.w3engineers.mesh.application.data.model.SellerRemoved;
+import com.w3engineers.mesh.application.data.model.ServiceUpdate;
 import com.w3engineers.mesh.application.data.model.TransportInit;
 import com.w3engineers.mesh.application.data.model.UserInfoEvent;
 import com.w3engineers.mesh.application.data.model.WalletLoaded;
@@ -42,6 +43,7 @@ public interface ApiEvent {
 
     Class USER_INFO = UserInfoEvent.class;
     Class CONFIG_SYNC = ConfigSyncEvent.class;
+    Class SERVICE_UPDATE = ServiceUpdate.class;
 
     Disposable startObserver(Class event, Consumer<? extends Event> next);
 

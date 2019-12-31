@@ -14,6 +14,7 @@ import com.w3engineers.mesh.application.data.model.DataAckEvent;
 import com.w3engineers.mesh.application.data.model.DataEvent;
 import com.w3engineers.mesh.application.data.model.PeerAdd;
 import com.w3engineers.mesh.application.data.model.PeerRemoved;
+import com.w3engineers.mesh.application.data.model.ServiceUpdate;
 import com.w3engineers.mesh.application.data.model.UserInfoEvent;
 import com.w3engineers.mesh.model.MessageModel;
 import com.w3engineers.mesh.model.UserModel;
@@ -150,6 +151,12 @@ public class ConnectionManager {
                 nearbyCallBack.onUserFound(userModel);
             }
 
+        });
+
+
+        AppDataObserver.on().startObserver(ApiEvent.SERVICE_UPDATE, event -> {
+            ServiceUpdate serviceUpdate = (ServiceUpdate) event;
+            MeshLog.e("need_update" + "Service update needed:" + serviceUpdate.isNeeded);
         });
 
 

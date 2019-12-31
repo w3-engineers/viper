@@ -36,6 +36,7 @@ import com.w3engineers.mesh.application.data.model.PayMessageAck;
 import com.w3engineers.mesh.application.data.model.PeerAdd;
 import com.w3engineers.mesh.application.data.model.PeerRemoved;
 import com.w3engineers.mesh.application.data.model.SellerRemoved;
+import com.w3engineers.mesh.application.data.model.ServiceUpdate;
 import com.w3engineers.mesh.application.data.model.TransportInit;
 import com.w3engineers.mesh.application.data.model.UserInfoEvent;
 import com.w3engineers.mesh.application.data.remote.model.BuyerPendingMessage;
@@ -392,6 +393,11 @@ public class DataManager {
         public void onProbableSellerDisconnected(String sellerId) throws RemoteException {
             DataManager.this.onProbableSellerDisconnected(sellerId);
         }
+
+        @Override
+        public void onServiceUpdateNeeded(boolean isNeeded) throws RemoteException {
+          DataManager.this.onServiceUpdateNeeded(isNeeded);
+        }
     };
 
 
@@ -746,6 +752,13 @@ public class DataManager {
         sellerRemoved.sellerId = sellerId;
 
         AppDataObserver.on().sendObserverData(sellerRemoved);
+    }
+
+    private void onServiceUpdateNeeded(boolean isNeeded){
+        ServiceUpdate serviceUpdate = new ServiceUpdate();
+        serviceUpdate.isNeeded = isNeeded;
+
+        AppDataObserver.on().sendObserverData(serviceUpdate);
     }
 
 
