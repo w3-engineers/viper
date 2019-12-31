@@ -13,6 +13,7 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.net.Uri;
 import android.os.IBinder;
 import android.os.RemoteException;
 import android.text.TextUtils;
@@ -187,7 +188,8 @@ public class DataManager {
                 new DialogUtil.DialogButtonListener() {
                     @Override
                     public void onClickPositive() {
-                        checkConnectionAndStartDownload();
+//                        checkConnectionAndStartDownload();
+                        gotoPlayStore();
                         isAlreadyToPlayStore = true;
                     }
 
@@ -201,6 +203,16 @@ public class DataManager {
                         isAlreadyToPlayStore = false;
                     }
                 });
+    }
+
+    private void gotoPlayStore() {
+        final String appPackageName = "com.w3engineers.meshservice";
+        //final String appPackageName = "com.w3engineers.banglabrowser";
+        try {
+            mContext.startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=" + appPackageName)));
+        } catch (android.content.ActivityNotFoundException anfe) {
+            mContext.startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://play.google.com/store/apps/details?id=" + appPackageName)));
+        }
     }
 
     private void checkConnectionAndStartDownload() {

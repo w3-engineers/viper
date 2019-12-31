@@ -75,4 +75,6 @@
     <color name="collapse_button_color">#FBFBFB</color>
     <color name="data_plan_selected_text">#212121</color>
 
+    <color name="inst_background">#FFF2B5</color>
+
 </resources>
