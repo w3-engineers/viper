@@ -102,24 +102,22 @@ public class EthereumService implements BlockRequest.BlockTransactionObserver, E
         this.giftDonateUrl = giftUrl;
 
 
-        if (blockRequests == null || blockRequests.isEmpty()) {
-            blockRequests = new HashMap<>();
+        blockRequests = new HashMap<>();
 
-            List<PayLibNetworkInfo> payLibNetworkInfos = networkInfoCallback.getNetworkInfo();
+        List<PayLibNetworkInfo> payLibNetworkInfos = networkInfoCallback.getNetworkInfo();
 
-            for (PayLibNetworkInfo payLibNetworkInfo : payLibNetworkInfos) {
-                BlockRequest blockRequestETH = new BlockRequest(payLibNetworkInfo.tokenAddress,
-                        payLibNetworkInfo.channelAddress,
-                        payLibNetworkInfo.networkUrl, mContext,
-                        payLibNetworkInfo.gasPrice, payLibNetworkInfo.gasLimit, EthereumService.this);
+        for (PayLibNetworkInfo payLibNetworkInfo : payLibNetworkInfos) {
+            BlockRequest blockRequestETH = new BlockRequest(payLibNetworkInfo.tokenAddress,
+                    payLibNetworkInfo.channelAddress,
+                    payLibNetworkInfo.networkUrl, mContext,
+                    payLibNetworkInfo.gasPrice, payLibNetworkInfo.gasLimit, EthereumService.this);
 
-                blockRequests.put(payLibNetworkInfo.networkType, blockRequestETH);
-            }
-            ethGift = EthGift.on(blockRequests, EthereumService.this);
+            blockRequests.put(payLibNetworkInfo.networkType, blockRequestETH);
         }
+        ethGift = EthGift.on(blockRequests, EthereumService.this);
 
 
-        if (network == null){
+        if (network == null) {
             CellularDataNetworkUtil.on(mContext, new CellularDataNetworkUtil.CellularDataNetworkListenerForPurchase() {
                 @Override
                 public void onAvailable(Network network1) {
@@ -136,7 +134,7 @@ public class EthereumService implements BlockRequest.BlockTransactionObserver, E
                     network = null;
                 }
             }).initMobileDataNetworkRequest();
-        }else {
+        } else {
             for (BlockRequest value : blockRequests.values()) {
                 value.setNetworkInterface(network);
             }
