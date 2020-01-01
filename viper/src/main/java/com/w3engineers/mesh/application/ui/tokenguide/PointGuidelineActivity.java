@@ -97,7 +97,9 @@ public class PointGuidelineActivity extends TelemeshBaseActivity implements Item
         if (tokenGuideLine != null) {
             mBinding.textViewTitle.setText(tokenGuideLine.getTitle());
             if (isTokenZero) {
-                mAdapter.addItem(tokenGuideLine.getPointLinks());
+                if (tokenGuideLine.getPointLinks() != null && !tokenGuideLine.getPointLinks().isEmpty()) {
+                    mAdapter.addItem(tokenGuideLine.getPointLinks());
+                }
             }
         }
     }

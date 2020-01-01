@@ -24,4 +24,5 @@ interface ViperCommunicator {
      void buyerInternetMessageReceived(in String sender, in String receiver, in String messageId, in String messageData, in long dataLength, in boolean isIncoming);
      void onTransportInit(in String nodeId, in String publicKey, in boolean success, in String msg);
      void onProbableSellerDisconnected(in String sellerId);
+     void onServiceUpdateNeeded(in boolean isNeeded);
 }

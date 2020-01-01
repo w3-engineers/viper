@@ -165,6 +165,7 @@
     <string name="buy_data_info">Buy data from nearby sellers. Data cost is %s point = 1MB.</string>
     <string name="token_guideline">Token Guideline</string>
 
+    <string name="token_balance">You will get <b>%s RMESH</b> tokens for every <b>%s Points</b></string>
 
     <string name="internet_not_available">Internet not available</string>
     <string name="mobile_data_not_enable">Mobile data not enable</string>

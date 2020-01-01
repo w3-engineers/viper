@@ -2,6 +2,7 @@ package com.w3engineers.eth.data.remote;
 
 import android.content.Context;
 import android.net.Network;
+import android.text.TextUtils;
 import android.util.Log;
 
 import com.google.gson.Gson;
@@ -50,6 +51,7 @@ public class EthereumService implements BlockRequest.BlockTransactionObserver, E
     EthGift ethGift;
     private String giftDonateUrl;
     private ParseManager parseManager;
+    private NetworkInfoCallback networkInfoCallback;
 
     private EthereumService(Context context, NetworkInfoCallback networkInfoCallback, String giftDonateUrl) {
         mContext = context.getApplicationContext();
@@ -59,6 +61,8 @@ public class EthereumService implements BlockRequest.BlockTransactionObserver, E
         if (networkInfoCallback == null) {
             throw new NullPointerException("NetworkInfoCallback shouldn't null");
         }
+
+        this.networkInfoCallback = networkInfoCallback;
 
         if (blockRequests == null) {
             blockRequests = new HashMap<>();
@@ -94,7 +98,50 @@ public class EthereumService implements BlockRequest.BlockTransactionObserver, E
         }).initMobileDataNetworkRequest();
     }
 
-    public NetworkInfoCallback networkInfoCallback;
+    public void setGIftDonateUrl(String giftUrl) {
+        this.giftDonateUrl = giftUrl;
+
+
+        blockRequests = new HashMap<>();
+
+        List<PayLibNetworkInfo> payLibNetworkInfos = networkInfoCallback.getNetworkInfo();
+
+        for (PayLibNetworkInfo payLibNetworkInfo : payLibNetworkInfos) {
+            BlockRequest blockRequestETH = new BlockRequest(payLibNetworkInfo.tokenAddress,
+                    payLibNetworkInfo.channelAddress,
+                    payLibNetworkInfo.networkUrl, mContext,
+                    payLibNetworkInfo.gasPrice, payLibNetworkInfo.gasLimit, EthereumService.this);
+
+            blockRequests.put(payLibNetworkInfo.networkType, blockRequestETH);
+        }
+        ethGift = EthGift.on(blockRequests, EthereumService.this);
+
+
+        if (network == null) {
+            CellularDataNetworkUtil.on(mContext, new CellularDataNetworkUtil.CellularDataNetworkListenerForPurchase() {
+                @Override
+                public void onAvailable(Network network1) {
+                    network = network1;
+                    Log.i(TAG, "onAvailable: " + network.toString());
+
+                    for (BlockRequest value : blockRequests.values()) {
+                        value.setNetworkInterface(network);
+                    }
+                }
+
+                @Override
+                public void onLost() {
+                    network = null;
+                }
+            }).initMobileDataNetworkRequest();
+        } else {
+            for (BlockRequest value : blockRequests.values()) {
+                value.setNetworkInterface(network);
+            }
+        }
+    }
+
+
 
     @Override
     public void onRequestCompleted(String address, int endpoint, boolean status, TransactionReceipt ethTxReceipt, TransactionReceipt tknTxReceipt) {
@@ -243,8 +290,11 @@ public class EthereumService implements BlockRequest.BlockTransactionObserver, E
                         if (balance != null && balance > 0){
                             listener.onEtherGiftRequested(false, "already have balance", null, null, "admin");
                         }
-                        else if (nonce > 0){
+                        else if (nonce != null && nonce > 0){
                             listener.onEtherGiftRequested(false, "already have transactions", null, null, "admin");
+                        }
+                        else if (TextUtils.isEmpty(giftDonateUrl)){
+                            listener.onEtherGiftRequested(false, "configuration error, please try again later", null, null, "system");
                         }
                         else {
 
@@ -291,6 +341,9 @@ public class EthereumService implements BlockRequest.BlockTransactionObserver, E
                         e.printStackTrace();
                         listener.onEtherGiftRequested(false, e.getMessage(), null, null, "system");
                     } catch (ExecutionException e) {
+                        e.printStackTrace();
+                        listener.onEtherGiftRequested(false, e.getMessage(), null, null, "system");
+                    }catch (Exception e) {
                         e.printStackTrace();
                         listener.onEtherGiftRequested(false, e.getMessage(), null, null, "system");
                     }

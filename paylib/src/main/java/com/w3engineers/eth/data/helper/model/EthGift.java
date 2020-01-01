@@ -19,20 +19,21 @@ public class EthGift {
     private static EthGift ethGift;
 //    Handler timerHandler = null;
     Runnable timerRunnable = null;
-    private EthGiftListener ethGiftListener;
-    private HashMap<Integer, BlockRequest> blockRequests = null;
+    private static EthGiftListener ethGiftListener;
+    private static HashMap<Integer, BlockRequest> blockRequests = null;
 
 
 
-    private EthGift(HashMap<Integer, BlockRequest> hashMap, EthGiftListener listener){
+    private EthGift(){
         this.ethGiftModels = new CopyOnWriteArrayList<EthGiftModel>();
-        this.blockRequests = hashMap;
-        this.ethGiftListener = listener;
+
     }
 
     public static EthGift on(HashMap<Integer, BlockRequest> hashMap, EthGiftListener listener){
+        blockRequests = hashMap;
+        ethGiftListener = listener;
         if (ethGift == null){
-            ethGift = new EthGift(hashMap, listener);
+            ethGift = new EthGift();
         }
 
         return ethGift;
