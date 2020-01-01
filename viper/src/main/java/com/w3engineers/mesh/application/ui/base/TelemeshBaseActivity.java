@@ -22,21 +22,21 @@ import com.w3engineers.mesh.util.lib.mesh.DataManager;
  */
 public abstract class TelemeshBaseActivity extends BaseActivity {
 
-    protected abstract BaseServiceLocator getServiceLocator();
+    public abstract BaseServiceLocator a();
 
     @Override
-    protected void startUI() {
+    public void startUI() {
         startMeshService();
     }
 
     @Override
-    protected void onPause() {
+    public void onPause() {
         super.onPause();
         setServiceForeground(true);
     }
 
     @Override
-    protected void onResume() {
+    public void onResume() {
         super.onResume();
         setServiceForeground(false);
     }
@@ -45,7 +45,7 @@ public abstract class TelemeshBaseActivity extends BaseActivity {
      * Exposed to child Activity so that showing service behavior can be modified as desired
      * @param isForeground
      */
-    protected void setServiceForeground(boolean isForeground) {
+    public void setServiceForeground(boolean isForeground) {
 
         DataManager.on().setServiceForeground(isForeground);
 
@@ -53,7 +53,7 @@ public abstract class TelemeshBaseActivity extends BaseActivity {
 
     private void startMeshService() {
 
-        BaseServiceLocator baseServiceLocator = getServiceLocator();
+        BaseServiceLocator baseServiceLocator = a();
 
         if (baseServiceLocator != null) {
             baseServiceLocator.initViper();

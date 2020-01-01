@@ -12,19 +12,19 @@ import com.w3engineers.mesh.R;
 
 public class DialogUtil {
     static ProgressDialog progressDialog;
+    static AlertDialog alertDialog;
 
-    public static void showConfirmationDialog(Context context,
+    public static AlertDialog showConfirmationDialog(Context context,
                                               String title,
                                               String message,
                                               String negativeText,
                                               String positiveText,
                                               final DialogButtonListener listener) {
         try {
-
-
             AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(context, R.style.DefaultAlertDialogStyle);
             alertDialogBuilder.setTitle(Html.fromHtml("<b>" + title + "</b>"));
             alertDialogBuilder.setMessage(Html.fromHtml("<font color='#757575'>" + message + "</font>"));
+
 
             if (negativeText != null) {
                 alertDialogBuilder.setNegativeButton(negativeText, new DialogInterface.OnClickListener() {
@@ -59,7 +59,7 @@ public class DialogUtil {
                     }
                 }
             });
-            AlertDialog alertDialog = alertDialogBuilder.create();
+            alertDialog = alertDialogBuilder.create();
             alertDialog.setCancelable(false);
 //            alertDialog.getWindow().setType(WindowManager.LayoutParams.TYPE_SYSTEM_ALERT);
 //            alertDialog.getWindow().setType(WindowManager.LayoutParams.TYPE_APPLICATION_PANEL);
@@ -69,6 +69,7 @@ public class DialogUtil {
             e.printStackTrace();
 
         }
+        return alertDialog;
     }
 
     public interface DialogButtonListener {
@@ -97,6 +98,16 @@ public class DialogUtil {
             e.printStackTrace();
         }
 
+    }
+
+    public static void dismissDialog() {
+        if (alertDialog != null) {
+            try {
+                alertDialog.dismiss();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     public static void dismissLoadingProgress() {

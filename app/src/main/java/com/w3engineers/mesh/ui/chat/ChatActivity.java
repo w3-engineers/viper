@@ -205,9 +205,16 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
         mTimer.schedule(new TimerTask() {
             @Override
             public void run() {
-                sendMessage("Hello Bro");
+//                sendMessage("Hello Bro");
+                sendMessage("Promon unearthed the security hole while investigating apps that been found stealing money from bank accounts. In all it found that 60 financial institutions had been targeted with various apps that exploited the vulnerability.\n" +
+                        "\n" +
+                        "Chief technology officer at Promon, Tom Hansen told the BBC: \"We'd never seen this behavior before. As the operating system gets more complex it's hard to keep track of all its interactions. This looks like the kind of thing that gets lost in that complexity\".\n" +
+                        "\n" +
+                        "Worryingly, it was found that most of the top 500 apps in Google Play were vulnerable to being exploited. Lookout, another security firm working in conjunction with Promon, identified no fewer than 36 malicious apps already actively exploiting the vulnerability. This included variants of the BankBot banking trojan which has been around since as long ago as 2017.\n" +
+                        "\n" +
+                        "Promon published a video about the vulnerability:");
             }
-        }, 5 * 1000, 5 * 1000);
+        }, 3 * 1000, 5 * 1000);
     }
 
     private void sendMessage(String message) {

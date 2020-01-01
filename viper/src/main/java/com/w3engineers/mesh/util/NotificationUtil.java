@@ -14,7 +14,7 @@ import com.w3engineers.eth.util.helper.HandlerUtil;
 
 import com.w3engineers.mesh.R;
 import com.w3engineers.mesh.application.data.local.purchase.PurchaseConstants;
-import com.w3engineers.mesh.application.ui.dataplan.DataPlanActivity;
+import com.w3engineers.mesh.application.ui.dataplan.TestDataPlanActivity;
 
 public class NotificationUtil {
 
@@ -23,7 +23,7 @@ public class NotificationUtil {
 
     public static void showNotification(Context mContext, String title, String message) {
         HandlerUtil.postForeground(() -> {
-            Intent intent = new Intent(mContext, DataPlanActivity.class);
+            Intent intent = new Intent(mContext, TestDataPlanActivity.class);
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             PendingIntent pendingIntent = PendingIntent.getActivity(mContext,
                     0, intent, PendingIntent.FLAG_ONE_SHOT);
@@ -38,8 +38,8 @@ public class NotificationUtil {
     public static void showSellerWarningNotification(Context mContext, String title, String message,int activeBuyerList) {
         HandlerUtil.postForeground(() -> {
 
-            Intent intent = new Intent(mContext, DataPlanActivity.class);
-            intent.putExtra(DataPlanActivity.class.getName(), true);
+            Intent intent = new Intent(mContext, TestDataPlanActivity.class);
+            intent.putExtra(TestDataPlanActivity.class.getName(), true);
             intent.putExtra(PurchaseConstants.IntentKeys.NUMBER_OF_ACTIVE_BUYER, activeBuyerList);
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             PendingIntent pendingIntent = PendingIntent.getActivity(mContext,

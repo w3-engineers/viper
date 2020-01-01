@@ -27,7 +27,6 @@ public interface PurchaseConstants {
         int BUY_TOKEN_RESPONSE = 18;
 
         int SYNC_BUYER_TO_SELLER = 19;
-
         int SYNC_SELLER_TO_BUYER = 21;
         int SYNC_SELLER_TO_BUYER_OK = 22;
 
@@ -46,8 +45,7 @@ public interface PurchaseConstants {
         int GIFT_ETHER_REQUEST_WITH_HASH = 33;
         int GIFT_RESPONSE = 34;
 
-        int CONNECT_BUYER = 35;
-
+        int DISCONNECTED_BY_SELLER = 35;
     }
 
     interface INTERNAL_MESSAGE_TYPES {
@@ -55,6 +53,7 @@ public interface PurchaseConstants {
     }
 
     double PRICE_PER_MB = 1.0;
+    double RMESH_PER_POINT = 1.0;
     double BUY_TOKEN_ETHER_VALUE = 0.1;
 
     interface CHANNEL_STATE {

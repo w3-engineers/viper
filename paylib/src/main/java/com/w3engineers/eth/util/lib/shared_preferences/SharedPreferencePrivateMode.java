@@ -2,7 +2,6 @@ package com.w3engineers.eth.util.lib.shared_preferences;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.preference.PreferenceManager;
 
 /**
  * Created by Monir Zzaman on 10/30/2017.
@@ -11,10 +10,11 @@ import android.preference.PreferenceManager;
  */
 
 public class SharedPreferencePrivateMode {
+    private final static String PREFERENCE_NAME = "pay_lib";
     private SharedPreferences mPrivatePreference;
 
     public SharedPreferencePrivateMode(Context mContext) {
-        mPrivatePreference = PreferenceManager.getDefaultSharedPreferences(mContext);
+        mPrivatePreference = mContext.getSharedPreferences(PREFERENCE_NAME, Context.MODE_PRIVATE | Context.MODE_MULTI_PROCESS);
     }
 
     synchronized protected boolean writeString(String key, String value) {

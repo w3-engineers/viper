@@ -3,47 +3,6 @@
     xmlns:tools="http://schemas.android.com/tools"
     package="com.w3engineers.mesh">
 
-    <application
-        android:name="com.w3engineers.ext.strom.App"
-        tools:replace="android:name">
-        <activity
-            android:name=".application.ui.wallet.WalletActivity"
-            android:label="@string/title_activity_wallet"
-            android:theme="@style/AppTheme.NoActionBar"/>
-        <activity
-            android:name="com.w3engineers.mesh.application.ui.dataplan.DataPlanActivity"
-            android:label="@string/title_activity_data_plan"
-            android:theme="@style/AppTheme.NoActionBar" />
-
-        <activity
-            android:name="com.w3engineers.mesh.application.ui.premission.PermissionActivity" />
-
-<!--        <service
-            android:name="com.w3engineers.mesh.application.data.local.service.MeshService"
-            android:enabled="true"
-            android:exported="true"
-            android:stopWithTask="false" />-->
-
-        <service android:name=".ClientLibraryService"
-            android:exported="true"
-            android:enabled="true">
-            <intent-filter>
-                <action android:name="service.viper" />
-            </intent-filter>
-        </service>
-
-      <!--  <provider
-            android:authorities="@string/authority"
-            android:name="android.support.v4.content.FileProvider"
-            android:exported="false"
-            android:syncable="true">
-
-            <meta-data
-                android:name="android.support.FILE_PROVIDER_PATHS"
-                android:resource="@xml/filepaths"/>
-        </provider>
--->
-    </application>
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
     <uses-permission android:name="android.permission.BLUETOOTH" />
     <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
@@ -57,7 +16,33 @@
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
-
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+
+    <application
+        android:name="com.w3engineers.ext.strom.App"
+        tools:replace="android:name">
+        <activity android:name=".application.ui.tokenguide.PointGuidelineActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.NoActionBar"/>
+        <activity
+            android:name=".application.ui.wallet.WalletActivity"
+            android:label="@string/title_activity_wallet"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".application.ui.dataplan.TestDataPlanActivity"
+            android:label="@string/title_activity_data_plan"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity android:name=".application.ui.premission.PermissionActivity" />
+        <activity
+            android:name=".application.ui.meshlog.MeshLogHistoryActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".application.ui.meshlog.MeshLogDetailsActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.NoActionBar" />
+    </application>
 
 </manifest>

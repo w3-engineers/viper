@@ -19,20 +19,21 @@ public class EthGift {
     private static EthGift ethGift;
 //    Handler timerHandler = null;
     Runnable timerRunnable = null;
-    private EthGiftListener ethGiftListener;
-    private HashMap<Integer, BlockRequest> blockRequests = null;
+    private static EthGiftListener ethGiftListener;
+    private static HashMap<Integer, BlockRequest> blockRequests = null;
 
 
 
-    private EthGift(HashMap<Integer, BlockRequest> hashMap, EthGiftListener listener){
+    private EthGift(){
         this.ethGiftModels = new CopyOnWriteArrayList<EthGiftModel>();
-        this.blockRequests = hashMap;
-        this.ethGiftListener = listener;
+
     }
 
     public static EthGift on(HashMap<Integer, BlockRequest> hashMap, EthGiftListener listener){
+        blockRequests = hashMap;
+        ethGiftListener = listener;
         if (ethGift == null){
-            ethGift = new EthGift(hashMap, listener);
+            ethGift = new EthGift();
         }
 
         return ethGift;
@@ -62,19 +63,19 @@ public class EthGift {
                                 if (ethTxReceipt != null && tknTxReceipt != null){
                                     if (ethTxReceipt.getStatus().equals("0x1") && tknTxReceipt.getStatus().equals("0x1")) {
                                         //success
-                                        ethGiftListener.onRequestCompleted(e.userAddress, e.endpoint, true);
+                                        ethGiftListener.onRequestCompleted(e.userAddress, e.endpoint, true, ethTxReceipt, tknTxReceipt);
                                         ethGiftModels.remove(e);
                                     } else if(ethTxReceipt.getStatus().equals("0x0") && tknTxReceipt.getStatus().equals("0x0")) {
                                         //fail
-                                        ethGiftListener.onRequestCompleted(e.userAddress, e.endpoint, false);
+                                        ethGiftListener.onRequestCompleted(e.userAddress, e.endpoint, false, null, null);
                                         ethGiftModels.remove(e);
                                     } else if(ethTxReceipt.getStatus().equals("0x1") && tknTxReceipt.getStatus().equals("0x0")) {
                                         Log.v("Timer", "eth true tkn false");
-                                        ethGiftListener.onRequestCompleted(e.userAddress, e.endpoint, true);
+                                        ethGiftListener.onRequestCompleted(e.userAddress, e.endpoint, true, ethTxReceipt, null);
                                         ethGiftModels.remove(e);
                                     } else if(ethTxReceipt.getStatus().equals("0x0") && tknTxReceipt.getStatus().equals("0x1")) {
                                         Log.v("Timer", "eth false tkn true");
-                                        ethGiftListener.onRequestCompleted(e.userAddress, e.endpoint, true);
+                                        ethGiftListener.onRequestCompleted(e.userAddress, e.endpoint, true, null, tknTxReceipt);
                                         ethGiftModels.remove(e);
                                     } else {
                                         //pending
@@ -107,7 +108,8 @@ public class EthGift {
     }
 
     public interface EthGiftListener {
-        public void onRequestCompleted(String address, int endpoint, boolean status);
+        public void onRequestCompleted(String address, int endpoint, boolean status, TransactionReceipt ethTransactionReceipt, TransactionReceipt tokenTransactionReceipt);
+
     }
 
 

@@ -3,6 +3,7 @@ package com.w3engineers.mesh.util;
 import android.content.Intent;
 import android.util.Log;
 
+import com.w3engineers.mesh.BuildConfig;
 import com.w3engineers.mesh.util.lib.mesh.DataManager;
 
 import java.text.SimpleDateFormat;
@@ -25,60 +26,77 @@ public class MeshLog {
     }
 
     public static void clearLog() {
-        writeText("", false);
+        if (BuildConfig.DEBUG) {
+            writeText("", false);
+        }
     }
 
 
     public static void p(String msg) {
         String m = addTimeWithType(PAYMENT, msg);
-        e(TAG, m);
+        if (BuildConfig.DEBUG) {
+            e(TAG, m);
+        }
         writeText(m, true);
     }
 
     public static void o(String msg) {
-        p(msg);
+        if (BuildConfig.DEBUG) {
+            p(msg);
 //        e(TAG, msg);
 //        writeText(msg, true);
+        }
     }
 
     public static void k(String msg) {
         String m = addTimeWithType(SPECIAL, msg);
-        e(TAG, m);
+        if (BuildConfig.DEBUG) {
+            e(TAG, m);
+        }
         writeText(m, true);
     }
 
     public static void v(String msg) {
         String m = addTimeWithType(SPECIAL, msg);
-        v(TAG, m);
+        if (BuildConfig.DEBUG) {
+            v(TAG, m);
+        }
         writeText(m, true);
     }
 
     public static void mm(String msg) {
         String m = addTimeWithType(SPECIAL, msg);
-
-        e(TAG, m);
+        if (BuildConfig.DEBUG) {
+            e(TAG, m);
+        }
         writeText(m, true);
     }
 
     public static void i(String msg) {
         String m = addTimeWithType(INFO, msg);
-        i(TAG, m);
+        if (BuildConfig.DEBUG) {
+            i(TAG, m);
+        }
         writeText(m, true);
     }
 
 
     public static void e(String msg) {
         String m = addTimeWithType(ERROR, msg);
-        e(TAG, m);
+        if (BuildConfig.DEBUG) {
+            e(TAG, m);
+        }
         writeText(m, true);
     }
 
     public static void w(String msg) {
         String m = addTimeWithType(PAYMENT, msg);
-        w(TAG, m);
+        if (BuildConfig.DEBUG) {
+            w(TAG, m);
+        }
+
         writeText(m, true);
     }
-
 
     private static void v(String tag, String msg) {
         Log.v(tag, msg);
@@ -98,11 +116,9 @@ public class MeshLog {
 
 
     private static void writeText(String text, boolean isAppend) {
-
         Intent intent = new Intent("com.w3engineers.meshrnd.DEBUG_MESSAGE");
         intent.putExtra("value", text);
         MeshApp.getContext().sendBroadcast(intent);
-
         DataManager.on().writeLogIntoTxtFile(text, isAppend);
     }
 }

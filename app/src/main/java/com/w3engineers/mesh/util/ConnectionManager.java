@@ -1,11 +1,11 @@
 package com.w3engineers.mesh.util;
 
 import android.content.Context;
-import android.os.RemoteException;
 import android.text.TextUtils;
 import android.widget.Toast;
 
 import com.w3engineers.ext.strom.util.Text;
+import com.w3engineers.ext.viper.BuildConfig;
 import com.w3engineers.ext.viper.ViperApp;
 import com.w3engineers.mesh.application.data.ApiEvent;
 import com.w3engineers.mesh.application.data.AppDataObserver;
@@ -14,6 +14,7 @@ import com.w3engineers.mesh.application.data.model.DataAckEvent;
 import com.w3engineers.mesh.application.data.model.DataEvent;
 import com.w3engineers.mesh.application.data.model.PeerAdd;
 import com.w3engineers.mesh.application.data.model.PeerRemoved;
+import com.w3engineers.mesh.application.data.model.ServiceUpdate;
 import com.w3engineers.mesh.application.data.model.UserInfoEvent;
 import com.w3engineers.mesh.model.MessageModel;
 import com.w3engineers.mesh.model.UserModel;
@@ -36,7 +37,7 @@ import java.util.Map;
 import java.util.UUID;
 
 public class ConnectionManager {
-    private static final String NETWORK_PREFIX = "ifli";
+    private static final String NETWORK_PREFIX = "arif";
     private static final String APP_NAME = "viper";
     private static ConnectionManager mConnectionManager;
     private ViperClient viperClient;
@@ -45,40 +46,53 @@ public class ConnectionManager {
     private Map<String, UserModel> discoverUserMap;
     private Map<String, String> requestUserInfoList;
 
+
     public static ConnectionManager on(Context context) {
         if (mConnectionManager == null) {
-            synchronized (ViperClient.class) {
+            synchronized (ConnectionManager.class) {
                 if (mConnectionManager == null)
-                    mConnectionManager = new ConnectionManager(context, APP_NAME, NETWORK_PREFIX);
+                    mConnectionManager = new ConnectionManager(context);
             }
         }
         return mConnectionManager;
     }
 
-    private ConnectionManager(Context context, String appName, String networkPrefix) {
+    private ConnectionManager(Context context) {
         MeshLog.e("Connection Manager is called");
         mContext = context;
         discoverUserMap = Collections.synchronizedMap(new HashMap());
         requestUserInfoList = Collections.synchronizedMap(new HashMap<>());
+        startAllObserver();
+    }
 
+    public void startViper(){
         try {
-            String jsonData = loadJSONFromAsset(context);
-
+            String jsonData = loadJSONFromAsset(mContext);
             if (!TextUtils.isEmpty(jsonData)) {
+
                 JSONObject jsonObject = new JSONObject(jsonData);
 
                 String AUTH_USER_NAME = jsonObject.optString("AUTH_USER_NAME");
                 String AUTH_PASSWORD = jsonObject.optString("AUTH_PASSWORD");
-                String APP_DOWNLOAD_LINK = jsonObject.optString("APP_DOWNLOAD_LINK");
-                String GIFT_DONATE_LINK = jsonObject.optString("GIFT_DONATE_LINK");
+                String FILE_REPO_LINK = jsonObject.optString("FILE_REPO_LINK");
+                String PARSE_APP_ID = jsonObject.optString("PARSE_APP_ID");
+                String PARSE_URL = jsonObject.optString("PARSE_URL");
 
-                viperClient = ViperClient.on(context, appName, "com.w3engineers.ext.viper", networkPrefix, SharedPref.read(Constant.KEY_USER_NAME), 1, System.currentTimeMillis(), true)
-                        .setConfig(AUTH_USER_NAME, AUTH_PASSWORD, APP_DOWNLOAD_LINK, GIFT_DONATE_LINK);
+                /*String AUTH_USER_NAME = BuildConfig.AUTH_USER_NAME;
+                String AUTH_PASSWORD = BuildConfig.AUTH_PASSWORD;
+                String FILE_REPO_LINK = BuildConfig.FILE_REPO_LINK;
+                String PARSE_APP_ID = BuildConfig.PARSE_APP_ID;
+                String PARSE_URL = BuildConfig.PARSE_URL;*/
 
-                startAllObserver();
+//                String GIFT_DONATE_LINK = jsonObject.optString("GIFT_DONATE_LINK");
+
+                viperClient = ViperClient.on(mContext, APP_NAME, "com.w3engineers.ext.viper", NETWORK_PREFIX, SharedPref.read(Constant.KEY_USER_NAME),
+                        SharedPref.read(Constant.PreferenceKeys.ADDRESS), SharedPref.read(Constant.PreferenceKeys.PUBLIC_KEY), 1, System.currentTimeMillis(), true)
+                        .setConfig(AUTH_USER_NAME, AUTH_PASSWORD, FILE_REPO_LINK/*, GIFT_DONATE_LINK*/, PARSE_URL, PARSE_APP_ID);
+
             }
 
-        } catch (JSONException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
@@ -136,6 +150,12 @@ public class ConnectionManager {
                 nearbyCallBack.onUserFound(userModel);
             }
 
+        });
+
+
+        AppDataObserver.on().startObserver(ApiEvent.SERVICE_UPDATE, event -> {
+            ServiceUpdate serviceUpdate = (ServiceUpdate) event;
+            MeshLog.e("Service update needed:" + serviceUpdate.isNeeded);
         });
 
 
@@ -271,7 +291,7 @@ public class ConnectionManager {
                 viperClient.sendMessage(userId, nodeId, uniqueId.toString(), userJson.getBytes(), false);
             } catch (Exception e) {
                 e.printStackTrace();
-                showToast();
+                showToast(e.getMessage());
             }
         }
 
@@ -308,7 +328,7 @@ public class ConnectionManager {
                 viperClient.sendMessage(userId, nodeId, messageId, userJson.getBytes(), true);
             } catch (Exception e) {
                 e.printStackTrace();
-                showToast();
+                showToast(e.getMessage());
             }
         }
     }
@@ -320,7 +340,7 @@ public class ConnectionManager {
             viperClient.sendMessage(userId, receiverId, messageModel.messageId, msgJson.getBytes(), true);
         } catch (Exception e) {
             e.printStackTrace();
-            showToast();
+            showToast(e.getMessage());
         }
     }
 
@@ -357,7 +377,7 @@ public class ConnectionManager {
             type = viperClient.getLinkTypeById(nodeId);
         } catch (Exception e) {
             e.printStackTrace();
-            showToast();
+            showToast(e.getMessage());
         }
 
         if (type == Link.Type.NA.getValue()) {
@@ -384,7 +404,7 @@ public class ConnectionManager {
                 return userId;
             } catch (Exception e) {
                 e.printStackTrace();
-                showToast();
+                showToast(e.getMessage());
                 return null;
             }
         } else {
@@ -409,11 +429,10 @@ public class ConnectionManager {
 
     }
 
-    private void showToast() {
-        HandlerUtil.postForeground(() ->
-                Toast.makeText(mContext,
-                        "TeleMesh Service is not running",
-                        Toast.LENGTH_LONG).show());
+    private void showToast(String msg) {
+        if (BuildConfig.DEBUG){
+            HandlerUtil.postForeground(() -> Toast.makeText(mContext, msg, Toast.LENGTH_LONG).show());
+        }
     }
 
 }

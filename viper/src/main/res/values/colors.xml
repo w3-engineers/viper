@@ -13,7 +13,7 @@
     <color name="info_color">#398EEA</color>
 
     <color name="body_text">#4C4C4C</color>
-    <color name="White">#ffffff</color>
+    <color name="white_light">#CCFFFFFF</color>
     <color name="grey_text">#757575</color>
 
     <color name="colorWhite">#ffffff</color>
@@ -41,5 +41,40 @@
     <color name="colorSemiGreen">#15BA62</color>
     <color name="colorOrange">#FF9D00</color>
 
+    <color name="light_black">#80000000</color>
+    <color name="color_green">#00C853</color>
+    <color name="color_orange">#DF5454</color>
+
+    <color name="colorPrimary">#083480</color>
+    <color name="colorPrimaryDark">#052459</color>
+    <color name="colorAccent">#083480</color>
+    <color name="colorGradientStart">#00acc2</color>
+    <color name="select_photo_text_color">#3C3C3C</color>
+    <color name="grey_400">#BDBDBD</color>
+    <color name="incoming_message_color">#D6FDEE</color>
+    <color name="outcoming_message_color">#F0F0F0</color>
+    <color name="bottom_bar_color">#B2DFDB</color>
+    <color name="colorBackgroundDark">#d7d9db</color>
+    <color name="colorBackground">#083480</color>
+
+    <color name="colorGreen">#008577</color>
+    <color name="colorYellow">#FFFF00</color>
+    <color name="colorRed">#FF0000</color>
+    <color name="colorClickHere">#900c3e</color>
+    <color name="light_paste_color">#7397CAFF</color>
+    <color name="light_magenta">#73008DFF</color>
+    <color name="color_magenta">#008DFF</color>
+    <color name="ninety_black">#E6000000</color>
+    <color name="sixty_black">#9900001F</color>
+    <color name="eighty_black">#80000000</color>
+    <color name="currency_note_shape_color">#6E97CAFF</color>
+    <color name="currency_text_color">#083480</color>
+
+    <color name="data_plan_unselected_text">#7F7F7F</color>
+    <color name="divider_color">#99000000</color>
+    <color name="collapse_button_color">#FBFBFB</color>
+    <color name="data_plan_selected_text">#212121</color>
+
+    <color name="inst_background">#FFF2B5</color>
 
 </resources>

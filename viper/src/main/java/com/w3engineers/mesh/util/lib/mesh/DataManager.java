@@ -13,39 +13,44 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.net.Uri;
 import android.os.IBinder;
 import android.os.RemoteException;
 import android.text.TextUtils;
 import android.util.Log;
-import android.view.View;
-import android.widget.Toast;
 
+import com.w3engineers.ext.strom.util.helper.Toaster;
 import com.w3engineers.mesh.BuildConfig;
-import com.w3engineers.mesh.ClientLibraryService;
 import com.w3engineers.mesh.R;
-import com.w3engineers.mesh.application.data.local.helper.crypto.CryptoHelper;
-import com.w3engineers.mesh.application.data.local.wallet.WalletService;
+import com.w3engineers.mesh.ViperCommunicator;
+import com.w3engineers.mesh.application.data.ApiEvent;
+import com.w3engineers.mesh.application.data.AppDataObserver;
+import com.w3engineers.mesh.application.data.local.dataplan.DataPlanManager;
 import com.w3engineers.mesh.application.data.local.db.SharedPref;
+import com.w3engineers.mesh.application.data.local.helper.PreferencesHelperDataplan;
+import com.w3engineers.mesh.application.data.local.helper.crypto.CryptoHelper;
+import com.w3engineers.mesh.application.data.model.ConfigSyncEvent;
+import com.w3engineers.mesh.application.data.model.DataAckEvent;
+import com.w3engineers.mesh.application.data.model.DataEvent;
 import com.w3engineers.mesh.application.data.model.PayMessage;
 import com.w3engineers.mesh.application.data.model.PayMessageAck;
+import com.w3engineers.mesh.application.data.model.PeerAdd;
+import com.w3engineers.mesh.application.data.model.PeerRemoved;
 import com.w3engineers.mesh.application.data.model.SellerRemoved;
+import com.w3engineers.mesh.application.data.model.ServiceUpdate;
 import com.w3engineers.mesh.application.data.model.TransportInit;
 import com.w3engineers.mesh.application.data.model.UserInfoEvent;
 import com.w3engineers.mesh.application.data.remote.model.BuyerPendingMessage;
-import com.w3engineers.mesh.application.ui.dataplan.DataPlanActivity;
+import com.w3engineers.mesh.util.ConfigSyncUtil;
 import com.w3engineers.mesh.util.Constant;
 import com.w3engineers.mesh.util.DialogUtil;
 import com.w3engineers.mesh.util.MeshApp;
 import com.w3engineers.mesh.util.MeshLog;
 import com.w3engineers.mesh.util.TSAppInstaller;
+import com.w3engineers.mesh.util.Util;
 import com.w3engineers.meshrnd.ITmCommunicator;
-import com.w3engineers.mesh.ViperCommunicator;
-import com.w3engineers.mesh.application.data.AppDataObserver;
-import com.w3engineers.mesh.application.data.model.DataAckEvent;
-import com.w3engineers.mesh.application.data.model.DataEvent;
-import com.w3engineers.mesh.application.data.model.PeerAdd;
-import com.w3engineers.mesh.application.data.model.PeerRemoved;
 import com.w3engineers.models.UserInfo;
+import com.w3engineers.walleter.wallet.WalletService;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -105,8 +110,20 @@ public class DataManager {
         context.startService(mIntent);
 
         context.bindService(mIntent, clientServiceConnection, Service.BIND_AUTO_CREATE);*/
+    }
 
-        checkAndBindService();
+    public void startMeshService() {
+        AppDataObserver.on().startObserver(ApiEvent.CONFIG_SYNC, event -> {
+            ConfigSyncEvent configSyncEvent = (ConfigSyncEvent) event;
+
+            if (configSyncEvent != null) {
+                if (configSyncEvent.isMeshStartTime()) {
+                    checkAndBindService();
+                }
+            }
+        });
+
+        ConfigSyncUtil.getInstance().startConfigurationSync(mContext, true);
     }
 
 
@@ -145,16 +162,14 @@ public class DataManager {
                     boolean isSuccess = initServiceConnection();
 
                     if (isSuccess) {
-                        Toast.makeText(mContext, "Bind service successful", Toast.LENGTH_LONG).show();
+                        Toaster.showShort("Bind service successful");
                         return;
                     }
                     MeshLog.i("Bind Service failed 1 " + isAlreadyToPlayStore);
                     HandlerUtil.postBackground(this, 5000);
 
                     if (!isAlreadyToPlayStore) {
-                        //   Toast.makeText(mContext, "Please install TeleMeshService app", Toast.LENGTH_LONG).show();
                         showConfirmationPopUp();
-
                     }
                     isAlreadyToPlayStore = true;
                 }
@@ -174,7 +189,8 @@ public class DataManager {
                 new DialogUtil.DialogButtonListener() {
                     @Override
                     public void onClickPositive() {
-                        TSAppInstaller.downloadApkFile(mContext, SharedPref.read(Constant.PreferenceKeys.APP_DOWNLOAD_LINK));
+//                        checkConnectionAndStartDownload();
+                        gotoPlayStore();
                         isAlreadyToPlayStore = true;
                     }
 
@@ -188,6 +204,30 @@ public class DataManager {
                         isAlreadyToPlayStore = false;
                     }
                 });
+    }
+
+    private void gotoPlayStore() {
+        final String appPackageName = "com.w3engineers.meshservice";
+        //final String appPackageName = "com.w3engineers.banglabrowser";
+        try {
+            mContext.startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=" + appPackageName)));
+        } catch (android.content.ActivityNotFoundException anfe) {
+            mContext.startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://play.google.com/store/apps/details?id=" + appPackageName)));
+        }
+    }
+
+    private void checkConnectionAndStartDownload() {
+        Util.isConnected(isConnected ->
+                HandlerUtil.postForeground(() -> {
+                    if (isConnected) {
+                        TSAppInstaller.downloadApkFile(mContext, SharedPref.read(Constant.PreferenceKeys.APP_DOWNLOAD_LINK));
+                    } else {
+                        isAlreadyToPlayStore = false;
+                        Toaster.showShort("Internet connection not available");
+                    }
+                })
+
+        );
     }
 
     private void showPermissionPopUp() {
@@ -218,7 +258,7 @@ public class DataManager {
     }
 
     private void launchServiceApp() {
-        Intent intent = mContext.getPackageManager().getLaunchIntentForPackage("com.w3engineers.meshrnd");
+        Intent intent = mContext.getPackageManager().getLaunchIntentForPackage("com.w3engineers.meshservice");
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         mContext.startActivity(intent);
     }
@@ -234,7 +274,7 @@ public class DataManager {
             intent.setAction("service.viper_server");
 
             /*From 5.0 annonymous intent calls are suspended so replacing with server app's package name*/
-            intent.setPackage("com.w3engineers.meshrnd");
+            intent.setPackage("com.w3engineers.meshservice");
             // binding to remote service
             return mContext.bindService(intent, serviceConnection, Service.BIND_AUTO_CREATE);
         } else {
@@ -255,7 +295,12 @@ public class DataManager {
             try {
                 //mTmCommunicator.saveUserInfo(userInfo);
                 Log.e("service_status", "onServiceConnected");
-                boolean status = mTmCommunicator.startMesh(appName, userInfo);
+                int userRole = DataPlanManager.getInstance().getDataPlanRole();
+
+                int configVersion = PreferencesHelperDataplan.on().getConfigVersion();
+                userInfo.setConfigVersion(configVersion);
+
+                boolean status = mTmCommunicator.startMesh(appName, userRole, userInfo, mSsid);
                 if (!status) {
                     showPermissionPopUp();
                 }
@@ -317,9 +362,11 @@ public class DataManager {
 
         @Override
         public void onReceiveLog(String text) throws RemoteException {
-            Intent intent = new Intent("com.w3engineers.meshrnd.DEBUG_MESSAGE");
-            intent.putExtra("value", text);
-            MeshApp.getContext().sendBroadcast(intent);
+            if (BuildConfig.DEBUG) {
+                Intent intent = new Intent("com.w3engineers.meshservice.DEBUG_MESSAGE");
+                intent.putExtra("value", text);
+                MeshApp.getContext().sendBroadcast(intent);
+            }
 
             DataManager.this.writeLogIntoTxtFile(text, true);
         }
@@ -358,6 +405,11 @@ public class DataManager {
         public void onProbableSellerDisconnected(String sellerId) throws RemoteException {
             DataManager.this.onProbableSellerDisconnected(sellerId);
         }
+
+        @Override
+        public void onServiceUpdateNeeded(boolean isNeeded) throws RemoteException {
+          DataManager.this.onServiceUpdateNeeded(isNeeded);
+        }
     };
 
 
@@ -385,28 +437,34 @@ public class DataManager {
      * @return
      */
     public int getLinkTypeById(String nodeID) throws RemoteException {
-        if (mTmCommunicator !=null){
+        if (mTmCommunicator != null) {
             return mTmCommunicator.getLinkTypeById(nodeID);
         }
         return 0;
     }
 
     public String getUserId() throws RemoteException {
-        if (mTmCommunicator !=null){
+        if (mTmCommunicator != null) {
             return mTmCommunicator.getUserId();
         }
-       return "";
+        return "";
     }
 
     public void saveDiscoveredUserInfo(String userId, String userName) throws RemoteException {
-        if (mTmCommunicator !=null){
+        if (mTmCommunicator != null) {
             mTmCommunicator.saveDiscoveredUserInfo(userId, userName);
         }
 
     }
 
     public void saveUserInfo(UserInfo userInfo) throws RemoteException {
-        if (mTmCommunicator !=null){
+        if (mTmCommunicator != null) {
+
+            int configVersion = PreferencesHelperDataplan.on().getConfigVersion();
+            userInfo.setConfigVersion(configVersion);
+
+            this.userInfo = userInfo;
+
             mTmCommunicator.saveUserInfo(userInfo);
         }
     }
@@ -509,6 +567,7 @@ public class DataManager {
             userInfoEvent.setAvatar(userInfo.getAvatar());
             userInfoEvent.setUserName(userInfo.getUserName());
             userInfoEvent.setRegTime(userInfo.getRegTime());
+            userInfoEvent.setConfigVersion(userInfo.getConfigVersion());
             userInfoEvent.setSync(userInfo.isSync());
 
             AppDataObserver.on().sendObserverData(userInfoEvent);
@@ -535,6 +594,17 @@ public class DataManager {
             MeshLog.v("mTmCommunicator null");
         }
         return mTmCommunicator.getUserPublicKey(address);
+    }
+
+    public String getUserNameByAddress(String address) throws RemoteException {
+        MeshLog.v("getUserNameByAddress dtm " + address);
+
+        if (mTmCommunicator == null) {
+            MeshLog.v("mTmCommunicator null");
+        } else {
+            return mTmCommunicator.getUserNameByAddress(address);
+        }
+        return null;
     }
 
     public void sendPayMessage(String receiverId, String message, String messageId) throws RemoteException {
@@ -599,7 +669,7 @@ public class DataManager {
     }
 
     public void disconnectFromInternet() throws RemoteException {
-        if (mTmCommunicator == null){
+        if (mTmCommunicator == null) {
             MeshLog.v("mTmCommunicator null");
         }
         mTmCommunicator.disconnectFromInternet();
@@ -621,10 +691,24 @@ public class DataManager {
         }
 
         try {
-            mTmCommunicator.restartMesh(newRole);
+            mTmCommunicator.restartMesh(newRole, mSsid);
         } catch (RemoteException e) {
             e.printStackTrace();
         }
+    }
+
+    public void destroyMeshService() {
+        try {
+            if (mTmCommunicator != null) {
+                mTmCommunicator.destroyService();
+            }
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void resetCommunicator() {
+        mTmCommunicator = null;
     }
 
 
@@ -660,7 +744,7 @@ public class DataManager {
 
     }
 
-    public void onTransportInit(String nodeId, String publicKey, boolean success, String msg) {
+    private void onTransportInit(String nodeId, String publicKey, boolean success, String msg) {
 
         MeshLog.v("onTransportInit dtm " + nodeId);
         TransportInit transportInit = new TransportInit();
@@ -673,7 +757,7 @@ public class DataManager {
     }
 
 
-    public void onProbableSellerDisconnected(String sellerId) {
+    private void onProbableSellerDisconnected(String sellerId) {
 
         MeshLog.v("onProbableSellerDisconnected dtm " + sellerId);
         SellerRemoved sellerRemoved = new SellerRemoved();
@@ -682,11 +766,15 @@ public class DataManager {
         AppDataObserver.on().sendObserverData(sellerRemoved);
     }
 
+    private void onServiceUpdateNeeded(boolean isNeeded){
+        ServiceUpdate serviceUpdate = new ServiceUpdate();
+        serviceUpdate.isNeeded = isNeeded;
+        AppDataObserver.on().sendObserverData(serviceUpdate);
+    }
+
 
     public void writeLogIntoTxtFile(String text, boolean isAppend) {
-
         try {
-
             String sdCard = Constant.Directory.PARENT_DIRECTORY + Constant.Directory.MESH_LOG;
             File directory = new File(sdCard);
             if (!directory.exists()) {
@@ -704,7 +792,6 @@ public class DataManager {
             OutputStreamWriter osw = new
                     OutputStreamWriter(fOut);
 
-
             osw.write("\n" + text);
             //  osw.append(text)
             osw.flush();
@@ -715,5 +802,6 @@ public class DataManager {
         } catch (IOException ioe) {
             ioe.printStackTrace();
         }
+
     }
 }

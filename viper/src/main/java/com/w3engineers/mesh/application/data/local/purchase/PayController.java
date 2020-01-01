@@ -13,10 +13,8 @@ import com.w3engineers.mesh.application.data.AppDataObserver;
 import com.w3engineers.mesh.application.data.local.DataPlanConstants;
 import com.w3engineers.mesh.application.data.local.helper.PreferencesHelperDataplan;
 import com.w3engineers.mesh.application.data.local.helper.crypto.CryptoHelper;
-import com.w3engineers.mesh.application.data.local.wallet.WalletService;
 import com.w3engineers.mesh.application.data.model.PayMessage;
 import com.w3engineers.mesh.application.data.model.PayMessageAck;
-import com.w3engineers.mesh.application.data.model.PeerAdd;
 import com.w3engineers.mesh.application.data.model.PeerRemoved;
 import com.w3engineers.mesh.application.data.model.SellerRemoved;
 import com.w3engineers.mesh.application.data.model.UserInfoEvent;
@@ -24,7 +22,7 @@ import com.w3engineers.mesh.application.data.remote.model.BuyerPendingMessage;
 import com.w3engineers.mesh.util.MeshApp;
 import com.w3engineers.mesh.util.MeshLog;
 import com.w3engineers.mesh.util.lib.mesh.DataManager;
-import com.w3engineers.models.UserInfo;
+import com.w3engineers.walleter.wallet.WalletService;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -59,7 +57,7 @@ public class PayController {
     }
 
     public interface PayControllerListenerForBuyer {
-        void onInitPurchaseOkReceived(String sellerAddress, double ethBalance, double tokenBallance, int nonce, double allowance, int endPointType);
+        void onInitPurchaseOkReceived(String sellerAddress, double ethBalance, double tokenBallance, int nonce, double allowance, int endPointType, long sharedData);
 
         void onInitPurchaseErrorReceived(String sellerAddress, String msg);
 
@@ -106,6 +104,7 @@ public class PayController {
                           double tokenBalance, int endPoint);
         void onProbableSellerDisconnected(String sellerId);
 
+        void onDisconnectedBySeller(String sellerAddress, String msg);
     }
 
     public void setBuyerListener(PayControllerListenerForBuyer listener1) {
@@ -242,9 +241,10 @@ public class PayController {
                         double tknB = ((Number) jsonObject.get("tkn")).doubleValue();
                         double allowance = ((Number) jsonObject.get("allowance")).doubleValue();
                         nonce = jsonObject.getInt("nonce");
+                        long sharedData = jsonObject.getLong(PurchaseConstants.INFO_KEYS.SHARED_DATA);
 
                         if (payControllerListenerForBuyer != null) {
-                            payControllerListenerForBuyer.onInitPurchaseOkReceived(fromAddress, ethB, tknB, nonce, allowance, endPointType);
+                            payControllerListenerForBuyer.onInitPurchaseOkReceived(fromAddress, ethB, tknB, nonce, allowance, endPointType, sharedData);
                         } else {
                             MeshLog.v("INIT_PURCHASE_OK Listener not found");
                         }
@@ -559,12 +559,14 @@ public class PayController {
                             payControllerListenerForBuyer.giftResponse(isSuccessForGift, ethBalance, tknBalance, endPointType);
                         }
                         break;
+                    case PurchaseConstants.MESSAGE_TYPES.DISCONNECTED_BY_SELLER:
+                        msg = jsonObject.getString(PurchaseConstants.JSON_KEYS.MESSAGE_TEXT);
 
-                    case PurchaseConstants.MESSAGE_TYPES.CONNECT_BUYER:
-                        if (payControllerListenerForSeller != null) {
-                            payControllerListenerForSeller.onUserConnected(fromAddress);
+                        if (payControllerListenerForBuyer != null) {
+                            payControllerListenerForBuyer.onDisconnectedBySeller(fromAddress, msg);
                         }
                         break;
+
 
                     default:
                         break;
@@ -715,8 +717,8 @@ public class PayController {
         try {
             jObject.put(PurchaseConstants.JSON_KEYS.MESSAGE_TYPE, PurchaseConstants.MESSAGE_TYPES.GOT_MESSAGE);
 
-            //sendPayMessage(receiver, jObject.toString());
-            sendPayWithTimeoutMessage(receiver, jObject.toString(), PurchaseConstants.TimeoutPurpose.BUYER_PENDING_MESSAGE);
+            sendPayMessage(receiver, jObject.toString());
+//            sendPayWithTimeoutMessage(receiver, jObject.toString(), PurchaseConstants.TimeoutPurpose.BUYER_PENDING_MESSAGE);
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -761,8 +763,8 @@ public class PayController {
 
         try {
             successJson.put(PurchaseConstants.JSON_KEYS.MESSAGE_TYPE, PurchaseConstants.MESSAGE_TYPES.PAY_FOR_MESSAGE_RESPONSE);
-            //sendPayMessage(receiver, successJson.toString());
-            sendPayWithTimeoutMessage(receiver, successJson.toString(), PurchaseConstants.TimeoutPurpose.PAY_FOR_MESSAGE_RESPONSE);
+            sendPayMessage(receiver, successJson.toString());
+//            sendPayWithTimeoutMessage(receiver, successJson.toString(), PurchaseConstants.TimeoutPurpose.PAY_FOR_MESSAGE_RESPONSE);
         } catch (Exception e) {
             MeshLog.v("Exception" + e.getMessage());
         }
@@ -911,7 +913,7 @@ public class PayController {
             e.printStackTrace();
         }
         sendPayWithTimeoutMessage(receiver, jsonObject.toString(), purpose);
-//        sendPayMessage(receiver, jsonObject.toString());
+
     }
 
     public void sendBlockChainResponse(JSONObject jsonObject, String receiver) {
@@ -999,10 +1001,10 @@ public class PayController {
         sendPayMessage(receiver, jo.toString());
     }
 
-    public void sendConnectBuyer(JSONObject jo, String receiver) {
-        MeshLog.p("sendConnectBuyer " + jo.toString());
+    public void sendDisconnectedBySeller(JSONObject jo, String receiver){
+        MeshLog.p("sendDisconnectedBySeller " + jo.toString());
         try {
-            jo.put(PurchaseConstants.JSON_KEYS.MESSAGE_TYPE, PurchaseConstants.MESSAGE_TYPES.CONNECT_BUYER);
+            jo.put(PurchaseConstants.JSON_KEYS.MESSAGE_TYPE, PurchaseConstants.MESSAGE_TYPES.DISCONNECTED_BY_SELLER);
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -1052,6 +1054,7 @@ public class PayController {
         timeoutMap.put(requestId, timeoutModel);
         handler.sendMessageDelayed(msg, delayTime);
     }
+
 }
 
 

@@ -3,6 +3,8 @@ package com.w3engineers.mesh.application.data.local.dataplan;
 import android.arch.lifecycle.LiveData;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.RemoteException;
 import android.text.TextUtils;
 
@@ -18,10 +20,12 @@ import com.w3engineers.mesh.application.data.local.purchase.PayController;
 import com.w3engineers.mesh.application.data.local.purchase.PurchaseConstants;
 import com.w3engineers.mesh.application.data.local.purchase.PurchaseManagerBuyer;
 import com.w3engineers.mesh.application.data.local.purchase.PurchaseManagerSeller;
-import com.w3engineers.mesh.application.ui.dataplan.DataPlanActivity;
+import com.w3engineers.mesh.application.ui.dataplan.TestDataPlanActivity;
 import com.w3engineers.mesh.util.EthereumServiceUtil;
+import com.w3engineers.mesh.util.MeshApp;
 import com.w3engineers.mesh.util.MeshLog;
 
+import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
@@ -59,9 +63,25 @@ public class DataPlanManager {
         return dataPlanManager;
     }
 
-    public static void openActivity(Context context){
-        Intent intent = new Intent(context, DataPlanActivity.class);
+    public static void openActivity(Context context, int imageValue){
+        Intent intent = new Intent(context, TestDataPlanActivity.class);
+        /*if(imageValue != 0) {
+            byte[] image = getPicture(context, imageValue);
+            intent.putExtra("picture", image);
+        }*/
         context.startActivity(intent);
+    }
+
+    private static byte[] getPicture(Context context, int value){
+        Bitmap bitmap = BitmapFactory.decodeResource(context.getResources(), value);
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        bitmap.compress(Bitmap.CompressFormat.PNG, 100, baos);
+        byte[] b = baos.toByteArray();
+        return b;
+    }
+
+    public static void resumeMessaging() {
+        PurchaseManagerSeller.getInstance().resumeMessaging();
     }
 
     public void setDataPlanListener(DataPlanListener dataPlanListener) {
@@ -69,7 +89,14 @@ public class DataPlanManager {
 
         if (getDataPlanRole() == DataPlanConstants.USER_ROLE.DATA_BUYER) {
             PurchaseManagerBuyer.getInstance().setDataPlanListener(dataPlanListener);
+        } else if (getDataPlanRole() == DataPlanConstants.USER_ROLE.DATA_SELLER){
+            PurchaseManagerSeller.getInstance().setDataPlanListener(dataPlanListener);
         }
+    }
+
+    public void closeMesh(int role) {
+        preferencesHelperDataplan.setDataPlanRole(role);
+        payController.getDataManager().restartMesh(role);
     }
 
     public interface DataPlanListener {
@@ -93,6 +120,8 @@ public class DataPlanManager {
         void onTopUpFailed(String sellerAddress, String msg);
 
         void onRoleSwitchCompleted();
+
+        void onLimitFinished(boolean isFullyFinished, String message);
     }
 
     public void roleSwitch(int newRole) {
@@ -111,11 +140,15 @@ public class DataPlanManager {
         if (getDataPlanRole() == DataPlanConstants.USER_ROLE.DATA_BUYER) {
 
             PurchaseManagerBuyer.getInstance().setDataPlanListener(dataPlanListener);
+
+            PurchaseManagerSeller.getInstance().setDataPlanListener(null);
             PurchaseManagerSeller.getInstance().destroyObject();
+
 
             PurchaseManagerBuyer.getInstance().setPayControllerListener();
 
         } else if (getDataPlanRole() == DataPlanConstants.USER_ROLE.DATA_SELLER) {
+            PurchaseManagerSeller.getInstance().setDataPlanListener(dataPlanListener);
 
             PurchaseManagerBuyer.getInstance().setDataPlanListener(null);
             PurchaseManagerBuyer.getInstance().destroyObject();
@@ -153,9 +186,9 @@ public class DataPlanManager {
         return preferencesHelperDataplan.getSellFromDate();
     }
 
-    public long getSellToDate() {
-        return preferencesHelperDataplan.getSellDataAmount();
-    }
+//    public long getSellToDate() {
+//        return preferencesHelperDataplan.getSellToDate();
+//    }
 
     public long getSellDataAmount() {
         return preferencesHelperDataplan.getSellDataAmount();
@@ -173,16 +206,34 @@ public class DataPlanManager {
         preferencesHelperDataplan.setSellDataAmount(sharedData);
     }
 
-    public void setSellToDate(long toDate) {
-        preferencesHelperDataplan.setSellToDate(toDate);
+
+    public long getRemainingData(){
+        if (preferencesHelperDataplan.getDataAmountMode() == DataPlanConstants.DATA_MODE.LIMITED){
+            try {
+                long sharedData = preferencesHelperDataplan.getSellDataAmount();
+                long usedData = getUsedData(MeshApp.getContext(), preferencesHelperDataplan.getSellFromDate());
+                return sharedData - usedData;
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            } catch (ExecutionException e) {
+                e.printStackTrace();
+            }
+
+        }
+
+        return 0;
     }
 
-    public long getUsedData(Context context, long fromDate, long toDate) throws ExecutionException, InterruptedException {
-        return DatabaseService.getInstance(context).getDataUsageByDate(fromDate, toDate);
+//    public void setSellToDate(long toDate) {
+//        preferencesHelperDataplan.setSellToDate(toDate);
+//    }
+
+    public long getUsedData(Context context, long fromDate) throws ExecutionException, InterruptedException {
+        return DatabaseService.getInstance(context).getDataUsageByDate(fromDate);
     }
 
-    public LiveData<Long> getDataUsage(Context context, long fromDate, long toDate) {
-        return DatabaseService.getInstance(context).getDatausageDao().getDataUsage(fromDate, toDate);
+    public LiveData<Long> getDataUsage(Context context, long fromDate) {
+        return DatabaseService.getInstance(context).getDatausageDao().getDataUsage(fromDate);
     }
 
     public void closeAllActiveChannel() {
@@ -234,10 +285,11 @@ public class DataPlanManager {
 
                 if (!TextUtils.isEmpty(purchase.sellerAddress) && connectedSellers.contains(purchase.sellerAddress)) {
 
+
                     if(purchase.balance < purchase.deposit) {
-                        connectedWithPurchasesClose.add(purchase.toSeller(DataPlanConstants.SELLER_LABEL.ONLINE_PURCHASED));
+                        connectedWithPurchasesClose.add(purchase.toSeller(DataPlanConstants.SELLER_LABEL.ONLINE_PURCHASED, payController.getDataManager().getUserNameByAddress(purchase.sellerAddress)));
                     } else {
-                        connectedWithPurchasesOpen.add(purchase.toSeller(DataPlanConstants.SELLER_LABEL.ONLINE_NOT_PURCHASED));
+                        connectedWithPurchasesOpen.add(purchase.toSeller(DataPlanConstants.SELLER_LABEL.ONLINE_NOT_PURCHASED, payController.getDataManager().getUserNameByAddress(purchase.sellerAddress)));
                     }
 
                     connectedSellers.remove(purchase.sellerAddress);
@@ -250,7 +302,7 @@ public class DataPlanManager {
             if (connectedSellers.size() > 0) {
 
                 for (String sellerId : connectedSellers) {
-                    finalSeller.add(getSellerById(sellerId, DataPlanConstants.SELLER_LABEL.ONLINE_NOT_PURCHASED));
+                    finalSeller.add(getSellerById(sellerId, DataPlanConstants.SELLER_LABEL.ONLINE_NOT_PURCHASED, payController.getDataManager().getUserNameByAddress(sellerId)));
                 }
 
                 // Add all top up seller in connected seller list
@@ -270,7 +322,7 @@ public class DataPlanManager {
                     // Ony added seller for close action seller
                     // Because those are not connected
                     if(purchase.balance < purchase.deposit) {
-                        finalSeller.add(purchase.toSeller(DataPlanConstants.SELLER_LABEL.OFFLINE_PURCHASED));
+                        finalSeller.add(purchase.toSeller(DataPlanConstants.SELLER_LABEL.OFFLINE_PURCHASED, payController.getDataManager().getUserNameByAddress(purchase.sellerAddress)));
                     }
                 }
             }
@@ -293,7 +345,7 @@ public class DataPlanManager {
 
             setSellers(finalSeller);
 
-        } catch (ExecutionException | InterruptedException e) {
+        } catch (ExecutionException | InterruptedException | RemoteException e) {
             e.printStackTrace();
         }
     }
@@ -322,10 +374,10 @@ public class DataPlanManager {
         }
     }
 
-    private Seller getSellerById(String sellerId, int label) {
+    private Seller getSellerById(String sellerId, int label, String name) {
         return new Seller()
                 .setId(sellerId)
-                .setName(sellerId)
+                .setName(name)
                 .setPurchasedData(0)
                 .setUsedData(0)
                 .setBtnEnabled(true)
