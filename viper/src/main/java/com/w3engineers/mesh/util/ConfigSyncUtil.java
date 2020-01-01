@@ -171,7 +171,7 @@ public class ConfigSyncUtil {
             PreferencesHelperDataplan.on().setRmeshPerPoint(configurationCommand.getRmeshPerToken());
             SharedPref.write(Constant.PreferenceKeys.GIFT_DONATE_LINK, configurationCommand.getGiftDonateLink());
 
-            EthereumServiceUtil.getInstance(context).getEthereumService().setGIftDonateUrl(configurationCommand.getGiftDonateLink());
+
 
             PreferencesHelperDataplan.on().setWalletRmeshAvailable(configurationCommand.isWalletRmeshAvailable());
             PreferencesHelperDataplan.on().setRmeshInfoText(configurationCommand.getRmeshInfoText());
@@ -184,6 +184,8 @@ public class ConfigSyncUtil {
             }
 
             configSyncEvent.setUpdate(true);
+
+            EthereumServiceUtil.getInstance(context).getEthereumService().setGIftDonateUrl(configurationCommand.getGiftDonateLink());
         } else {
             EthereumServiceUtil.getInstance(context).getEthereumService().setGIftDonateUrl(SharedPref.read(Constant.PreferenceKeys.GIFT_DONATE_LINK));
             configSyncEvent.setUpdate(false);
@@ -193,6 +195,32 @@ public class ConfigSyncUtil {
         configSyncEvent.setConfigurationCommand(configurationCommand);
         AppDataObserver.on().sendObserverData(configSyncEvent);
 
+    }
+
+    public void  loadFirstTimeData(Context context) {
+        int configVersion = PreferencesHelperDataplan.on().getConfigVersion();
+
+        String configData = loadJSONFromAsset(context);
+        ConfigurationCommand configurationCommand = new Gson().fromJson(configData, ConfigurationCommand.class);
+
+        if (configurationCommand != null && configVersion < configurationCommand.getConfigVersionCode()) {
+
+            PreferencesHelperDataplan.on().setConfigVersion(configurationCommand.getConfigVersionCode());
+            PreferencesHelperDataplan.on().setPerMbTokenValue(configurationCommand.getTokenPerMb());
+
+            PreferencesHelperDataplan.on().setMaxPointForRmesh(configurationCommand.getMaxPointForRmesh());
+            PreferencesHelperDataplan.on().setRmeshPerPoint(configurationCommand.getRmeshPerToken());
+            SharedPref.write(Constant.PreferenceKeys.GIFT_DONATE_LINK, configurationCommand.getGiftDonateLink());
+
+            PreferencesHelperDataplan.on().setWalletRmeshAvailable(configurationCommand.isWalletRmeshAvailable());
+            PreferencesHelperDataplan.on().setRmeshInfoText(configurationCommand.getRmeshInfoText());
+            PreferencesHelperDataplan.on().setRmeshOwnerAddress(configurationCommand.getRmeshOwnerAddress());
+            PreferencesHelperDataplan.on().setMainnetNetworkType(configurationCommand.getMainNetNetworkType());
+
+            for (Network network : configurationCommand.getNetwork()) {
+                EthereumServiceUtil.getInstance(context).insertNetworkInfo(new NetworkInfo().toNetworkInfo(network));
+            }
+        }
     }
 
     public void updateConfigCommandFile(Context context, ConfigurationCommand configurationCommand) {
@@ -208,7 +236,7 @@ public class ConfigSyncUtil {
             PreferencesHelperDataplan.on().setRmeshPerPoint(configurationCommand.getRmeshPerToken());
             SharedPref.write(Constant.PreferenceKeys.GIFT_DONATE_LINK, configurationCommand.getGiftDonateLink());
 
-            EthereumServiceUtil.getInstance(context).getEthereumService().setGIftDonateUrl(configurationCommand.getGiftDonateLink());
+
 
             PreferencesHelperDataplan.on().setWalletRmeshAvailable(configurationCommand.isWalletRmeshAvailable());
             PreferencesHelperDataplan.on().setRmeshInfoText(configurationCommand.getRmeshInfoText());
@@ -218,6 +246,8 @@ public class ConfigSyncUtil {
             for (Network network : configurationCommand.getNetwork()) {
                 EthereumServiceUtil.getInstance(context).insertNetworkInfo(new NetworkInfo().toNetworkInfo(network));
             }
+
+            EthereumServiceUtil.getInstance(context).getEthereumService().setGIftDonateUrl(configurationCommand.getGiftDonateLink());
         }
     }
 

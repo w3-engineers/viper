@@ -140,6 +140,8 @@ public class ViperClient {
             }
         });*/
 
+        ConfigSyncUtil.getInstance().loadFirstTimeData(mContext);
+
         UserInfo userInfo = new UserInfo();
 
         userInfo.setAddress(wallerAddress);
