@@ -13,6 +13,7 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -23,6 +24,7 @@ import android.widget.EditText;
 import android.widget.RadioButton;
 import android.widget.Switch;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.w3engineers.ext.strom.util.helper.Toaster;
 import com.w3engineers.mesh.R;
@@ -39,10 +41,13 @@ import com.w3engineers.mesh.util.Constant;
 import com.w3engineers.mesh.util.DialogUtil;
 import com.w3engineers.mesh.util.NotificationUtil;
 import com.w3engineers.mesh.util.Util;
+import com.w3engineers.mesh.util.lib.ConnectivityUtil;
 import com.w3engineers.mesh.util.lib.mesh.HandlerUtil;
 
 import java.text.SimpleDateFormat;
 import java.util.concurrent.ExecutionException;
+
+import java8.util.function.BiConsumer;
 
 public class TestDataPlanActivity extends TelemeshBaseActivity implements DataPlanManager.DataPlanListener {
 
@@ -64,6 +69,8 @@ public class TestDataPlanActivity extends TelemeshBaseActivity implements DataPl
     private TestActivityDataPlanBinding mBinding;
     private View view;
     private SimpleDateFormat sdf;
+    private final int MOBILE_DATA_ACTION = 100;
+    private final int INTERNET_CONNECTION_ACTION = 101;
 
 
     @Override
@@ -141,6 +148,7 @@ public class TestDataPlanActivity extends TelemeshBaseActivity implements DataPl
         mBinding.switchButtonLocal.setOnCheckedChangeListener(
                 new CompoundButton.OnCheckedChangeListener() {
                     public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+
                         if (isChecked) {
                             dataPlanRadioClicked(DataPlanConstants.USER_ROLE.MESH_USER);
 
@@ -159,15 +167,21 @@ public class TestDataPlanActivity extends TelemeshBaseActivity implements DataPl
                 new CompoundButton.OnCheckedChangeListener() {
                     public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                         if (isChecked) {
-                            dataPlanRadioClicked(DataPlanConstants.USER_ROLE.DATA_SELLER);
+                            ConnectivityUtil.isMobileDataEnable(getApplicationContext(), (message, isConnected) -> {
+                                runOnUiThread(() -> {
+                                    if (isConnected) {
+                                        dataPlanRadioClicked(DataPlanConstants.USER_ROLE.DATA_SELLER);
+                                    } else {
 
-//                          Toast.makeText(TestDataPlanActivity.this,
-//                                    "Switch On", Toast.LENGTH_SHORT).show();
+                                        mBinding.switchButtonSeller.setChecked(false);
+                                        showMobileDataNotEnableDialog();
+
+                                    }
+                                });
+                            });
+
                         } else {
-
                             checkAndCloseMesh(DataPlanConstants.USER_ROLE.DATA_SELLER);
-//                            Toast.makeText(TestDataPlanActivity.this,
-//                                    "Switch Off", Toast.LENGTH_SHORT).show();
                         }
                     }
                 });
@@ -191,22 +205,107 @@ public class TestDataPlanActivity extends TelemeshBaseActivity implements DataPl
                 });
 
         mBinding.switchButtonInternet.setOnCheckedChangeListener(
-                new CompoundButton.OnCheckedChangeListener() {
-                    public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                        if (isChecked) {
-                            dataPlanRadioClicked(DataPlanConstants.USER_ROLE.INTERNET_USER);
+                (buttonView, isChecked) -> {
+                    if (isChecked) {
+                        ConnectivityUtil.isInternetAvailable((message, isAvailable) -> {
+                            runOnUiThread(() -> {
+                                if (!isAvailable) {
 
-//                            Toast.makeText(TestDataPlanActivity.this,
-//                                    "Switch On", Toast.LENGTH_SHORT).show();
-                        } else {
-                            checkAndCloseMesh(DataPlanConstants.USER_ROLE.INTERNET_USER);
-//                            Toast.makeText(TestDataPlanActivity.this,
-//                                    "Switch Off", Toast.LENGTH_SHORT).show();
-                        }
+                                    showAlertForInternetNotAvailable();
+                                    mBinding.switchButtonInternet.setChecked(false);
+
+
+                                } else {
+                                    dataPlanRadioClicked(DataPlanConstants.USER_ROLE.INTERNET_USER);
+                                }
+                            });
+                        });
+                    } else {
+                        checkAndCloseMesh(DataPlanConstants.USER_ROLE.INTERNET_USER);
                     }
+
                 });
 
 
+    }
+
+
+    private void showMobileDataNotEnableDialog() {
+        DialogUtil.showConfirmationDialog(this,
+                getString(R.string.mobile_data_not_enable),
+                getString(R.string.no_data_msg),
+                getString(R.string.cancel),
+                getString(R.string.ok),
+                new DialogUtil.DialogButtonListener() {
+                    @Override
+                    public void onClickPositive() {
+                        Intent intent = new Intent(android.provider.Settings.ACTION_SETTINGS);
+                        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                        startActivityForResult(intent, MOBILE_DATA_ACTION);
+                    }
+
+                    @Override
+                    public void onCancel() {
+
+                    }
+
+                    @Override
+                    public void onClickNegative() {
+
+                    }
+                });
+    }
+
+
+    private void showAlertForInternetNotAvailable() {
+        DialogUtil.showConfirmationDialog(this,
+                getString(R.string.internet_not_available),
+                getString(R.string.no_internet_msg),
+                getString(R.string.cancel),
+                getString(R.string.ok),
+                new DialogUtil.DialogButtonListener() {
+                    @Override
+                    public void onClickPositive() {
+                        Intent intent = new Intent(android.provider.Settings.ACTION_SETTINGS);
+                        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                        startActivityForResult(intent, INTERNET_CONNECTION_ACTION);
+                    }
+
+                    @Override
+                    public void onCancel() {
+
+                    }
+
+                    @Override
+                    public void onClickNegative() {
+
+                    }
+                });
+    }
+
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == MOBILE_DATA_ACTION) {
+            ConnectivityUtil.isMobileDataEnable(getApplicationContext(), (message, isEnable) -> {
+                if (isEnable) {
+                    runOnUiThread(() -> mBinding.switchButtonSeller.setChecked(true));
+                    dataPlanRadioClicked(DataPlanConstants.USER_ROLE.DATA_SELLER);
+                } else {
+                    runOnUiThread(() -> Toast.makeText(getApplicationContext(), "Mobile data not enabled", Toast.LENGTH_SHORT).show());
+                }
+            });
+        } else if (requestCode == INTERNET_CONNECTION_ACTION) {
+            ConnectivityUtil.isInternetAvailable((message, isAvailable) -> {
+                if (isAvailable) {
+                    mBinding.switchButtonInternet.setChecked(true);
+                    dataPlanRadioClicked(DataPlanConstants.USER_ROLE.INTERNET_USER);
+                } else {
+                    runOnUiThread(() -> Toast.makeText(getApplicationContext(), "Internet not enabled", Toast.LENGTH_SHORT).show());
+                }
+            });
+        }
     }
 
     private void setListenerForAllExpandable() {
@@ -398,14 +497,14 @@ public class TestDataPlanActivity extends TelemeshBaseActivity implements DataPl
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == R.id.menu_wallet) {
             WalletManager.openActivity(this, null);
-        }else {
+        } else {
             finish();
         }
 
         return false;
     }
 
-        @Override
+    @Override
     public void onPurchaseFailed(String sellerAddress, String msg) {
         runOnUiThread(() -> {
             for (Seller item : getAdapter().getItems()) {
@@ -583,7 +682,7 @@ public class TestDataPlanActivity extends TelemeshBaseActivity implements DataPl
         viewModel.roleSwitch(mCurrentRole);
 
 
-        if (prev != DataPlanConstants.USER_ROLE.MESH_STOP){
+        if (prev != DataPlanConstants.USER_ROLE.MESH_STOP) {
             roleSwitches[prev].setChecked(false);
             expandableButtons[mCurrentRole].setTextColor(Color.argb(255, 0, 141, 255));
         }
@@ -600,7 +699,7 @@ public class TestDataPlanActivity extends TelemeshBaseActivity implements DataPl
 
     private void loadUI() {
 
-        if (mCurrentRole != DataPlanConstants.USER_ROLE.MESH_STOP ) {
+        if (mCurrentRole != DataPlanConstants.USER_ROLE.MESH_STOP) {
             roleSwitches[DataPlanManager.getInstance().getDataPlanRole()].setChecked(true);
             expandableButtons[DataPlanManager.getInstance().getDataPlanRole()].setTextColor(Color.argb(255, 0, 141, 255));
 
@@ -630,10 +729,10 @@ public class TestDataPlanActivity extends TelemeshBaseActivity implements DataPl
         mBinding.sellDataTextView.setText(String.format(getResources().getString(R.string.sell_your_data_info), dataPerMb + ""));
         mBinding.buyDataTextView.setText(String.format(getResources().getString(R.string.buy_data_info), dataPerMb + ""));
 
-        if (dataLimitModel.isDataLimited()){
+        if (dataLimitModel.isDataLimited()) {
 
             long remainingData = DataPlanManager.getInstance().getRemainingData();
-            if (remainingData <= Constant.SELLER_MINIMUM_ERROR_DATA){
+            if (remainingData <= Constant.SELLER_MINIMUM_ERROR_DATA) {
                 showDatalimitError(this.getString(R.string.data_limit_error));
             } else if (remainingData < Constant.SELLER_MINIMUM_WARNING_DATA) {
                 showDatalimitWarning(this.getString(R.string.data_limit_warning));
@@ -643,13 +742,13 @@ public class TestDataPlanActivity extends TelemeshBaseActivity implements DataPl
         disableSaveButton();
     }
 
-    private void showDatalimitWarning(String msg){
+    private void showDatalimitWarning(String msg) {
         mBinding.dataLimitError.setTextColor(Color.argb(255, 255, 140, 0));
         mBinding.dataLimitError.setText(msg);
         mBinding.dataLimitError.setVisibility(View.VISIBLE);
     }
 
-    private void showDatalimitError(String msg){
+    private void showDatalimitError(String msg) {
         mBinding.dataLimitError.setTextColor(Color.RED);
         mBinding.dataLimitError.setText(msg);
         mBinding.dataLimitError.setVisibility(View.VISIBLE);
@@ -724,9 +823,9 @@ public class TestDataPlanActivity extends TelemeshBaseActivity implements DataPl
 
     private void showSellerWarningDialog(int activeBuyer) {
 
-        if (dataLimitModel.isDataLimited()){
+        if (dataLimitModel.isDataLimited()) {
             long remainingData = DataPlanManager.getInstance().getRemainingData();
-            if (remainingData <= Constant.SELLER_MINIMUM_ERROR_DATA){
+            if (remainingData <= Constant.SELLER_MINIMUM_ERROR_DATA) {
                 long sharedData = DataPlanManager.getInstance().getSellAmountData();
 
                 DialogUtil.showConfirmationDialog(TestDataPlanActivity.this, "Data Limit exceeded!",
@@ -748,7 +847,7 @@ public class TestDataPlanActivity extends TelemeshBaseActivity implements DataPl
                                 DataPlanManager.getInstance().closeAllActiveChannel();
                             }
                         });
-            }else if (remainingData <= Constant.SELLER_MINIMUM_WARNING_DATA){
+            } else if (remainingData <= Constant.SELLER_MINIMUM_WARNING_DATA) {
                 DialogUtil.showConfirmationDialog(TestDataPlanActivity.this, "Data Limit almost exceeded!",
                         "You have only" + " " + Util.humanReadableByteCount(remainingData) + " " + "remaining shared data, please increase limit before finishing all",
                         null,
@@ -853,7 +952,6 @@ public class TestDataPlanActivity extends TelemeshBaseActivity implements DataPl
         enableSaveButton();
 
 
-
     }
 
     public void onRadioLimitedButtonClicked(View view) {
@@ -890,32 +988,32 @@ public class TestDataPlanActivity extends TelemeshBaseActivity implements DataPl
 
                 long tempSharedData = convertMegabytesToBytes(Integer.valueOf(mBinding.range.getText().toString()));
 
-                if (tempSharedData <= 0){
+                if (tempSharedData <= 0) {
                     showDatalimitError(this.getString(R.string.data_limit_validation_text));
                 } else {
-                    if (from == 0 || sharedData == 0){
+                    if (from == 0 || sharedData == 0) {
                         mBinding.dataLimitError.setVisibility(View.INVISIBLE);
                         dataLimitModel.setFromDate(System.currentTimeMillis());
                         dataLimitModel.setSharedData(tempSharedData);
                         dataLimitModel.setDataLimited(true);
                         disableSaveButton();
                         DataPlanManager.resumeMessaging();
-                        if (tempSharedData < Constant.SELLER_MINIMUM_WARNING_DATA){
+                        if (tempSharedData < Constant.SELLER_MINIMUM_WARNING_DATA) {
                             showDatalimitWarning(this.getString(R.string.data_limit_warning));
                         }
                     } else {
                         long usedData = DataPlanManager.getInstance().getUsedData(this, from);
-                        if (sharedData <= (usedData + Constant.SELLER_MINIMUM_ERROR_DATA)){
+                        if (sharedData <= (usedData + Constant.SELLER_MINIMUM_ERROR_DATA)) {
                             mBinding.dataLimitError.setVisibility(View.INVISIBLE);
                             dataLimitModel.setFromDate(System.currentTimeMillis());
                             dataLimitModel.setSharedData(tempSharedData);
                             dataLimitModel.setDataLimited(true);
                             disableSaveButton();
                             DataPlanManager.resumeMessaging();
-                            if (tempSharedData < Constant.SELLER_MINIMUM_WARNING_DATA){
+                            if (tempSharedData < Constant.SELLER_MINIMUM_WARNING_DATA) {
                                 showDatalimitWarning(this.getString(R.string.data_limit_warning));
                             }
-                        }else {
+                        } else {
                             if (tempSharedData <= usedData) {
                                 showDatalimitError(this.getString(R.string.data_limit_larger_needed));
                             } else {
@@ -924,7 +1022,7 @@ public class TestDataPlanActivity extends TelemeshBaseActivity implements DataPl
                                 dataLimitModel.setDataLimited(true);
                                 disableSaveButton();
                                 DataPlanManager.resumeMessaging();
-                                if (tempSharedData - usedData <Constant.SELLER_MINIMUM_WARNING_DATA){
+                                if (tempSharedData - usedData < Constant.SELLER_MINIMUM_WARNING_DATA) {
                                     showDatalimitWarning(this.getString(R.string.data_limit_warning));
                                 }
                             }

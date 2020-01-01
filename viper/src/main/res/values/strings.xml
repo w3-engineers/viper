@@ -166,4 +166,9 @@
     <string name="token_guideline">Token Guideline</string>
 
 
+    <string name="internet_not_available">Internet not available</string>
+    <string name="mobile_data_not_enable">Mobile data not enable</string>
+    <string name="no_internet_msg">Please enable mobile data or connect with WiFi</string>
+    <string name="no_data_msg">Please enable mobile data to be a seller</string>
+
 </resources>
