@@ -135,61 +135,68 @@ public class ConfigSyncUtil {
         protected void onPostExecute(String s) {
             super.onPostExecute(s);
 
-            processConfigJson(context, s, isMeshStartTime);
+            processConfigJson(context, null, isMeshStartTime);
         }
     }
 
     private void processConfigJson(Context context, String configData, boolean isMeshStartTime) {
 
-        ConfigurationCommand configurationCommand;
-
-        if (!TextUtils.isEmpty(configData)) {
-            configurationCommand = new Gson().fromJson(configData, ConfigurationCommand.class);
-        } else {
-            configData = loadJSONFromAsset(context);
-            configurationCommand = new Gson().fromJson(configData, ConfigurationCommand.class);
-        }
-
-        int configVersion = PreferencesHelperDataplan.on().getConfigVersion();
-        int tokenGuideVersion = PreferencesHelperDataplan.on().getTokenGuideVersion();
-
+        ConfigurationCommand configurationCommand = null;
         ConfigSyncEvent configSyncEvent = new ConfigSyncEvent();
 
-        if (configurationCommand != null && tokenGuideVersion < configurationCommand.getTokenGuideVersion()) {
-            String downloadLink = SharedPref.read(Constant.PreferenceKeys.APP_DOWNLOAD_LINK) + "point_guide.json";
-            new DownloadGuidelineContent(context).execute(downloadLink);
+        if (!TextUtils.isEmpty(configData)) {
 
-            PreferencesHelperDataplan.on().setTokenGuideVersion(configurationCommand.getTokenGuideVersion());
-        }
+            configurationCommand = new Gson().fromJson(configData, ConfigurationCommand.class);
 
-        if (configurationCommand != null && configVersion < configurationCommand.getConfigVersionCode()) {
+            int configVersion = PreferencesHelperDataplan.on().getConfigVersion();
+            int tokenGuideVersion = PreferencesHelperDataplan.on().getTokenGuideVersion();
 
-            PreferencesHelperDataplan.on().setConfigVersion(configurationCommand.getConfigVersionCode());
-            PreferencesHelperDataplan.on().setPerMbTokenValue(configurationCommand.getTokenPerMb());
+            if (configurationCommand != null && tokenGuideVersion < configurationCommand.getTokenGuideVersion()) {
+                String downloadLink = SharedPref.read(Constant.PreferenceKeys.APP_DOWNLOAD_LINK) + "point_guide.json";
+                new DownloadGuidelineContent(context).execute(downloadLink);
 
-            PreferencesHelperDataplan.on().setMaxPointForRmesh(configurationCommand.getMaxPointForRmesh());
-            PreferencesHelperDataplan.on().setRmeshPerPoint(configurationCommand.getRmeshPerToken());
-            SharedPref.write(Constant.PreferenceKeys.GIFT_DONATE_LINK, configurationCommand.getGiftDonateLink());
-
-
-
-            PreferencesHelperDataplan.on().setWalletRmeshAvailable(configurationCommand.isWalletRmeshAvailable());
-            PreferencesHelperDataplan.on().setRmeshInfoText(configurationCommand.getRmeshInfoText());
-            PreferencesHelperDataplan.on().setRmeshOwnerAddress(configurationCommand.getRmeshOwnerAddress());
-            PreferencesHelperDataplan.on().setMainnetNetworkType(configurationCommand.getMainNetNetworkType());
-
-
-            for (Network network : configurationCommand.getNetwork()) {
-                EthereumServiceUtil.getInstance(context).insertNetworkInfo(new NetworkInfo().toNetworkInfo(network));
+                PreferencesHelperDataplan.on().setTokenGuideVersion(configurationCommand.getTokenGuideVersion());
             }
 
-            configSyncEvent.setUpdate(true);
+            if (configurationCommand != null && configVersion < configurationCommand.getConfigVersionCode()) {
 
-            EthereumServiceUtil.getInstance(context).getEthereumService().setGIftDonateUrl(configurationCommand.getGiftDonateLink());
-        } else {
+                PreferencesHelperDataplan.on().setConfigVersion(configurationCommand.getConfigVersionCode());
+                PreferencesHelperDataplan.on().setPerMbTokenValue(configurationCommand.getTokenPerMb());
+
+                PreferencesHelperDataplan.on().setMaxPointForRmesh(configurationCommand.getMaxPointForRmesh());
+                PreferencesHelperDataplan.on().setRmeshPerPoint(configurationCommand.getRmeshPerToken());
+                SharedPref.write(Constant.PreferenceKeys.GIFT_DONATE_LINK, configurationCommand.getGiftDonateLink());
+
+
+
+                PreferencesHelperDataplan.on().setWalletRmeshAvailable(configurationCommand.isWalletRmeshAvailable());
+                PreferencesHelperDataplan.on().setRmeshInfoText(configurationCommand.getRmeshInfoText());
+                PreferencesHelperDataplan.on().setRmeshOwnerAddress(configurationCommand.getRmeshOwnerAddress());
+                PreferencesHelperDataplan.on().setMainnetNetworkType(configurationCommand.getMainNetNetworkType());
+
+
+                for (Network network : configurationCommand.getNetwork()) {
+                    EthereumServiceUtil.getInstance(context).insertNetworkInfo(new NetworkInfo().toNetworkInfo(network));
+                }
+
+                configSyncEvent.setUpdate(true);
+
+                EthereumServiceUtil.getInstance(context).getEthereumService().setGIftDonateUrl(configurationCommand.getGiftDonateLink());
+            } else {
+                EthereumServiceUtil.getInstance(context).getEthereumService().setGIftDonateUrl(SharedPref.read(Constant.PreferenceKeys.GIFT_DONATE_LINK));
+                configSyncEvent.setUpdate(false);
+            }
+        }
+        else {
             EthereumServiceUtil.getInstance(context).getEthereumService().setGIftDonateUrl(SharedPref.read(Constant.PreferenceKeys.GIFT_DONATE_LINK));
             configSyncEvent.setUpdate(false);
         }
+//        else {
+//            configData = loadJSONFromAsset(context);
+//            configurationCommand = new Gson().fromJson(configData, ConfigurationCommand.class);
+//        }
+
+
 
         configSyncEvent.setMeshStartTime(isMeshStartTime);
         configSyncEvent.setConfigurationCommand(configurationCommand);

@@ -687,6 +687,7 @@ public class PurchaseManagerSeller extends PurchaseManager implements PayControl
 
                 Double etherBalance = ethService.getUserEthBalance(ethService.getAddress(), endPointType);
                 Double tokenBalance = ethService.getUserTokenBalance(ethService.getAddress(), endPointType);
+
                 if (etherBalance != null) {
                     EthereumServiceUtil.getInstance(mContext).updateCurrency(endPointType, etherBalance);
                 }
@@ -713,6 +714,46 @@ public class PurchaseManagerSeller extends PurchaseManager implements PayControl
         } else {
             if(walletListener != null) {
                 walletListener.onBalanceInfo(false, "No internet found on this device.");
+            }
+        }
+    }
+
+    public void getMyRmBalance() {
+
+        if (InternetUtil.isNetworkConnected(mContext)) {
+            try {
+
+                int endPointType = preferencesHelperDataplan.getMainnetNetworkType();
+
+                Double etherBalance = ethService.getUserEthBalance(ethService.getAddress(), endPointType);
+                Double tokenBalance = ethService.getUserTokenBalance(ethService.getAddress(), endPointType);
+
+
+                if (etherBalance != null) {
+                    EthereumServiceUtil.getInstance(mContext).updateCurrency(endPointType, etherBalance);
+                }
+
+                if (tokenBalance != null) {
+                    EthereumServiceUtil.getInstance(mContext).updateToken(endPointType, tokenBalance);
+                }
+
+                if (etherBalance == null || tokenBalance == null) {
+                    if(walletListener != null) {
+                        walletListener.onRmBalanceInfo(false, "Can't reach network, please try again later.");
+                    }
+                } else {
+                    if(walletListener != null) {
+                        walletListener.onRmBalanceInfo(true, "Balance updated");
+                    }
+                }
+            } catch (Exception e) {
+                if(walletListener != null) {
+                    walletListener.onRmBalanceInfo(false, e.getMessage());
+                }
+            }
+        } else {
+            if(walletListener != null) {
+                walletListener.onRmBalanceInfo(false, "No internet found on this device.");
             }
         }
     }

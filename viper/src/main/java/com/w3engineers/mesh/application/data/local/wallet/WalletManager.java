@@ -88,6 +88,19 @@ public class WalletManager {
         return false;
     }
 
+    public void donotShowGiftRmeshAlert(boolean b) {
+        preferencesHelperDataplan.setChoiseForRmeshAlert(b);
+    }
+
+    public boolean isNotShowGiftRmeshAlert() {
+       return preferencesHelperDataplan.getChoiseForRmeshAlert();
+    }
+
+    public int getMainnetNetworkType(){
+        return preferencesHelperDataplan.getMainnetNetworkType();
+    }
+
+
     public interface WalletListener {
 
         void onGiftResponse(boolean success, boolean isGifted, String message);
@@ -101,6 +114,8 @@ public class WalletManager {
         void onRequestSubmitted(boolean success, String msg);
 
         void onRequestCompleted(boolean success, String msg);
+
+        void onRmBalanceInfo(boolean success, String msg);
     }
 
     public LiveData<Double> getTotalEarn(String myAddress, int endPoint) {
@@ -137,8 +152,14 @@ public class WalletManager {
 
             PurchaseManagerSeller.getInstance().getMyBalanceInfo();
 
+            if (isWalletRmeshAvailable()){
+                PurchaseManagerSeller.getInstance().getMyRmBalance();
+            }
         } else if (dataPlanManager.getDataPlanRole() == DataPlanConstants.USER_ROLE.DATA_BUYER){
             PurchaseManagerBuyer.getInstance().getMyBalanceInfo();
+            if (isWalletRmeshAvailable()){
+                PurchaseManagerBuyer.getInstance().getMyRmBalance();
+            }
         } else {
 
             if (walletListener != null) {

@@ -167,4 +167,10 @@
 
     <string name="token_balance">You will get <b>%s RMESH</b> tokens for every <b>%s Points</b></string>
 
+    <string name="txt_rmesh_reward_title">RMESH Reward!</string>
+    <string name="txt_rmesh_reward_message">You are eligible for 1000 RMESH tokens for your 1000 Points.\nClaim it now!</string>
+    <string name="txt_do_not_show_messahe">You can do this anytime you want.\nTo claim the gift later, just click on your Points.</string>
+    <string name="txt_do_not_show">Don\'t show it again.</string>
+    <string name="txt_claim_now">Claim Now</string>
+
 </resources>

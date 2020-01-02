@@ -36,7 +36,7 @@ public class WalletViewModel extends BaseRxViewModel {
                 .subscribe(walletInfos -> {
                     for (WalletInfo walletInfo : walletInfos) {
 
-                        if (walletInfo.networkType == PreferencesHelperPaylib.onInstance(MeshApp.getContext()).getEndpointMode()) {
+                        if (walletInfo.networkType == PreferencesHelperPaylib.onInstance(MeshApp.getContext()).getEndpointMode() || walletInfo.networkType == walletManager.getMainnetNetworkType()) {
                             networkMutableLiveData.postValue(walletInfo);
                         }
                     }

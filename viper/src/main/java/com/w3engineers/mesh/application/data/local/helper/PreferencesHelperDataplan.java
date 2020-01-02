@@ -23,6 +23,9 @@ public class PreferencesHelperDataplan {
     private static final String GIFT_TOKEN_TRANX_HASH = "requested_token_hash";
     private static final String GIFT_ENDPOINT_TYPE = "gift_end_point_type";
     private static final String ETHER_REQUEST_TIME = "ether_request_time";
+    private static final String DONOT_SHOW_RMESH_ALERT = "do_not_show_rmesh_alert";
+
+
     private static final String CONFIG_VERSION = "CONFIG_VERSION";
     private static final String TOKEN_GUIDE_VERSION = "TOKEN_GUIDE_VERSION";
     private static final String PER_MB_TKN_VALUE = "PER_MB_TKN_VALUE";
@@ -235,5 +238,12 @@ public class PreferencesHelperDataplan {
 
     public int getMainnetNetworkType() {
         return SharedPref.readInt(MAINNET_NETWORK_TYPE);
+    }
+
+    public void setChoiseForRmeshAlert(boolean b) {
+        SharedPref.write(DONOT_SHOW_RMESH_ALERT, b);
+    }
+    public boolean getChoiseForRmeshAlert() {
+        return SharedPref.readBoolean(DONOT_SHOW_RMESH_ALERT, false);
     }
 }

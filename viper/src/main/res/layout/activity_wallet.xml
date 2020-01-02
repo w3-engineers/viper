@@ -275,7 +275,6 @@
                             android:textColor="@color/currency_text_color"
                             android:textSize="@dimen/text_size_15" />
 
-
                         <android.support.constraint.ConstraintLayout
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
@@ -283,6 +282,70 @@
                             android:layout_marginTop="@dimen/margin_40"
                             android:layout_marginEnd="@dimen/margin_5"
                             android:theme="@style/allTextInputOfLayoutBlack">
+
+
+                            <android.support.constraint.ConstraintLayout
+                                android:id="@+id/rm_layer"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:visibility="gone"
+                                app:layout_constraintStart_toStartOf="parent"
+                                app:layout_constraintTop_toTopOf="parent">
+
+                                <ImageView
+                                    android:id="@+id/ic_rm"
+                                    android:layout_width="@dimen/width_25"
+                                    android:layout_height="@dimen/width_25"
+                                    android:contentDescription="@string/withdraw"
+                                    app:layout_constraintTop_toTopOf="parent"
+                                    android:layout_marginStart="@dimen/margin_5"
+                                    app:layout_constraintStart_toStartOf="parent"
+                                    android:src="@mipmap/ic_rm" />
+
+                                <TextView
+                                    android:id="@+id/rm_info"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="RMESH"
+                                    android:textAllCaps="true"
+                                    android:textColor="@color/light_black"
+                                    android:textSize="@dimen/text_size_16"
+                                    android:textStyle="bold"
+                                    android:layout_marginStart="@dimen/margin_10"
+                                    app:layout_constraintStart_toEndOf="@+id/ic_rm"
+                                    app:layout_constraintTop_toTopOf="parent" />
+
+                                <TextView
+                                    android:id="@+id/rm_earned"
+                                    android:layout_width="@dimen/width_0"
+                                    android:layout_height="wrap_content"
+                                    android:gravity="end"
+                                    android:paddingStart="@dimen/padding_5"
+                                    android:paddingEnd="@dimen/padding_5"
+                                    android:text="100"
+                                    android:textColor="@color/color_magenta"
+                                    android:textSize="@dimen/text_size_20"
+                                    android:textStyle="bold"
+                                    app:layout_constraintBottom_toBottomOf="@+id/rm_info"
+                                    app:layout_constraintEnd_toEndOf="parent"
+                                    app:layout_constraintTop_toTopOf="@+id/rm_info" />
+
+                                <View
+                                    android:id="@+id/rm_view"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="@dimen/height_2"
+                                    android:layout_marginTop="@dimen/margin_20"
+                                    android:background="@drawable/dotted_line"
+                                    android:layerType="software"
+                                    android:visibility="visible"
+                                    app:layout_constraintEnd_toEndOf="parent"
+                                    app:layout_constraintStart_toStartOf="parent"
+                                    app:layout_constraintTop_toBottomOf="@+id/rm_earned" />
+
+                            </android.support.constraint.ConstraintLayout>
+
+
+
 
                             <TextView
                                 android:id="@+id/tv_title_total_earned"
@@ -295,8 +358,9 @@
                                 android:textColor="@color/light_black"
                                 android:textSize="@dimen/text_size_16"
                                 android:textStyle="bold"
+                                android:layout_marginTop="@dimen/margin_20"
                                 app:layout_constraintStart_toStartOf="parent"
-                                app:layout_constraintTop_toTopOf="parent" />
+                                app:layout_constraintTop_toBottomOf="@+id/rm_layer" />
 
                             <TextView
                                 android:id="@+id/tv_earned"
@@ -305,7 +369,7 @@
                                 android:gravity="end"
                                 android:paddingStart="@dimen/padding_5"
                                 android:paddingEnd="@dimen/padding_5"
-                                android:text="0.000000000000"
+                                android:text="0.0"
                                 android:textColor="@color/color_green"
                                 android:textSize="@dimen/text_size_20"
                                 android:textStyle="bold"
@@ -348,7 +412,7 @@
                                 android:paddingStart="@dimen/padding_5"
                                 android:paddingEnd="@dimen/padding_5"
                                 android:paddingBottom="@dimen/padding_5"
-                                android:text="0.000000"
+                                android:text="4.94"
                                 android:textColor="@color/color_orange"
                                 android:textSize="@dimen/text_size_20"
                                 android:textStyle="bold"
@@ -358,13 +422,28 @@
 
 
                         </android.support.constraint.ConstraintLayout>
+                        <Button
+                            android:id="@+id/button_convert_rmpoint"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginLeft="@dimen/margin_15"
+                            android:layout_marginTop="@dimen/margin_60"
+                            android:layout_marginRight="@dimen/margin_15"
+                            android:layout_marginBottom="@dimen/margin_5"
+                            android:background="@drawable/gradient_color_primary_and_dark_point"
+                            android:text="Convert RMESH to point"
+                            android:textAllCaps="true"
+                            android:textColor="@color/white"
+                            android:textSize="@dimen/text_size_16"
+                            android:visibility="gone"/>
+
 
                         <Button
                             android:id="@+id/button_view_transaction"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_marginLeft="@dimen/margin_15"
-                            android:layout_marginTop="@dimen/margin_60"
+                            android:layout_marginTop="@dimen/margin_10"
                             android:layout_marginRight="@dimen/margin_15"
                             android:layout_marginBottom="@dimen/margin_20"
                             android:background="@drawable/rectangle_button_shape"

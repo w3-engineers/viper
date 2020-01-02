@@ -301,6 +301,29 @@ public class PurchaseManagerBuyer extends PurchaseManager implements PayControll
 
     }
 
+    public void getMyRmBalance() {
+        MeshLog.p("getMyRmBalance");
+        try {
+            List<String> sellerIds = payController.getDataManager().getInternetSellers();
+            if (sellerIds.size() == 0) {
+
+                if (walletListener != null) {
+                    walletListener.onRmBalanceInfo(false, "No internet seller connected.");
+                }
+            } else {
+                String sellerId = sellerIds.get(0);
+                String query = PurchaseConstants.INFO_KEYS.ETH_BALANCE + "," + PurchaseConstants.INFO_KEYS.TKN_BALANCE;
+                int endPointType = preferencesHelperDataplan.getMainnetNetworkType();
+
+                getMyInfo(sellerId, query, PurchaseConstants.INFO_PURPOSES.REFRESH_BALANCE, endPointType);
+            }
+        } catch (Exception ex){
+            ex.printStackTrace();
+        }
+
+    }
+
+
 /*    public void sendEtherRequest() {
 
         try {
@@ -506,20 +529,20 @@ public class PurchaseManagerBuyer extends PurchaseManager implements PayControll
                     EthereumServiceUtil.getInstance(mContext).updateCurrencyAndToken(endPointType, ethBalance, tknBalance);
 
                     if (walletListener != null) {
-                        walletListener.onBalanceInfo(true, "Balance updated");
+                        if (endPointType == preferencesHelperDataplan.getMainnetNetworkType()){
+                            walletListener.onRmBalanceInfo(true, "Balance updated");
+                        } else {
+                            walletListener.onBalanceInfo(true, "Balance updated");
+                        }
                     }
-
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
                 break;
             case PurchaseConstants.INFO_PURPOSES.BUY_TOKEN:
-                double token = EthereumServiceUtil.getInstance(mContext).getToken(endPointType);
-                double currency = EthereumServiceUtil.getInstance(mContext).getCurrency(endPointType);
+//                double token = EthereumServiceUtil.getInstance(mContext).getToken(endPointType);
+//                double currency = EthereumServiceUtil.getInstance(mContext).getCurrency(endPointType);
                 try {
-
-
-
                     if (infoJson.has(PurchaseConstants.INFO_KEYS.NONCE) && infoJson.has(PurchaseConstants.INFO_KEYS.ETH_BALANCE)) {
                         int nonce = infoJson.getInt(PurchaseConstants.INFO_KEYS.NONCE);
                         double ethBalance = infoJson.getDouble(PurchaseConstants.INFO_KEYS.ETH_BALANCE);
