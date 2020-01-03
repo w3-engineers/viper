@@ -329,6 +329,7 @@ public class BlockRequest {
                     BigInteger balance = tmeshToken.balanceOf(address).send();
                     if (balance != null) {
                         double tokenValue = getETHorTOKEN(balance);
+                        Log.v("BlockRequest", "tkn " + tokenValue);
                         return tokenValue;
                     }
                 } catch (Exception e) {
@@ -353,6 +354,7 @@ public class BlockRequest {
                     EthGetBalance ethGetBalance = web3j.ethGetBalance(address, DefaultBlockParameterName.LATEST).sendAsync().get();
                     if (ethGetBalance != null) {
                         double ethValue = getETHorTOKEN(ethGetBalance.getBalance());
+                        Log.v("BlockRequest", "eth " + ethValue);
                         return ethValue;
                     }
                 } catch (Exception e) {
@@ -430,7 +432,7 @@ public class BlockRequest {
 
     public double getETHorTOKEN(BigInteger value) {
         BigDecimal tokenValue = Convert.fromWei(new BigDecimal(value), Convert.Unit.ETHER);
-        Log.i(TAG, "tokenValue: " + tokenValue.doubleValue());
+        Log.i(TAG, "converted to base br: " + tokenValue.doubleValue());
         return tokenValue.doubleValue();
     }
     //    public void verifyClosingHashSignature(final String sender, final int blockNumber, final int balance, final String closingSig, final VerifyClosingHash listener) {

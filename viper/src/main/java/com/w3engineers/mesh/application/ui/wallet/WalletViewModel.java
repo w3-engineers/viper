@@ -16,6 +16,7 @@ import com.w3engineers.ext.strom.application.ui.base.BaseRxViewModel;
 import com.w3engineers.mesh.application.data.local.db.networkinfo.WalletInfo;
 import com.w3engineers.mesh.application.data.local.wallet.WalletManager;
 import com.w3engineers.mesh.util.MeshApp;
+import com.w3engineers.mesh.util.MeshLog;
 
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
@@ -23,6 +24,7 @@ import io.reactivex.schedulers.Schedulers;
 public class WalletViewModel extends BaseRxViewModel {
 
     public MutableLiveData<WalletInfo> networkMutableLiveData = new MutableLiveData<>();
+    public MutableLiveData<WalletInfo> networkMutableLiveDataRm = new MutableLiveData<>();
     private WalletManager walletManager;
 
     public WalletViewModel() {
@@ -34,10 +36,17 @@ public class WalletViewModel extends BaseRxViewModel {
                 .subscribeOn(Schedulers.newThread())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(walletInfos -> {
+
+                    MeshLog.v("wallet data length " + walletInfos.size());
                     for (WalletInfo walletInfo : walletInfos) {
 
-                        if (walletInfo.networkType == PreferencesHelperPaylib.onInstance(MeshApp.getContext()).getEndpointMode() || walletInfo.networkType == walletManager.getMainnetNetworkType()) {
+                        MeshLog.v("wallet data1 " + walletInfo.networkType + " eth " + walletInfo.currencyAmount + " tkn " + walletInfo.tokenAmount);
+                        if (walletInfo.networkType == PreferencesHelperPaylib.onInstance(MeshApp.getContext()).getEndpointMode()) {
+                            MeshLog.v("wallet data2 " + walletInfo.networkType + " eth " + walletInfo.currencyAmount + " tkn " + walletInfo.tokenAmount);
                             networkMutableLiveData.postValue(walletInfo);
+                        }else if (walletInfo.networkType == walletManager.getMainnetNetworkType()){
+                            MeshLog.v("wallet data3 " + walletInfo.networkType + " eth " + walletInfo.currencyAmount + " tkn " + walletInfo.tokenAmount);
+                            networkMutableLiveDataRm.postValue(walletInfo);
                         }
                     }
                 }, Throwable::printStackTrace));

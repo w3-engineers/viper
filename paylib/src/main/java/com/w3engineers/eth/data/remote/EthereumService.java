@@ -139,6 +139,10 @@ public class EthereumService implements BlockRequest.BlockTransactionObserver, E
                 value.setNetworkInterface(network);
             }
         }
+
+        if (this.credentials != null){
+            setCredential(this.credentials);
+        }
     }
 
 
@@ -413,6 +417,8 @@ public class EthereumService implements BlockRequest.BlockTransactionObserver, E
         if (network == null)
             return  null;
 
+        Log.v("EthereumService ", "tkn endpoint " + endpointType);
+
         return blockRequests.get(endpointType).getUserTokenBalance(address);
     }
 
@@ -420,6 +426,7 @@ public class EthereumService implements BlockRequest.BlockTransactionObserver, E
         if (network == null)
             return  null;
 
+        Log.v("EthereumService ", "eth endpoint " + endpointType);
         return blockRequests.get(endpointType).getUserEthBalance(address);
     }
 
@@ -619,7 +626,7 @@ public class EthereumService implements BlockRequest.BlockTransactionObserver, E
 
     public double getETHorTOKEN(BigInteger value) {
         BigDecimal tokenValue = Convert.fromWei(new BigDecimal(value), Convert.Unit.ETHER);
-        Log.i(TAG, "tokenValue: " + tokenValue.doubleValue());
+        Log.i(TAG, "converted to base es: " + tokenValue.doubleValue());
         return tokenValue.doubleValue();
     }
 

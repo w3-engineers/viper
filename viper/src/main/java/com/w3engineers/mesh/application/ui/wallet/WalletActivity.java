@@ -9,8 +9,6 @@ import android.content.Intent;
 import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AlertDialog;
-import android.text.SpannableStringBuilder;
-import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -21,7 +19,6 @@ import com.w3engineers.mesh.R;
 import com.w3engineers.mesh.application.data.BaseServiceLocator;
 import com.w3engineers.mesh.application.data.local.DataPlanConstants;
 import com.w3engineers.mesh.application.data.local.dataplan.DataPlanManager;
-import com.w3engineers.mesh.application.data.local.db.networkinfo.WalletInfo;
 import com.w3engineers.mesh.application.data.local.wallet.WalletManager;
 import com.w3engineers.mesh.application.ui.base.TelemeshBaseActivity;
 import com.w3engineers.mesh.application.ui.tokenguide.PointGuidelineActivity;
@@ -30,10 +27,6 @@ import com.w3engineers.mesh.databinding.PromptRmeshGiftBinding;
 import com.w3engineers.mesh.util.DialogUtil;
 import com.w3engineers.mesh.util.MeshLog;
 import com.w3engineers.mesh.util.lib.mesh.HandlerUtil;
-
-import java.text.Format;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 
 
 public class WalletActivity extends TelemeshBaseActivity implements WalletManager.WalletListener {
@@ -54,7 +47,8 @@ public class WalletActivity extends TelemeshBaseActivity implements WalletManage
     private final String kottyUrl = "https://explorer.eth.events/ethereum/ethereum/kotti/address/";
     private byte[] picture;
     private final double minimumWithdrawAmount = 10.0;
-
+    private boolean giftAlertDisplayed = false;
+    private double tokenAmount;
     /*private interface REQUEST_TYPE {
         int ETHER = 1;
         int TOKEN = 2;
@@ -268,12 +262,11 @@ public class WalletActivity extends TelemeshBaseActivity implements WalletManage
         } else if (v.getId() == R.id.tv_balance_last_updated) {
             //startActivity(new Intent(WalletActivity.this, PointGuidelineActivity.class));
         } else if (v.getId() == R.id.textView_point_value){
-            showRmeshGiftPopup();
+            if (tokenAmount >= walletManager.maxPointForRmesh()){
+                showRmeshGiftPopup();
+            }
         }
-
-
     }
-
 
     private void openUrl() {
         int myRole = dataPlanManager.getDataPlanRole();
@@ -537,21 +530,11 @@ public class WalletActivity extends TelemeshBaseActivity implements WalletManage
     private void setCurrencyAndTokenObserver() {
         walletViewModel.networkMutableLiveData.observe(this, walletInfo -> {
 
-            Log.e("Wallet_info", "Wallet info received from ");
+            MeshLog.v("Wallet_info type1 " + walletInfo.networkType + " eth " + walletInfo.currencyAmount + " tkn " + walletInfo.tokenAmount);
             if (walletInfo != null) {
-                if(walletInfo.networkType == walletManager.getMainnetNetworkType()){
-                    if (walletInfo.tokenAmount > 0){
-                        mBinding.rmLayer.setVisibility(View.VISIBLE);
-                        mBinding.buttonConvertRmpoint.setVisibility(View.VISIBLE);
-                    }else {
-                        mBinding.rmLayer.setVisibility(View.GONE);
-                        mBinding.buttonConvertRmpoint.setVisibility(View.GONE);
-                    }
-                } else {
                     mBinding.textViewPointValue.setText(convertTwoDigitString(walletInfo.tokenAmount));
-
+                    tokenAmount = walletInfo.tokenAmount;
                     int dataShareMode = dataPlanManager.getDataPlanRole();
-
                     if (dataShareMode == DataPlanConstants.USER_ROLE.DATA_SELLER || dataShareMode == DataPlanConstants.USER_ROLE.DATA_BUYER) {
 
                         if (walletManager.isGiftGot()) {
@@ -564,13 +547,28 @@ public class WalletActivity extends TelemeshBaseActivity implements WalletManage
                                 startActivity(intent);
                             }
                         }
-
-                        if (!walletManager.isNotShowGiftRmeshAlert()){ //walletInfo.tokenAmount >= walletManager.maxPointForRmesh()
-
+                        if (walletInfo.tokenAmount >= walletManager.maxPointForRmesh() && !walletManager.isNotShowGiftRmeshAlert() && !giftAlertDisplayed){
+                            giftAlertDisplayed = true;
                             showRmeshGiftPopup();
                         }
                     }
-                }
+            } else {
+                Log.e("Wallet_info", "Wallet info null received from ");
+            }
+        });
+
+        walletViewModel.networkMutableLiveDataRm.observe(this, walletInfo -> {
+
+            MeshLog.v("Wallet_info type2 " + walletInfo.networkType + " eth " + walletInfo.currencyAmount + " tkn " + walletInfo.tokenAmount);
+            if (walletInfo != null) {
+                    if (walletInfo.tokenAmount > 0){
+                        mBinding.rmLayer.setVisibility(View.VISIBLE);
+                        mBinding.buttonConvertRmpoint.setVisibility(View.VISIBLE);
+                        mBinding.rmEarned.setText(walletInfo.tokenAmount+"");
+                    }else {
+                        mBinding.rmLayer.setVisibility(View.GONE);
+                        mBinding.buttonConvertRmpoint.setVisibility(View.GONE);
+                    }
             } else {
                 Log.e("Wallet_info", "Wallet info null received from ");
             }
