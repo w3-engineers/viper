@@ -63,6 +63,13 @@ public class ParseConstant {
         String VALUE = "value";
     }
 
+
+    interface TOKEN_TRANSFER {
+        String FROM = "from";
+        String TO = "to";
+        String VALUE = "value";
+    }
+    
     interface TOKEN_MINTED {
         String TO = "to";
         String NUM = "num";
@@ -75,6 +82,9 @@ public class ParseConstant {
         String WITHDRAW_CHANNEL = "withdraw";
         String ETHER_GIFTED = "eth_gifted";
         String TOKEN_GIFTED = "tkn_gifted";
+        String RM_CLAIMED = "rm_claimed";
+        String RM_CONVERT = "rm_convert";
+
 
     }
 }

@@ -34,6 +34,7 @@ import java.util.concurrent.ExecutionException;
 public class PurchaseManagerBuyer extends PurchaseManager implements PayController.PayControllerListenerForBuyer {
     private static PurchaseManagerBuyer purchaseManagerBuyer;
     private double totalDataAmount;
+    private double rmAmountToConvert;
     private PurchaseManagerBuyerListener purchaseManagerBuyerListener;
 
     private boolean isWarningShown;
@@ -360,7 +361,6 @@ public class PurchaseManagerBuyer extends PurchaseManager implements PayControll
                 if (walletListener != null) {
                     walletListener.onTokenRequestResponse(false, "No internet provider connected");
                 }
-
             } else {
                 String sellerId = sellerIds.get(0);
 
@@ -374,8 +374,6 @@ public class PurchaseManagerBuyer extends PurchaseManager implements PayControll
         }catch (Exception ex){
             ex.printStackTrace();
         }
-
-
     }
 
     public void closePurchase(String sellerId) {
@@ -719,6 +717,64 @@ public class PurchaseManagerBuyer extends PurchaseManager implements PayControll
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
+                }
+                break;
+            case PurchaseConstants.INFO_PURPOSES.CONVERT_RM:
+                try {
+                    if (infoJson.has(PurchaseConstants.INFO_KEYS.NONCE) && infoJson.has(PurchaseConstants.INFO_KEYS.ETH_BALANCE) && infoJson.has(PurchaseConstants.INFO_KEYS.TKN_BALANCE)) {
+
+                        int nonce = infoJson.getInt(PurchaseConstants.INFO_KEYS.NONCE);
+                        double ethBalance = infoJson.getDouble(PurchaseConstants.INFO_KEYS.ETH_BALANCE);
+                        double tknBalance = infoJson.optDouble(PurchaseConstants.INFO_KEYS.TKN_BALANCE);
+
+                        EthereumServiceUtil.getInstance(mContext).updateCurrencyAndToken(endPointType, ethBalance, tknBalance);
+
+                        if (ethBalance > 0) {
+                            if (tknBalance >= rmAmountToConvert){
+
+                                String signedMessage = ethService.transferToken(preferencesHelperDataplan.getRmeshOwnerAddress(), rmAmountToConvert, nonce, endPointType);
+
+                                JSONObject jsonObject = new JSONObject();
+                                jsonObject.put(PurchaseConstants.JSON_KEYS.MESSAME_FROM, ethService.getAddress());
+
+                                JSONArray array = new JSONArray();
+
+                                JSONObject convertToken = new JSONObject();
+                                convertToken.put(PurchaseConstants.JSON_KEYS.REQUEST_TYPE, PurchaseConstants.REQUEST_TYPES.CONVERT_RM);
+                                convertToken.put(PurchaseConstants.JSON_KEYS.SIGNED_MESSAGE, signedMessage);
+                                convertToken.put(PurchaseConstants.JSON_KEYS.REQUEST_VALUE, rmAmountToConvert);
+                                convertToken.put(PurchaseConstants.JSON_KEYS.NONCE, nonce);
+                                array.put(convertToken);
+
+                                jsonObject.put(PurchaseConstants.JSON_KEYS.REQUEST_LIST, array);
+
+                                setEndPointInfoInJson(jsonObject, endPointType);
+
+                                payController.sendBlockChainRequest(jsonObject, from, PurchaseConstants.INFO_PURPOSES.CONVERT_RM);
+
+                                if (walletListener != null) {
+                                    walletListener.onConvertSubmitted(true, "Request sent.");
+                                }
+                            } else{
+                                if (walletListener != null) {
+                                    walletListener.onConvertSubmitted(false, ("You don't have enough RMESH"));
+                                }
+                            }
+                        } else {
+                            if (walletListener != null) {
+                                walletListener.onConvertSubmitted(false, ("You don't have enough ETHER"));
+                            }
+                        }
+                    } else {
+
+                        if (walletListener != null) {
+                            walletListener.onConvertSubmitted(false, "Can't reach network, please try again later.");
+                        }
+                    }
+                } catch (Exception e) {
+                    if (walletListener != null) {
+                        walletListener.onConvertSubmitted(false, e.getMessage());
+                    }
                 }
                 break;
             default:
@@ -1322,11 +1378,13 @@ public class PurchaseManagerBuyer extends PurchaseManager implements PayControll
                         purchaseCloseFailed(fromAddress, msg);
                     }
                 }
-
+                break;
+            case PurchaseConstants.REQUEST_TYPES.CONVERT_RM:
+                if (walletListener != null) {
+                    walletListener.onConvertSubmitted(success, msg);
+                }
                 break;
         }
-
-
     }
 
     @Override
@@ -1360,6 +1418,13 @@ public class PurchaseManagerBuyer extends PurchaseManager implements PayControll
                     walletListener.onTokenRequestResponse(false, internetProviderError);
                 }
                 break;
+            case PurchaseConstants.INFO_PURPOSES.CONVERT_RM:
+
+                if (walletListener != null) {
+                    walletListener.onConvertSubmitted(false, internetProviderError);
+                }
+                break;
+
 
             case PurchaseConstants.INFO_PURPOSES.CLOSE_PURCHASE:
 
@@ -1396,6 +1461,44 @@ public class PurchaseManagerBuyer extends PurchaseManager implements PayControll
                 }
                 break;
         }
+    }
+
+    public boolean hasSeller() {
+        List<String> sellerIds = null;
+        try {
+            sellerIds = payController.getDataManager().getInternetSellers();
+            return  sellerIds.size() > 0;
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    public void convertRmToPoints(double amount) {
+        MeshLog.v("PurchaseManagerBuyer convertRmToPoints");
+        try {
+            List<String> sellerIds = payController.getDataManager().getInternetSellers();
+            if (sellerIds.size() == 0) {
+                if (walletListener != null) {
+                    walletListener.onConvertSubmitted(false, "No internet provider connected");
+                }
+
+            } else {
+                rmAmountToConvert = amount;
+                String sellerId = sellerIds.get(0);
+
+                String query = PurchaseConstants.INFO_KEYS.ETH_BALANCE + "," + PurchaseConstants.INFO_KEYS.NONCE + "," + PurchaseConstants.INFO_KEYS.TKN_BALANCE;
+
+                int endPointType = preferencesHelperDataplan.getMainnetNetworkType();
+
+                getMyInfo(sellerId, query, PurchaseConstants.INFO_PURPOSES.CONVERT_RM, endPointType);
+
+            }
+        }catch (Exception ex){
+            ex.printStackTrace();
+        }
+
+
     }
 
 

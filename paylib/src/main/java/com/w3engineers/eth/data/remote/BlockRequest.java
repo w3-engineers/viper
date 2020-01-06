@@ -527,7 +527,7 @@ public class BlockRequest {
     }
 
     public void logTokenTransferred(long blockNumber) {
-        Log.i(TAG, "logTokenMinted: " + blockNumber);
+        Log.i(TAG, "logTokenTransferred: " + blockNumber);
 
         if (tokenTransferredObserver == null) {
             callableExecutor.submit(new Callable() {
@@ -659,6 +659,18 @@ public class BlockRequest {
                 }
             });
         }
+    }
+
+    public String transferToken(String to, double value, int nonce) throws Exception {
+        Log.i(TAG, "approve: " + value + " " + nonce);
+
+        final Function transferFunc = new Function(
+                TmeshToken.FUNC_TRANSFER,
+                Arrays.<Type>asList(new Address(to),
+                        new Uint256(getWeiValue(value))),
+                Collections.<TypeReference<?>>emptyList());
+
+        return signMessage(transferFunc, tokenAddress, nonce, null);
     }
 
     public String approve(double value, int nonce) throws Exception {

@@ -18,6 +18,7 @@ public class PreferencesHelperDataplan {
     private static final String BALANCE_APPROVED_BLOCK = "balance_approved_block";
     private static final String CHANNEL_WITHDRAWN_BLOCK = "channel_withdrawn_block";
     private static final String TOKEN_MINTED_BLOCK = "token_minted_block";
+    private static final String TOKEN_TRANSFERRED_BLOCK = "token_transferred_block";
     private static final String REQUESTED_FOR_ETHER_STATUS = "requested_for_ether";
     private static final String GIFT_ETHER_TRANX_HASH = "requested_ether_hash";
     private static final String GIFT_TOKEN_TRANX_HASH = "requested_token_hash";
@@ -134,6 +135,14 @@ public class PreferencesHelperDataplan {
 
     public long getTokenMintedBlock(){
         return SharedPref.readLong(TOKEN_MINTED_BLOCK);
+    }
+
+    public void setTokenTransferredBlock(long value){
+        SharedPref.write(TOKEN_TRANSFERRED_BLOCK, value);
+    }
+
+    public long getTokenTransferredBlock(){
+        return SharedPref.readLong(TOKEN_TRANSFERRED_BLOCK);
     }
 
     public void setRequestedForEther(int requestState, int endpoint) {

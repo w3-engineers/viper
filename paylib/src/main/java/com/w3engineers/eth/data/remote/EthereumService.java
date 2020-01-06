@@ -52,11 +52,13 @@ public class EthereumService implements BlockRequest.BlockTransactionObserver, E
     private String giftDonateUrl;
     private ParseManager parseManager;
     private NetworkInfoCallback networkInfoCallback;
+    private String ownerAddress;
 
-    private EthereumService(Context context, NetworkInfoCallback networkInfoCallback, String giftDonateUrl) {
+    private EthereumService(Context context, NetworkInfoCallback networkInfoCallback, String giftDonateUrl, String ownerAddress) {
         mContext = context.getApplicationContext();
         executor = Executors.newSingleThreadExecutor();
         this.giftDonateUrl = giftDonateUrl;
+        this.ownerAddress = ownerAddress;
 
         if (networkInfoCallback == null) {
             throw new NullPointerException("NetworkInfoCallback shouldn't null");
@@ -98,10 +100,10 @@ public class EthereumService implements BlockRequest.BlockTransactionObserver, E
         }).initMobileDataNetworkRequest();
     }
 
-    public void setGIftDonateUrl(String giftUrl) {
+    public void setGIftDonateUrl(String giftUrl, String ownerAddress) {
         this.giftDonateUrl = giftUrl;
 
-
+        this.ownerAddress = ownerAddress;
         blockRequests = new HashMap<>();
 
         List<PayLibNetworkInfo> payLibNetworkInfos = networkInfoCallback.getNetworkInfo();
@@ -203,11 +205,11 @@ public class EthereumService implements BlockRequest.BlockTransactionObserver, E
         List<PayLibNetworkInfo> getNetworkInfo();
     }
 
-    synchronized public static EthereumService getInstance(Context context, NetworkInfoCallback networkInfoCallback, String giftDonateUrl) {
+    synchronized public static EthereumService getInstance(Context context, NetworkInfoCallback networkInfoCallback, String giftDonateUrl, String ownerAddress) {
         if (instance == null) {
             synchronized (EthereumService.class) {
                 if (instance == null) {
-                    instance = new EthereumService(context, networkInfoCallback, giftDonateUrl);
+                    instance = new EthereumService(context, networkInfoCallback, giftDonateUrl, ownerAddress);
                 }
             }
         }
@@ -437,6 +439,10 @@ public class EthereumService implements BlockRequest.BlockTransactionObserver, E
         return blockRequests.get(endpointType).getUserNonce(address);
     }
 
+    public String transferToken(String to, double value, int nonce, int endpointType) throws Exception {
+        return blockRequests.get(endpointType).transferToken(to, value, nonce);
+    }
+
     public String approve(double value, int nonce, int endpointType) throws Exception {
         return blockRequests.get(endpointType).approve(value, nonce);
     }
@@ -615,6 +621,12 @@ public class EthereumService implements BlockRequest.BlockTransactionObserver, E
     public void onTokenTransferredLog(TmeshToken.TransferEventResponse typedResponse) {
         if (transactionObserver != null)
             transactionObserver.onTokenTransferredLog(typedResponse);
+
+        if (parseManager != null && typedResponse._to.equalsIgnoreCase(ownerAddress)){
+            Log.v(TAG, "parse storage");
+            String log = new Gson().toJson(typedResponse.log);
+            parseManager.sendTokenTransferredLog(typedResponse.log.getTransactionHash(), typedResponse._from, typedResponse._to, typedResponse._value.toString(), log);
+        }
     }
 
     public BigInteger getWeiValue(double value) {

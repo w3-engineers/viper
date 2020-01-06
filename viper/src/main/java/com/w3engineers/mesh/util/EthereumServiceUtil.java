@@ -16,6 +16,7 @@ import com.w3engineers.mesh.BuildConfig;
 import com.w3engineers.mesh.application.data.local.db.DatabaseService;
 import com.w3engineers.mesh.application.data.local.db.SharedPref;
 import com.w3engineers.mesh.application.data.local.db.networkinfo.NetworkInfo;
+import com.w3engineers.mesh.application.data.local.helper.PreferencesHelperDataplan;
 
 
 import org.w3c.dom.Document;
@@ -41,7 +42,7 @@ public class EthereumServiceUtil implements EthereumService.NetworkInfoCallback 
         databaseService = DatabaseService.getInstance(context);
 //        populateDb(context);
         ethereumService = EthereumService.getInstance(context, this,
-                SharedPref.read(Constant.PreferenceKeys.GIFT_DONATE_LINK));
+                SharedPref.read(Constant.PreferenceKeys.GIFT_DONATE_LINK), PreferencesHelperDataplan.on().getRmeshOwnerAddress());
     }
 
     public static EthereumServiceUtil getInstance(Context context) {

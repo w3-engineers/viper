@@ -100,6 +100,22 @@ public class WalletManager {
         return preferencesHelperDataplan.getMainnetNetworkType();
     }
 
+    public void claimGift() {
+        if (dataPlanManager.getDataPlanRole() == DataPlanConstants.USER_ROLE.DATA_SELLER){
+            PurchaseManagerSeller.getInstance().claimGift();
+        }
+    }
+
+    public boolean hasSeller() {
+        return PurchaseManagerBuyer.getInstance().hasSeller();
+    }
+
+    public void convertRmToPoints(double amount) {
+        if (dataPlanManager.getDataPlanRole() == DataPlanConstants.USER_ROLE.DATA_BUYER){
+            PurchaseManagerBuyer.getInstance().convertRmToPoints(amount);
+        }
+    }
+
 
     public interface WalletListener {
 
@@ -116,6 +132,12 @@ public class WalletManager {
         void onRequestCompleted(boolean success, String msg);
 
         void onRmBalanceInfo(boolean success, String msg);
+
+        void onRmGiftClaimed(boolean tokenTransferred, String msg);
+        void onRmGiftcompleted(boolean success, String msg);
+
+        void onConvertSubmitted(boolean success, String msg);
+        void onConvertCompleted(boolean success, String msg);
     }
 
     public LiveData<Double> getTotalEarn(String myAddress, int endPoint) {

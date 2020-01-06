@@ -79,7 +79,7 @@ dependencies {
         exclude group: 'org.bouncycastle'
     }
     implementation 'org.bouncycastle:bcprov-jdk15on:1.61'
-    implementation 'com.snatik:storage:2.1.0'
+    implementation deps.snatik
 
     // Retrofit & OkHttp
     implementation 'com.squareup.retrofit2:retrofit:2.6.0'

@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/layout_root"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:orientation="vertical"
+    android:padding="10dp">
+
+    <TextView
+        android:id="@+id/rm_text_data_amount"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/margin_5"
+        android:layout_marginEnd="@dimen/margin_5"
+        android:text="Input RMESH amount to convert"
+        android:textColor="@color/black"
+        android:textSize="@dimen/text_size_16"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <EditText
+        android:id="@+id/rm_user_input"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/margin_10"
+        android:layout_marginEnd="@dimen/margin_5"
+        android:paddingTop="@dimen/padding_10"
+        android:paddingBottom="@dimen/padding_10"
+        android:background="@drawable/rectangular_gray_small"
+        android:inputType="numberDecimal"
+        android:maxLength="4"
+        android:text=""
+        android:paddingStart="@dimen/padding_10"
+        android:paddingEnd="@dimen/padding_10"
+        android:theme="@style/TextInputLayout"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/rm_text_data_amount">
+
+        <requestFocus />
+    </EditText>
+
+    <TextView
+        android:id="@+id/rm_cancel"
+        android:layout_width="@dimen/width_100"
+        android:layout_height="wrap_content"
+        android:background="@drawable/ractangular_gradient"
+        android:gravity="center"
+        android:layout_marginEnd="@dimen/margin_5"
+        android:paddingTop="@dimen/padding_12"
+        android:paddingBottom="@dimen/padding_12"
+        android:layout_marginTop="@dimen/margin_10"
+        android:text="@string/cancel"
+        android:textColor="@color/white"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/rm_user_input" />
+
+    <TextView
+        android:id="@+id/rm_ok"
+        android:layout_width="@dimen/width_100"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="@dimen/margin_20"
+        android:background="@drawable/ractangular_gradient"
+        android:gravity="center"
+        android:layout_marginTop="@dimen/margin_10"
+        android:paddingTop="@dimen/padding_12"
+        android:paddingBottom="@dimen/padding_12"
+        android:text="@string/ok"
+        android:textColor="@color/white"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toStartOf="@+id/rm_cancel"
+        app:layout_constraintTop_toBottomOf="@+id/rm_user_input" />
+
+</android.support.constraint.ConstraintLayout>

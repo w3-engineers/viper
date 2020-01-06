@@ -123,6 +123,8 @@ public interface PurchaseConstants {
         int CLOSE_CHANNEL = 4;
         int WITHDRAW_CHANNEL = 5;
         int BUY_TOKEN = 6;
+        int CLAIM_RM = 7;
+        int CONVERT_RM = 8;
     }
 
     interface REQUEST_STATE {
@@ -170,15 +172,15 @@ public interface PurchaseConstants {
         int CLOSE_PURCHASE = 3;
         int CREATE_CHANNEL = 4;
         int TOPUP_CHANNEL = 5;
+        int CONVERT_RM = 6;
     }
     interface TimeoutPurpose {
-        int INIT_PURCHASE = 6;
-        int INIT_CHANNEL = 7;
-        int INIT_ETHER = 8;
+        int INIT_PURCHASE = 9;
+        int INIT_CHANNEL = 10;
+        int INIT_ETHER = 11;
 
-        int BUYER_PENDING_MESSAGE = 9;
-        int PAY_FOR_MESSAGE_RESPONSE = 10;
-
+        int BUYER_PENDING_MESSAGE = 12;
+        int PAY_FOR_MESSAGE_RESPONSE = 13;
     }
 
     interface SELLERS_BTN_TEXT {

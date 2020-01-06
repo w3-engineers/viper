@@ -325,9 +325,6 @@ public class PurchaseManagerSeller extends PurchaseManager implements PayControl
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-
-
-
     }
 
     private void giftEtherRequestSubmitted(boolean isSuccess, String message, String ethTrnxHash,
@@ -401,6 +398,11 @@ public class PurchaseManagerSeller extends PurchaseManager implements PayControl
                 long buyTokenBlock = preferencesHelperDataplan.getTokenMintedBlock();
                 ethService.logTokenMinted(buyTokenBlock, endPointType);
                 break;
+            case PurchaseConstants.REQUEST_TYPES.CLAIM_RM:
+                long transferTokenBlock = preferencesHelperDataplan.getTokenTransferredBlock();
+                ethService.logTokenTransferred(transferTokenBlock, endPointType);
+                break;
+
             default:
                 break;
 
@@ -412,28 +414,20 @@ public class PurchaseManagerSeller extends PurchaseManager implements PayControl
         if (purchaseRequest.requesterAddress.equalsIgnoreCase(ethService.getAddress())) {
             switch (purchaseRequest.requestType) {
                 case PurchaseConstants.REQUEST_TYPES.BUY_TOKEN:
-
                         if (success) {
-
                             if (walletListener != null) {
                                 walletListener.onTokenRequestResponse(true, "Purchase request sent, Balance will be updated soon.");
                             }
                         } else {
-
                             if (walletListener != null) {
                                 walletListener.onTokenRequestResponse(false, msg);
                             }
                         }
-
                     break;
-
                 case PurchaseConstants.REQUEST_TYPES.WITHDRAW_CHANNEL:
-
-                    if (walletListener != null) {
-
+//                    if (walletListener != null) {
 //                        walletListener.onRequestSubmitted(success, msg);
-                    }
-
+//                    }
                     break;
                 case PurchaseConstants.REQUEST_TYPES.CLOSE_CHANNEL:
                     if (!success) {
@@ -450,9 +444,13 @@ public class PurchaseManagerSeller extends PurchaseManager implements PayControl
                         } catch (ExecutionException e) {
                             e.printStackTrace();
                         }
-
-
                     }
+                    break;
+                case PurchaseConstants.REQUEST_TYPES.CLAIM_RM:
+                    if (walletListener != null) {
+                        walletListener.onRmGiftClaimed(false, msg);
+                    }
+                    break;
                 default:
                     break;
             }
@@ -465,7 +463,6 @@ public class PurchaseManagerSeller extends PurchaseManager implements PayControl
                 jsonObject.put(PurchaseConstants.JSON_KEYS.REQUEST_SUCCESS, success);
                 jsonObject.put(PurchaseConstants.JSON_KEYS.MESSAGE_TEXT, msg);
                 jsonObject.put(PurchaseConstants.JSON_KEYS.REQUEST_TYPE, purchaseRequest.requestType);
-
 
                 payController.sendBlockChainResponse(jsonObject, purchaseRequest.buyerAddress);
             } catch (JSONException e) {
@@ -2063,6 +2060,92 @@ public class PurchaseManagerSeller extends PurchaseManager implements PayControl
     public void onTokenTransferredLog(TmeshToken.TransferEventResponse typedResponse) {
         MeshLog.v("onTokenTransferredLog " + typedResponse.log.getTransactionHash());
 
+        preferencesHelperDataplan.setTokenTransferredBlock(typedResponse.log.getBlockNumber().longValue());
+
+        String tokenSenderAddress = typedResponse._from;
+        double value = ethService.getETHorTOKEN(typedResponse._value);
+
+        try {
+            PurchaseRequests purchaseRequests = databaseService.getRequestByTrxHash(typedResponse.log.getTransactionHash());
+
+            if (purchaseRequests != null && purchaseRequests.state >= PurchaseConstants.REQUEST_STATE.COMPLETED) {
+                return;
+            }
+
+            if (purchaseRequests == null) {
+                purchaseRequests = databaseService.getPendingRequest(tokenSenderAddress, value, PurchaseConstants.REQUEST_TYPES.CLAIM_RM, PurchaseConstants.REQUEST_STATE.PENDING);
+            }
+
+            if (purchaseRequests != null) {
+
+                purchaseRequests.trxHash = typedResponse.log.getTransactionHash();
+                purchaseRequests.trxBlock = typedResponse.log.getBlockNumber().longValue();
+
+                Double tokenValue = ethService.getUserTokenBalance(tokenSenderAddress, purchaseRequests.blockChainEndpoint);
+                Double etherValue = ethService.getUserEthBalance(tokenSenderAddress, purchaseRequests.blockChainEndpoint);
+
+
+                if (tokenSenderAddress.equalsIgnoreCase(ethService.getAddress())) {
+
+                    purchaseRequests.state = PurchaseConstants.REQUEST_STATE.NOTIFIED;
+                    databaseService.updatePurchaseRequest(purchaseRequests);
+
+                    if (tokenValue == null)
+                        tokenValue = EthereumServiceUtil.getInstance(mContext).getToken(purchaseRequests.blockChainEndpoint);
+
+                    if (etherValue == null)
+                        etherValue = EthereumServiceUtil.getInstance(mContext).getCurrency(purchaseRequests.blockChainEndpoint);
+
+                    EthereumServiceUtil.getInstance(mContext).updateCurrencyAndToken(purchaseRequests.blockChainEndpoint,etherValue, tokenValue);
+
+                    if (walletListener != null) {
+                        walletListener.onRmGiftClaimed(true, "You have successfully claimed for RMESH.\nToken will be added to your account within 72 hours.");
+                    }
+                } else {
+                    ---
+//                    purchaseRequests.state = PurchaseConstants.REQUEST_STATE.COMPLETED;
+//
+//                    JSONObject jsonObject = new JSONObject();
+//                    jsonObject.put(PurchaseConstants.JSON_KEYS.MESSAME_FROM, ethService.getAddress());
+//                    if (tokenValue == null) {
+//                        tokenValue = typedResponse._num.doubleValue();
+//                    }
+//                    jsonObject.put(PurchaseConstants.INFO_KEYS.TKN_BALANCE, tokenValue);
+//
+//                    if (etherValue != null){
+//                        jsonObject.put(PurchaseConstants.INFO_KEYS.ETH_BALANCE, etherValue);
+//                    }
+//
+//
+//                    purchaseRequests.responseString = jsonObject.toString();
+//
+//                    UUID messageId = UUID.randomUUID();
+//
+//                    purchaseRequests.messageId = messageId.toString();
+//
+//                    databaseService.updatePurchaseRequest(purchaseRequests);
+//
+//                    setEndPointInfoInJson(jsonObject, purchaseRequests.blockChainEndpoint);
+//
+//                    payController.sendBuyTokenResponse(jsonObject, purchaseRequests.buyerAddress, messageId.toString());
+                }
+
+                pickAndSubmitRequest(purchaseRequests.requesterAddress);
+
+
+            } else {
+                MeshLog.v("onTokenTransferredLog purchaseRequest not found");
+            }
+
+        } catch (ExecutionException e) {
+            e.printStackTrace();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+//        catch (JSONException e) {
+//            e.printStackTrace();
+//        }
+
     }
 
     @Override
@@ -2202,6 +2285,63 @@ public class PurchaseManagerSeller extends PurchaseManager implements PayControl
             }
         } catch (Exception e){
             e.printStackTrace();
+        }
+    }
+
+    public void claimGift() {
+        if (InternetUtil.isNetworkConnected(mContext)) {
+
+            String address = ethService.getAddress();
+            int endPoint = getEndpoint();
+
+            try {
+                Double ethBalance = ethService.getUserEthBalance(address, endPoint);
+                Double tokenBalance = ethService.getUserTokenBalance(address, endPoint);
+                Integer nonce = ethService.getUserNonce(address, endPoint);
+
+                double requestValue = 10;//preferencesHelperDataplan.getMaxPointForRmesh();
+                if (ethBalance != null && nonce != null && ethBalance > 0 && tokenBalance != null && tokenBalance > requestValue) {
+
+                    String signedMessage = ethService.transferToken(preferencesHelperDataplan.getRmeshOwnerAddress(), requestValue, nonce, endPoint);
+
+                    PurchaseRequests purchaseRequest = new PurchaseRequests();
+                    purchaseRequest.buyerAddress = address;
+                    purchaseRequest.requesterAddress = address;
+                    purchaseRequest.requestType = PurchaseConstants.REQUEST_TYPES.CLAIM_RM;
+                    purchaseRequest.signedMessage = signedMessage;
+                    purchaseRequest.requestValue = requestValue;
+                    purchaseRequest.nonce = nonce;
+                    purchaseRequest.state = PurchaseConstants.REQUEST_STATE.RECEIVED;
+                    purchaseRequest.blockChainEndpoint = endPoint;
+                    databaseService.insertPurchaseRequest(purchaseRequest);
+                    nonce++;
+
+                    pickAndSubmitRequest(address);
+                } else {
+                    if (walletListener != null) {
+                        walletListener.onRmGiftClaimed(false, "Can't claim now, balance or nonce error.");
+                    }
+                }
+            } catch (ExecutionException e) {
+                e.printStackTrace();
+                if (walletListener != null) {
+                    walletListener.onRmGiftClaimed(false, e.getMessage());
+                }
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+                if (walletListener != null) {
+                    walletListener.onRmGiftClaimed(false, e.getMessage());
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+                if (walletListener != null) {
+                    walletListener.onRmGiftClaimed(false, e.getMessage());
+                }
+            }
+        }else {
+            if (walletListener != null) {
+                walletListener.onRmGiftClaimed(false, "No internet found on this device.");
+            }
         }
     }
 }
