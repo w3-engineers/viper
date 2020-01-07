@@ -41,6 +41,7 @@ import com.w3engineers.mesh.application.data.model.ServiceUpdate;
 import com.w3engineers.mesh.application.data.model.TransportInit;
 import com.w3engineers.mesh.application.data.model.UserInfoEvent;
 import com.w3engineers.mesh.application.data.remote.model.BuyerPendingMessage;
+import com.w3engineers.mesh.util.CommonUtil;
 import com.w3engineers.mesh.util.ConfigSyncUtil;
 import com.w3engineers.mesh.util.Constant;
 import com.w3engineers.mesh.util.DialogUtil;
@@ -300,7 +301,14 @@ public class DataManager {
                 int configVersion = PreferencesHelperDataplan.on().getConfigVersion();
                 userInfo.setConfigVersion(configVersion);
 
-                boolean status = mTmCommunicator.startMesh(appName, userRole, userInfo, mSsid);
+                boolean status;
+                if (CommonUtil.isEmulator()) {
+                    status = true;
+                } else {
+                    status = mTmCommunicator.startMesh(appName, userRole, userInfo, mSsid);
+                }
+
+//                boolean status = mTmCommunicator.startMesh(appName, userRole, userInfo, mSsid);
                 if (!status) {
                     showPermissionPopUp();
                 }
