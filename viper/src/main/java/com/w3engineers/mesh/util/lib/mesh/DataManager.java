@@ -160,7 +160,14 @@ public class DataManager {
             @Override
             public void run() {
                 if (mTmCommunicator == null) {
-                    boolean isSuccess = initServiceConnection();
+
+                    boolean isSuccess;
+
+                    if (CommonUtil.isEmulator()) {
+                        isSuccess = true;
+                    } else {
+                        isSuccess = initServiceConnection();
+                    }
 
                     if (isSuccess) {
                         Toaster.showShort("Bind service successful");
@@ -310,7 +317,7 @@ public class DataManager {
 
 //                boolean status = mTmCommunicator.startMesh(appName, userRole, userInfo, mSsid);
                 if (!status) {
-//                    showPermissionPopUp();
+                    showPermissionPopUp();
                 }
                 mTmCommunicator.setViperCommunicator(viperCommunicator);
             } catch (RemoteException e) {
