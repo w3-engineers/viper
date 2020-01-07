@@ -310,7 +310,7 @@ public class DataManager {
 
 //                boolean status = mTmCommunicator.startMesh(appName, userRole, userInfo, mSsid);
                 if (!status) {
-                    showPermissionPopUp();
+//                    showPermissionPopUp();
                 }
                 mTmCommunicator.setViperCommunicator(viperCommunicator);
             } catch (RemoteException e) {
