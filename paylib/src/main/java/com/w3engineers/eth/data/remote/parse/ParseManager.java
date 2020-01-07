@@ -188,12 +188,12 @@ public class ParseManager {
         saveObject(parseObject, tx_hash);
     }
 
-    public void sendTokenTransferredLog(String transactionHash, String from, String to, String value, String log) {
+    public void sendTokenTransferredLog(String transactionHash, String from, String to, String value, String log, String purpose) {
         ParseObject parseObject = new ParseObject(ParseConstant.Transaction.TABLE);
 
         parseObject.put(ParseConstant.Transaction.TX_HASH, transactionHash);
         parseObject.put(ParseConstant.Transaction.LOG, log);
-        parseObject.put(ParseConstant.Transaction.PURPOSE, ParseConstant.REQUEST_TYPES.RM_CLAIMED);
+        parseObject.put(ParseConstant.Transaction.PURPOSE, purpose);
 
         parseObject.put(ParseConstant.TOKEN_TRANSFER.FROM, from);
         parseObject.put(ParseConstant.TOKEN_TRANSFER.TO, to);

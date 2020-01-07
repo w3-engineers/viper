@@ -7,6 +7,7 @@ import com.w3engineers.mesh.model.MessageModel_;
 import com.w3engineers.mesh.model.UserModel;
 import com.w3engineers.mesh.model.UserModel_;
 import com.w3engineers.mesh.util.Constant;
+import com.w3engineers.mesh.util.MeshLog;
 import com.w3engineers.mesh.util.ObjectBox;
 
 import java.util.List;
@@ -132,6 +133,7 @@ public class ChatDataProvider {
     }
 
     public UserModel getUserInfoById(String userId){
+        MeshLog.v("getUserInfoById " + userId);
         UserModel userModel = userModelBox.query().equal(UserModel_.userId, userId).build().findFirst();
         return userModel;
     }

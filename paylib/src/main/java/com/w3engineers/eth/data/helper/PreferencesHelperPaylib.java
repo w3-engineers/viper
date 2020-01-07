@@ -13,6 +13,13 @@ import com.w3engineers.eth.util.lib.shared_preferences.SharedPreferencePrivateMo
 public class PreferencesHelperPaylib extends SharedPreferencePrivateMode {
 
     private static PreferencesHelperPaylib sInstance;
+    private static final String CHANNEL_CREATED_LATEST_BLOCK = "channel_create_latest_block";
+    private static final String CHANNEL_CLOSED_LATEST_BLOCK = "channel_closed_latest_block";
+    private static final String CHANNEL_TOPUP_LATEST_BLOCK = "channel_topup_latest_block";
+    private static final String BALANCE_APPROVED_BLOCK = "balance_approved_block";
+    private static final String CHANNEL_WITHDRAWN_BLOCK = "channel_withdrawn_block";
+    private static final String TOKEN_MINTED_BLOCK = "token_minted_block";
+    private static final String TOKEN_TRANSFERRED_BLOCK = "token_transferred_block";
 
     private PreferencesHelperPaylib(Context context) {
         super(context);
@@ -63,5 +70,62 @@ public class PreferencesHelperPaylib extends SharedPreferencePrivateMode {
     public int getEndpointMode() {
         return readInt(ENDPOINT_MODE, PayLibConstant.END_POINT_TYPE.ETC_KOTTI);
     }
+
+    public void setChannelCreatedBlock(long value, int endpoint){
+        writeLong(CHANNEL_CREATED_LATEST_BLOCK + "_" + endpoint, value);
+    }
+
+    public long getChannelCreatedBlock(int endpoint){
+        return readLong(CHANNEL_CREATED_LATEST_BLOCK + "_" + endpoint, 0);
+    }
+
+    public void setChannelClosedBlock(long value, int endpoint){
+        writeLong(CHANNEL_CLOSED_LATEST_BLOCK + "_" + endpoint, value);
+    }
+
+    public long getChannelClosedBlock(int endpoint){
+        return readLong(CHANNEL_CLOSED_LATEST_BLOCK + "_" + endpoint,0);
+    }
+
+    public void setChannelTopupBlock(long value, int endpoint){
+        writeLong(CHANNEL_TOPUP_LATEST_BLOCK + "_" + endpoint, value);
+    }
+
+    public long getChannelTopupBlock(int endpoint){
+        return readLong(CHANNEL_TOPUP_LATEST_BLOCK + "_" + endpoint,0);
+    }
+
+    public void setBalanceApprovedBlock(long value, int endpoint){
+        writeLong(BALANCE_APPROVED_BLOCK + "_" + endpoint, value);
+    }
+
+    public long getBalanceApprovedBlock(int endpoint){
+        return readLong(BALANCE_APPROVED_BLOCK + "_" + endpoint,0);
+    }
+
+    public void setChannelWithdrawnBlock(long value, int endpoint){
+        writeLong(CHANNEL_WITHDRAWN_BLOCK + "_" + endpoint, value);
+    }
+
+    public long getChannelWithdrawnBlock(int endpoint){
+        return readLong(CHANNEL_WITHDRAWN_BLOCK + "_" + endpoint,0);
+    }
+
+    public void setTokenMintedBlock(long value, int endpoint){
+        writeLong(TOKEN_MINTED_BLOCK + "_" + endpoint, value);
+    }
+
+    public long getTokenMintedBlock(int endpoint){
+        return readLong(TOKEN_MINTED_BLOCK + "_" + endpoint,0);
+    }
+
+    public void setTokenTransferredBlock(long value, int endpoint){
+        writeLong(TOKEN_TRANSFERRED_BLOCK + "_" + endpoint, value);
+    }
+
+    public long getTokenTransferredBlock(int endpoint){
+        return readLong(TOKEN_TRANSFERRED_BLOCK + "_" + endpoint,0);
+    }
+
 
 }

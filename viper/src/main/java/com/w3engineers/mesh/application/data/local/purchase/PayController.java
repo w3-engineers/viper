@@ -56,6 +56,16 @@ public class PayController {
         return payController;
     }
 
+    public void sendConvertRmResponse(JSONObject jsonObject, String buyerAddress, String messageId) {
+        MeshLog.o("sendConvertRmResponse" + buyerAddress);
+        try {
+            jsonObject.put(PurchaseConstants.JSON_KEYS.MESSAGE_TYPE, PurchaseConstants.MESSAGE_TYPES.CONVERT_RM_RESPONSE);
+            sendPayMessageWithMessageId(buyerAddress, jsonObject.toString(), messageId);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
     public interface PayControllerListenerForBuyer {
         void onInitPurchaseOkReceived(String sellerAddress, double ethBalance, double tokenBallance, int nonce, double allowance, int endPointType, long sharedData);
 
@@ -134,7 +144,7 @@ public class PayController {
 
         void onSynBuyerOKReceive(String from, String sellerAddress);
 
-        void onReceivedEtherRequest(String from, int endpointType);
+//        void onReceivedEtherRequest(String from, int endpointType);
 
         void onBuyerUpdateNotified(String msg_Id, String fromAddress);
 
@@ -457,12 +467,12 @@ public class PayController {
                         }
                         break;
 
-                    case PurchaseConstants.MESSAGE_TYPES.ETHER_REQUEST:
-                        endPointType = jsonObject.getInt(PurchaseConstants.JSON_KEYS.END_POINT_TYPE);
-                        if (payControllerListenerForSeller != null) {
-                            payControllerListenerForSeller.onReceivedEtherRequest(fromAddress, endPointType);
-                        }
-                        break;
+//                    case PurchaseConstants.MESSAGE_TYPES.ETHER_REQUEST:
+//                        endPointType = jsonObject.getInt(PurchaseConstants.JSON_KEYS.END_POINT_TYPE);
+//                        if (payControllerListenerForSeller != null) {
+//                            payControllerListenerForSeller.onReceivedEtherRequest(fromAddress, endPointType);
+//                        }
+//                        break;
                     case PurchaseConstants.MESSAGE_TYPES.ETHER_REQUEST_RESPONSE:
                         int responseCode = jsonObject.getInt(PurchaseConstants.JSON_KEYS.RESPONSE_CODE);
                         if (payControllerListenerForBuyer != null) {
@@ -565,6 +575,13 @@ public class PayController {
                         if (payControllerListenerForBuyer != null) {
                             payControllerListenerForBuyer.onDisconnectedBySeller(fromAddress, msg);
                         }
+                        break;
+                    case PurchaseConstants.MESSAGE_TYPES.CONVERT_RM_RESPONSE:
+//                        msg = jsonObject.getString(PurchaseConstants.JSON_KEYS.MESSAGE_TEXT);
+//
+//                        if (payControllerListenerForBuyer != null) {
+//                            payControllerListenerForBuyer.onDisconnectedBySeller(fromAddress, msg);
+//                        }
                         break;
 
 
@@ -981,15 +998,15 @@ public class PayController {
         sendPayMessage(receiver, object.toString());
     }
 
-    public void sendEtherRequestMessage(JSONObject jo, String receiver) {
-        MeshLog.p("sendEtherRequestMessage " + jo.toString() + " " + receiver);
-        try {
-            jo.put(PurchaseConstants.JSON_KEYS.MESSAGE_TYPE, PurchaseConstants.MESSAGE_TYPES.ETHER_REQUEST);
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-        sendPayWithTimeoutMessage(receiver, jo.toString(), PurchaseConstants.TimeoutPurpose.INIT_ETHER);
-    }
+//    public void sendEtherRequestMessage(JSONObject jo, String receiver) {
+//        MeshLog.p("sendEtherRequestMessage " + jo.toString() + " " + receiver);
+//        try {
+//            jo.put(PurchaseConstants.JSON_KEYS.MESSAGE_TYPE, PurchaseConstants.MESSAGE_TYPES.ETHER_REQUEST);
+//        } catch (JSONException e) {
+//            e.printStackTrace();
+//        }
+//        sendPayWithTimeoutMessage(receiver, jo.toString(), PurchaseConstants.TimeoutPurpose.INIT_ETHER);
+//    }
 
     public void sendEtherRequestMessageResponse(JSONObject jo, String receiver) {
         MeshLog.p("sendEtherRequestMessageOk " + jo.toString());

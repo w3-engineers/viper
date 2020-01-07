@@ -42,7 +42,7 @@ public class EthereumServiceUtil implements EthereumService.NetworkInfoCallback 
         databaseService = DatabaseService.getInstance(context);
 //        populateDb(context);
         ethereumService = EthereumService.getInstance(context, this,
-                SharedPref.read(Constant.PreferenceKeys.GIFT_DONATE_LINK), PreferencesHelperDataplan.on().getRmeshOwnerAddress());
+                SharedPref.read(Constant.PreferenceKeys.GIFT_DONATE_LINK));
     }
 
     public static EthereumServiceUtil getInstance(Context context) {

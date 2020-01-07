@@ -375,32 +375,25 @@ public class PurchaseManagerSeller extends PurchaseManager implements PayControl
         switch (type) {
             case PurchaseConstants.REQUEST_TYPES.APPROVE_ZERO:
             case PurchaseConstants.REQUEST_TYPES.APPROVE_TOKEN:
-                long approveBlock = preferencesHelperDataplan.getBalanceApprovedBlock();
-                ethService.logBalanceApproved(approveBlock, endPointType);
+                ethService.logBalanceApproved(endPointType);
                 break;
             case PurchaseConstants.REQUEST_TYPES.CREATE_CHANNEL:
-                long createblock = preferencesHelperDataplan.getChannelCreatedBlock();
-                ethService.logChannelCreated(createblock, endPointType);
+                ethService.logChannelCreated(endPointType);
                 break;
             case PurchaseConstants.REQUEST_TYPES.CLOSE_CHANNEL:
-                long closeBlock = preferencesHelperDataplan.getChannelClosedBlock();
-                ethService.logChannelClosed(closeBlock, endPointType);
+                ethService.logChannelClosed(endPointType);
                 break;
             case PurchaseConstants.REQUEST_TYPES.TOPUP_CHANNEL:
-                long topupBlock = preferencesHelperDataplan.getChannelTopupBlock();
-                ethService.logChannelToppedUp(topupBlock, endPointType);
+                ethService.logChannelToppedUp(endPointType);
                 break;
             case PurchaseConstants.REQUEST_TYPES.WITHDRAW_CHANNEL:
-                long withdrawnBlock = preferencesHelperDataplan.getChannelWithdrawnBlock();
-                ethService.logChannelWithdrawn(withdrawnBlock, endPointType);
+                ethService.logChannelWithdrawn(endPointType);
                 break;
             case PurchaseConstants.REQUEST_TYPES.BUY_TOKEN:
-                long buyTokenBlock = preferencesHelperDataplan.getTokenMintedBlock();
-                ethService.logTokenMinted(buyTokenBlock, endPointType);
+                ethService.logTokenMinted(endPointType);
                 break;
             case PurchaseConstants.REQUEST_TYPES.CLAIM_RM:
-                long transferTokenBlock = preferencesHelperDataplan.getTokenTransferredBlock();
-                ethService.logTokenTransferred(transferTokenBlock, endPointType);
+                ethService.logTokenTransferred(endPointType);
                 break;
 
             default:
@@ -1591,7 +1584,7 @@ public class PurchaseManagerSeller extends PurchaseManager implements PayControl
         }
     }
 
-    @Override
+   /* @Override
     public void onReceivedEtherRequest(String from, int endpointType) {
 
         ethService.requestEther(from, endpointType, new EthereumService.ReqEther() {
@@ -1608,7 +1601,7 @@ public class PurchaseManagerSeller extends PurchaseManager implements PayControl
                 }
             }
         });
-    }
+    }*/
 
     @Override
     public void onBuyerUpdateNotified(String msg_Id, String fromAddress) {
@@ -1671,7 +1664,6 @@ public class PurchaseManagerSeller extends PurchaseManager implements PayControl
         String buyerAddress = typedResponse._owner;
 
         PurchaseRequests purchaseRequests = null;
-        preferencesHelperDataplan.setBalanceApprovedBlock(typedResponse.log.getBlockNumber().longValue());
 
         try {
 
@@ -1714,7 +1706,6 @@ public class PurchaseManagerSeller extends PurchaseManager implements PayControl
     public void onChannelCreatedLog(RaidenMicroTransferChannels.ChannelCreatedEventResponse typedResponse) {
         MeshLog.v("onChannelCreatedLog " + typedResponse._sender_address + " " + typedResponse._deposit.toString());
 
-        preferencesHelperDataplan.setChannelCreatedBlock(typedResponse.log.getBlockNumber().longValue());
 
         if (typedResponse._receiver_address.equalsIgnoreCase(ethService.getAddress())) {
             String buyerAddress = typedResponse._sender_address;
@@ -1777,8 +1768,6 @@ public class PurchaseManagerSeller extends PurchaseManager implements PayControl
     @Override
     public void onChannelToppedUpLog(RaidenMicroTransferChannels.ChannelToppedUpEventResponse typedResponse) {
         MeshLog.v("onChannelToppedUpLog " + typedResponse._sender_address + " " + typedResponse._added_deposit.toString());
-
-        preferencesHelperDataplan.setChannelTopupBlock(typedResponse.log.getBlockNumber().longValue());
 
         if (typedResponse._receiver_address.equalsIgnoreCase(ethService.getAddress())) {
 
@@ -1843,8 +1832,6 @@ public class PurchaseManagerSeller extends PurchaseManager implements PayControl
     @Override
     public void onChannelClosedLog(RaidenMicroTransferChannels.ChannelSettledEventResponse typedResponse) {
         MeshLog.v("onChannelClosedLog " + typedResponse._sender_address + " " + typedResponse._balance.toString());
-
-        preferencesHelperDataplan.setChannelClosedBlock(typedResponse.log.getBlockNumber().longValue());
 
         try {
             String buyerAddress = typedResponse._sender_address;
@@ -1911,8 +1898,6 @@ public class PurchaseManagerSeller extends PurchaseManager implements PayControl
     public void onChannelWithdrawnLog(RaidenMicroTransferChannels.ChannelWithdrawEventResponse typedResponse) {
         MeshLog.v("onChannelWithdrawnLog " + typedResponse._sender_address + " " + typedResponse._withdrawn_balance.toString());
 
-        preferencesHelperDataplan.setChannelWithdrawnBlock(typedResponse.log.getBlockNumber().longValue());
-
         if (typedResponse._receiver_address.equalsIgnoreCase(ethService.getAddress())) {
 
             try {
@@ -1960,8 +1945,6 @@ public class PurchaseManagerSeller extends PurchaseManager implements PayControl
     @Override
     public void onTokenMintedLog(TmeshToken.MintedEventResponse typedResponse) {
         MeshLog.v("onTokenMinted " + typedResponse._to + " " + typedResponse._num.toString());
-
-        preferencesHelperDataplan.setTokenMintedBlock(typedResponse.log.getBlockNumber().longValue());
         String tokenBuyerAddress = typedResponse._to;
         double value = ethService.getETHorTOKEN(typedResponse._num);
 
@@ -2060,8 +2043,6 @@ public class PurchaseManagerSeller extends PurchaseManager implements PayControl
     public void onTokenTransferredLog(TmeshToken.TransferEventResponse typedResponse) {
         MeshLog.v("onTokenTransferredLog " + typedResponse.log.getTransactionHash());
 
-        preferencesHelperDataplan.setTokenTransferredBlock(typedResponse.log.getBlockNumber().longValue());
-
         String tokenSenderAddress = typedResponse._from;
         double value = ethService.getETHorTOKEN(typedResponse._value);
 
@@ -2085,54 +2066,67 @@ public class PurchaseManagerSeller extends PurchaseManager implements PayControl
                 Double etherValue = ethService.getUserEthBalance(tokenSenderAddress, purchaseRequests.blockChainEndpoint);
 
 
-                if (tokenSenderAddress.equalsIgnoreCase(ethService.getAddress())) {
+                if (typedResponse._to.equalsIgnoreCase(preferencesHelperDataplan.getRmeshOwnerAddress())){
+                    if (purchaseRequests.requestType == PurchaseConstants.REQUEST_TYPES.CLAIM_RM){
+                        ethService.saveClaimGiftTransaction(typedResponse);
 
-                    purchaseRequests.state = PurchaseConstants.REQUEST_STATE.NOTIFIED;
-                    databaseService.updatePurchaseRequest(purchaseRequests);
+                        if (tokenSenderAddress.equalsIgnoreCase(ethService.getAddress())) {
 
-                    if (tokenValue == null)
-                        tokenValue = EthereumServiceUtil.getInstance(mContext).getToken(purchaseRequests.blockChainEndpoint);
+                            purchaseRequests.state = PurchaseConstants.REQUEST_STATE.NOTIFIED;
+                            databaseService.updatePurchaseRequest(purchaseRequests);
 
-                    if (etherValue == null)
-                        etherValue = EthereumServiceUtil.getInstance(mContext).getCurrency(purchaseRequests.blockChainEndpoint);
+                            if (tokenValue == null)
+                                tokenValue = EthereumServiceUtil.getInstance(mContext).getToken(purchaseRequests.blockChainEndpoint);
 
-                    EthereumServiceUtil.getInstance(mContext).updateCurrencyAndToken(purchaseRequests.blockChainEndpoint,etherValue, tokenValue);
+                            if (etherValue == null)
+                                etherValue = EthereumServiceUtil.getInstance(mContext).getCurrency(purchaseRequests.blockChainEndpoint);
 
-                    if (walletListener != null) {
-                        walletListener.onRmGiftClaimed(true, "You have successfully claimed for RMESH.\nToken will be added to your account within 72 hours.");
+                            EthereumServiceUtil.getInstance(mContext).updateCurrencyAndToken(purchaseRequests.blockChainEndpoint,etherValue, tokenValue);
+
+                            if (walletListener != null) {
+                                walletListener.onRmGiftClaimed(true, "You have successfully claimed for RMESH.\nToken will be added to your account within 72 hours.");
+                            }
+                        }else {
+                            //NOT MY TRANSACTION
+                        }
+                    }else if (purchaseRequests.requestType == PurchaseConstants.REQUEST_TYPES.CONVERT_RM){
+                        ethService.saveConvertRmTransaction(typedResponse);
+                        double rmValue = ethService.getETHorTOKEN(typedResponse._value);
+
+                        ethService.sendPointRequest(typedResponse.log.getTransactionHash(), rmValue, typedResponse.log.getBlockNumber().longValue(), typedResponse._from, getEndpoint());
+
+                        /*if (!tokenSenderAddress.equalsIgnoreCase(ethService.getAddress())) {
+                            purchaseRequests.state = PurchaseConstants.REQUEST_STATE.COMPLETED;
+
+                            JSONObject jsonObject = new JSONObject();
+                            jsonObject.put(PurchaseConstants.JSON_KEYS.MESSAME_FROM, ethService.getAddress());
+
+                            if (tokenValue != null) {
+                                jsonObject.put(PurchaseConstants.INFO_KEYS.TKN_BALANCE, tokenValue);
+                            }
+
+                            if (etherValue != null){
+                                jsonObject.put(PurchaseConstants.INFO_KEYS.ETH_BALANCE, etherValue);
+                            }
+
+
+                            purchaseRequests.responseString = jsonObject.toString();
+
+                            UUID messageId = UUID.randomUUID();
+
+                            purchaseRequests.messageId = messageId.toString();
+
+                            databaseService.updatePurchaseRequest(purchaseRequests);
+
+                            setEndPointInfoInJson(jsonObject, purchaseRequests.blockChainEndpoint);
+
+                            payController.sendConvertRmResponse(jsonObject, purchaseRequests.buyerAddress, messageId.toString());
+                            }else {
+                            //MY TRANSACTION
+                          }*/
                     }
-                } else {
-                    ---
-//                    purchaseRequests.state = PurchaseConstants.REQUEST_STATE.COMPLETED;
-//
-//                    JSONObject jsonObject = new JSONObject();
-//                    jsonObject.put(PurchaseConstants.JSON_KEYS.MESSAME_FROM, ethService.getAddress());
-//                    if (tokenValue == null) {
-//                        tokenValue = typedResponse._num.doubleValue();
-//                    }
-//                    jsonObject.put(PurchaseConstants.INFO_KEYS.TKN_BALANCE, tokenValue);
-//
-//                    if (etherValue != null){
-//                        jsonObject.put(PurchaseConstants.INFO_KEYS.ETH_BALANCE, etherValue);
-//                    }
-//
-//
-//                    purchaseRequests.responseString = jsonObject.toString();
-//
-//                    UUID messageId = UUID.randomUUID();
-//
-//                    purchaseRequests.messageId = messageId.toString();
-//
-//                    databaseService.updatePurchaseRequest(purchaseRequests);
-//
-//                    setEndPointInfoInJson(jsonObject, purchaseRequests.blockChainEndpoint);
-//
-//                    payController.sendBuyTokenResponse(jsonObject, purchaseRequests.buyerAddress, messageId.toString());
                 }
-
                 pickAndSubmitRequest(purchaseRequests.requesterAddress);
-
-
             } else {
                 MeshLog.v("onTokenTransferredLog purchaseRequest not found");
             }
@@ -2186,6 +2180,16 @@ public class PurchaseManagerSeller extends PurchaseManager implements PayControl
         }catch (Exception ex){
             ex.printStackTrace();
         }
+    }
+
+    @Override
+    public void onTokenRequested(boolean success, String msg, String tknTx) {
+
+    }
+
+    @Override
+    public void onTokenCompleted(boolean success) {
+
     }
 
     public LiveData<Integer> getDifferentNetworkData(String myAddress, int endpoint) {

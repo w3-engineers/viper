@@ -181,14 +181,14 @@ public class ConfigSyncUtil {
 
                 configSyncEvent.setUpdate(true);
 
-                EthereumServiceUtil.getInstance(context).getEthereumService().setGIftDonateUrl(configurationCommand.getGiftDonateLink(), PreferencesHelperDataplan.on().getRmeshOwnerAddress());
+                EthereumServiceUtil.getInstance(context).getEthereumService().setGIftDonateUrl(configurationCommand.getGiftDonateLink());
             } else {
-                EthereumServiceUtil.getInstance(context).getEthereumService().setGIftDonateUrl(SharedPref.read(Constant.PreferenceKeys.GIFT_DONATE_LINK), PreferencesHelperDataplan.on().getRmeshOwnerAddress());
+                EthereumServiceUtil.getInstance(context).getEthereumService().setGIftDonateUrl(SharedPref.read(Constant.PreferenceKeys.GIFT_DONATE_LINK));
                 configSyncEvent.setUpdate(false);
             }
         }
         else {
-            EthereumServiceUtil.getInstance(context).getEthereumService().setGIftDonateUrl(SharedPref.read(Constant.PreferenceKeys.GIFT_DONATE_LINK), PreferencesHelperDataplan.on().getRmeshOwnerAddress());
+            EthereumServiceUtil.getInstance(context).getEthereumService().setGIftDonateUrl(SharedPref.read(Constant.PreferenceKeys.GIFT_DONATE_LINK));
             configSyncEvent.setUpdate(false);
         }
 //        else {
@@ -254,7 +254,7 @@ public class ConfigSyncUtil {
                 EthereumServiceUtil.getInstance(context).insertNetworkInfo(new NetworkInfo().toNetworkInfo(network));
             }
 
-            EthereumServiceUtil.getInstance(context).getEthereumService().setGIftDonateUrl(configurationCommand.getGiftDonateLink(), PreferencesHelperDataplan.on().getRmeshOwnerAddress());
+            EthereumServiceUtil.getInstance(context).getEthereumService().setGIftDonateUrl(configurationCommand.getGiftDonateLink());
         }
     }
 

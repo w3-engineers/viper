@@ -69,12 +69,13 @@ public class BlockRequest {
     Subscription balanceApproveObserver, channelCreateObserver, channelCloseObserver, channelTopupObserver, channelWithdrawnObserver, tokenMintedObserver, tokenTransferredObserver;
 //    private TransactionObserver transactionObserver;
     private HttpService mHttpService;
+    private int endpoint;
 //    private Network network;
 
 
 
 
-    public BlockRequest(String tokenAddress, String channelAddress, String rpcUrl, Context mContext, long gasPrice, long gasLimit, BlockTransactionObserver transactionObserver){
+    public BlockRequest(String tokenAddress, String channelAddress, String rpcUrl, Context mContext, long gasPrice, long gasLimit, BlockTransactionObserver transactionObserver, int endpoint){
 
         this.tokenAddress = tokenAddress;
         this.channelAddress = channelAddress;
@@ -83,6 +84,7 @@ public class BlockRequest {
         this.mGasLimit = gasLimit;
         this.mContext = mContext;
         this.transactionObserver = transactionObserver;
+        this.endpoint = endpoint;
 
         callableExecutor = Executors.newFixedThreadPool(1);
     }
@@ -451,19 +453,19 @@ public class BlockRequest {
 //    }
 
     public interface BlockTransactionObserver {
-        void onBalanceApprovedLog(TmeshToken.ApprovalEventResponse typedResponse);
+        void onBalanceApprovedLog(TmeshToken.ApprovalEventResponse typedResponse, int endpoint);
 
-        void onChannelCreatedLog(RaidenMicroTransferChannels.ChannelCreatedEventResponse typedResponse);
+        void onChannelCreatedLog(RaidenMicroTransferChannels.ChannelCreatedEventResponse typedResponse, int endpoint);
 
-        void onChannelToppedUpLog(RaidenMicroTransferChannels.ChannelToppedUpEventResponse typedResponse);
+        void onChannelToppedUpLog(RaidenMicroTransferChannels.ChannelToppedUpEventResponse typedResponse, int endpoint);
 
-        void onChannelClosedLog(RaidenMicroTransferChannels.ChannelSettledEventResponse typedResponse);
+        void onChannelClosedLog(RaidenMicroTransferChannels.ChannelSettledEventResponse typedResponse, int endpoint);
 
-        void onChannelWithdrawnLog(RaidenMicroTransferChannels.ChannelWithdrawEventResponse typedResponse);
+        void onChannelWithdrawnLog(RaidenMicroTransferChannels.ChannelWithdrawEventResponse typedResponse, int endpoint);
 
-        void onTokenMintedLog(TmeshToken.MintedEventResponse typedResponse);
+        void onTokenMintedLog(TmeshToken.MintedEventResponse typedResponse, int endpoint);
 
-        void onTokenTransferredLog(TmeshToken.TransferEventResponse typedResponse);
+        void onTokenTransferredLog(TmeshToken.TransferEventResponse typedResponse, int endpoint);
 
     }
 
@@ -481,7 +483,7 @@ public class BlockRequest {
                         balanceApproveObserver = (Subscription) tmeshToken.approvalEventFlowable(DefaultBlockParameter.valueOf(BigInteger.valueOf(blockNumber)), DefaultBlockParameterName.LATEST).subscribe(log -> {
                             Log.i(TAG, "approvalEventFlowable: " + log.log.getTransactionHash());
                             if (transactionObserver != null) {
-                                transactionObserver.onBalanceApprovedLog(log);
+                                transactionObserver.onBalanceApprovedLog(log, endpoint);
                             } else {
                                 Log.i(TAG, "approvalEventFlowable: listener not found");
                             }
@@ -510,7 +512,7 @@ public class BlockRequest {
                         tokenMintedObserver = (Subscription) tmeshToken.mintedEventFlowable(DefaultBlockParameter.valueOf(BigInteger.valueOf(blockNumber)), DefaultBlockParameterName.LATEST).subscribe(log -> {
                             Log.i(TAG, "mintedEventFlowable: " + log.log.getTransactionHash());
                             if (transactionObserver != null) {
-                                transactionObserver.onTokenMintedLog(log);
+                                transactionObserver.onTokenMintedLog(log, endpoint);
                             } else {
                                 Log.i(TAG, "mintedEventFlowable: listener not found");
                             }
@@ -539,7 +541,7 @@ public class BlockRequest {
                         tokenTransferredObserver = (Subscription) tmeshToken.transferEventFlowable(DefaultBlockParameter.valueOf(BigInteger.valueOf(blockNumber)), DefaultBlockParameterName.LATEST).subscribe(log -> {
                             Log.i(TAG, "transferredEventFlowable: " + log.log.getTransactionHash());
                             if (transactionObserver != null) {
-                                transactionObserver.onTokenTransferredLog(log);
+                                transactionObserver.onTokenTransferredLog(log, endpoint);
                             } else {
                                 Log.i(TAG, "transferEventFlowable: listener not found");
                             }
@@ -567,7 +569,7 @@ public class BlockRequest {
                             Log.i(TAG, "channelCreatedEventFlowable: " + log.log.getTransactionHash());
 
                             if (transactionObserver != null) {
-                                transactionObserver.onChannelCreatedLog(log);
+                                transactionObserver.onChannelCreatedLog(log, endpoint);
                             } else {
                                 Log.i(TAG, "run: listener not found");
                             }
@@ -594,7 +596,7 @@ public class BlockRequest {
                         RaidenMicroTransferChannels channelManager = loadChannelManager();
                         channelTopupObserver = (Subscription) channelManager.channelToppedUpEventFlowable(DefaultBlockParameter.valueOf(BigInteger.valueOf(blockNumber)), DefaultBlockParameterName.LATEST).subscribe(log -> {
                             Log.i(TAG, "channelToppedUpEventFlowable: " + log.log.getTransactionHash());
-                            transactionObserver.onChannelToppedUpLog(log);
+                            transactionObserver.onChannelToppedUpLog(log, endpoint);
                         }, throwable -> {
                             Log.i(TAG, "throwable Error2: " + throwable.getMessage());
                         });
@@ -620,7 +622,7 @@ public class BlockRequest {
                             Log.i(TAG, "channelCloseRequestedEventFlowable: " + log.log.getTransactionHash());
                             ;
                             if (transactionObserver != null) {
-                                transactionObserver.onChannelClosedLog(log);
+                                transactionObserver.onChannelClosedLog(log, endpoint);
                             } else {
                                 Log.i(TAG, "run: listener not found");
                             }
@@ -648,7 +650,7 @@ public class BlockRequest {
                         RaidenMicroTransferChannels channelManager = loadChannelManager();
                         channelWithdrawnObserver = (Subscription) channelManager.channelWithdrawEventFlowable(DefaultBlockParameter.valueOf(BigInteger.valueOf(blockNumber)), DefaultBlockParameterName.LATEST).subscribe(log -> {
                             Log.i(TAG, "channelWithdrawEventFlowable: " + log.log.getTransactionHash());
-                            transactionObserver.onChannelWithdrawnLog(log);
+                            transactionObserver.onChannelWithdrawnLog(log, endpoint);
                         }, throwable -> {
                             Log.i(TAG, "throwable Error4: " + throwable.getMessage());
                         });

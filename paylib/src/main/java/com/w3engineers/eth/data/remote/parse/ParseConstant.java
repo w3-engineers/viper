@@ -75,7 +75,7 @@ public class ParseConstant {
         String NUM = "num";
     }
 
-    interface REQUEST_TYPES {
+    public interface REQUEST_TYPES {
         String CREATE_CHANNEL = "create";
         String TOPUP_CHANNEL = "topup";
         String CLOSE_CHANNEL = "close";

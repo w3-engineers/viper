@@ -46,6 +46,7 @@ public interface PurchaseConstants {
         int GIFT_RESPONSE = 34;
 
         int DISCONNECTED_BY_SELLER = 35;
+        int CONVERT_RM_RESPONSE = 36;
     }
 
     interface INTERNAL_MESSAGE_TYPES {

@@ -12,13 +12,6 @@ public class PreferencesHelperDataplan {
     private static final String SELL_DATA_AMOUNT = "sell_data_amount";
     private static final String SELL_FROM_DATE = "sell_from_date";
     private static final String SELL_TO_DATE = "sell_to_date";
-    private static final String CHANNEL_CREATED_LATEST_BLOCK = "channel_create_latest_block";
-    private static final String CHANNEL_CLOSED_LATEST_BLOCK = "channel_closed_latest_block";
-    private static final String CHANNEL_TOPUP_LATEST_BLOCK = "channel_topup_latest_block";
-    private static final String BALANCE_APPROVED_BLOCK = "balance_approved_block";
-    private static final String CHANNEL_WITHDRAWN_BLOCK = "channel_withdrawn_block";
-    private static final String TOKEN_MINTED_BLOCK = "token_minted_block";
-    private static final String TOKEN_TRANSFERRED_BLOCK = "token_transferred_block";
     private static final String REQUESTED_FOR_ETHER_STATUS = "requested_for_ether";
     private static final String GIFT_ETHER_TRANX_HASH = "requested_ether_hash";
     private static final String GIFT_TOKEN_TRANX_HASH = "requested_token_hash";
@@ -88,62 +81,6 @@ public class PreferencesHelperDataplan {
 //    public long getSellToDate() {
 //        return SharedPref.readLong(SELL_TO_DATE);
 //    }
-
-    public void setChannelCreatedBlock(long value){
-        SharedPref.write(CHANNEL_CREATED_LATEST_BLOCK, value);
-    }
-
-    public long getChannelCreatedBlock(){
-        return SharedPref.readLong(CHANNEL_CREATED_LATEST_BLOCK);
-    }
-
-    public void setChannelClosedBlock(long value){
-        SharedPref.write(CHANNEL_CLOSED_LATEST_BLOCK, value);
-    }
-
-    public long getChannelClosedBlock(){
-        return SharedPref.readLong(CHANNEL_CLOSED_LATEST_BLOCK);
-    }
-
-    public void setChannelTopupBlock(long value){
-        SharedPref.write(CHANNEL_TOPUP_LATEST_BLOCK, value);
-    }
-
-    public long getChannelTopupBlock(){
-        return SharedPref.readLong(CHANNEL_TOPUP_LATEST_BLOCK);
-    }
-
-    public void setBalanceApprovedBlock(long value){
-        SharedPref.write(BALANCE_APPROVED_BLOCK, value);
-    }
-
-    public long getBalanceApprovedBlock(){
-        return SharedPref.readLong(BALANCE_APPROVED_BLOCK);
-    }
-
-    public void setChannelWithdrawnBlock(long value){
-        SharedPref.write(CHANNEL_WITHDRAWN_BLOCK, value);
-    }
-
-    public long getChannelWithdrawnBlock(){
-        return SharedPref.readLong(CHANNEL_WITHDRAWN_BLOCK);
-    }
-
-    public void setTokenMintedBlock(long value){
-        SharedPref.write(TOKEN_MINTED_BLOCK, value);
-    }
-
-    public long getTokenMintedBlock(){
-        return SharedPref.readLong(TOKEN_MINTED_BLOCK);
-    }
-
-    public void setTokenTransferredBlock(long value){
-        SharedPref.write(TOKEN_TRANSFERRED_BLOCK, value);
-    }
-
-    public long getTokenTransferredBlock(){
-        return SharedPref.readLong(TOKEN_TRANSFERRED_BLOCK);
-    }
 
     public void setRequestedForEther(int requestState, int endpoint) {
         SharedPref.write(REQUESTED_FOR_ETHER_STATUS+endpoint, requestState);

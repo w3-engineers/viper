@@ -24,6 +24,7 @@ public class EthGift {
 
 
 
+
     private EthGift(){
         this.ethGiftModels = new CopyOnWriteArrayList<EthGiftModel>();
 
