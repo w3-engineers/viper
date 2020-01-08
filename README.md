@@ -8,11 +8,7 @@ We are not accepting any contribution request right now.
 
 # Viper
 
-Viper is the android library that acts as a communication bridge between Telemesh Android Application and Telemesh Service.
-It is responsible for coordinating the actions to the Telemesh Service. 
-It can also perform some mappings to prepare the objects coming from the Android Application.
-
-## Usage
+Please follow this [Technical documentation](https://viper-w3.readthedocs.io/en/latest/) to get detail about Viper
 
 ### Dependency
 
@@ -30,11 +26,6 @@ Include the library in app `build.gradle`
     dependencies{
         implementation 'com.github.w3-engineers.viper:paylib:0.0.1-alpha'
     }
-
-## Technical documentation
-
-
-
 
 
 ## Contributing
