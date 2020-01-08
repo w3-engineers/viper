@@ -237,10 +237,10 @@ public class EthereumService implements BlockRequest.BlockTransactionObserver, E
                                         } else {
                                             if (tknTxReceipt.getStatus().equals("0x1")) {
                                                 //success
-                                                transactionObserver.onTokenCompleted(true);
+                                                transactionObserver.onTokenCompleted(true, userAddress, currentEndpoint);
                                             } else if(tknTxReceipt.getStatus().equals("0x0")) {
                                                 //fail
-                                                transactionObserver.onTokenCompleted(false);
+                                                transactionObserver.onTokenCompleted(false, userAddress, currentEndpoint);
                                             } else {
                                                 txList.add(tknTx.toLowerCase());
                                                 logTokenTransferred(currentEndpoint);
@@ -587,7 +587,7 @@ public class EthereumService implements BlockRequest.BlockTransactionObserver, E
 
         void onTokenRequested(boolean success, String msg, String tknTx);
 
-        void onTokenCompleted(boolean success);
+        void onTokenCompleted(boolean success, String userAddress, int endpoint);
     }
 
     public void setTransactionObserver(TransactionObserver transactionObserver) {
@@ -705,10 +705,11 @@ public class EthereumService implements BlockRequest.BlockTransactionObserver, E
     @Override
     public void onTokenTransferredLog(TmeshToken.TransferEventResponse typedResponse, int endpoint) {
         preferencesHelperPaylib.setTokenTransferredBlock(typedResponse.log.getBlockNumber().longValue(), endpoint);
+        Log.v(TAG, "onTokenTransferredLog " + txList.toString() + "  " + typedResponse.log.getTransactionHash() +"  " + endpoint);
         if (txList.contains(typedResponse.log.getTransactionHash().toLowerCase())){
             txList.remove(typedResponse.log.getTransactionHash().toLowerCase());
             if (transactionObserver != null)
-                transactionObserver.onTokenCompleted(true);
+                transactionObserver.onTokenCompleted(true, typedResponse._to, endpoint);
         }else {
             if (transactionObserver != null)
                 transactionObserver.onTokenTransferredLog(typedResponse);

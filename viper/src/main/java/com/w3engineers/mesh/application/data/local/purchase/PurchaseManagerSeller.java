@@ -358,8 +358,8 @@ public class PurchaseManagerSeller extends PurchaseManager implements PayControl
             JSONObject jsonObject = new JSONObject();
             jsonObject.put(PurchaseConstants.JSON_KEYS.MESSAME_FROM, ethService.getAddress());
             jsonObject.put(PurchaseConstants.JSON_KEYS.GIFT_REQUEST_IS_SUBMITTED, isSuccess);
-            jsonObject.put(PurchaseConstants.JSON_KEYS.GIFT_ETH_BALANCE, ethBalance);
-            jsonObject.put(PurchaseConstants.JSON_KEYS.GIFT_TKN_BALANCE, tknBalance);
+            jsonObject.put(PurchaseConstants.INFO_KEYS.ETH_BALANCE, ethBalance);
+            jsonObject.put(PurchaseConstants.INFO_KEYS.TKN_BALANCE, tknBalance);
 
             setEndPointInfoInJson(jsonObject, endPointType);
 
@@ -393,6 +393,8 @@ public class PurchaseManagerSeller extends PurchaseManager implements PayControl
                 ethService.logTokenMinted(endPointType);
                 break;
             case PurchaseConstants.REQUEST_TYPES.CLAIM_RM:
+                ethService.logTokenTransferred(endPointType);
+            case PurchaseConstants.REQUEST_TYPES.CONVERT_RM:
                 ethService.logTokenTransferred(endPointType);
                 break;
 
@@ -468,7 +470,7 @@ public class PurchaseManagerSeller extends PurchaseManager implements PayControl
         try {
             PurchaseRequests purchaseRequest = databaseService.pickNextRequest(address, PurchaseConstants.REQUEST_STATE.RECEIVED);
             if (purchaseRequest != null) {
-                MeshLog.v("purchaseRequest" + purchaseRequest.toString());
+                MeshLog.v("purchaseRequest " + purchaseRequest.toString());
                 setObserverForRequest(purchaseRequest.requestType, purchaseRequest.blockChainEndpoint);
 
                 ethService.submitRequest(purchaseRequest.signedMessage, purchaseRequest.rid,purchaseRequest.blockChainEndpoint, new EthereumService.SubmitRequestListener() {
@@ -551,11 +553,11 @@ public class PurchaseManagerSeller extends PurchaseManager implements PayControl
         MeshLog.v("sendPurchaseInitOk");
         JSONObject jsonObject = new JSONObject();
         try {
-            jsonObject.put("fr", ethService.getAddress());
-            jsonObject.put("eth", ethBalance);
-            jsonObject.put("tkn", tokenBalance);
-            jsonObject.put("nonce", nonce);
-            jsonObject.put("allowance", allowance);
+            jsonObject.put(PurchaseConstants.JSON_KEYS.MESSAME_FROM, ethService.getAddress());
+            jsonObject.put(PurchaseConstants.INFO_KEYS.ETH_BALANCE, ethBalance);
+            jsonObject.put(PurchaseConstants.INFO_KEYS.TKN_BALANCE, tokenBalance);
+            jsonObject.put(PurchaseConstants.INFO_KEYS.NONCE, nonce);
+            jsonObject.put(PurchaseConstants.INFO_KEYS.ALOWANCE, allowance);
             jsonObject.put(PurchaseConstants.INFO_KEYS.SHARED_DATA, remainingData);
 
             setEndPointInfoInJson(jsonObject, endPointType);
@@ -662,6 +664,11 @@ public class PurchaseManagerSeller extends PurchaseManager implements PayControl
         }else {
             syncWithBuyer(buyerAddress);
         }
+    }
+
+    @Override
+    public void onConvertRmRequestReceived(String fromAddress, int endPointType, int convert_tx_phase, String rm_convert_tx, double rmValue, long open_block) {
+        ethService.sendPointRequest(rm_convert_tx, rmValue, open_block, fromAddress, endPointType);
     }
 
     public void setPayControllerListener() {
@@ -2093,9 +2100,7 @@ public class PurchaseManagerSeller extends PurchaseManager implements PayControl
                         ethService.saveConvertRmTransaction(typedResponse);
                         double rmValue = ethService.getETHorTOKEN(typedResponse._value);
 
-                        ethService.sendPointRequest(typedResponse.log.getTransactionHash(), rmValue, typedResponse.log.getBlockNumber().longValue(), typedResponse._from, getEndpoint());
-
-                        /*if (!tokenSenderAddress.equalsIgnoreCase(ethService.getAddress())) {
+                        if (!tokenSenderAddress.equalsIgnoreCase(ethService.getAddress())) {
                             purchaseRequests.state = PurchaseConstants.REQUEST_STATE.COMPLETED;
 
                             JSONObject jsonObject = new JSONObject();
@@ -2109,6 +2114,16 @@ public class PurchaseManagerSeller extends PurchaseManager implements PayControl
                                 jsonObject.put(PurchaseConstants.INFO_KEYS.ETH_BALANCE, etherValue);
                             }
 
+                            jsonObject.put(PurchaseConstants.JSON_KEYS.REQUEST_SUCCESS, true);
+
+                            jsonObject.put(PurchaseConstants.JSON_KEYS.MESSAGE_TEXT, "Conversion process started, Points will be added to your account soon");
+
+                            jsonObject.put(PurchaseConstants.JSON_KEYS.CONVERT_TRANSACTION_PHASE, PurchaseConstants.CONVERT_TRANSACTION_PHASE.RM_TRANSACTION_PHASE);
+                            jsonObject.put(PurchaseConstants.JSON_KEYS.RM_CONVERT_TX, typedResponse.log.getTransactionHash());
+                            jsonObject.put(PurchaseConstants.JSON_KEYS.RM_VALUE, rmValue);
+                            jsonObject.put(PurchaseConstants.JSON_KEYS.OPEN_BLOCK, typedResponse.log.getBlockNumber().longValue());
+
+
 
                             purchaseRequests.responseString = jsonObject.toString();
 
@@ -2121,9 +2136,9 @@ public class PurchaseManagerSeller extends PurchaseManager implements PayControl
                             setEndPointInfoInJson(jsonObject, purchaseRequests.blockChainEndpoint);
 
                             payController.sendConvertRmResponse(jsonObject, purchaseRequests.buyerAddress, messageId.toString());
-                            }else {
+                        } else {
                             //MY TRANSACTION
-                          }*/
+                        }
                     }
                 }
                 pickAndSubmitRequest(purchaseRequests.requesterAddress);
@@ -2136,9 +2151,9 @@ public class PurchaseManagerSeller extends PurchaseManager implements PayControl
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-//        catch (JSONException e) {
-//            e.printStackTrace();
-//        }
+        catch (JSONException e) {
+            e.printStackTrace();
+        }
 
     }
 
@@ -2185,10 +2200,40 @@ public class PurchaseManagerSeller extends PurchaseManager implements PayControl
     @Override
     public void onTokenRequested(boolean success, String msg, String tknTx) {
 
+
     }
 
     @Override
-    public void onTokenCompleted(boolean success) {
+    public void onTokenCompleted(boolean success, String userAddress, int endpoint) {
+        try {
+            if (success){
+
+                    Double etherValue = ethService.getUserEthBalance(userAddress, endpoint);
+                    Double tokenValue = ethService.getUserTokenBalance(userAddress, endpoint);
+
+                    JSONObject jsonObject = new JSONObject();
+
+                    jsonObject.put(PurchaseConstants.JSON_KEYS.MESSAME_FROM, ethService.getAddress());
+
+                    if (tokenValue != null) {
+                        jsonObject.put(PurchaseConstants.INFO_KEYS.TKN_BALANCE, tokenValue);
+                    }
+                    if (etherValue != null){
+                        jsonObject.put(PurchaseConstants.INFO_KEYS.ETH_BALANCE, etherValue);
+                    }
+
+                    jsonObject.put(PurchaseConstants.JSON_KEYS.CONVERT_TRANSACTION_PHASE, PurchaseConstants.CONVERT_TRANSACTION_PHASE.TM_TRANSACTION_PHASE);
+                    jsonObject.put(PurchaseConstants.JSON_KEYS.REQUEST_SUCCESS, success);
+                    jsonObject.put(PurchaseConstants.JSON_KEYS.MESSAGE_TEXT, "Your Points are added to your account");
+                    setEndPointInfoInJson(jsonObject, endpoint);
+
+                    payController.sendConvertRmResponse(jsonObject, userAddress, "");
+            } else {
+                //todo
+            }
+        } catch (Exception e){
+            e.printStackTrace();
+        }
 
     }
 

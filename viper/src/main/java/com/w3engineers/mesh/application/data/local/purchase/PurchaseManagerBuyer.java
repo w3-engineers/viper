@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.arch.lifecycle.LiveData;
 import android.os.RemoteException;
 import android.text.TextUtils;
-import android.widget.Toast;
 import android.support.v7.app.AlertDialog;
 
 import com.w3engineers.eth.util.helper.HandlerUtil;
@@ -932,6 +931,34 @@ public class PurchaseManagerBuyer extends PurchaseManager implements PayControll
             e.printStackTrace();
         }
 
+    }
+
+    @Override
+    public void onConvertRmResponseReceived(String from, boolean success, String msg, double ethBalance, double tknBalance, int endPoint, int convert_tx_phase, String rm_convert_tx, double rmValue, long open_block) {
+        if (success){
+            EthereumServiceUtil.getInstance(mContext).updateCurrencyAndToken(endPoint, ethBalance, tknBalance);
+
+            if (convert_tx_phase == PurchaseConstants.CONVERT_TRANSACTION_PHASE.RM_TRANSACTION_PHASE){
+
+                try {
+
+                    JSONObject jsonObject = new JSONObject();
+                    jsonObject.put(PurchaseConstants.JSON_KEYS.MESSAME_FROM, ethService.getAddress());
+                    jsonObject.put(PurchaseConstants.JSON_KEYS.CONVERT_TRANSACTION_PHASE, PurchaseConstants.CONVERT_TRANSACTION_PHASE.TM_TRANSACTION_PHASE);
+                    jsonObject.put(PurchaseConstants.JSON_KEYS.RM_CONVERT_TX, rm_convert_tx);
+                    jsonObject.put(PurchaseConstants.JSON_KEYS.RM_VALUE, rmValue);
+                    jsonObject.put(PurchaseConstants.JSON_KEYS.OPEN_BLOCK, open_block);
+                    setEndPointInfoInJson(jsonObject, getEndpoint());
+
+
+                    payController.sendrmConvertRequest(jsonObject, from);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+
+            }
+        }
+        walletListener.onConvertSubmitted(success, msg);
     }
 
     @Override

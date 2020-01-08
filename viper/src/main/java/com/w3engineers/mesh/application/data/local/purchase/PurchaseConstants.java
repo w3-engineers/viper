@@ -32,7 +32,7 @@ public interface PurchaseConstants {
 
         int ETHER_REQUEST = 23;
         int ETHER_REQUEST_RESPONSE = 24;
-        int RECEIVED_ETHER = 25;
+//        int RECEIVED_ETHER = 25;
 
         int BLOCKCHAIN_REQUEST = 26;
         int BLOCKCHAIN_RESPONSE = 27;
@@ -47,6 +47,7 @@ public interface PurchaseConstants {
 
         int DISCONNECTED_BY_SELLER = 35;
         int CONVERT_RM_RESPONSE = 36;
+        int CONVERT_RM_REQUEST = 37;
     }
 
     interface INTERNAL_MESSAGE_TYPES {
@@ -79,8 +80,6 @@ public interface PurchaseConstants {
         String INFO_KEYS = "info";
         String INFO_PURPOSE = "pur";
         String INFO_JSON = "ij";
-
-
         String ACK_MODE = "am";
         String MESSAGE_MODE = "mm";
         String MESSAGE_BPS = "bps";
@@ -90,30 +89,23 @@ public interface PurchaseConstants {
         String MESSAGE_DATA = "md";
         String BPS_BALANCE = "bb";
         String DATA_SIZE = "ds";
-
-        String MESSAGE_SENT_SUCCESS = "mss";
-        String MESSAGE_BODY = "mb";
         String MESSAGE_ID = "mi";
-
         String BUYER_ADDRESS = "ba";
         String SELLER_ADDRESS = "sa";
         String USED_DATA = "ud";
         String TOTAL_DATA = "td";
-        String ETHER = "eth";
         String RESPONSE_CODE = "rc";
         String REQUEST_SUCCESS = "rs";
         String END_POINT_TYPE = "ept";
-
         String GIFT_REQUEST_IS_SUBMITTED = "gris";
         String GIFT_REQUEST_SUBMIT_MESSAGE = "grsm";
         String GIFT_ETH_HASH_REQUEST_SUBMIT = "gers";
         String GIFT_TKN_HASH_REQUEST_SUBMIT = "gtrs";
         String GIFT_TKN_FAILED_BY = "failedby";
-
-        String GIFT_ETH_BALANCE = "geb";
-        String GIFT_TKN_BALANCE = "gtb";
-
         String IS_INCOMING = "ii";
+        String CONVERT_TRANSACTION_PHASE = "chp";
+        String RM_CONVERT_TX = "rct";
+        String RM_VALUE = "rmv";
     }
 
     interface REQUEST_TYPES {
@@ -126,6 +118,11 @@ public interface PurchaseConstants {
         int BUY_TOKEN = 6;
         int CLAIM_RM = 7;
         int CONVERT_RM = 8;
+    }
+
+    interface CONVERT_TRANSACTION_PHASE {
+        int RM_TRANSACTION_PHASE = 1;
+        int TM_TRANSACTION_PHASE = 2;
     }
 
     interface REQUEST_STATE {
