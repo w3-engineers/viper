@@ -31,51 +31,9 @@ Include the library in app `build.gradle`
         implementation 'com.github.w3-engineers.viper:paylib:0.0.1-alpha'
     }
 
-To start using the library you just need to call :
-
-TBA
-
-### Supports provided on App side 
-It contains few tools to ease developers daily development. Support provides:
-
-* Custom components (BaseActivity, BaseFragment, BaseAdapter etc.)
-* Custom Widgets (BaseButton, BaseRecyclerView, BaseEditText etc.)
-* Close Coupled Behavior with Widget and Components
-* Separate *release* and *build* application class with predefined library attached
-* Few configurable options (debugDatabase, Toasty etc.Still we are improving here)
-* Enhanced support for Room (migration, creation of database, columns etc.)
-* Necessary library added such a way so that developers can use
-without including in their gradle file (Timber, Multidex, Crashlytics, Debug Database etc.)
-* Timber facilitates clickable logs with method name, line number prefixed
-and automatic TAG of class name. It distinguishes expected release build
-and debug build behavior
-* BaseSplashViewModel provides time calculation facility and enforce ViewModel 
-LiveData communication
-
-### Supports taken from Telemesh Service 
-It takes below supports:
-
-* Discovery list​
-* Events (Connect, Disconnect, Receive)​​
-* Send & Receive Message (Local, Hop, Internet)
-* Balance Check​
-* Data Buy​
-* Balance withdraw (Buyer/Seller])
-* Token Air Drop​​
+## Technical documentation
 
 
-
-## Getting Started
-TBA
-
-
-### Prerequisites
-TBA
-
-
-### Installing
-
-TBA
 
 
 
