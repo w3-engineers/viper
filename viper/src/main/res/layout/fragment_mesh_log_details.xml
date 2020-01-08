@@ -1,0 +1,179 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <android.support.constraint.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:focusableInTouchMode="true">
+
+        <android.support.v7.widget.Toolbar
+            android:id="@+id/toolbar"
+            android:layout_width="0dp"
+            android:layout_height="?android:attr/actionBarSize"
+            android:background="@color/colorPrimary"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <ImageView
+            android:id="@+id/imageView_back"
+            android:layout_width="@dimen/width_40"
+            android:layout_height="@dimen/height_40"
+            android:layout_marginLeft="@dimen/margin_5"
+            android:layout_marginTop="@dimen/margin_5"
+            android:padding="@dimen/padding_10"
+            android:src="@mipmap/ic_back_white"
+            app:layout_constraintBottom_toBottomOf="@+id/toolbar"
+            app:layout_constraintStart_toStartOf="@+id/toolbar"
+            app:layout_constraintTop_toTopOf="@+id/toolbar" />
+
+        <TextView
+            android:id="@+id/text_view_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/log_details"
+            android:textColor="@color/white"
+            android:textSize="18sp"
+            app:layout_constraintBottom_toBottomOf="@+id/toolbar"
+            app:layout_constraintEnd_toEndOf="@+id/toolbar"
+            app:layout_constraintStart_toStartOf="@+id/toolbar"
+            app:layout_constraintTop_toTopOf="@+id/toolbar" />
+
+        <CheckBox
+            android:id="@+id/check_box_scroll"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Scroll off"
+            app:layout_constraintBottom_toBottomOf="@+id/top_view"
+            app:layout_constraintStart_toStartOf="@+id/text_view_clear"
+            app:layout_constraintTop_toTopOf="@+id/top_view" />
+
+        <EditText
+            android:id="@+id/edit_text_search"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginEnd="8dp"
+            android:hint="Search"
+            android:imeOptions="actionGo"
+            app:layout_constraintBottom_toBottomOf="@+id/top_view"
+            app:layout_constraintEnd_toStartOf="@+id/spinner"
+            app:layout_constraintStart_toEndOf="@+id/check_box_scroll"
+            app:layout_constraintTop_toTopOf="@+id/top_view" />
+
+
+        <EditText
+            android:id="@+id/edit_text_advance_search"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:hint="Advance Search"
+            app:layout_constraintBottom_toBottomOf="@+id/advance_search_container"
+            app:layout_constraintEnd_toStartOf="@+id/image_view_left"
+            app:layout_constraintStart_toEndOf="@+id/text_view_clear"
+            app:layout_constraintTop_toTopOf="@+id/advance_search_container" />
+
+        <ImageView
+            android:id="@+id/image_view_left"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/btn_left_cntrl"
+            app:layout_constraintBottom_toBottomOf="@+id/advance_search_container"
+            app:layout_constraintEnd_toStartOf="@+id/image_view_right"
+            app:layout_constraintTop_toTopOf="@+id/advance_search_container" />
+
+        <ImageView
+            android:id="@+id/image_view_right"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="4dp"
+            android:src="@drawable/btn_right_cntrl"
+            app:layout_constraintBottom_toBottomOf="@+id/advance_search_container"
+            app:layout_constraintEnd_toStartOf="@+id/text_view_restart"
+            app:layout_constraintTop_toTopOf="@+id/advance_search_container" />
+
+        <Spinner
+            android:id="@+id/spinner"
+            android:layout_width="wrap_content"
+            android:layout_height="0dp"
+            android:layout_marginEnd="8dp"
+            android:entries="@array/log_list"
+            app:layout_constraintBottom_toBottomOf="@+id/top_view"
+            app:layout_constraintEnd_toEndOf="@+id/top_view"
+            app:layout_constraintTop_toTopOf="@+id/top_view" />
+
+        <TextView
+            android:id="@+id/text_view_restart"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="8dp"
+            android:text="Restart"
+            android:textColor="@android:color/holo_red_dark"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="@+id/advance_search_container"
+            app:layout_constraintEnd_toEndOf="@+id/advance_search_container"
+            app:layout_constraintTop_toTopOf="@+id/advance_search_container" />
+
+        <TextView
+            android:id="@+id/text_view_clear"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:padding="8dp"
+            android:text="Clear"
+            android:textColor="@android:color/holo_red_dark"
+            app:layout_constraintBottom_toBottomOf="@+id/advance_search_container"
+            app:layout_constraintStart_toStartOf="@+id/top_view"
+            app:layout_constraintTop_toTopOf="@+id/advance_search_container" />
+
+        <View
+            android:id="@+id/top_view"
+            android:layout_width="0dp"
+            android:layout_height="?android:attr/actionBarSize"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/toolbar" />
+
+        <View
+            android:id="@+id/advance_search_container"
+            android:layout_width="0dp"
+            android:layout_height="?android:attr/actionBarSize"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/top_view" />
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/recycler_view_log"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/advance_search_container" />
+
+
+        <!--   <ScrollView
+               android:id="@+id/scrollView"
+               android:layout_width="match_parent"
+               android:layout_height="0dp"
+               app:layout_constraintBottom_toBottomOf="parent"
+               app:layout_constraintEnd_toEndOf="parent"
+               app:layout_constraintStart_toStartOf="parent"
+               app:layout_constraintTop_toBottomOf="@+id/top_view">
+
+               <TextView
+                   android:id="@+id/textView"
+                   android:layout_width="match_parent"
+                   android:layout_height="match_parent"
+                   android:layout_marginStart="8dp"
+                   android:layout_marginTop="@dimen/margin_10"
+                   android:layout_marginEnd="8dp"
+                   android:layout_marginBottom="8dp"
+                   android:text="Message Fragment"
+                   app:layout_constraintEnd_toEndOf="parent"
+                   app:layout_constraintStart_toStartOf="parent"
+                   app:layout_constraintTop_toTopOf="parent" />
+
+           </ScrollView>-->
+    </android.support.constraint.ConstraintLayout>
+</layout>

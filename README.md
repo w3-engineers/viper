@@ -1,3 +1,6 @@
+[![](https://jitpack.io/v/w3-engineers/viper.svg)](https://jitpack.io/#w3-engineers/viper)
+
+
 # Important Note
 
 This project is currently under highly breaking changes and team is now focusing on achieving some important features.
@@ -13,10 +16,19 @@ It can also perform some mappings to prepare the objects coming from the Android
 
 ### Dependency
 
+Add it in your root `build.gradle` at the end of repositories:
+
+    allprojects {
+		repositories {
+			...
+			maven { url 'https://jitpack.io' }
+		}
+	}
+
 Include the library in app `build.gradle`
 
     dependencies{
-        implementation ' TBA......'
+        implementation 'com.github.w3-engineers.viper:paylib:0.0.1-alpha'
     }
 
 To start using the library you just need to call :

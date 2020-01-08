@@ -6,6 +6,37 @@
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
+        <item name="actionMenuTextAppearance">@style/MenuItemTextAppearance</item>
+
+    </style>
+
+    <style name="AppTheme.NoActionBar">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+    </style>
+
+    <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
+
+    <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
+
+    <style name="TextInputLayout">
+        <item name="colorAccent">@color/colorGradientStart</item>
+        <item name="colorPrimary">#00bb5c</item>
+    </style>
+
+    <style name="MenuItemTextAppearance" parent="@style/TextAppearance.AppCompat.Widget.ActionBar.Menu">
+        <item name="textAllCaps">false</item>
+    </style>
+
+    <style name="Tooltip">
+        <item name="android:text">Hello World!</item>
+        <item name="android:textColor">?android:textColorPrimaryInverse</item>
+        <item name="android:textSize">12sp</item>
+        <item name="android:lineSpacingExtra">5dp</item>
+        <item name="backgroundColor">#00574B</item>
+        <item name="cornerRadius">10dp</item>
+        <!--        <item name="arrowWidth">48dp</item>
+                <item name="arrowHeight">48dp</item>-->
     </style>
 
 </resources>
