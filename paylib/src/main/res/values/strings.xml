@@ -1,0 +1,18 @@
+<resources>
+    <string name="app_name">paylib</string>
+    <string name="acc_balance">Account Balance</string>
+    <string name="token">TMESH</string>
+    <string name="eth">ETH</string>
+    <string name="my_address">My Address</string>
+    <string name="my_data_plan">My Data Plan</string>
+    <string name="my_wallet_address">My Wallet Address</string>
+    <string name="request_token">Request Token</string>
+    <string name="see_my_transactions">See My Transactions</string>
+    <string name="txt_last_updated">Last Updated : </string>
+
+    <string name="new_seller">New Seller</string>
+    <string name="online_seller">Online Seller</string>
+    <string name="offline_seller">Offline Seller</string>
+
+
+</resources>

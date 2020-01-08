@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#083480</color>
+    <color name="colorPrimaryDark">#052459</color>
+    <color name="colorAccent">#083480</color>
+    <color name="colorGradientPrimary">#00bb5c</color>
+    <color name="colorGradientStart">#00acc2</color>
+    <color name="select_photo_text_color">#3C3C3C</color>
+    <color name="grey_400">#BDBDBD</color>
+    <color name="incoming_message_color">#D6FDEE</color>
+    <color name="outcoming_message_color">#F0F0F0</color>
+    <color name="bottom_bar_color">#B2DFDB</color>
+    <color name="colorBackgroundDark">#d7d9db</color>
+    <color name="colorBackground">#083480</color>
+    <color name="colorWhite">#FFFFFF</color>
+    <color name="colorGreen">#008577</color>
+    <color name="colorYellow">#FFFF00</color>
+    <color name="colorRed">#FF0000</color>
+    <color name="colorEtBorder">#d1d1d1</color>
+    <color name="colorClickHere">#900c3e</color>
+    <color name="light_paste_color">#7397CAFF</color>
+    <color name="light_magenta">#73008DFF</color>
+    <color name="color_magenta">#008DFF</color>
+    <color name="color_yellow">#FFAE43</color>
+</resources>
