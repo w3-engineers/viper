@@ -16,6 +16,7 @@ import com.w3engineers.mesh.application.data.model.PeerAdd;
 import com.w3engineers.mesh.application.data.model.PeerRemoved;
 import com.w3engineers.mesh.application.data.model.ServiceUpdate;
 import com.w3engineers.mesh.application.data.model.UserInfoEvent;
+import com.w3engineers.mesh.data.AppCredentials;
 import com.w3engineers.mesh.model.MessageModel;
 import com.w3engineers.mesh.model.UserModel;
 import com.w3engineers.mesh.ui.Nearby.NearbyCallBack;
@@ -70,22 +71,11 @@ public class ConnectionManager {
             String jsonData = loadJSONFromAsset(mContext);
             if (!TextUtils.isEmpty(jsonData)) {
 
-//                JSONObject jsonObject = new JSONObject(jsonData);
-
-/*                String AUTH_USER_NAME = jsonObject.optString("AUTH_USER_NAME");
-                String AUTH_PASSWORD = jsonObject.optString("AUTH_PASSWORD");
-                String APP_DOWNLOAD_LINK = jsonObject.optString("APP_DOWNLOAD_LINK");
-                String GIFT_DONATE_LINK = jsonObject.optString("GIFT_DONATE_LINK");
-                String PARSE_APP_ID = jsonObject.optString("PARSE_APP_ID");
-                String PARSE_URL = jsonObject.optString("PARSE_URL");*/
-
-                String AUTH_USER_NAME = BuildConfig.AUTH_USER_NAME;
-                String AUTH_PASSWORD = BuildConfig.AUTH_PASSWORD;
-                String FILE_REPO_LINK = BuildConfig.FILE_REPO_LINK;
-                String PARSE_APP_ID = BuildConfig.PARSE_APP_ID;
-                String PARSE_URL = BuildConfig.PARSE_URL;
-
-//                String GIFT_DONATE_LINK = jsonObject.optString("GIFT_DONATE_LINK");
+                String AUTH_USER_NAME = AppCredentials.getInstance().getAuthUserName();
+                String AUTH_PASSWORD = AppCredentials.getInstance().getAuthPassword();
+                String FILE_REPO_LINK = AppCredentials.getInstance().getFileRepoLink();
+                String PARSE_APP_ID = AppCredentials.getInstance().getParseAppId();
+                String PARSE_URL = AppCredentials.getInstance().getParseUrl();
 
                 viperClient = ViperClient.on(mContext, APP_NAME, "com.w3engineers.ext.viper", NETWORK_PREFIX, SharedPref.read(Constant.KEY_USER_NAME),
                         SharedPref.read(Constant.PreferenceKeys.ADDRESS), SharedPref.read(Constant.PreferenceKeys.PUBLIC_KEY), 1, System.currentTimeMillis(), true)

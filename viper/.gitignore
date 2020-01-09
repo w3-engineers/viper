@@ -1,2 +1,4 @@
 /build
 /assets/*
+viper/src/main/cpp/native-lib.cpp
+viper/src/main/cpp/CMakeLists.txt
