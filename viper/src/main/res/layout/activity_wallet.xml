@@ -275,6 +275,22 @@
                             android:textColor="@color/currency_text_color"
                             android:textSize="@dimen/text_size_15" />
 
+                        <TextView
+                            android:id="@+id/rmesh_gift_info"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:background="@drawable/rm_note_shape"
+                            android:elevation="@dimen/elevation_4"
+                            android:gravity="center"
+                            android:visibility="gone"
+                            android:paddingStart="@dimen/padding_20"
+                            android:paddingTop="@dimen/padding_10"
+                            android:paddingEnd="@dimen/padding_20"
+                            android:paddingBottom="@dimen/padding_10"
+                            android:text="@string/txt_gift_claim_message"
+                            android:textColor="@color/colorClickHere"
+                            android:textSize="@dimen/text_size_15" />
+
                         <android.support.constraint.ConstraintLayout
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"

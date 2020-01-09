@@ -18,6 +18,7 @@ public class PreferencesHelperDataplan {
     private static final String GIFT_ENDPOINT_TYPE = "gift_end_point_type";
     private static final String ETHER_REQUEST_TIME = "ether_request_time";
     private static final String DONOT_SHOW_RMESH_ALERT = "do_not_show_rmesh_alert";
+    private static final String RM_GIFT_CLAIMED = "rm_gift_claimed";
 
 
     private static final String CONFIG_VERSION = "CONFIG_VERSION";
@@ -192,4 +193,12 @@ public class PreferencesHelperDataplan {
     public boolean getChoiseForRmeshAlert() {
         return SharedPref.readBoolean(DONOT_SHOW_RMESH_ALERT, false);
     }
+
+    public void setRMGiftClaimed(boolean b) {
+        SharedPref.write(RM_GIFT_CLAIMED, b);
+    }
+
+   public boolean isRMGiftClaimed(){
+        return  SharedPref.readBoolean(RM_GIFT_CLAIMED);
+   }
 }

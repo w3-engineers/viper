@@ -166,6 +166,7 @@
     <string name="token_guideline">Token Guideline</string>
 
     <string name="token_balance">You will get <b>%s RMESH</b> tokens for every <b>%s Points</b></string>
+    <string name="txt_gift_claim_message">* RMESH will be added to your account after admin approval, be patient.</string>
 
     <string name="txt_rmesh_reward_title">RMESH Reward!</string>
     <string name="txt_rmesh_reward_message">You are eligible for 1000 RMESH tokens for your 1000 Points.\nClaim it now!</string>

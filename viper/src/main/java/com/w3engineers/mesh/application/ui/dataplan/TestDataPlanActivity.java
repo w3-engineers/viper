@@ -465,7 +465,7 @@ public class TestDataPlanActivity extends TelemeshBaseActivity implements DataPl
         });
     }
 
-    @Override
+/*    @Override
     public void onTopUpFailed(String sellerAddress, String msg) {
         runOnUiThread(() -> {
             for (Seller item : getAdapter().getItems()) {
@@ -478,7 +478,7 @@ public class TestDataPlanActivity extends TelemeshBaseActivity implements DataPl
                 }
             }
         });
-    }
+    }*/
 
     @Override
     public void onRoleSwitchCompleted() {

@@ -66,11 +66,11 @@ public interface PurchaseDao {
     @Query("SELECT * FROM purchase WHERE state = :state AND buyer_address = :buyer_address AND seller_address = :seller_address AND block_chain_endpoint = :endPointType LIMIT 1")
     Purchase getPurchaseByState(int state, String buyer_address, String seller_address, int endPointType);
 
-    @Query("SELECT COUNT(*) FROM purchase WHERE seller_address = :myID AND block_chain_endpoint != :endPointType")
-    LiveData<Integer> getDifferentNetworkData(String myID, int endPointType);
+/*    @Query("SELECT COUNT(*) FROM purchase WHERE seller_address = :myID AND block_chain_endpoint != :endPointType")
+    LiveData<Integer> getDifferentNetworkData(String myID, int endPointType);*/
 
-    @Query("SELECT COUNT(*) FROM purchase WHERE buyer_address = :myID AND block_chain_endpoint != :endPointType")
-    LiveData<Integer> getDifferentNetworkPurchase(String myID, int endPointType);
+   /* @Query("SELECT COUNT(*) FROM purchase WHERE buyer_address = :myID AND block_chain_endpoint != :endPointType")
+    LiveData<Integer> getDifferentNetworkPurchase(String myID, int endPointType);*/
 
 //    @Query("SELECT * FROM purchase WHERE buyer_address =:address AND state =:state")
 //    List<Purchase> gettMyOpenPurchases(String address, int state);

@@ -299,7 +299,7 @@ public class DatabaseService {
         return future.get();
     }
 
-    public LiveData<Integer> getDifferentNetworkData(String myAddress, int endPointType) throws ExecutionException, InterruptedException {
+    /*public LiveData<Integer> getDifferentNetworkData(String myAddress, int endPointType) throws ExecutionException, InterruptedException {
 
         Future<LiveData<Integer>> future = executor.submit(() -> {
             LiveData<Integer> totalTokenEarn = null;
@@ -312,9 +312,9 @@ public class DatabaseService {
         });
 
         return future.get();
-    }
+    }*/
 
-    public LiveData<Integer> getDifferentNetworkPurchase(String myAddress, int endPointType) throws ExecutionException, InterruptedException {
+/*    public LiveData<Integer> getDifferentNetworkPurchase(String myAddress, int endPointType) throws ExecutionException, InterruptedException {
 
         Future<LiveData<Integer>> future = executor.submit(() -> {
             LiveData<Integer> totalTokenEarn = null;
@@ -327,7 +327,7 @@ public class DatabaseService {
         });
 
         return future.get();
-    }
+    }*/
 
     public LiveData<Integer> getTotalOpenChannel(String myAddress, int channelStatus) throws ExecutionException, InterruptedException {
         Future<LiveData<Integer>> future = executor.submit(new Callable<LiveData<Integer>>() {

@@ -114,7 +114,7 @@ public class WalletActivity extends TelemeshBaseActivity implements WalletManage
         setTotalEarn();
         setTotalSpent();
         getTotalPendingEarningBySeller();
-        setDifferentNetworkInfo();
+//        setDifferentNetworkInfo();
 
         //changeStatusBarColor();
 
@@ -135,6 +135,10 @@ public class WalletActivity extends TelemeshBaseActivity implements WalletManage
             mBinding.rmeshPointInfo.setText(data);
         } else {
             mBinding.rmeshPointInfo.setVisibility(View.GONE);
+        }
+
+        if (walletManager.isRMGiftClaimed()){
+            mBinding.rmeshGiftInfo.setVisibility(View.VISIBLE);
         }
     }
 
@@ -193,7 +197,7 @@ public class WalletActivity extends TelemeshBaseActivity implements WalletManage
         });
     }
 
-    @Override
+    /*    @Override
     public void onEtherRequestResponse(boolean success, String msg) {
         runOnUiThread(() -> {
             resetDialogLoadingTimer();
@@ -203,31 +207,31 @@ public class WalletActivity extends TelemeshBaseActivity implements WalletManage
             }
             Toaster.showLong(msg);
         });
-    }
+    }*/
 
-    @Override
+    /*    @Override
     public void onTokenRequestResponse(boolean success, String msg) {
         runOnUiThread(() -> {
             resetDialogLoadingTimer();
 
             Toaster.showLong(msg);
         });
-    }
+    }*/
 
-    @Override
+    /*    @Override
     public void onRequestSubmitted(boolean success, String msg) {
         runOnUiThread(() -> {
             Toaster.showLong(msg);
         });
-    }
+    }*/
 
-    @Override
+    /*    @Override
     public void onRequestCompleted(boolean success, String msg) {
         runOnUiThread(() -> {
             Toaster.showLong(msg);
             refreshMyBalance();
         });
-    }
+    }*/
 
     @Override
     public void onRmBalanceInfo(boolean success, String msg) {
@@ -238,8 +242,12 @@ public class WalletActivity extends TelemeshBaseActivity implements WalletManage
     public void onRmGiftClaimed(boolean tokenTransferred, String msg) {
         runOnUiThread(() -> {
             if (tokenTransferred){
+                walletManager.donotShowGiftRmeshAlert(false);
+                giftAlertDisplayed = false;
                 DialogUtil.showConfirmationDialog(WalletActivity.this, "RMESH Gift Claimed", msg,
                         null, "OK", null);
+                walletManager.setRMGiftClaimed(true);
+                mBinding.rmeshGiftInfo.setVisibility(View.VISIBLE);
 
             } else {
                 resetDialogLoadingTimer();
@@ -254,17 +262,17 @@ public class WalletActivity extends TelemeshBaseActivity implements WalletManage
     }
 
     @Override
-    public void onConvertSubmitted(boolean success, String msg) {
+    public void onConvertRM(boolean success, String msg) {
         runOnUiThread(() -> {
             resetDialogLoadingTimer();
             Toaster.showLong(msg);
         });
     }
 
-    @Override
+    /*   @Override
     public void onConvertCompleted(boolean success, String msg) {
 
-    }
+    }*/
 
     @Override
     public void onResume() {
@@ -306,40 +314,40 @@ public class WalletActivity extends TelemeshBaseActivity implements WalletManage
     private void convertRmToPoint() {
         MeshLog.v("convertRmToPoint");
 
-            runOnUiThread(() -> {
-                LayoutInflater li = LayoutInflater.from(WalletActivity.this);
-                View promptsView = li.inflate(R.layout.text_input_rmconvert_amount, null);
-                AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(WalletActivity.this);
-                alertDialogBuilder.setView(promptsView);
+        runOnUiThread(() -> {
+            LayoutInflater li = LayoutInflater.from(WalletActivity.this);
+            View promptsView = li.inflate(R.layout.text_input_rmconvert_amount, null);
+            AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(WalletActivity.this);
+            alertDialogBuilder.setView(promptsView);
 
-                TextView rmOk, rmCancel;
-                final EditText userInput = (EditText) promptsView.findViewById(R.id.rm_user_input);
-                rmOk = (TextView) promptsView.findViewById(R.id.rm_ok);
-                rmCancel = (TextView) promptsView.findViewById(R.id.rm_cancel);
-                AlertDialog alertDialog = alertDialogBuilder.create();
-                alertDialog.setCancelable(false);
-                rmOk.setOnClickListener(v -> {
-                    String inputText = userInput.getText().toString();
-                    if (inputText.length() > 0) {
-                        double amount = Double.valueOf(inputText);
-                        if (amount > 0) {
-                            setDialogLoadingTimer("Sending request, please wait.");
-                            walletManager.convertRmToPoints(amount);
-                        } else {
-                            Toaster.showShort("RMESH amount should be bigger than zero.");
-                        }
+            TextView rmOk, rmCancel;
+            final EditText userInput = (EditText) promptsView.findViewById(R.id.rm_user_input);
+            rmOk = (TextView) promptsView.findViewById(R.id.rm_ok);
+            rmCancel = (TextView) promptsView.findViewById(R.id.rm_cancel);
+            AlertDialog alertDialog = alertDialogBuilder.create();
+            alertDialog.setCancelable(false);
+            rmOk.setOnClickListener(v -> {
+                String inputText = userInput.getText().toString();
+                if (inputText.length() > 0) {
+                    double amount = Double.valueOf(inputText);
+                    if (amount > 0) {
+                        setDialogLoadingTimer("Sending request, please wait.");
+                        walletManager.convertRmToPoints(amount);
                     } else {
-                        Toaster.showShort("RMESH amount required.");
+                        Toaster.showShort("RMESH amount should be bigger than zero.");
                     }
-                    alertDialog.cancel();
-                });
-
-                rmCancel.setOnClickListener(v -> {
-                    alertDialog.cancel();
-                });
-
-                alertDialog.show();
+                } else {
+                    Toaster.showShort("RMESH amount required.");
+                }
+                alertDialog.cancel();
             });
+
+            rmCancel.setOnClickListener(v -> {
+                alertDialog.cancel();
+            });
+
+            alertDialog.show();
+        });
     }
 
     private void openUrl() {
@@ -397,7 +405,7 @@ public class WalletActivity extends TelemeshBaseActivity implements WalletManage
         alertDialog.show();
     }*/
 
-   /* private void showAlertWithdraw() {
+    /* private void showAlertWithdraw() {
         LayoutInflater inflater = LayoutInflater.from(this);
         View promptView = inflater.inflate(R.layout.prompt_wallet_withdrow, null);
         PromptWalletWithdrowBinding promptBinding = PromptWalletWithdrowBinding.bind(promptView);
@@ -453,7 +461,7 @@ public class WalletActivity extends TelemeshBaseActivity implements WalletManage
         alertDialog.show();
     }*/
 
-   /* private void selectWithdrawOption(ConstraintLayout view) {
+    /* private void selectWithdrawOption(ConstraintLayout view) {
         view.setBackground(getResources().getDrawable(R.drawable.bg_withdraw_choice));
     }
 
@@ -489,11 +497,11 @@ public class WalletActivity extends TelemeshBaseActivity implements WalletManage
         walletManager.sendEtherRequest();
     }*/
 
-    private void sendTokenRequest() {
+    /*    private void sendTokenRequest() {
         setDialogLoadingTimer("Sending request, please wait.");
 
         walletManager.sendTokenRequest();
-    }
+    }*/
 
     private void setTotalEarn() {
 
@@ -560,7 +568,7 @@ public class WalletActivity extends TelemeshBaseActivity implements WalletManage
         }
     }
 
-    private void setDifferentNetworkInfo() {
+    /*private void setDifferentNetworkInfo() {
 
         if (haveDifferentNetworkDataObserver != null) {
             haveDifferentNetworkDataObserver.removeObservers(this);
@@ -572,61 +580,63 @@ public class WalletActivity extends TelemeshBaseActivity implements WalletManage
             haveDifferentNetworkDataObserver.observe(this, integer -> {
 
                 if (integer != null && integer > 0) {
-         /*           mBinding.anotherDeposit.setVisibility(View.VISIBLE);
+         *//*           mBinding.anotherDeposit.setVisibility(View.VISIBLE);
 
                     if (dataPlanManager.getDataPlanRole() == DataPlanConstants.USER_ROLE.DATA_SELLER) {
                         mBinding.anotherDeposit.setText(getString(R.string.different_network_data_for_seller));
                     } else if (dataPlanManager.getDataPlanRole() == DataPlanConstants.USER_ROLE.DATA_BUYER) {
                         mBinding.anotherDeposit.setText(getString(R.string.different_network_data_for_buyer));
-                    }*/
+                    }*//*
 
                 } else {
                     //  mBinding.anotherDeposit.setVisibility(View.GONE);
                 }
             });
         }
-    }
+    }*/
 
     public void performWithdrawBalance() {
         walletManager.getAllOpenDrawableBlock();
     }
 
-//    public void setLastUpdated() {
-//        Date date = new Date();
-//        long timeMilli = date.getTime();
-//        date = new Date(timeMilli);
-//        Format format = new SimpleDateFormat("yyyy-MM-dd hh:mm aaa");
-//        String dateTime = format.format(date);
-//        mBinding.tvLastUpdated.setText(getString(R.string.txt_last_updated) + " " + dateTime);
-//        WalletPreference.on().write(WalletPreference.LATEST_UPDATE, dateTime);
-//    }
+    /*
+    public void setLastUpdated() {
+        Date date = new Date();
+        long timeMilli = date.getTime();
+        date = new Date(timeMilli);
+        Format format = new SimpleDateFormat("yyyy-MM-dd hh:mm aaa");
+        String dateTime = format.format(date);
+        mBinding.tvLastUpdated.setText(getString(R.string.txt_last_updated) + " " + dateTime);
+        WalletPreference.on().write(WalletPreference.LATEST_UPDATE, dateTime);
+    }
+*/
 
     private void setCurrencyAndTokenObserver() {
         walletViewModel.networkMutableLiveData.observe(this, walletInfo -> {
 
             MeshLog.v("Wallet_info type1 " + walletInfo.networkType + " eth " + walletInfo.currencyAmount + " tkn " + walletInfo.tokenAmount);
             if (walletInfo != null) {
-                    mBinding.textViewPointValue.setText(convertTwoDigitString(walletInfo.tokenAmount));
-                    tokenAmount = walletInfo.tokenAmount;
-                    int dataShareMode = dataPlanManager.getDataPlanRole();
-                    if (dataShareMode == DataPlanConstants.USER_ROLE.DATA_SELLER || dataShareMode == DataPlanConstants.USER_ROLE.DATA_BUYER) {
+                mBinding.textViewPointValue.setText(convertTwoDigitString(walletInfo.tokenAmount));
+                tokenAmount = walletInfo.tokenAmount;
+                int dataShareMode = dataPlanManager.getDataPlanRole();
+                if (dataShareMode == DataPlanConstants.USER_ROLE.DATA_SELLER || dataShareMode == DataPlanConstants.USER_ROLE.DATA_BUYER) {
 
-                        if (walletManager.isGiftGot() && (dataShareMode == DataPlanConstants.USER_ROLE.DATA_SELLER || walletManager.hasSeller())) {
-                            Intent intent = new Intent(WalletActivity.this, PointGuidelineActivity.class);
-                            if (walletInfo.tokenAmount == 0) {
-                                intent.putExtra(PointGuidelineActivity.class.getName(), true);
-                                startActivity(intent);
-                            } else if (walletInfo.currencyAmount == 0) {
-                                intent.putExtra(PointGuidelineActivity.class.getName(), false);
-                                startActivity(intent);
-                            }
-                        }
-
-                        if (dataShareMode == DataPlanConstants.USER_ROLE.DATA_SELLER && walletInfo.tokenAmount >= walletManager.maxPointForRmesh() && !walletManager.isNotShowGiftRmeshAlert() && !giftAlertDisplayed){
-                            giftAlertDisplayed = true;
-                            showRmeshGiftPopup();
+                    if (walletManager.isGiftGot() && (dataShareMode == DataPlanConstants.USER_ROLE.DATA_SELLER || walletManager.hasSeller())) {
+                        Intent intent = new Intent(WalletActivity.this, PointGuidelineActivity.class);
+                        if (walletInfo.tokenAmount == 0) {
+                            intent.putExtra(PointGuidelineActivity.class.getName(), true);
+                            startActivity(intent);
+                        } else if (walletInfo.currencyAmount == 0) {
+                            intent.putExtra(PointGuidelineActivity.class.getName(), false);
+                            startActivity(intent);
                         }
                     }
+
+                    if (dataShareMode == DataPlanConstants.USER_ROLE.DATA_SELLER && walletInfo.tokenAmount >= walletManager.maxPointForRmesh() && !walletManager.isNotShowGiftRmeshAlert() && !giftAlertDisplayed){
+                        giftAlertDisplayed = true;
+                        showRmeshGiftPopup();
+                    }
+                }
             } else {
                 Log.e("Wallet_info", "Wallet info null received from ");
             }
@@ -636,16 +646,22 @@ public class WalletActivity extends TelemeshBaseActivity implements WalletManage
 
             MeshLog.v("Wallet_info type2 " + walletInfo.networkType + " eth " + walletInfo.currencyAmount + " tkn " + walletInfo.tokenAmount);
             if (walletInfo != null) {
-                    if (walletInfo.tokenAmount > 0){
-                        mBinding.rmLayer.setVisibility(View.VISIBLE);
-                        mBinding.rmEarned.setText(walletInfo.tokenAmount+"");
-                        if (dataPlanManager.getDataPlanRole() == DataPlanConstants.USER_ROLE.DATA_BUYER){
-                            mBinding.buttonConvertRmpoint.setVisibility(View.VISIBLE);
-                        }
-                    }else {
-                        mBinding.rmLayer.setVisibility(View.GONE);
-                        mBinding.buttonConvertRmpoint.setVisibility(View.GONE);
+                if (walletInfo.tokenAmount > 0){
+                    mBinding.rmLayer.setVisibility(View.VISIBLE);
+                    mBinding.rmEarned.setText(walletInfo.tokenAmount+"");
+                    if (dataPlanManager.getDataPlanRole() == DataPlanConstants.USER_ROLE.DATA_BUYER){
+                        mBinding.buttonConvertRmpoint.setVisibility(View.VISIBLE);
                     }
+
+                    if (walletInfo.tokenAmount > 1000){
+                        walletManager.setRMGiftClaimed(false);
+                        mBinding.rmeshGiftInfo.setVisibility(View.GONE);
+                    }
+                }else {
+                    mBinding.rmLayer.setVisibility(View.GONE);
+                    mBinding.buttonConvertRmpoint.setVisibility(View.GONE);
+                    mBinding.rmeshGiftInfo.setVisibility(View.GONE);
+                }
             } else {
                 Log.e("Wallet_info", "Wallet info null received from ");
             }

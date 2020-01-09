@@ -50,9 +50,6 @@ public class WalletManager {
         context.startActivity(intent);
     }
 
-
-
-
     public static WalletManager getInstance(){
         if (walletManager == null){
             walletManager = new WalletManager();
@@ -79,6 +76,7 @@ public class WalletManager {
     public boolean giftEther() {
 
         if (dataPlanManager.getDataPlanRole() == DataPlanConstants.USER_ROLE.DATA_BUYER) {
+            PurchaseManagerBuyer.getInstance().checkAndSendRMConvertRequest();
 
             return PurchaseManagerBuyer.getInstance().giftEtherForOtherNetwork();
 
@@ -116,6 +114,14 @@ public class WalletManager {
         }
     }
 
+    public void setRMGiftClaimed(boolean b) {
+        preferencesHelperDataplan.setRMGiftClaimed(b);
+    }
+
+    public boolean isRMGiftClaimed(){
+        return  preferencesHelperDataplan.isRMGiftClaimed();
+    }
+
 
     public interface WalletListener {
 
@@ -123,21 +129,21 @@ public class WalletManager {
 
         void onBalanceInfo(boolean success, String msg);
 
-        void onEtherRequestResponse(boolean success, String msg);
+//        void onEtherRequestResponse(boolean success, String msg);
 
-        void onTokenRequestResponse(boolean success, String msg);
+//        void onTokenRequestResponse(boolean success, String msg);
 
-        void onRequestSubmitted(boolean success, String msg);
+//        void onRequestSubmitted(boolean success, String msg);
 
-        void onRequestCompleted(boolean success, String msg);
+//        void onRequestCompleted(boolean success, String msg);
 
         void onRmBalanceInfo(boolean success, String msg);
 
         void onRmGiftClaimed(boolean tokenTransferred, String msg);
         void onRmGiftcompleted(boolean success, String msg);
 
-        void onConvertSubmitted(boolean success, String msg);
-        void onConvertCompleted(boolean success, String msg);
+        void onConvertRM(boolean success, String msg);
+//        void onConvertCompleted(boolean success, String msg);
     }
 
     public LiveData<Double> getTotalEarn(String myAddress, int endPoint) {
@@ -158,9 +164,9 @@ public class WalletManager {
     public int getMyEndpoint(){
         return PurchaseManager.getInstance().getEndpoint();
     }
-    public void setEndpoint(int endpoint){
+    /*public void setEndpoint(int endpoint){
         PurchaseManager.getInstance().setEndpoint(endpoint);
-    }
+    }*/
 
     public void refreshMyBalance() {
 
@@ -211,7 +217,7 @@ public class WalletManager {
         return preferencesHelperDataplan.getEtherRequestStatus(getMyEndpoint()) == PurchaseConstants.GIFT_REQUEST_STATE.GOT_GIFT_ETHER;
     }
 
-    public void sendTokenRequest() {
+/*    public void sendTokenRequest() {
 
         if (dataPlanManager.getDataPlanRole() == DataPlanConstants.USER_ROLE.DATA_SELLER) {
 
@@ -226,13 +232,14 @@ public class WalletManager {
                 walletListener.onTokenRequestResponse(false, "This feature is available only for data seller and data buyer.");
             }
         }
-    }
+    }*/
 
 
-    public static String getCurrencyTypeMessage(String message) {
+/*    public static String getCurrencyTypeMessage(String message) {
         return Util.getCurrencyTypeMessage(message);
-    }
+    }*/
 
+/*
     public LiveData<Integer> getDifferentNetworkData(String myAddress, int endpoint) {
         if (dataPlanManager.getDataPlanRole() == DataPlanConstants.USER_ROLE.DATA_SELLER) {
             return PurchaseManagerSeller.getInstance().getDifferentNetworkData(myAddress, endpoint);
@@ -241,6 +248,7 @@ public class WalletManager {
         }
         return null;
     }
+*/
 
     public void getAllOpenDrawableBlock() {
         PurchaseManagerSeller.getInstance().getAllOpenDrawableBlock();

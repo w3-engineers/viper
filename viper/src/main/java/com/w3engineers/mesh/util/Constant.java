@@ -91,11 +91,11 @@ public class Constant {
     }
 
 
-    public interface TimeoutPurpose {
+/*    public interface TimeoutPurpose {
         int INIT_PURCHASE = 6;
         int INIT_CHANNEL = 7;
         int INIT_ETHER = 8;
-    }
+    }*/
 
     public interface DiagramColor {
         int[] colors = new int[]{Color.DKGRAY,

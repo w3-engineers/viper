@@ -81,7 +81,7 @@ public class PayController {
 
         void onInitPurchaseErrorReceived(String sellerAddress, String msg);
 
-        void onBuyTokenResponseReceived(String from, double tokenValue, double ethValue, int endPointType);
+//        void onBuyTokenResponseReceived(String from, double tokenValue, double ethValue, int endPointType);
 
         void onChannelCreateOkayReceived(String from, long openBlock, double deposit, int endPointType);
 
@@ -93,7 +93,7 @@ public class PayController {
 
         void onInternetMessageResponseSuccess(String sender, String bps, double bps_balance, String chs, long open_block, long byteSize, String messageId);
 
-        void onInternetMessageResponseFailed(String sender, String message);
+//        void onInternetMessageResponseFailed(String sender, String message);
 
         void onPendingMessageInfo(String fromAddress, long dataSize, String msg_id, boolean isIncoming);
 
@@ -105,9 +105,9 @@ public class PayController {
 
         void onInfoErrorReceived(String from, int purpose, String msg);
 
-        void onReceivedEtherRequestResponse(String from, int responseCode);
+//        void onReceivedEtherRequestResponse(String from, int responseCode);
 
-        void onReceivedEther(String from, double balance);
+//        void onReceivedEther(String from, double balance);
 
         void onChannelCloseReceived(String fromAddress, String sellerAddress, long open_block, int endPointType);
 
@@ -137,7 +137,7 @@ public class PayController {
 
         void onCreateChannelRequested(String from, JSONArray reqList, int endPointType);
 
-        void onBuyTokenRequested(String from, JSONArray jArray, int endPointType);
+//        void onBuyTokenRequested(String from, JSONArray jArray, int endPointType);
 
         void onBlockchainRequestReceived(String from, JSONArray jArray, int endPointType);
 
@@ -307,7 +307,7 @@ public class PayController {
                             MeshLog.v("INIT_PURCHASE_ERROR Listener not found");
                         }
                         break;
-                    case PurchaseConstants.MESSAGE_TYPES.BUY_TOKEN:
+                    /*case PurchaseConstants.MESSAGE_TYPES.BUY_TOKEN:
 
                         if (jsonObject.has(PurchaseConstants.JSON_KEYS.REQUEST_LIST)) {
                             jArray = jsonObject.getJSONArray(PurchaseConstants.JSON_KEYS.REQUEST_LIST);
@@ -330,7 +330,7 @@ public class PayController {
                         } else {
                             MeshLog.v("BUY_TOKEN_RESPONSE Listener not found");
                         }
-                        break;
+                        break;*/
                     case PurchaseConstants.MESSAGE_TYPES.CREATE_CHANNEL_OK:
 
                         open_block = jsonObject.getLong(PurchaseConstants.JSON_KEYS.OPEN_BLOCK);
@@ -485,25 +485,25 @@ public class PayController {
                         }
                         break;
 
-//                    case PurchaseConstants.MESSAGE_TYPES.ETHER_REQUEST:
-//                        endPointType = jsonObject.getInt(PurchaseConstants.JSON_KEYS.END_POINT_TYPE);
-//                        if (payControllerListenerForSeller != null) {
-//                            payControllerListenerForSeller.onReceivedEtherRequest(fromAddress, endPointType);
-//                        }
-//                        break;
-                    case PurchaseConstants.MESSAGE_TYPES.ETHER_REQUEST_RESPONSE:
+/*                    case PurchaseConstants.MESSAGE_TYPES.ETHER_REQUEST:
+                        endPointType = jsonObject.getInt(PurchaseConstants.JSON_KEYS.END_POINT_TYPE);
+                        if (payControllerListenerForSeller != null) {
+                            payControllerListenerForSeller.onReceivedEtherRequest(fromAddress, endPointType);
+                        }
+                        break;*/
+/*                    case PurchaseConstants.MESSAGE_TYPES.ETHER_REQUEST_RESPONSE:
                         int responseCode = jsonObject.getInt(PurchaseConstants.JSON_KEYS.RESPONSE_CODE);
                         if (payControllerListenerForBuyer != null) {
                             payControllerListenerForBuyer.onReceivedEtherRequestResponse(fromAddress, responseCode);
                         }
-                        break;
+                        break;*/
 
-//                    case PurchaseConstants.MESSAGE_TYPES.RECEIVED_ETHER:
-//                        ethValue = jsonObject.getDouble(PurchaseConstants.JSON_KEYS.ETHER);
-//                        if (payControllerListenerForBuyer != null) {
-//                            payControllerListenerForBuyer.onReceivedEther(fromAddress, ethValue);
-//                        }
-//                        break;
+/*                    case PurchaseConstants.MESSAGE_TYPES.RECEIVED_ETHER:
+                        ethValue = jsonObject.getDouble(PurchaseConstants.JSON_KEYS.ETHER);
+                        if (payControllerListenerForBuyer != null) {
+                            payControllerListenerForBuyer.onReceivedEther(fromAddress, ethValue);
+                        }
+                        break;*/
                     case PurchaseConstants.MESSAGE_TYPES.BLOCKCHAIN_REQUEST:
 
                         if (jsonObject.has(PurchaseConstants.JSON_KEYS.REQUEST_LIST)) {
@@ -983,7 +983,7 @@ public class PayController {
         sendPayMessage(receiver, jsonObject.toString());
     }
 
-    public void sendBuyToken(JSONObject jsonObject, String receiver) {
+   /* public void sendBuyToken(JSONObject jsonObject, String receiver) {
 
         MeshLog.v("sendBuyToken " + jsonObject.toString());
         try {
@@ -993,9 +993,9 @@ public class PayController {
         }
         sendPayWithTimeoutMessage(receiver, jsonObject.toString(), PurchaseConstants.INFO_PURPOSES.BUY_TOKEN);
 //        sendPayMessage(receiver, jsonObject.toString());
-    }
+    }*/
 
-    public void sendBuyTokenResponse(JSONObject jsonObject, String receiver, String msg_id) {
+/*    public void sendBuyTokenResponse(JSONObject jsonObject, String receiver, String msg_id) {
 
         MeshLog.v("sendBuyToken " + jsonObject.toString());
         try {
@@ -1005,7 +1005,7 @@ public class PayController {
         }
         sendPayMessageWithMessageId(receiver, jsonObject.toString(), msg_id);
 
-    }
+    }*/
 
     public void sendSyncOkMessageToSeller(JSONObject object, String receiver) {
         try {
@@ -1047,15 +1047,15 @@ public class PayController {
 //        sendPayWithTimeoutMessage(receiver, jo.toString(), PurchaseConstants.TimeoutPurpose.INIT_ETHER);
 //    }
 
-    public void sendEtherRequestMessageResponse(JSONObject jo, String receiver) {
-        MeshLog.p("sendEtherRequestMessageOk " + jo.toString());
-        try {
-            jo.put(PurchaseConstants.JSON_KEYS.MESSAGE_TYPE, PurchaseConstants.MESSAGE_TYPES.ETHER_REQUEST_RESPONSE);
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-        sendPayMessage(receiver, jo.toString());
-    }
+//    public void sendEtherRequestMessageResponse(JSONObject jo, String receiver) {
+//        MeshLog.p("sendEtherRequestMessageOk " + jo.toString());
+//        try {
+//            jo.put(PurchaseConstants.JSON_KEYS.MESSAGE_TYPE, PurchaseConstants.MESSAGE_TYPES.ETHER_REQUEST_RESPONSE);
+//        } catch (JSONException e) {
+//            e.printStackTrace();
+//        }
+//        sendPayMessage(receiver, jo.toString());
+//    }
 
     public void sendDisconnectedBySeller(JSONObject jo, String receiver){
         MeshLog.p("sendDisconnectedBySeller " + jo.toString());

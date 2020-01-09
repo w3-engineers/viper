@@ -20,6 +20,7 @@ public class PreferencesHelperPaylib extends SharedPreferencePrivateMode {
     private static final String CHANNEL_WITHDRAWN_BLOCK = "channel_withdrawn_block";
     private static final String TOKEN_MINTED_BLOCK = "token_minted_block";
     private static final String TOKEN_TRANSFERRED_BLOCK = "token_transferred_block";
+    private static final String RM_TRANSACTION_HASH = "rm_tx_hash";
 
     private PreferencesHelperPaylib(Context context) {
         super(context);
@@ -127,5 +128,11 @@ public class PreferencesHelperPaylib extends SharedPreferencePrivateMode {
         return readLong(TOKEN_TRANSFERRED_BLOCK + "_" + endpoint,0);
     }
 
+    public void setRMTransactionInfo(String s) {
+        writeString(RM_TRANSACTION_HASH, s);
+    }
 
+    public String getRMTransactionInfo(){
+        return readString(RM_TRANSACTION_HASH, "");
+    }
 }

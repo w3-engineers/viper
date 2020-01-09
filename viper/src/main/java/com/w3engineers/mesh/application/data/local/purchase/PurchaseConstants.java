@@ -23,8 +23,8 @@ public interface PurchaseConstants {
         int PAY_FOR_MESSAGE_RESPONSE = 13;
         int BUYER_UPDATE_NOTIFYER = 14;
 
-        int BUY_TOKEN = 17;
-        int BUY_TOKEN_RESPONSE = 18;
+//        int BUY_TOKEN = 17;
+//        int BUY_TOKEN_RESPONSE = 18;
 
         int SYNC_BUYER_TO_SELLER = 19;
         int SYNC_SELLER_TO_BUYER = 21;
@@ -115,7 +115,7 @@ public interface PurchaseConstants {
         int TOPUP_CHANNEL = 3;
         int CLOSE_CHANNEL = 4;
         int WITHDRAW_CHANNEL = 5;
-        int BUY_TOKEN = 6;
+//        int BUY_TOKEN = 6;
         int CLAIM_RM = 7;
         int CONVERT_RM = 8;
     }
@@ -175,7 +175,7 @@ public interface PurchaseConstants {
     interface TimeoutPurpose {
         int INIT_PURCHASE = 9;
         int INIT_CHANNEL = 10;
-        int INIT_ETHER = 11;
+//        int INIT_ETHER = 11;
 
         int BUYER_PENDING_MESSAGE = 12;
         int PAY_FOR_MESSAGE_RESPONSE = 13;

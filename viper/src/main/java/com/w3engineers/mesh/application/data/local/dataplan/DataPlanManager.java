@@ -72,13 +72,13 @@ public class DataPlanManager {
         context.startActivity(intent);
     }
 
-    private static byte[] getPicture(Context context, int value){
+/*    private static byte[] getPicture(Context context, int value){
         Bitmap bitmap = BitmapFactory.decodeResource(context.getResources(), value);
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         bitmap.compress(Bitmap.CompressFormat.PNG, 100, baos);
         byte[] b = baos.toByteArray();
         return b;
-    }
+    }*/
 
     public static void resumeMessaging() {
         PurchaseManagerSeller.getInstance().resumeMessaging();
@@ -117,7 +117,7 @@ public class DataPlanManager {
 
         void onBalancedFinished(String sellerAddress, int remain);
 
-        void onTopUpFailed(String sellerAddress, String msg);
+//        void onTopUpFailed(String sellerAddress, String msg);
 
         void onRoleSwitchCompleted();
 

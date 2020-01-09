@@ -198,7 +198,7 @@ public class EthereumService implements BlockRequest.BlockTransactionObserver, E
 
     public void sendPointRequest(String transactionHash, double rmValue, long block, String userAddress, int currentEndpoint) {
         if (network == null){
-            transactionObserver.onTokenRequested(false, "network error", null);
+            transactionObserver.onTokenRequested(false, "network error", null, userAddress);
         }else {
             executor.execute(new Runnable() {
                 @Override
@@ -206,7 +206,7 @@ public class EthereumService implements BlockRequest.BlockTransactionObserver, E
 
                     try {
                         if (TextUtils.isEmpty(giftDonateUrl)){
-                            transactionObserver.onTokenRequested(false, "configuration error, please try again later", null);
+                            transactionObserver.onTokenRequested(false, "configuration error, please try again later", null, userAddress);
                         }
                         else {
 
@@ -228,6 +228,7 @@ public class EthereumService implements BlockRequest.BlockTransactionObserver, E
                                     JSONObject Jobject = new JSONObject(jsonData);
                                     if (Jobject.getBoolean("success")){
                                         String tknTx = Jobject.getString("tokenTx");
+                                        transactionObserver.onTokenRequested(true, null, tknTx, userAddress);
 
                                         TransactionReceipt tknTxReceipt = getTransactionReceipt(tknTx, currentEndpoint);
 
@@ -246,26 +247,26 @@ public class EthereumService implements BlockRequest.BlockTransactionObserver, E
                                                 logTokenTransferred(currentEndpoint);
                                             }
                                         }
-                                        transactionObserver.onTokenRequested(true, null, tknTx);
+
                                     } else {
-                                        transactionObserver.onTokenRequested(false, Jobject.getString("data"), null);
+                                        transactionObserver.onTokenRequested(false, Jobject.getString("data"), null, userAddress);
                                     }
                                 } else {
-                                    transactionObserver.onTokenRequested(false, "network error", null);
+                                    transactionObserver.onTokenRequested(false, "network error", null, userAddress);
                                 }
                             } else {
-                                transactionObserver.onTokenRequested(false, "network error", null);
+                                transactionObserver.onTokenRequested(false, "network error", null, userAddress);
                             }
                         }
                     } catch (IOException e) {
                         e.printStackTrace();
-                        transactionObserver.onTokenRequested(false, e.getMessage(), null);
+                        transactionObserver.onTokenRequested(false, e.getMessage(), null, userAddress);
                     } catch (JSONException e) {
                         e.printStackTrace();
-                        transactionObserver.onTokenRequested(false, e.getMessage(), null);
+                        transactionObserver.onTokenRequested(false, e.getMessage(), null, userAddress);
                     } catch (Exception e) {
                         e.printStackTrace();
-                        transactionObserver.onTokenRequested(false, e.getMessage(), null);
+                        transactionObserver.onTokenRequested(false, e.getMessage(), null, userAddress);
                     }
                 }
             });
@@ -585,7 +586,7 @@ public class EthereumService implements BlockRequest.BlockTransactionObserver, E
 
         void onGiftCompleted(String address, int endpoint, boolean Status);
 
-        void onTokenRequested(boolean success, String msg, String tknTx);
+        void onTokenRequested(boolean success, String msg, String tknTx, String userAddress);
 
         void onTokenCompleted(boolean success, String userAddress, int endpoint);
     }

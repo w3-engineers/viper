@@ -64,7 +64,7 @@ public class WalletViewModel extends BaseRxViewModel {
         return walletManager.getTotalPendingEarning(walletManager.getMyAddress(), walletManager.getMyEndpoint());
     }
 
-    public LiveData<Integer> getDifferentNetworkData(String myAddress) {
+   /* public LiveData<Integer> getDifferentNetworkData(String myAddress) {
         return walletManager.getDifferentNetworkData(walletManager.getMyAddress(), walletManager.getMyEndpoint());
-    }
+    }*/
 }

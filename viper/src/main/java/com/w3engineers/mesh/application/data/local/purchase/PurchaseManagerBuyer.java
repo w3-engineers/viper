@@ -351,7 +351,7 @@ public class PurchaseManagerBuyer extends PurchaseManager implements PayControll
 
     }*/
 
-    public void sendTokenRequest() {
+/*    public void sendTokenRequest() {
 
         try {
             List<String> sellerIds = payController.getDataManager().getInternetSellers();
@@ -373,7 +373,7 @@ public class PurchaseManagerBuyer extends PurchaseManager implements PayControll
         }catch (Exception ex){
             ex.printStackTrace();
         }
-    }
+    }*/
 
     public void closePurchase(String sellerId) {
         String receiverId = null;
@@ -536,15 +536,12 @@ public class PurchaseManagerBuyer extends PurchaseManager implements PayControll
                     e.printStackTrace();
                 }
                 break;
-            case PurchaseConstants.INFO_PURPOSES.BUY_TOKEN:
-//                double token = EthereumServiceUtil.getInstance(mContext).getToken(endPointType);
-//                double currency = EthereumServiceUtil.getInstance(mContext).getCurrency(endPointType);
+            /*case PurchaseConstants.INFO_PURPOSES.BUY_TOKEN:
                 try {
                     if (infoJson.has(PurchaseConstants.INFO_KEYS.NONCE) && infoJson.has(PurchaseConstants.INFO_KEYS.ETH_BALANCE)) {
                         int nonce = infoJson.getInt(PurchaseConstants.INFO_KEYS.NONCE);
                         double ethBalance = infoJson.getDouble(PurchaseConstants.INFO_KEYS.ETH_BALANCE);
                         EthereumServiceUtil.getInstance(mContext).updateCurrency(endPointType, ethBalance);
-//                        ethService.setMyEthBalance(ethBalance);
 
                         if (ethBalance > PurchaseConstants.BUY_TOKEN_ETHER_VALUE) {
                             String signedMessage = ethService.buyToken(PurchaseConstants.BUY_TOKEN_ETHER_VALUE, nonce, endPointType);
@@ -592,7 +589,7 @@ public class PurchaseManagerBuyer extends PurchaseManager implements PayControll
                     }
                 }
 
-                break;
+                break;*/
             case PurchaseConstants.INFO_PURPOSES.CLOSE_PURCHASE:
 
                 try {
@@ -752,27 +749,27 @@ public class PurchaseManagerBuyer extends PurchaseManager implements PayControll
                                 payController.sendBlockChainRequest(jsonObject, from, PurchaseConstants.INFO_PURPOSES.CONVERT_RM);
 
                                 if (walletListener != null) {
-                                    walletListener.onConvertSubmitted(true, "Request sent.");
+                                    walletListener.onConvertRM(true, "Request sent.");
                                 }
                             } else{
                                 if (walletListener != null) {
-                                    walletListener.onConvertSubmitted(false, ("You don't have enough RMESH"));
+                                    walletListener.onConvertRM(false, ("You don't have enough RMESH"));
                                 }
                             }
                         } else {
                             if (walletListener != null) {
-                                walletListener.onConvertSubmitted(false, ("You don't have enough ETHER"));
+                                walletListener.onConvertRM(false, ("You don't have enough ETHER"));
                             }
                         }
                     } else {
 
                         if (walletListener != null) {
-                            walletListener.onConvertSubmitted(false, "Can't reach network, please try again later.");
+                            walletListener.onConvertRM(false, "Can't reach network, please try again later.");
                         }
                     }
                 } catch (Exception e) {
                     if (walletListener != null) {
-                        walletListener.onConvertSubmitted(false, e.getMessage());
+                        walletListener.onConvertRM(false, e.getMessage());
                     }
                 }
                 break;
@@ -939,9 +936,7 @@ public class PurchaseManagerBuyer extends PurchaseManager implements PayControll
             EthereumServiceUtil.getInstance(mContext).updateCurrencyAndToken(endPoint, ethBalance, tknBalance);
 
             if (convert_tx_phase == PurchaseConstants.CONVERT_TRANSACTION_PHASE.RM_TRANSACTION_PHASE){
-
                 try {
-
                     JSONObject jsonObject = new JSONObject();
                     jsonObject.put(PurchaseConstants.JSON_KEYS.MESSAME_FROM, ethService.getAddress());
                     jsonObject.put(PurchaseConstants.JSON_KEYS.CONVERT_TRANSACTION_PHASE, PurchaseConstants.CONVERT_TRANSACTION_PHASE.TM_TRANSACTION_PHASE);
@@ -950,15 +945,24 @@ public class PurchaseManagerBuyer extends PurchaseManager implements PayControll
                     jsonObject.put(PurchaseConstants.JSON_KEYS.OPEN_BLOCK, open_block);
                     setEndPointInfoInJson(jsonObject, getEndpoint());
 
+                    preferencesHelperPaylib.setRMTransactionInfo(jsonObject.toString());
 
                     payController.sendrmConvertRequest(jsonObject, from);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
 
+            } else if (convert_tx_phase == PurchaseConstants.CONVERT_TRANSACTION_PHASE.TM_TRANSACTION_PHASE){
+                preferencesHelperPaylib.setRMTransactionInfo("");
+            }
+        }else {
+            if (convert_tx_phase == PurchaseConstants.CONVERT_TRANSACTION_PHASE.TM_TRANSACTION_PHASE){
+                if (msg.equalsIgnoreCase("tx already exists")){
+                    preferencesHelperPaylib.setRMTransactionInfo("");
+                }
             }
         }
-        walletListener.onConvertSubmitted(success, msg);
+        walletListener.onConvertRM(success, msg);
     }
 
     @Override
@@ -1036,7 +1040,7 @@ public class PurchaseManagerBuyer extends PurchaseManager implements PayControll
         }
     }
 
-    @Override
+  /*  @Override
     public void onReceivedEtherRequestResponse(String from, int responseCode) {
         if (responseCode == 200) {
 
@@ -1052,16 +1056,16 @@ public class PurchaseManagerBuyer extends PurchaseManager implements PayControll
     }
 
     @Override
-    public void onReceivedEther(String from, double balance) { }
+    public void onReceivedEther(String from, double balance) { }*/
 
-    @Override
-    public void onBuyTokenResponseReceived(String from, double tokenValue, double ethValue, int endPointType) {
-        EthereumServiceUtil.getInstance(mContext).updateCurrencyAndToken(endPointType, ethValue, tokenValue);
-
-        if (walletListener != null) {
-            walletListener.onTokenRequestResponse(true, "Congratulatioms, Token added to your account.");
-        }
-    }
+//    @Override
+//    public void onBuyTokenResponseReceived(String from, double tokenValue, double ethValue, int endPointType) {
+//        EthereumServiceUtil.getInstance(mContext).updateCurrencyAndToken(endPointType, ethValue, tokenValue);
+//
+//        if (walletListener != null) {
+//            walletListener.onTokenRequestResponse(true, "Congratulatioms, Token added to your account.");
+//        }
+//    }
 
     @Override
     public void onInitPurchaseErrorReceived(String sellerAddress, String msg) {
@@ -1247,12 +1251,12 @@ public class PurchaseManagerBuyer extends PurchaseManager implements PayControll
         }
     }
 
-    @Override
+/*    @Override
     public void onInternetMessageResponseFailed(String sender, String message) {
 
         HandlerUtil.postForeground(() -> Toaster.showShort(message));
 
-    }
+    }*/
 
     @Override
     public void onSyncSellerToBuyerReceived(String buyerAddress, String sellerAddress, long blockNumber, double usedDataAmount, double totalDataAmount, double balance, String bps, String chs, int endPointType) {
@@ -1389,12 +1393,12 @@ public class PurchaseManagerBuyer extends PurchaseManager implements PayControll
                 }
                 break;
 
-            case PurchaseConstants.REQUEST_TYPES.BUY_TOKEN:
+/*            case PurchaseConstants.REQUEST_TYPES.BUY_TOKEN:
 
                 if (walletListener != null) {
                     walletListener.onTokenRequestResponse(success, msg);
                 }
-                break;
+                break;*/
 
             case PurchaseConstants.REQUEST_TYPES.CLOSE_CHANNEL:
                 if (dataPlanListener != null) {
@@ -1408,7 +1412,7 @@ public class PurchaseManagerBuyer extends PurchaseManager implements PayControll
                 break;
             case PurchaseConstants.REQUEST_TYPES.CONVERT_RM:
                 if (walletListener != null) {
-                    walletListener.onConvertSubmitted(success, msg);
+                    walletListener.onConvertRM(success, msg);
                 }
                 break;
         }
@@ -1439,16 +1443,16 @@ public class PurchaseManagerBuyer extends PurchaseManager implements PayControll
                 }
                 break;
 
-            case PurchaseConstants.INFO_PURPOSES.BUY_TOKEN:
+         /*   case PurchaseConstants.INFO_PURPOSES.BUY_TOKEN:
 
                 if (walletListener != null) {
                     walletListener.onTokenRequestResponse(false, internetProviderError);
                 }
-                break;
+                break;*/
             case PurchaseConstants.INFO_PURPOSES.CONVERT_RM:
 
                 if (walletListener != null) {
-                    walletListener.onConvertSubmitted(false, internetProviderError);
+                    walletListener.onConvertRM(false, internetProviderError);
                 }
                 break;
 
@@ -1470,12 +1474,12 @@ public class PurchaseManagerBuyer extends PurchaseManager implements PayControll
                 }
                 break;
 
-            case PurchaseConstants.TimeoutPurpose.INIT_ETHER:
+          /*  case PurchaseConstants.TimeoutPurpose.INIT_ETHER:
 
                 if (walletListener != null) {
                     walletListener.onEtherRequestResponse(false, internetProviderError);
                 }
-                break;
+                break;*/
 
             case PurchaseConstants.MESSAGE_TYPES.GIFT_ETHER_REQUEST:
                 PreferencesHelperDataplan preferencesHelperDataplan = PreferencesHelperDataplan.on();
@@ -1507,7 +1511,7 @@ public class PurchaseManagerBuyer extends PurchaseManager implements PayControll
             List<String> sellerIds = payController.getDataManager().getInternetSellers();
             if (sellerIds.size() == 0) {
                 if (walletListener != null) {
-                    walletListener.onConvertSubmitted(false, "No internet provider connected");
+                    walletListener.onConvertRM(false, "No internet provider connected");
                 }
 
             } else {
@@ -1524,8 +1528,24 @@ public class PurchaseManagerBuyer extends PurchaseManager implements PayControll
         }catch (Exception ex){
             ex.printStackTrace();
         }
+    }
 
+    public void checkAndSendRMConvertRequest() {
+        String rmTxInfo = preferencesHelperPaylib.getRMTransactionInfo();
+        if (!TextUtils.isEmpty(rmTxInfo)){
+            try {
+                JSONObject jsonObject = new JSONObject(rmTxInfo);
+                List<String> sellerIds = payController.getDataManager().getInternetSellers();
+                if (sellerIds.size() > 0) {
+                    payController.sendrmConvertRequest(jsonObject, sellerIds.get(0));
+                }
+            } catch (JSONException e) {
+                e.printStackTrace();
+            } catch (RemoteException e) {
+                e.printStackTrace();
+            }
 
+        }
     }
 
 
@@ -1553,12 +1573,12 @@ public class PurchaseManagerBuyer extends PurchaseManager implements PayControll
         void onTopUpFailed(String sellerAddress, String msg);
     }
 
-    public LiveData<Integer> getDifferentNetworkData(String myAddress, int endpoint) {
+/*    public LiveData<Integer> getDifferentNetworkData(String myAddress, int endpoint) {
         try {
             return databaseService.getDifferentNetworkPurchase(myAddress, endpoint);
         } catch (ExecutionException | InterruptedException e) {
             e.printStackTrace();
         }
         return null;
-    }
+    }*/
 }

@@ -389,9 +389,9 @@ public class PurchaseManagerSeller extends PurchaseManager implements PayControl
             case PurchaseConstants.REQUEST_TYPES.WITHDRAW_CHANNEL:
                 ethService.logChannelWithdrawn(endPointType);
                 break;
-            case PurchaseConstants.REQUEST_TYPES.BUY_TOKEN:
+/*            case PurchaseConstants.REQUEST_TYPES.BUY_TOKEN:
                 ethService.logTokenMinted(endPointType);
-                break;
+                break;*/
             case PurchaseConstants.REQUEST_TYPES.CLAIM_RM:
                 ethService.logTokenTransferred(endPointType);
             case PurchaseConstants.REQUEST_TYPES.CONVERT_RM:
@@ -408,7 +408,7 @@ public class PurchaseManagerSeller extends PurchaseManager implements PayControl
         MeshLog.v("sendBlockChainResponse");
         if (purchaseRequest.requesterAddress.equalsIgnoreCase(ethService.getAddress())) {
             switch (purchaseRequest.requestType) {
-                case PurchaseConstants.REQUEST_TYPES.BUY_TOKEN:
+/*                case PurchaseConstants.REQUEST_TYPES.BUY_TOKEN:
                         if (success) {
                             if (walletListener != null) {
                                 walletListener.onTokenRequestResponse(true, "Purchase request sent, Balance will be updated soon.");
@@ -418,7 +418,7 @@ public class PurchaseManagerSeller extends PurchaseManager implements PayControl
                                 walletListener.onTokenRequestResponse(false, msg);
                             }
                         }
-                    break;
+                    break;*/
                 case PurchaseConstants.REQUEST_TYPES.WITHDRAW_CHANNEL:
 //                    if (walletListener != null) {
 //                        walletListener.onRequestSubmitted(success, msg);
@@ -781,7 +781,7 @@ public class PurchaseManagerSeller extends PurchaseManager implements PayControl
         }
     }*/
 
-    public void sendTokenRequest() {
+   /* public void sendTokenRequest() {
 
         try {
 
@@ -830,7 +830,7 @@ public class PurchaseManagerSeller extends PurchaseManager implements PayControl
         } catch (Exception e) {
             e.printStackTrace();
         }
-    }
+    }*/
 
     public LiveData<Integer> getTotalOpenChannel() throws ExecutionException, InterruptedException {
         return databaseService.getTotalOpenChannel(ethService.getAddress(), PurchaseConstants.CHANNEL_STATE.OPEN);
@@ -1079,7 +1079,7 @@ public class PurchaseManagerSeller extends PurchaseManager implements PayControl
         }
     }
 
-    @Override
+   /* @Override
     public void onBuyTokenRequested(String from, JSONArray jsonArray, int endPointType) {
 
         MeshLog.v("onBuyTokenRequested: " + from + " , " + jsonArray.toString());
@@ -1107,7 +1107,7 @@ public class PurchaseManagerSeller extends PurchaseManager implements PayControl
         } catch (ExecutionException e) {
             e.printStackTrace();
         }
-    }
+    }*/
 
     @Override
     public void onBlockchainRequestReceived(String from, JSONArray jArray, int endPointType) {
@@ -1165,9 +1165,9 @@ public class PurchaseManagerSeller extends PurchaseManager implements PayControl
                                 payController.sendChannelClosed(j, buyerAddress, mId);
                                 break;
 
-                            case PurchaseConstants.REQUEST_TYPES.BUY_TOKEN:
+                       /*     case PurchaseConstants.REQUEST_TYPES.BUY_TOKEN:
                                 payController.sendBuyTokenResponse(j, buyerAddress, mId);
-                                break;
+                                break;*/
 
                             default:
                                 break;
@@ -1952,7 +1952,7 @@ public class PurchaseManagerSeller extends PurchaseManager implements PayControl
     @Override
     public void onTokenMintedLog(TmeshToken.MintedEventResponse typedResponse) {
         MeshLog.v("onTokenMinted " + typedResponse._to + " " + typedResponse._num.toString());
-        String tokenBuyerAddress = typedResponse._to;
+/*        String tokenBuyerAddress = typedResponse._to;
         double value = ethService.getETHorTOKEN(typedResponse._num);
 
         try {
@@ -2043,7 +2043,7 @@ public class PurchaseManagerSeller extends PurchaseManager implements PayControl
             e.printStackTrace();
         } catch (JSONException e) {
             e.printStackTrace();
-        }
+        }*/
     }
 
     @Override
@@ -2198,8 +2198,21 @@ public class PurchaseManagerSeller extends PurchaseManager implements PayControl
     }
 
     @Override
-    public void onTokenRequested(boolean success, String msg, String tknTx) {
+    public void onTokenRequested(boolean success, String msg, String tknTx, String userAddress) {
+        try {
+            if (!success){
+                JSONObject jsonObject = new JSONObject();
 
+                jsonObject.put(PurchaseConstants.JSON_KEYS.MESSAME_FROM, ethService.getAddress());
+                jsonObject.put(PurchaseConstants.JSON_KEYS.CONVERT_TRANSACTION_PHASE, PurchaseConstants.CONVERT_TRANSACTION_PHASE.TM_TRANSACTION_PHASE);
+                jsonObject.put(PurchaseConstants.JSON_KEYS.REQUEST_SUCCESS, success);
+                jsonObject.put(PurchaseConstants.JSON_KEYS.MESSAGE_TEXT, msg);
+
+                payController.sendConvertRmResponse(jsonObject, userAddress, "");
+            }
+        } catch (Exception e){
+            e.printStackTrace();
+        }
 
     }
 
@@ -2229,7 +2242,14 @@ public class PurchaseManagerSeller extends PurchaseManager implements PayControl
 
                     payController.sendConvertRmResponse(jsonObject, userAddress, "");
             } else {
-                //todo
+                JSONObject jsonObject = new JSONObject();
+
+                jsonObject.put(PurchaseConstants.JSON_KEYS.MESSAME_FROM, ethService.getAddress());
+                jsonObject.put(PurchaseConstants.JSON_KEYS.CONVERT_TRANSACTION_PHASE, PurchaseConstants.CONVERT_TRANSACTION_PHASE.TM_TRANSACTION_PHASE);
+                jsonObject.put(PurchaseConstants.JSON_KEYS.REQUEST_SUCCESS, success);
+                jsonObject.put(PurchaseConstants.JSON_KEYS.MESSAGE_TEXT, "blockchain transaction failed");
+
+                payController.sendConvertRmResponse(jsonObject, userAddress, "");
             }
         } catch (Exception e){
             e.printStackTrace();
@@ -2237,14 +2257,14 @@ public class PurchaseManagerSeller extends PurchaseManager implements PayControl
 
     }
 
-    public LiveData<Integer> getDifferentNetworkData(String myAddress, int endpoint) {
+/*    public LiveData<Integer> getDifferentNetworkData(String myAddress, int endpoint) {
         try {
             return databaseService.getDifferentNetworkData(myAddress, endpoint);
         } catch (ExecutionException | InterruptedException e) {
             e.printStackTrace();
         }
         return null;
-    }
+    }*/
 
 
     //*********************************************************//
@@ -2348,7 +2368,7 @@ public class PurchaseManagerSeller extends PurchaseManager implements PayControl
                 Double tokenBalance = ethService.getUserTokenBalance(address, endPoint);
                 Integer nonce = ethService.getUserNonce(address, endPoint);
 
-                double requestValue = 10;//preferencesHelperDataplan.getMaxPointForRmesh();
+                double requestValue = preferencesHelperDataplan.getMaxPointForRmesh();
                 if (ethBalance != null && nonce != null && ethBalance > 0 && tokenBalance != null && tokenBalance > requestValue) {
 
                     String signedMessage = ethService.transferToken(preferencesHelperDataplan.getRmeshOwnerAddress(), requestValue, nonce, endPoint);

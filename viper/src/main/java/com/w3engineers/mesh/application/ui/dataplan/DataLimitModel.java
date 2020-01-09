@@ -14,7 +14,7 @@ public class DataLimitModel {
     private int mInitialRole;
     private int numberOfDay = 7;
 
-    private LiveData<Long> usedData;
+//    private LiveData<Long> usedData;
     private long sharedData = 0;
     private static DataLimitModel dataLimitModelObj;
 
@@ -25,13 +25,13 @@ public class DataLimitModel {
 
         sharedData = DataPlanManager.getInstance().getSellDataAmount();
 
-        if (!isDataLimited){
-            long toDate = System.currentTimeMillis();
-            long fromDate1 = toDate - (numberOfDay*24*60*60*1000);
-            usedData = DataPlanManager.getInstance().getDataUsage(context, fromDate1);
-        } else {
-            usedData = DataPlanManager.getInstance().getDataUsage(context, fromDate);
-        }
+//        if (!isDataLimited){
+//            long toDate = System.currentTimeMillis();
+//            long fromDate1 = toDate - (numberOfDay*24*60*60*1000);
+//            usedData = DataPlanManager.getInstance().getDataUsage(context, fromDate1);
+//        } else {
+//            usedData = DataPlanManager.getInstance().getDataUsage(context, fromDate);
+//        }
     }
 
     public static DataLimitModel getInstance(Context context){
@@ -45,9 +45,9 @@ public class DataLimitModel {
         return sharedData;
     }
 
-    public LiveData<Long> getUsedData() {
-        return usedData;
-    }
+//    public LiveData<Long> getUsedData() {
+//        return usedData;
+//    }
 
     public long getFromDate() {
         return fromDate;
