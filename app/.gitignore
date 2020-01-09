@@ -2,5 +2,5 @@
 /assets/*
 
 src/main/cpp/*
-app/src/main/cpp/native-lib.cpp
-app/src/main/cpp/CMakeLists.txt
+src/main/cpp/native-lib.cpp
+src/main/cpp/CMakeLists.txt
