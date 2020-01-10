@@ -98,7 +98,7 @@ public class EthereumServiceUtil implements EthereumService.NetworkInfoCallback 
         }
         return 0.0D;
     }
-
+/*
     private void populateDb(Context context){
         try {
             InputStream is = context.getAssets().open("blockchainnetworkinfo.xml");
@@ -150,7 +150,7 @@ public class EthereumServiceUtil implements EthereumService.NetworkInfoCallback 
         } catch (Exception e) {
             e.printStackTrace();
         }
-    }
+    }*/
 
     public void insertNetworkInfo(NetworkInfo networkInfo) {
         try {

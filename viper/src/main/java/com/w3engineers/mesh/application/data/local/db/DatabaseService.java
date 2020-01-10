@@ -739,10 +739,29 @@ public class DatabaseService {
         return future.get();
     }
 
-    public void insertNetworkInfo(NetworkInfo... networkInfos) {
+    public void insertNetworkInfo(NetworkInfo networkInfo) {
         executor.submit((Callable) () -> {
             try {
-                db.getNetworkInfoDao().insertAll(networkInfos);
+                NetworkInfo prevData = db.getNetworkInfoDao().getNetworkInfoByNetworkType(networkInfo.networkType);
+                if (prevData == null){
+                    db.getNetworkInfoDao().insertAll(networkInfo);
+                } else {
+                    NetworkInfo newData = new NetworkInfo();
+
+                    newData.networkName = prevData.networkName;
+                    newData.networkUrl = prevData.networkUrl;
+
+                    newData.currencySymbol = prevData.currencySymbol;
+                    newData.tokenSymbol = prevData.tokenSymbol;
+
+                    newData.tokenAddress = prevData.tokenAddress;
+                    newData.channelAddress = prevData.channelAddress;
+
+                    newData.gasPrice = prevData.gasPrice;
+                    newData.gasLimit = prevData.gasLimit;
+
+                    db.getNetworkInfoDao().update(networkInfo);
+                }
             } catch (Exception e) {
                 Log.e("error", e.toString());
             }

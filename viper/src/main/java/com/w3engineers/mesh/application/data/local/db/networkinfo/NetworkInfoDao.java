@@ -5,6 +5,7 @@ import android.arch.persistence.room.Delete;
 import android.arch.persistence.room.Insert;
 import android.arch.persistence.room.OnConflictStrategy;
 import android.arch.persistence.room.Query;
+import android.arch.persistence.room.Update;
 
 
 import com.w3engineers.mesh.application.data.local.db.message.Message;
@@ -21,6 +22,9 @@ public interface NetworkInfoDao {
 
     @Query("SELECT * FROM NetworkInfo")
     Flowable<List<NetworkInfo>> getAllNetworkInfo();
+
+    @Query("SELECT * FROM NetworkInfo WHERE network_type = :networkType LIMIT 1")
+    NetworkInfo getNetworkInfoByNetworkType(int networkType);
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     void insertAll(NetworkInfo... networkInfos);
@@ -42,4 +46,7 @@ public interface NetworkInfoDao {
 
     @Query("SELECT currency_amount FROM NetworkInfo WHERE network_type = :networkType")
     Double getCurrencyByType(int networkType);
+
+    @Update
+    void update(NetworkInfo networkInfo);
 }

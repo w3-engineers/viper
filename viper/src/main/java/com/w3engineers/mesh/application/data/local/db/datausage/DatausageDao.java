@@ -15,9 +15,6 @@ public interface DatausageDao {
     @Query("SELECT SUM(data_in_byte) FROM Datausage WHERE date >= :fromDate")
     public Long getUsedData(long fromDate);
 
-    @Update
-    void updatePurchase(Datausage datausage);
-
     @Insert
     void insertAll(Datausage... datausages);
 
