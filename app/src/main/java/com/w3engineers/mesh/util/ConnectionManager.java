@@ -9,6 +9,7 @@ import com.w3engineers.ext.viper.BuildConfig;
 import com.w3engineers.ext.viper.ViperApp;
 import com.w3engineers.mesh.application.data.ApiEvent;
 import com.w3engineers.mesh.application.data.AppDataObserver;
+import com.w3engineers.mesh.application.data.ViperCredentials;
 import com.w3engineers.mesh.application.data.local.db.SharedPref;
 import com.w3engineers.mesh.application.data.model.DataAckEvent;
 import com.w3engineers.mesh.application.data.model.DataEvent;
@@ -68,7 +69,10 @@ public class ConnectionManager {
 
     public void startViper(){
         try {
-            String jsonData = loadJSONFromAsset(mContext);
+          //  String jsonData = loadJSONFromAsset(mContext);
+
+            String jsonData = ViperCredentials.getInstance().getConfiguration();
+
             if (!TextUtils.isEmpty(jsonData)) {
 
                 String AUTH_USER_NAME = AppCredentials.getInstance().getAuthUserName();
@@ -403,7 +407,7 @@ public class ConnectionManager {
         }
     }
 
-    public String loadJSONFromAsset(Context context) {
+/*    public String loadJSONFromAsset(Context context) {
         String json = null;
         try {
             InputStream is = context.getAssets().open("config.json");
@@ -418,7 +422,7 @@ public class ConnectionManager {
         }
         return json;
 
-    }
+    }*/
 
     private void showToast(String msg) {
         if (BuildConfig.DEBUG){

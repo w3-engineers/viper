@@ -13,10 +13,12 @@ import android.content.Context;
 import android.os.AsyncTask;
 import android.text.TextUtils;
 import android.util.Base64;
+import android.util.Log;
 
 import com.google.gson.Gson;
 import com.w3engineers.eth.data.remote.EthereumService;
 import com.w3engineers.mesh.application.data.AppDataObserver;
+import com.w3engineers.mesh.application.data.ViperCredentials;
 import com.w3engineers.mesh.application.data.local.db.SharedPref;
 import com.w3engineers.mesh.application.data.local.db.networkinfo.NetworkInfo;
 import com.w3engineers.mesh.application.data.local.helper.PreferencesHelperDataplan;
@@ -146,7 +148,9 @@ public class ConfigSyncUtil {
         if (!TextUtils.isEmpty(configData)) {
             configurationCommand = new Gson().fromJson(configData, ConfigurationCommand.class);
         } else {
-            configData = loadJSONFromAsset(context);
+           //  configData = loadJSONFromAsset(context);
+            configData = ViperCredentials.getInstance().getConfiguration();
+
             configurationCommand = new Gson().fromJson(configData, ConfigurationCommand.class);
         }
 
@@ -200,7 +204,12 @@ public class ConfigSyncUtil {
     public void  loadFirstTimeData(Context context) {
         int configVersion = PreferencesHelperDataplan.on().getConfigVersion();
 
-        String configData = loadJSONFromAsset(context);
+     //   String configData = loadJSONFromAsset(context);
+
+        String configData = ViperCredentials.getInstance().getConfiguration();
+
+        Log.e("config_file", "config_data:: " +configData);
+
         ConfigurationCommand configurationCommand = new Gson().fromJson(configData, ConfigurationCommand.class);
 
         if (configurationCommand != null && configVersion < configurationCommand.getConfigVersionCode()) {
@@ -251,7 +260,7 @@ public class ConfigSyncUtil {
         }
     }
 
-    private String loadJSONFromAsset(Context context) {
+/*    private String loadJSONFromAsset(Context context) {
         String json = null;
         try {
             InputStream is = context.getAssets().open("configuration.json");
@@ -266,7 +275,7 @@ public class ConfigSyncUtil {
         }
         return json;
 
-    }
+    }*/
 
     private void processGuidelineJson(Context context, String guidelineJson) {
         //PointGuideLine tokenGuideLine = new Gson().fromJson(guidelineJson, PointGuideLine.class);
