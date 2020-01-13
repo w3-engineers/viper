@@ -84,15 +84,19 @@ public class ViperClient {
         return mViperClient;
     }
 
-    public ViperClient setConfig(String authName, String authPass, String downloadLink, String parseUrl, String parseAppId) {
+    public ViperClient setConfig(String authName, String authPass, String downloadLink, String parseUrl, String parseAppId, String configData) {
 
         SharedPref.write(Constant.PreferenceKeys.AUTH_USER_NAME, authName);
         SharedPref.write(Constant.PreferenceKeys.AUTH_PASSWORD, authPass);
         SharedPref.write(Constant.PreferenceKeys.APP_DOWNLOAD_LINK, downloadLink);
 //        SharedPref.write(Constant.PreferenceKeys.GIFT_DONATE_LINK, giftUrl);
+        SharedPref.write(Constant.PreferenceKeys.CONFIG_FILE, configData);
         PurchaseManager.getInstance().setParseInfo(parseUrl, parseAppId);
 
         DataManager.on().startMeshService();
+
+
+        ConfigSyncUtil.getInstance().loadFirstTimeData(mContext, configData);
 
         return this;
     }
@@ -140,7 +144,6 @@ public class ViperClient {
             }
         });*/
 
-        ConfigSyncUtil.getInstance().loadFirstTimeData(mContext);
 
         UserInfo userInfo = new UserInfo();
 

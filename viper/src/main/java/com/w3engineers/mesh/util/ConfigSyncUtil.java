@@ -16,9 +16,7 @@ import android.util.Base64;
 import android.util.Log;
 
 import com.google.gson.Gson;
-import com.w3engineers.eth.data.remote.EthereumService;
 import com.w3engineers.mesh.application.data.AppDataObserver;
-import com.w3engineers.mesh.application.data.ViperCredentials;
 import com.w3engineers.mesh.application.data.local.db.SharedPref;
 import com.w3engineers.mesh.application.data.local.db.networkinfo.NetworkInfo;
 import com.w3engineers.mesh.application.data.local.helper.PreferencesHelperDataplan;
@@ -31,9 +29,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.net.Authenticator;
 import java.net.HttpURLConnection;
-import java.net.PasswordAuthentication;
 import java.net.URL;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
@@ -149,7 +145,8 @@ public class ConfigSyncUtil {
             configurationCommand = new Gson().fromJson(configData, ConfigurationCommand.class);
         } else {
            //  configData = loadJSONFromAsset(context);
-            configData = ViperCredentials.getInstance().getConfiguration();
+
+            configData = SharedPref.read(Constant.PreferenceKeys.CONFIG_FILE);
 
             configurationCommand = new Gson().fromJson(configData, ConfigurationCommand.class);
         }
@@ -201,12 +198,11 @@ public class ConfigSyncUtil {
 
     }
 
-    public void  loadFirstTimeData(Context context) {
+    public void  loadFirstTimeData(Context context,  String configData) {
         int configVersion = PreferencesHelperDataplan.on().getConfigVersion();
 
      //   String configData = loadJSONFromAsset(context);
 
-        String configData = ViperCredentials.getInstance().getConfiguration();
 
         Log.e("config_file", "config_data:: " +configData);
 

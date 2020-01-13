@@ -9,7 +9,6 @@ import com.w3engineers.ext.viper.BuildConfig;
 import com.w3engineers.ext.viper.ViperApp;
 import com.w3engineers.mesh.application.data.ApiEvent;
 import com.w3engineers.mesh.application.data.AppDataObserver;
-import com.w3engineers.mesh.application.data.ViperCredentials;
 import com.w3engineers.mesh.application.data.local.db.SharedPref;
 import com.w3engineers.mesh.application.data.model.DataAckEvent;
 import com.w3engineers.mesh.application.data.model.DataEvent;
@@ -69,7 +68,7 @@ public class ConnectionManager {
         try {
           //  String jsonData = loadJSONFromAsset(mContext);
 
-            String jsonData = ViperCredentials.getInstance().getConfiguration();
+            String jsonData = AppCredentials.getInstance().getConfiguration();
 
             if (!TextUtils.isEmpty(jsonData)) {
 
@@ -78,10 +77,11 @@ public class ConnectionManager {
                 String FILE_REPO_LINK = AppCredentials.getInstance().getFileRepoLink();
                 String PARSE_APP_ID = AppCredentials.getInstance().getParseAppId();
                 String PARSE_URL = AppCredentials.getInstance().getParseUrl();
+                String CONFIG_DATA = AppCredentials.getInstance().getConfiguration();
 
                 viperClient = ViperClient.on(mContext, APP_NAME, "com.w3engineers.ext.viper", NETWORK_PREFIX, SharedPref.read(Constant.KEY_USER_NAME),
                         SharedPref.read(Constant.PreferenceKeys.ADDRESS), SharedPref.read(Constant.PreferenceKeys.PUBLIC_KEY), 1, System.currentTimeMillis(), true)
-                        .setConfig(AUTH_USER_NAME, AUTH_PASSWORD, FILE_REPO_LINK/*, GIFT_DONATE_LINK*/, PARSE_URL, PARSE_APP_ID);
+                        .setConfig(AUTH_USER_NAME, AUTH_PASSWORD, FILE_REPO_LINK, PARSE_URL, PARSE_APP_ID, CONFIG_DATA);
 
             }
 

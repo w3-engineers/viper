@@ -88,6 +88,7 @@ public class Constant {
         String AUTH_PASSWORD = "AUTH_PASSWORD";
         String APP_DOWNLOAD_LINK = "APP_DOWNLOAD_LINK";
         String GIFT_DONATE_LINK = "GIFT_DONATE_LINK";
+        String CONFIG_FILE = "CONFIG_FILE";
     }
 
 
