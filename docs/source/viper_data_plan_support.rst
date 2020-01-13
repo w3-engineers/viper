@@ -1,13 +1,8 @@
 .. _viper_data_plan_support:
 
 
-Data plan
----------
-
-Viper provides Wallet and data plan functionalities with ui/ux design.
-
-So the complete feature of wallet and data plan is coming from Viper.
-
+Data plan Support
+-----------------
 
 ``public static DataPlanManager getInstance()`` - returns DataPlanManager singleton object
 
