@@ -84,7 +84,7 @@ public class ViperClient {
         return mViperClient;
     }
 
-    public ViperClient setConfig(String authName, String authPass, String downloadLink, String parseUrl, String parseAppId, String configData) {
+    public ViperClient setConfig(String authName, String authPass, String downloadLink, String parseUrl, String parseAppId, String signalServerUrl, String configData) {
 
         SharedPref.write(Constant.PreferenceKeys.AUTH_USER_NAME, authName);
         SharedPref.write(Constant.PreferenceKeys.AUTH_PASSWORD, authPass);
@@ -92,6 +92,20 @@ public class ViperClient {
 //        SharedPref.write(Constant.PreferenceKeys.GIFT_DONATE_LINK, giftUrl);
         SharedPref.write(Constant.PreferenceKeys.CONFIG_FILE, configData);
         PurchaseManager.getInstance().setParseInfo(parseUrl, parseAppId);
+
+
+        UserInfo userInfo = new UserInfo();
+
+        userInfo.setAddress(wallerAddress);
+        userInfo.setAvatar(avatar);
+        userInfo.setRegTime(regTime);
+        userInfo.setSync(isSync);
+        userInfo.setUserName(usersName);
+        userInfo.setPublicKey(publicKey);
+        userInfo.setPackageName(packageName);
+
+        DataManager.on().doBindService(mContext, appName, networkPrefix, userInfo, signalServerUrl);
+
 
         DataManager.on().startMeshService();
 
@@ -145,17 +159,6 @@ public class ViperClient {
         });*/
 
 
-        UserInfo userInfo = new UserInfo();
-
-        userInfo.setAddress(wallerAddress);
-        userInfo.setAvatar(avatar);
-        userInfo.setRegTime(regTime);
-        userInfo.setSync(isSync);
-        userInfo.setUserName(usersName);
-        userInfo.setPublicKey(publicKey);
-        userInfo.setPackageName(packageName);
-
-        DataManager.on().doBindService(mContext, appName, networkPrefix, userInfo);
 
         if (PreferencesHelperDataplan.on().getDataPlanRole() == DataPlanConstants.USER_ROLE.DATA_SELLER) {
             PurchaseManagerSeller.getInstance().setPayControllerListener();

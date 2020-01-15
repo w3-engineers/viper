@@ -71,6 +71,7 @@ public class DataManager {
     private Context mContext;
     private String appName;
     private UserInfo userInfo;
+    private String signalServerUrl;
 
     private static DataManager mDataManager;
     private boolean isAlreadyToPlayStore = false;
@@ -98,11 +99,12 @@ public class DataManager {
      * @param appName
      * @param networkPrefix
      */
-    public void doBindService(Context context, String appName, String networkPrefix, UserInfo userInfo) {
+    public void doBindService(Context context, String appName, String networkPrefix, UserInfo userInfo, String signalServerUrl) {
         this.mContext = context;
         this.appName = appName;
         this.mSsid = networkPrefix;
         this.userInfo = userInfo;
+        this.signalServerUrl = signalServerUrl;
 
 
         MeshLog.v("Data manager has been called");
@@ -305,7 +307,7 @@ public class DataManager {
                 if (CommonUtil.isEmulator()) {
                     status = true;
                 } else {
-                    status = mTmCommunicator.startMesh(appName, userRole, userInfo, mSsid);
+                    status = mTmCommunicator.startMesh(appName, userRole, userInfo, mSsid, signalServerUrl);
                 }
 
 //                boolean status = mTmCommunicator.startMesh(appName, userRole, userInfo, mSsid);
@@ -699,7 +701,7 @@ public class DataManager {
         }
 
         try {
-            mTmCommunicator.restartMesh(newRole, mSsid);
+            mTmCommunicator.restartMesh(newRole, mSsid, signalServerUrl);
         } catch (RemoteException e) {
             e.printStackTrace();
         }
