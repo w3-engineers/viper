@@ -115,6 +115,8 @@ class TestSellerListAdapter extends BaseAdapter<Seller> {
 
             String totalDataInfo = String.format(context.getResources().getString(R.string.total_purchase) , " " + convertTwoDigitString(seller.getPurchasedData()));
 
+            itemDataSellerBinding.sellerMeshStatus.setBackgroundResource(activeStatusResource(seller.getLabel()));
+
             itemDataSellerBinding.userUseAmount.setText(usedDataInfo);
             itemDataSellerBinding.userTotalAmount.setText(totalDataInfo);
 
@@ -129,6 +131,14 @@ class TestSellerListAdapter extends BaseAdapter<Seller> {
 
             itemDataSellerBinding.status.setTag(seller);
             itemDataSellerBinding.status.setOnClickListener(clickListener);
+        }
+    }
+
+    private int activeStatusResource(int label) {
+        if (label == DataPlanConstants.SELLER_LABEL.OFFLINE_PURCHASED) {
+            return R.mipmap.ic_offline;
+        } else {
+            return R.mipmap.ic_mesh_online;
         }
     }
 }

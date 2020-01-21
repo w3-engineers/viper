@@ -248,7 +248,17 @@ public class PurchaseManagerBuyer extends PurchaseManager implements PayControll
     public void buyData(double amount, String sellerAddress) {
         try {
 
-            if (!TextUtils.isEmpty(probableSellerId) || (!TextUtils.isEmpty(payController.getDataManager().getCurrentSellerId()) && !sellerAddress.equalsIgnoreCase(payController.getDataManager().getCurrentSellerId()))){
+
+            if (!payController.getDataManager().isUserConnected(sellerAddress)) {
+                if (dataPlanListener != null) {
+                    dataPlanListener.onPurchaseFailed(sellerAddress, "Seller is not connected now.");
+                }
+                return;
+            }
+
+            String currentSellerId = payController.getDataManager().getCurrentSellerId();
+
+            if ((!TextUtils.isEmpty(probableSellerId) && !sellerAddress.equalsIgnoreCase(probableSellerId)) || (!TextUtils.isEmpty(currentSellerId) && !sellerAddress.equalsIgnoreCase(currentSellerId))){
                 if (dataPlanListener != null) {
                     dataPlanListener.onPurchaseFailed(sellerAddress, "You already have an active purchase in the same network.");
                 }
@@ -275,8 +285,6 @@ public class PurchaseManagerBuyer extends PurchaseManager implements PayControll
         } catch (RemoteException e) {
             e.printStackTrace();
         }
-
-
     }
 
     public void getMyBalanceInfo() {
@@ -1166,7 +1174,7 @@ public class PurchaseManagerBuyer extends PurchaseManager implements PayControll
             }
 
             if (purchase != null) {
-                if (purchase.balance != balance) {
+//                if (purchase.balance != balance) {
                     purchase.balance = balance;
                     purchase.usedDataAmount = usedDataAmount;
                     purchase.balanceProof = bps;
@@ -1181,7 +1189,7 @@ public class PurchaseManagerBuyer extends PurchaseManager implements PayControll
                     }
                     MeshLog.p("balancemismatchcheck2 " + balance + "  " + purchase.usedDataAmount);
                     databaseService.updatePurchase(purchase);
-                }
+//                }
 
             } else {
 
@@ -1249,7 +1257,7 @@ public class PurchaseManagerBuyer extends PurchaseManager implements PayControll
 
         try {
             Purchase topupPurchase = databaseService.getPurchaseByBlockNumber(openBlock, ethService.getAddress(), fromAddress);
-            double totalData = topupPurchase.deposit / PreferencesHelperDataplan.on().getPerMbTokenValue();
+            double totalData = deposit / PreferencesHelperDataplan.on().getPerMbTokenValue();
 
             topupPurchase.deposit = deposit;
             topupPurchase.totalDataAmount = totalData;
@@ -1258,6 +1266,7 @@ public class PurchaseManagerBuyer extends PurchaseManager implements PayControll
             databaseService.updatePurchase(topupPurchase);
 
             setCurrentSellerWithStatus(null, PurchaseConstants.SELLERS_BTN_TEXT.CLOSE);
+
             if (dataPlanListener != null) {
                 dataPlanListener.onPurchaseSuccess(fromAddress, totalData, openBlock);
             }

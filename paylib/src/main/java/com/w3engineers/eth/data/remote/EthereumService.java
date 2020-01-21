@@ -139,6 +139,13 @@ public class EthereumService implements BlockRequest.BlockTransactionObserver, E
                 value.setNetworkInterface(network);
             }
         }
+
+
+        if (credentials != null){
+            setCredential(credentials);
+        }
+
+
     }
 
 

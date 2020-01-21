@@ -117,6 +117,7 @@ public class DataManager {
 
     public void startMeshService() {
         AppDataObserver.on().startObserver(ApiEvent.CONFIG_SYNC, event -> {
+            MeshLog.v("startMeshService  CONFIG_SYNC");
             ConfigSyncEvent configSyncEvent = (ConfigSyncEvent) event;
 
             if (configSyncEvent != null) {
@@ -126,7 +127,17 @@ public class DataManager {
             }
         });
 
-        ConfigSyncUtil.getInstance().startConfigurationSync(mContext, true);
+
+        Util.isConnected(new Util.ConnectionCheck() {
+            @Override
+            public void onConnectionCheck(boolean isConnected) {
+                if (isConnected){
+                    ConfigSyncUtil.getInstance().startConfigurationSync(mContext, true);
+                } else {
+                    checkAndBindService();
+                }
+            }
+        });
     }
 
 
