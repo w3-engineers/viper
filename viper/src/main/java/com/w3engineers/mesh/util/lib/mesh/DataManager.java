@@ -8,6 +8,7 @@ Proprietary and confidential
 ============================================================================
 */
 
+import android.app.Activity;
 import android.app.Service;
 import android.content.ComponentName;
 import android.content.Context;
@@ -141,18 +142,6 @@ public class DataManager {
     }
 
 
-    ServiceConnection clientServiceConnection = new ServiceConnection() {
-        @Override
-        public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
-            mViperCommunicator = ViperCommunicator.Stub.asInterface(iBinder);
-        }
-
-        @Override
-        public void onServiceDisconnected(ComponentName componentName) {
-
-        }
-    };
-
     public void stopService() {
         mContext.unbindService(serviceConnection);
     }
@@ -245,7 +234,18 @@ public class DataManager {
     }
 
     private void showPermissionPopUp() {
-        DialogUtil.showConfirmationDialog(mContext,
+        Toaster.showLong("showpopup");
+        MeshLog.v("mContext  " + mContext);
+        if (mContext instanceof Activity){
+            MeshLog.v("yes");
+        }else {
+            MeshLog.v("no");
+        }
+
+
+
+
+        DialogUtil.showConfirmationDialog(MeshApp.getCurrentActivity(),
                 mContext.getResources().getString(R.string.permission),
                 mContext.getResources().getString(R.string.permission_message),
                 mContext.getString(R.string.later),
@@ -320,6 +320,7 @@ public class DataManager {
                 } else {
                     status = mTmCommunicator.startMesh(appName, userRole, userInfo, mSsid, signalServerUrl);
                 }
+                MeshLog.v("status " + status);
 
 //                boolean status = mTmCommunicator.startMesh(appName, userRole, userInfo, mSsid);
                 if (!status) {
@@ -334,7 +335,7 @@ public class DataManager {
         @Override
         public void onServiceDisconnected(ComponentName name) {
             mTmCommunicator = null;
-            Log.e("service_status", "onServiceDisconnected");
+            Log.v("service_status", "onServiceDisconnected");
         }
     };
 
