@@ -101,13 +101,15 @@ public class WalletActivity extends TelemeshBaseActivity implements WalletManage
             //  mBinding.totalSpentBlock.setVisibility(View.GONE);
         }
 
-        boolean giftEther = walletManager.giftEther();
-
         setDialogLoadingTimer("Refreshing balance, please wait.");
 
-        if (!giftEther) {
-            refreshMyBalance();
-        }
+        HandlerUtil.postBackground(() -> {
+            boolean giftEther = walletManager.giftEther();
+
+            if (!giftEther) {
+                refreshMyBalance();
+            }
+        });
 
         setTotalEarn();
         setTotalSpent();
