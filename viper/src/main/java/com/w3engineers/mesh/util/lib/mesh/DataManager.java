@@ -192,8 +192,9 @@ public class DataManager {
                 new DialogUtil.DialogButtonListener() {
                     @Override
                     public void onClickPositive() {
-//                        checkConnectionAndStartDownload();
-                        gotoPlayStore();
+//                        if()
+                        checkConnectionAndStartDownload();
+//                        gotoPlayStore();
                         isAlreadyToPlayStore = true;
                     }
 
