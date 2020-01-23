@@ -559,7 +559,7 @@ public class DataManager {
 
     public void onGetUserInfo(List<UserInfo> userInfoList) {
 
-        MeshLog.e("user info list receive in data manager");
+        MeshLog.e("user_info list receive in data manager: "+userInfoList.get(0).toString());
 
         for (UserInfo userInfo : userInfoList) {
             UserInfoEvent userInfoEvent = new UserInfoEvent();
@@ -572,7 +572,7 @@ public class DataManager {
 
             AppDataObserver.on().sendObserverData(userInfoEvent);
 
-            MeshLog.e("user info send to app level");
+            MeshLog.e("user_info send to app level :"+userInfoEvent.toString());
         }
     }
 

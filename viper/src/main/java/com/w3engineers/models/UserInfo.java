@@ -2,6 +2,7 @@ package com.w3engineers.models;
 
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.support.annotation.NonNull;
 
 public class UserInfo implements Parcelable {
     private String address;
@@ -119,5 +120,11 @@ public class UserInfo implements Parcelable {
         dest.writeByte((byte) (isSync ? 1 : 0));
         dest.writeString(publicKey);
         dest.writeString(packageName);
+    }
+
+    @NonNull
+    @Override
+    public String toString() {
+        return "Address: "+address+"\n name: "+userName+"\n package: "+packageName;
     }
 }

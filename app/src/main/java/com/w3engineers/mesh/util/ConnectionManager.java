@@ -137,13 +137,13 @@ public class ConnectionManager {
 
         AppDataObserver.on().startObserver(ApiEvent.USER_INFO, event -> {
             UserInfoEvent userInfoEvent = (UserInfoEvent) event;
+            MeshLog.e("user info found in app level ="+userInfoEvent.toString());
 
-            MeshLog.e("user info found in app level");
 
             UserModel userModel = new UserModel();
             userModel.setUserId(userInfoEvent.getAddress());
             userModel.setUserName(userInfoEvent.getUserName());
-
+            MeshLog.e("user info found in app level ="+userModel.toString());
 
             discoverUserMap.put(userModel.getUserId(), userModel);
             ChatDataProvider.On().upSertUser(userModel);

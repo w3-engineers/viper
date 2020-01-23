@@ -2,6 +2,7 @@ package com.w3engineers.mesh.application.data.model;
 
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.support.annotation.NonNull;
 
 import com.w3engineers.models.UserInfo;
 
@@ -101,5 +102,11 @@ public class UserInfoEvent extends Event implements Parcelable {
         dest.writeLong(regTime);
         dest.writeInt(configVersion);
         dest.writeByte((byte) (isSync ? 1 : 0));
+    }
+
+    @NonNull
+    @Override
+    public String toString() {
+        return "{ Address: "+address+" Avater: "+avatar+" Name: "+userName+" }";
     }
 }
