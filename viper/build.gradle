@@ -23,7 +23,7 @@ android {
     buildTypes {
         release {
             debuggable false
-            minifyEnabled true
+            minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
 
             /*buildConfigField 'String', 'AUTH_USER_NAME', System.getenv('AUTH_USER_NAME').equals(null) ? AUTH_USER_NAME : System.getenv('AUTH_USER_NAME')

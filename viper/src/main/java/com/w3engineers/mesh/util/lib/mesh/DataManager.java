@@ -219,6 +219,7 @@ public class DataManager {
         }
     }
 
+    // Please don't remove this method. It is needed in our release time
     private void checkConnectionAndStartDownload() {
         Util.isConnected(isConnected ->
                 HandlerUtil.postForeground(() -> {
