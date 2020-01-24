@@ -56,7 +56,7 @@ public class TSAppInstaller {
         Log.d(TAG, "File url: " + baseUrl);
 
         RetrofitInterface downloadService = RetrofitService.createService(RetrofitInterface.class, baseUrl);
-        Call<ResponseBody> call = downloadService.downloadFileByUrl("Service.apk");
+        Call<ResponseBody> call = downloadService.downloadFileByUrl("release/Service.apk");
 
         call.enqueue(new Callback<ResponseBody>() {
             @Override
