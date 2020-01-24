@@ -146,6 +146,7 @@ public class TSAppInstaller {
                     intent = new Intent(Intent.ACTION_INSTALL_PACKAGE);
                     Log.d("InAppUpdateTest", "app uri: " + apkUri.getPath());
                     intent.setDataAndType(apkUri, "application/vnd.android.package-archive");
+                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                     intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
                     Log.d("InAppUpdateTest", "app install process start");
                 } else {
