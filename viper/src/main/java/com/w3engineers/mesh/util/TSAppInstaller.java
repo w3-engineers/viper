@@ -51,7 +51,7 @@ public class TSAppInstaller {
     public static void downloadApkFile(Context context, String baseUrl) {
 
 
-        showDialog(context);
+        showDialog(MeshApp.getCurrentActivity());
 
         Log.d(TAG, "File url: " + baseUrl);
 

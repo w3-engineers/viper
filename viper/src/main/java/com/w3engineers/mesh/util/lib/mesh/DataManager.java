@@ -184,7 +184,7 @@ public class DataManager {
 
         MeshLog.i("Bind Service failed 2");
 
-        DialogUtil.showConfirmationDialog(mContext,
+        DialogUtil.showConfirmationDialog(MeshApp.getCurrentActivity(),
                 mContext.getResources().getString(R.string.install_ts),
                 mContext.getResources().getString(R.string.need_ts),
                 mContext.getString(R.string.cancel),
