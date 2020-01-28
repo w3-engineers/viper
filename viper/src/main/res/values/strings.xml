@@ -42,6 +42,7 @@
     <string name="set_data_limit_properly">*set data limit properly</string>
     <string name="switching_role">Switching your role, please be patient.</string>
     <string name="my_wallet">My Wallet</string>
+
     <string name="data_limit_larger_needed">Data limit must be larger than used data</string>
     <string name="data_limit_warning">Data limit almost exceeded.</string>
     <string name="data_limit_error">Data limit exceeded.</string>
@@ -166,5 +167,6 @@
     <string name="token_guideline">Token Guideline</string>
 
     <string name="token_balance">You will get <b>%s RMESH</b> tokens for every <b>%s Points</b></string>
+    <string name="image">Image</string>
 
 </resources>

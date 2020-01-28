@@ -40,6 +40,7 @@ public class ViperClient {
     public static long regTime;
     public static boolean isSync;
     public static String packageName;
+    public static String configData;
     boolean status = false;
 
     private static ViperClient mViperClient;
@@ -51,7 +52,7 @@ public class ViperClient {
         }
     }
 
-    protected ViperClient(Context context, String appName, String packageName, String networkPrefix, String userName, String walletAddress, String publicKey, int avatar, long regTime, boolean isSync) {
+    protected ViperClient(Context context, String appName, String packageName, String networkPrefix, String userName, String walletAddress, String publicKey, int avatar, long regTime, boolean isSync, String configData) {
         this.mContext = context;
         this.appName = appName;
         this.packageName = packageName;
@@ -63,6 +64,10 @@ public class ViperClient {
         this.avatar = avatar;
         this.regTime = regTime;
         this.isSync = isSync;
+        this.configData = configData;
+
+
+        ConfigSyncUtil.getInstance().loadFirstTimeData(mContext, configData);
 
 
         startClient(walletAddress, publicKey);
@@ -74,25 +79,43 @@ public class ViperClient {
         }*/
     }
 
-    public static ViperClient on(Context context, String appName, String packageName, String networkPrefix, String userName, String walletAddress, String publicKey, int avatar, long regTime, boolean isSync) {
+    public static ViperClient on(Context context, String appName, String packageName, String networkPrefix, String userName, String walletAddress, String publicKey, int avatar, long regTime, boolean isSync, String configData) {
         if (mViperClient == null) {
             synchronized (ViperClient.class) {
                 if (mViperClient == null)
-                    mViperClient = new ViperClient(context, appName, packageName, networkPrefix, userName, walletAddress, publicKey, avatar, regTime, isSync);
+                    mViperClient = new ViperClient(context, appName, packageName, networkPrefix, userName, walletAddress, publicKey, avatar, regTime, isSync, configData);
             }
         }
         return mViperClient;
     }
 
-    public ViperClient setConfig(String authName, String authPass, String downloadLink, String parseUrl, String parseAppId) {
+    public ViperClient setConfig(String authName, String authPass, String downloadLink, String parseUrl, String parseAppId, String signalServerUrl) {
+
+        MeshLog.v("setConfig");
 
         SharedPref.write(Constant.PreferenceKeys.AUTH_USER_NAME, authName);
         SharedPref.write(Constant.PreferenceKeys.AUTH_PASSWORD, authPass);
         SharedPref.write(Constant.PreferenceKeys.APP_DOWNLOAD_LINK, downloadLink);
 //        SharedPref.write(Constant.PreferenceKeys.GIFT_DONATE_LINK, giftUrl);
+//        SharedPref.write(Constant.PreferenceKeys.CONFIG_FILE, configData);
         PurchaseManager.getInstance().setParseInfo(parseUrl, parseAppId);
 
+
+        UserInfo userInfo = new UserInfo();
+
+        userInfo.setAddress(wallerAddress);
+        userInfo.setAvatar(avatar);
+        userInfo.setRegTime(regTime);
+        userInfo.setSync(isSync);
+        userInfo.setUserName(usersName);
+        userInfo.setPublicKey(publicKey);
+        userInfo.setPackageName(packageName);
+
+        DataManager.on().doBindService(mContext, appName, networkPrefix, userInfo, signalServerUrl);
+
+
         DataManager.on().startMeshService();
+
 
         return this;
     }
@@ -140,19 +163,7 @@ public class ViperClient {
             }
         });*/
 
-        ConfigSyncUtil.getInstance().loadFirstTimeData(mContext);
 
-        UserInfo userInfo = new UserInfo();
-
-        userInfo.setAddress(wallerAddress);
-        userInfo.setAvatar(avatar);
-        userInfo.setRegTime(regTime);
-        userInfo.setSync(isSync);
-        userInfo.setUserName(usersName);
-        userInfo.setPublicKey(publicKey);
-        userInfo.setPackageName(packageName);
-
-        DataManager.on().doBindService(mContext, appName, networkPrefix, userInfo);
 
         if (PreferencesHelperDataplan.on().getDataPlanRole() == DataPlanConstants.USER_ROLE.DATA_SELLER) {
             PurchaseManagerSeller.getInstance().setPayControllerListener();

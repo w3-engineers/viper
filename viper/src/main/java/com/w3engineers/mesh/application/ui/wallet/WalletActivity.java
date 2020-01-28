@@ -5,7 +5,6 @@ import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.ViewModel;
 import android.arch.lifecycle.ViewModelProvider;
 import android.arch.lifecycle.ViewModelProviders;
-import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.support.annotation.NonNull;
@@ -20,7 +19,6 @@ import com.w3engineers.mesh.application.data.local.DataPlanConstants;
 import com.w3engineers.mesh.application.data.local.dataplan.DataPlanManager;
 import com.w3engineers.mesh.application.data.local.wallet.WalletManager;
 import com.w3engineers.mesh.application.ui.base.TelemeshBaseActivity;
-import com.w3engineers.mesh.application.ui.dataplan.TestDataPlanActivity;
 import com.w3engineers.mesh.application.ui.tokenguide.PointGuidelineActivity;
 import com.w3engineers.mesh.databinding.ActivityWalletBinding;
 import com.w3engineers.mesh.util.DialogUtil;
@@ -103,13 +101,15 @@ public class WalletActivity extends TelemeshBaseActivity implements WalletManage
             //  mBinding.totalSpentBlock.setVisibility(View.GONE);
         }
 
-        boolean giftEther = walletManager.giftEther();
-
         setDialogLoadingTimer("Refreshing balance, please wait.");
 
-        if (!giftEther) {
-            refreshMyBalance();
-        }
+        HandlerUtil.postBackground(() -> {
+            boolean giftEther = walletManager.giftEther();
+
+            if (!giftEther) {
+                refreshMyBalance();
+            }
+        });
 
         setTotalEarn();
         setTotalSpent();
@@ -145,10 +145,10 @@ public class WalletActivity extends TelemeshBaseActivity implements WalletManage
         mBinding.pullToRefresh.setRefreshing(false);
     }
 
-    public static void openActivity(Context context) {
-        Intent intent = new Intent(context, TestDataPlanActivity.class);
-        context.startActivity(intent);
-    }
+//    public static void openActivity(Context context) {
+//        Intent intent = new Intent(context, TestDataPlanActivity.class);
+//        context.startActivity(intent);
+//    }
 
 
     private String convertTwoDigitString(double value) {

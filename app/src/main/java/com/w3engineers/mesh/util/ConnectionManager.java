@@ -16,6 +16,7 @@ import com.w3engineers.mesh.application.data.model.PeerAdd;
 import com.w3engineers.mesh.application.data.model.PeerRemoved;
 import com.w3engineers.mesh.application.data.model.ServiceUpdate;
 import com.w3engineers.mesh.application.data.model.UserInfoEvent;
+import com.w3engineers.mesh.data.AppCredentials;
 import com.w3engineers.mesh.model.MessageModel;
 import com.w3engineers.mesh.model.UserModel;
 import com.w3engineers.mesh.ui.Nearby.NearbyCallBack;
@@ -27,8 +28,6 @@ import com.w3engineers.mesh.util.lib.mesh.ViperClient;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -67,28 +66,23 @@ public class ConnectionManager {
 
     public void startViper(){
         try {
-            String jsonData = loadJSONFromAsset(mContext);
+          //  String jsonData = loadJSONFromAsset(mContext);
+
+            String jsonData = AppCredentials.getInstance().getConfiguration();
+
             if (!TextUtils.isEmpty(jsonData)) {
 
-                JSONObject jsonObject = new JSONObject(jsonData);
-
-                String AUTH_USER_NAME = jsonObject.optString("AUTH_USER_NAME");
-                String AUTH_PASSWORD = jsonObject.optString("AUTH_PASSWORD");
-                String FILE_REPO_LINK = jsonObject.optString("FILE_REPO_LINK");
-                String PARSE_APP_ID = jsonObject.optString("PARSE_APP_ID");
-                String PARSE_URL = jsonObject.optString("PARSE_URL");
-
-                /*String AUTH_USER_NAME = BuildConfig.AUTH_USER_NAME;
-                String AUTH_PASSWORD = BuildConfig.AUTH_PASSWORD;
-                String FILE_REPO_LINK = BuildConfig.FILE_REPO_LINK;
-                String PARSE_APP_ID = BuildConfig.PARSE_APP_ID;
-                String PARSE_URL = BuildConfig.PARSE_URL;*/
-
-//                String GIFT_DONATE_LINK = jsonObject.optString("GIFT_DONATE_LINK");
+                String AUTH_USER_NAME = AppCredentials.getInstance().getAuthUserName();
+                String AUTH_PASSWORD = AppCredentials.getInstance().getAuthPassword();
+                String FILE_REPO_LINK = AppCredentials.getInstance().getFileRepoLink();
+                String PARSE_APP_ID = AppCredentials.getInstance().getParseAppId();
+                String PARSE_URL = AppCredentials.getInstance().getParseUrl();
+                String SIGNAL_SERVER_URL = AppCredentials.getInstance().getSignalServerUrl();
+                String CONFIG_DATA = AppCredentials.getInstance().getConfiguration();
 
                 viperClient = ViperClient.on(mContext, APP_NAME, "com.w3engineers.ext.viper", NETWORK_PREFIX, SharedPref.read(Constant.KEY_USER_NAME),
-                        SharedPref.read(Constant.PreferenceKeys.ADDRESS), SharedPref.read(Constant.PreferenceKeys.PUBLIC_KEY), 1, System.currentTimeMillis(), true)
-                        .setConfig(AUTH_USER_NAME, AUTH_PASSWORD, FILE_REPO_LINK/*, GIFT_DONATE_LINK*/, PARSE_URL, PARSE_APP_ID);
+                        SharedPref.read(Constant.PreferenceKeys.ADDRESS), SharedPref.read(Constant.PreferenceKeys.PUBLIC_KEY), 1, System.currentTimeMillis(), true, CONFIG_DATA)
+                        .setConfig(AUTH_USER_NAME, AUTH_PASSWORD, FILE_REPO_LINK, PARSE_URL, PARSE_APP_ID, SIGNAL_SERVER_URL);
 
             }
 
@@ -412,7 +406,7 @@ public class ConnectionManager {
         }
     }
 
-    public String loadJSONFromAsset(Context context) {
+/*    public String loadJSONFromAsset(Context context) {
         String json = null;
         try {
             InputStream is = context.getAssets().open("config.json");
@@ -427,7 +421,7 @@ public class ConnectionManager {
         }
         return json;
 
-    }
+    }*/
 
     private void showToast(String msg) {
         if (BuildConfig.DEBUG){

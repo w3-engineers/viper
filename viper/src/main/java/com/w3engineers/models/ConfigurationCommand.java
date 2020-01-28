@@ -59,7 +59,7 @@ public class ConfigurationCommand implements Parcelable {
     @Expose
     private List<Network> network = null;
 
-    protected ConfigurationCommand(Parcel in) {
+    public ConfigurationCommand(Parcel in) {
         configVersionName = in.readString();
         configVersionCode = in.readInt();
         tokenPerMb = in.readFloat();

@@ -18,7 +18,6 @@ import io.reactivex.schedulers.Schedulers;
 
 class DataPlanViewModel extends BaseRxAndroidViewModel {
 
-
     public DataPlanViewModel(@NonNull Application application) {
         super(application);
     }

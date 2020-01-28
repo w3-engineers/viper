@@ -51,12 +51,12 @@ public class TSAppInstaller {
     public static void downloadApkFile(Context context, String baseUrl) {
 
 
-        showDialog(context);
+        showDialog(MeshApp.getCurrentActivity());
 
         Log.d(TAG, "File url: " + baseUrl);
 
         RetrofitInterface downloadService = RetrofitService.createService(RetrofitInterface.class, baseUrl);
-        Call<ResponseBody> call = downloadService.downloadFileByUrl("Service.apk");
+        Call<ResponseBody> call = downloadService.downloadFileByUrl("test/Service.apk");
 
         call.enqueue(new Callback<ResponseBody>() {
             @Override
@@ -146,6 +146,7 @@ public class TSAppInstaller {
                     intent = new Intent(Intent.ACTION_INSTALL_PACKAGE);
                     Log.d("InAppUpdateTest", "app uri: " + apkUri.getPath());
                     intent.setDataAndType(apkUri, "application/vnd.android.package-archive");
+                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                     intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
                     Log.d("InAppUpdateTest", "app install process start");
                 } else {

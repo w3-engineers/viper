@@ -8,6 +8,7 @@ Proprietary and confidential
 ============================================================================
 */
 
+import android.app.Activity;
 import android.app.Service;
 import android.content.ComponentName;
 import android.content.Context;
@@ -41,6 +42,7 @@ import com.w3engineers.mesh.application.data.model.ServiceUpdate;
 import com.w3engineers.mesh.application.data.model.TransportInit;
 import com.w3engineers.mesh.application.data.model.UserInfoEvent;
 import com.w3engineers.mesh.application.data.remote.model.BuyerPendingMessage;
+import com.w3engineers.mesh.util.CommonUtil;
 import com.w3engineers.mesh.util.ConfigSyncUtil;
 import com.w3engineers.mesh.util.Constant;
 import com.w3engineers.mesh.util.DialogUtil;
@@ -70,6 +72,7 @@ public class DataManager {
     private Context mContext;
     private String appName;
     private UserInfo userInfo;
+    private String signalServerUrl;
 
     private static DataManager mDataManager;
     private boolean isAlreadyToPlayStore = false;
@@ -97,11 +100,12 @@ public class DataManager {
      * @param appName
      * @param networkPrefix
      */
-    public void doBindService(Context context, String appName, String networkPrefix, UserInfo userInfo) {
+    public void doBindService(Context context, String appName, String networkPrefix, UserInfo userInfo, String signalServerUrl) {
         this.mContext = context;
         this.appName = appName;
         this.mSsid = networkPrefix;
         this.userInfo = userInfo;
+        this.signalServerUrl = signalServerUrl;
 
 
         MeshLog.v("Data manager has been called");
@@ -114,6 +118,7 @@ public class DataManager {
 
     public void startMeshService() {
         AppDataObserver.on().startObserver(ApiEvent.CONFIG_SYNC, event -> {
+            MeshLog.v("startMeshService  CONFIG_SYNC");
             ConfigSyncEvent configSyncEvent = (ConfigSyncEvent) event;
 
             if (configSyncEvent != null) {
@@ -123,21 +128,19 @@ public class DataManager {
             }
         });
 
-        ConfigSyncUtil.getInstance().startConfigurationSync(mContext, true);
+
+        Util.isConnected(new Util.ConnectionCheck() {
+            @Override
+            public void onConnectionCheck(boolean isConnected) {
+                if (isConnected){
+                    ConfigSyncUtil.getInstance().startConfigurationSync(mContext, true);
+                } else {
+                    checkAndBindService();
+                }
+            }
+        });
     }
 
-
-    ServiceConnection clientServiceConnection = new ServiceConnection() {
-        @Override
-        public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
-            mViperCommunicator = ViperCommunicator.Stub.asInterface(iBinder);
-        }
-
-        @Override
-        public void onServiceDisconnected(ComponentName componentName) {
-
-        }
-    };
 
     public void stopService() {
         mContext.unbindService(serviceConnection);
@@ -181,7 +184,7 @@ public class DataManager {
 
         MeshLog.i("Bind Service failed 2");
 
-        DialogUtil.showConfirmationDialog(mContext,
+        DialogUtil.showConfirmationDialog(MeshApp.getCurrentActivity(),
                 mContext.getResources().getString(R.string.install_ts),
                 mContext.getResources().getString(R.string.need_ts),
                 mContext.getString(R.string.cancel),
@@ -189,8 +192,9 @@ public class DataManager {
                 new DialogUtil.DialogButtonListener() {
                     @Override
                     public void onClickPositive() {
-//                        checkConnectionAndStartDownload();
-                        gotoPlayStore();
+//                        if()
+                        checkConnectionAndStartDownload();
+//                        gotoPlayStore();
                         isAlreadyToPlayStore = true;
                     }
 
@@ -216,6 +220,7 @@ public class DataManager {
         }
     }
 
+    // Please don't remove this method. It is needed in our release time
     private void checkConnectionAndStartDownload() {
         Util.isConnected(isConnected ->
                 HandlerUtil.postForeground(() -> {
@@ -231,7 +236,18 @@ public class DataManager {
     }
 
     private void showPermissionPopUp() {
-        DialogUtil.showConfirmationDialog(mContext,
+        Toaster.showLong("showpopup");
+        MeshLog.v("mContext  " + mContext);
+        if (mContext instanceof Activity){
+            MeshLog.v("yes");
+        }else {
+            MeshLog.v("no");
+        }
+
+
+
+
+        DialogUtil.showConfirmationDialog(MeshApp.getCurrentActivity(),
                 mContext.getResources().getString(R.string.permission),
                 mContext.getResources().getString(R.string.permission_message),
                 mContext.getString(R.string.later),
@@ -300,7 +316,15 @@ public class DataManager {
                 int configVersion = PreferencesHelperDataplan.on().getConfigVersion();
                 userInfo.setConfigVersion(configVersion);
 
-                boolean status = mTmCommunicator.startMesh(appName, userRole, userInfo, mSsid);
+                boolean status;
+                if (CommonUtil.isEmulator()) {
+                    status = true;
+                } else {
+                    status = mTmCommunicator.startMesh(appName, userRole, userInfo, mSsid, signalServerUrl);
+                }
+                MeshLog.v("status " + status);
+
+//                boolean status = mTmCommunicator.startMesh(appName, userRole, userInfo, mSsid);
                 if (!status) {
                     showPermissionPopUp();
                 }
@@ -313,7 +337,7 @@ public class DataManager {
         @Override
         public void onServiceDisconnected(ComponentName name) {
             mTmCommunicator = null;
-            Log.e("service_status", "onServiceDisconnected");
+            Log.v("service_status", "onServiceDisconnected");
         }
     };
 
@@ -691,7 +715,7 @@ public class DataManager {
         }
 
         try {
-            mTmCommunicator.restartMesh(newRole, mSsid);
+            mTmCommunicator.restartMesh(newRole, mSsid, signalServerUrl);
         } catch (RemoteException e) {
             e.printStackTrace();
         }
