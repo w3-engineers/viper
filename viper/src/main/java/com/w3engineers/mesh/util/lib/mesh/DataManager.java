@@ -37,6 +37,7 @@ import com.w3engineers.mesh.application.data.model.PayMessage;
 import com.w3engineers.mesh.application.data.model.PayMessageAck;
 import com.w3engineers.mesh.application.data.model.PeerAdd;
 import com.w3engineers.mesh.application.data.model.PeerRemoved;
+import com.w3engineers.mesh.application.data.model.PermissionInterruptionEvent;
 import com.w3engineers.mesh.application.data.model.SellerRemoved;
 import com.w3engineers.mesh.application.data.model.ServiceUpdate;
 import com.w3engineers.mesh.application.data.model.TransportInit;
@@ -168,6 +169,11 @@ public class DataManager {
                         Toaster.showShort("Bind service successful");
                         return;
                     }
+
+                    if (CommonUtil.isEmulator()) {
+                        isAlreadyToPlayStore = true;
+                    }
+
                     MeshLog.i("Bind Service failed 1 " + isAlreadyToPlayStore);
                     HandlerUtil.postBackground(this, 5000);
 
@@ -256,6 +262,14 @@ public class DataManager {
                     @Override
                     public void onClickPositive() {
 
+                        /*try {
+                            if (mTmCommunicator != null) {
+                                mTmCommunicator.allowPermissions();
+                            }
+                        } catch (RemoteException e) {
+                            e.printStackTrace();
+                        }*/
+
                         launchServiceApp();
 
                         android.os.Process.killProcess(android.os.Process.myPid());
@@ -298,6 +312,16 @@ public class DataManager {
         }
     }
 
+    public void allowMissingPermission(List<String> missingPermission) {
+        try {
+            if (mTmCommunicator != null) {
+                mTmCommunicator.allowPermissions(missingPermission);
+            }
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        }
+    }
+
 
     /**
      * Initializing with remote connection
@@ -320,15 +344,15 @@ public class DataManager {
                 if (CommonUtil.isEmulator()) {
                     status = true;
                 } else {
+                    mTmCommunicator.setViperCommunicator(viperCommunicator);
                     status = mTmCommunicator.startMesh(appName, userRole, userInfo, mSsid, signalServerUrl);
                 }
                 MeshLog.v("status " + status);
-
+                mTmCommunicator.startService();
 //                boolean status = mTmCommunicator.startMesh(appName, userRole, userInfo, mSsid);
                 if (!status) {
                     showPermissionPopUp();
                 }
-                mTmCommunicator.setViperCommunicator(viperCommunicator);
             } catch (RemoteException e) {
                 e.printStackTrace();
             }
@@ -433,6 +457,11 @@ public class DataManager {
         @Override
         public void onServiceUpdateNeeded(boolean isNeeded) throws RemoteException {
           DataManager.this.onServiceUpdateNeeded(isNeeded);
+        }
+
+        @Override
+        public void onInterruption(int hardwareState, List<String> permissions) throws RemoteException {
+            onInterruptionAction(hardwareState, permissions);
         }
     };
 
@@ -742,6 +771,16 @@ public class DataManager {
         payMessage.sender = sender;
         payMessage.paymentData = paymentData;
         AppDataObserver.on().sendObserverData(payMessage);
+    }
+
+    private void onInterruptionAction(int hardwareState, List<String> permissions) {
+        Log.v("MIMO_SAHA::", "Permission<><> 1");
+        MeshLog.v("onInterruptionEvent " + hardwareState + " " + permissions);
+        PermissionInterruptionEvent permissionInterruptionEvent = new PermissionInterruptionEvent();
+        permissionInterruptionEvent.hardwareState = hardwareState;
+        permissionInterruptionEvent.permissions = permissions;
+
+        AppDataObserver.on().sendObserverData(permissionInterruptionEvent);
     }
 
     public void onPayMessageAckReceived(String sender, String receiver, String messageId) {
