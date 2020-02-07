@@ -11,6 +11,7 @@ interface ITmCommunicator {
    String getUserId();
    void saveDiscoveredUserInfo(String userId, String userName);
    void saveUserInfo(in UserInfo userInfo);
+   void saveOtherUserInfo(in UserInfo userInfo);
    void stopMesh();
 
 

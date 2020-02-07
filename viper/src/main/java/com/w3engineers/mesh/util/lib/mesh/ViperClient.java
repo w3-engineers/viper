@@ -229,6 +229,21 @@ public class ViperClient {
         }
     }
 
+    public void saveOtherUserInfo(String usersName, int avatar, String walletAddress) {
+        try {
+            UserInfo userInfo = new UserInfo();
+
+            userInfo.setAddress(walletAddress);
+            userInfo.setAvatar(avatar);
+            userInfo.setUserName(usersName);
+
+            DataManager.on().saveOtherUserInfo(userInfo);
+
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        }
+    }
+
 /*    public void createWallet() {
         WalletManager.getInstance().readWallet(mContext, WalletService.getInstance(mContext).PASSWORD, new WalletManager.WaletListener() {
             @Override
