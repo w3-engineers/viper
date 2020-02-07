@@ -61,6 +61,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
@@ -651,6 +652,7 @@ public class DataManager {
 
         if (mTmCommunicator == null) {
             MeshLog.v("mTmCommunicator null");
+            return null;
         }
         return mTmCommunicator.getUserPublicKey(address);
     }
@@ -667,21 +669,31 @@ public class DataManager {
     }
 
     public void sendPayMessage(String receiverId, String message, String messageId) throws RemoteException {
+        if(mTmCommunicator==null){
+            return;
+        }
         MeshLog.v("sendPayMessage dtm");
         mTmCommunicator.sendPayMessage(receiverId, message, messageId);
     }
 
     public void onPaymentGotForIncomingMessage(boolean success, String receiver, String sender, String messageId, String msgData) throws RemoteException {
+        if(mTmCommunicator==null){
+            return;
+        }
         mTmCommunicator.onPaymentGotForIncomingMessage(success, receiver, sender, messageId, msgData);
     }
 
     public void onPaymentGotForOutgoingMessage(boolean success, String receiver, String sender, String messageId, String msgData) throws RemoteException {
+        if(mTmCommunicator==null){
+            return;
+        }
         mTmCommunicator.onPaymentGotForOutgoingMessage(success, receiver, sender, messageId, msgData);
     }
 
     public List<String> getInternetSellers() throws RemoteException {
         if (mTmCommunicator == null) {
             MeshLog.v("mTmCommunicator null");
+            return new ArrayList<>();
         }
         return mTmCommunicator.getInternetSellers();
     }
@@ -689,6 +701,7 @@ public class DataManager {
     public boolean isInternetSeller(String address) throws RemoteException {
         if (mTmCommunicator == null) {
             MeshLog.v("mTmCommunicator null");
+            return false;
         }
         return mTmCommunicator.isInternetSeller(address);
     }
@@ -696,6 +709,7 @@ public class DataManager {
     public boolean isUserConnected(String address) throws RemoteException {
         if (mTmCommunicator == null) {
             MeshLog.v("mTmCommunicator null");
+            return false;
         }
         return mTmCommunicator.isUserConnected(address);
     }
@@ -712,6 +726,7 @@ public class DataManager {
     public void onBuyerConnected(String address) throws RemoteException {
         if (mTmCommunicator == null) {
             MeshLog.v("mTmCommunicator null");
+            return;
         }
         if (TextUtils.isEmpty(address)) {
             MeshLog.v("address dtm null");
@@ -723,6 +738,7 @@ public class DataManager {
     public void onBuyerDisconnected(String address) throws RemoteException {
         if (mTmCommunicator == null) {
             MeshLog.v("mTmCommunicator null");
+            return;
         }
         mTmCommunicator.onBuyerDisconnected(address);
     }
@@ -730,6 +746,7 @@ public class DataManager {
     public void disconnectFromInternet() throws RemoteException {
         if (mTmCommunicator == null) {
             MeshLog.v("mTmCommunicator null");
+            return;
         }
         mTmCommunicator.disconnectFromInternet();
     }
