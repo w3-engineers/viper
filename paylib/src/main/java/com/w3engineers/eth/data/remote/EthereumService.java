@@ -1,7 +1,9 @@
 package com.w3engineers.eth.data.remote;
 
 import android.content.Context;
+import android.net.ConnectivityManager;
 import android.net.Network;
+import android.net.NetworkInfo;
 import android.text.TextUtils;
 import android.util.Log;
 
@@ -13,6 +15,7 @@ import com.w3engineers.eth.data.helper.model.EthGift;
 import com.w3engineers.eth.data.helper.model.PayLibNetworkInfo;
 import com.w3engineers.eth.data.remote.parse.ParseManager;
 import com.w3engineers.eth.util.data.CellularDataNetworkUtil;
+import com.w3engineers.eth.util.data.WiFiDataNetworkUtil;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -53,7 +56,7 @@ public class EthereumService implements BlockRequest.BlockTransactionObserver, E
     private ParseManager parseManager;
     private NetworkInfoCallback networkInfoCallback;
 
-    private EthereumService(Context context, NetworkInfoCallback networkInfoCallback, String giftDonateUrl) {
+    private EthereumService(Context context, NetworkInfoCallback networkInfoCallback, String giftDonateUrl, boolean isAdhohcConnected) {
         mContext = context.getApplicationContext();
         executor = Executors.newSingleThreadExecutor();
         this.giftDonateUrl = giftDonateUrl;
@@ -80,22 +83,31 @@ public class EthereumService implements BlockRequest.BlockTransactionObserver, E
             ethGift = EthGift.on(blockRequests, EthereumService.this);
         }
 
-        CellularDataNetworkUtil.on(mContext, new CellularDataNetworkUtil.CellularDataNetworkListenerForPurchase() {
-            @Override
-            public void onAvailable(Network network1) {
-                network = network1;
-                Log.i(TAG, "onAvailable: " + network.toString());
-
+        if (isAdhohcConnected){
+            network = WiFiDataNetworkUtil.getConnectedWiFiNetwork(context);
+            if (network != null){
                 for (BlockRequest value : blockRequests.values()) {
                     value.setNetworkInterface(network);
                 }
             }
+        } else {
+            CellularDataNetworkUtil.on(mContext, new CellularDataNetworkUtil.CellularDataNetworkListenerForPurchase() {
+                @Override
+                public void onAvailable(Network network1) {
+                    network = network1;
+                    Log.i(TAG, "onAvailable: " + network.toString());
 
-            @Override
-            public void onLost() {
-                network = null;
-            }
-        }).initMobileDataNetworkRequest();
+                    for (BlockRequest value : blockRequests.values()) {
+                        value.setNetworkInterface(network);
+                    }
+                }
+
+                @Override
+                public void onLost() {
+                    network = null;
+                }
+            }).initMobileDataNetworkRequest();
+        }
     }
 
     public void setGIftDonateUrl(String giftUrl) {
@@ -155,9 +167,6 @@ public class EthereumService implements BlockRequest.BlockTransactionObserver, E
         if (transactionObserver != null)
             transactionObserver.onGiftCompleted(address, endpoint, status);
 
-
-
-
         if (status && ethTxReceipt != null){
 
             if (parseManager != null){
@@ -206,11 +215,11 @@ public class EthereumService implements BlockRequest.BlockTransactionObserver, E
         List<PayLibNetworkInfo> getNetworkInfo();
     }
 
-    synchronized public static EthereumService getInstance(Context context, NetworkInfoCallback networkInfoCallback, String giftDonateUrl) {
+    synchronized public static EthereumService getInstance(Context context, NetworkInfoCallback networkInfoCallback, String giftDonateUrl, boolean isAdhocConnected) {
         if (instance == null) {
             synchronized (EthereumService.class) {
                 if (instance == null) {
-                    instance = new EthereumService(context, networkInfoCallback, giftDonateUrl);
+                    instance = new EthereumService(context, networkInfoCallback, giftDonateUrl, isAdhocConnected);
                 }
             }
         }
@@ -314,7 +323,7 @@ public class EthereumService implements BlockRequest.BlockTransactionObserver, E
                                     .post(body)
                                     .addHeader("Content-Type", "application/x-www-form-urlencoded")
                                     .addHeader("cache-control", "no-cache")
-                                    .addHeader("Postman-Token", "cd5a9cac-258a-4ef9-8bb1-e20201a24e3a")
+                                    .addHeader("Authorization", "Basic bWFqb3JhcmlmOndoYXRJU3RoZXA0c3N3MHJkPw")
                                     .build();
                             Response response = client.newCall(request).execute();
                             if (response != null) {

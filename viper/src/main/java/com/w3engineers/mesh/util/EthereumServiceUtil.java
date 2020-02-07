@@ -9,9 +9,14 @@ Proprietary and confidential
 */
 
 import android.content.Context;
+import android.net.ConnectivityManager;
+import android.net.wifi.WifiInfo;
+import android.net.wifi.WifiManager;
+import android.text.TextUtils;
 
 import com.w3engineers.eth.data.helper.model.PayLibNetworkInfo;
 import com.w3engineers.eth.data.remote.EthereumService;
+import com.w3engineers.ext.strom.util.Text;
 import com.w3engineers.mesh.BuildConfig;
 import com.w3engineers.mesh.application.data.local.db.DatabaseService;
 import com.w3engineers.mesh.application.data.local.db.SharedPref;
@@ -36,12 +41,13 @@ public class EthereumServiceUtil implements EthereumService.NetworkInfoCallback 
     private static EthereumServiceUtil ethereumServiceUtil = null;
     private DatabaseService databaseService;
     private EthereumService ethereumService;
+    private static final String GO_PREFIX = "DIRECT-";
 
     private EthereumServiceUtil(Context context) {
         databaseService = DatabaseService.getInstance(context);
-//        populateDb(context);
+        boolean isAdhocConnected = isAdhocConnected(context);
         ethereumService = EthereumService.getInstance(context, this,
-                SharedPref.read(Constant.PreferenceKeys.GIFT_DONATE_LINK));
+                SharedPref.read(Constant.PreferenceKeys.GIFT_DONATE_LINK), isAdhocConnected);
     }
 
     public static EthereumServiceUtil getInstance(Context context) {
@@ -98,7 +104,7 @@ public class EthereumServiceUtil implements EthereumService.NetworkInfoCallback 
         return 0.0D;
     }
 
-    private void populateDb(Context context){
+  /*  private void populateDb(Context context){
         try {
             InputStream is = context.getAssets().open("blockchainnetworkinfo.xml");
 
@@ -149,7 +155,7 @@ public class EthereumServiceUtil implements EthereumService.NetworkInfoCallback 
         } catch (Exception e) {
             e.printStackTrace();
         }
-    }
+    }*/
 
     public void insertNetworkInfo(NetworkInfo networkInfo) {
         try {
@@ -159,9 +165,41 @@ public class EthereumServiceUtil implements EthereumService.NetworkInfoCallback 
         }
     }
 
-    private static String getValue(String tag, Element element) {
+/*    private static String getValue(String tag, Element element) {
         NodeList nodeList = element.getElementsByTagName(tag).item(0).getChildNodes();
         Node node = nodeList.item(0);
         return node.getNodeValue();
+    }*/
+    public static boolean isWifiConnected(Context context) {
+        ConnectivityManager connManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        android.net.NetworkInfo mWifi = connManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
+        return mWifi.isConnected();
+    }
+
+    public static boolean isPotentialGO(Context context) {
+        if (context != null) {
+            String connectedSSID = getConnectedSSID(context);
+            if (Text.isNotEmpty(connectedSSID)) {
+                connectedSSID = connectedSSID.replaceAll("\"", "");
+                return Text.isNotEmpty(connectedSSID) && connectedSSID.startsWith(GO_PREFIX);
+            }
+        }
+        return false;
+    }
+    public static String getConnectedSSID(Context context) {
+        WifiManager wifiManager = (WifiManager) context.getApplicationContext().getSystemService(Context.WIFI_SERVICE);
+        WifiInfo connectionInfo = wifiManager.getConnectionInfo();
+        if (connectionInfo == null || TextUtils.isEmpty(connectionInfo.getSSID()))
+            return null;
+        return connectionInfo.getSSID();
+    }
+
+    public boolean isAdhocConnected(Context mContext){
+        if (isWifiConnected(mContext)) {
+            if (!isPotentialGO(mContext)) {
+                return true;
+            }
+        }
+        return false;
     }
 }

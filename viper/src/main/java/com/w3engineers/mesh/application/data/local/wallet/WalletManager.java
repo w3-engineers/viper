@@ -65,7 +65,7 @@ public class WalletManager {
 
         if (dataPlanManager.getDataPlanRole() == DataPlanConstants.USER_ROLE.DATA_BUYER) {
             PurchaseManagerBuyer.getInstance().setWalletListener(walletListener);
-        } else if (dataPlanManager.getDataPlanRole() == DataPlanConstants.USER_ROLE.DATA_SELLER) {
+        } else if (dataPlanManager.getDataPlanRole() == DataPlanConstants.USER_ROLE.DATA_SELLER || dataPlanManager.getDataPlanRole() == DataPlanConstants.USER_ROLE.INTERNET_USER) {
             PurchaseManagerSeller.getInstance().setWalletListener(walletListener);
         }
     }
