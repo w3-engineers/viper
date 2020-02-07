@@ -134,7 +134,7 @@ public class DataManager {
         Util.isConnected(new Util.ConnectionCheck() {
             @Override
             public void onConnectionCheck(boolean isConnected) {
-                if (isConnected){
+                if (isConnected) {
                     ConfigSyncUtil.getInstance().startConfigurationSync(mContext, true);
                 } else {
                     checkAndBindService();
@@ -245,13 +245,11 @@ public class DataManager {
     private void showPermissionPopUp() {
         Toaster.showLong("showpopup");
         MeshLog.v("mContext  " + mContext);
-        if (mContext instanceof Activity){
+        if (mContext instanceof Activity) {
             MeshLog.v("yes");
-        }else {
+        } else {
             MeshLog.v("no");
         }
-
-
 
 
         DialogUtil.showConfirmationDialog(MeshApp.getCurrentActivity(),
@@ -457,7 +455,7 @@ public class DataManager {
 
         @Override
         public void onServiceUpdateNeeded(boolean isNeeded) throws RemoteException {
-          DataManager.this.onServiceUpdateNeeded(isNeeded);
+            DataManager.this.onServiceUpdateNeeded(isNeeded);
         }
 
         @Override
@@ -525,7 +523,7 @@ public class DataManager {
 
     public void saveOtherUserInfo(UserInfo userInfo) throws RemoteException {
         if (mTmCommunicator != null) {
-
+            mTmCommunicator.saveOtherUserInfo(userInfo);
         }
     }
 
@@ -669,7 +667,7 @@ public class DataManager {
     }
 
     public void sendPayMessage(String receiverId, String message, String messageId) throws RemoteException {
-        if(mTmCommunicator==null){
+        if (mTmCommunicator == null) {
             return;
         }
         MeshLog.v("sendPayMessage dtm");
@@ -677,14 +675,14 @@ public class DataManager {
     }
 
     public void onPaymentGotForIncomingMessage(boolean success, String receiver, String sender, String messageId, String msgData) throws RemoteException {
-        if(mTmCommunicator==null){
+        if (mTmCommunicator == null) {
             return;
         }
         mTmCommunicator.onPaymentGotForIncomingMessage(success, receiver, sender, messageId, msgData);
     }
 
     public void onPaymentGotForOutgoingMessage(boolean success, String receiver, String sender, String messageId, String msgData) throws RemoteException {
-        if(mTmCommunicator==null){
+        if (mTmCommunicator == null) {
             return;
         }
         mTmCommunicator.onPaymentGotForOutgoingMessage(success, receiver, sender, messageId, msgData);
@@ -852,7 +850,7 @@ public class DataManager {
         AppDataObserver.on().sendObserverData(sellerRemoved);
     }
 
-    private void onServiceUpdateNeeded(boolean isNeeded){
+    private void onServiceUpdateNeeded(boolean isNeeded) {
         ServiceUpdate serviceUpdate = new ServiceUpdate();
         serviceUpdate.isNeeded = isNeeded;
         AppDataObserver.on().sendObserverData(serviceUpdate);
