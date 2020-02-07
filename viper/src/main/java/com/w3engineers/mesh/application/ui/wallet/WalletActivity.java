@@ -97,10 +97,6 @@ public class WalletActivity extends TelemeshBaseActivity implements WalletManage
 
         dialog = new ProgressDialog(WalletActivity.this);
 
-        if (dataPlanManager.getDataPlanRole() == DataPlanConstants.USER_ROLE.DATA_BUYER) {
-            //  mBinding.totalSpentBlock.setVisibility(View.GONE);
-        }
-
         setDialogLoadingTimer("Refreshing balance, please wait.");
 
         HandlerUtil.postBackground(() -> {

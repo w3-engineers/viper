@@ -13,6 +13,7 @@ import android.net.ConnectivityManager;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.text.TextUtils;
+import android.util.Log;
 
 import com.w3engineers.eth.data.helper.model.PayLibNetworkInfo;
 import com.w3engineers.eth.data.remote.EthereumService;
@@ -36,17 +37,49 @@ import java.util.concurrent.ExecutionException;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
-public class EthereumServiceUtil implements EthereumService.NetworkInfoCallback {
+import io.reactivex.functions.BiConsumer;
+
+public class EthereumServiceUtil implements EthereumService.NetworkInfoCallback, WifiDetector.Listener {
 
     private static EthereumServiceUtil ethereumServiceUtil = null;
     private DatabaseService databaseService;
     private EthereumService ethereumService;
     private static final String GO_PREFIX = "DIRECT-";
+    private boolean isInternetConnected;
+    private boolean usingAdhocInternet;
+    private Context context;
 
     private EthereumServiceUtil(Context context) {
         databaseService = DatabaseService.getInstance(context);
-        boolean isAdhocConnected = isAdhocConnected(context);
-        ethereumService = EthereumService.getInstance(context, this,
+        this.context = context;
+        checkandSetAdhocInternetConnected(context);
+    }
+
+    public void checkandSetAdhocInternetConnected(Context mContext){
+        if (isWifiConnected(mContext)) {
+            if (!isPotentialGO(mContext)) {
+                isInternetAvailable(new BiConsumer<String, Boolean>() {
+                    @Override
+                    public void accept(String s, Boolean isConnected) throws Exception {
+                        initEthereumService(isConnected);
+                        if (isConnected){
+                            isInternetConnected = isConnected;
+                        } else {
+
+                        }
+                    }
+                });
+            } else {
+                initEthereumService(false);
+            }
+        } else {
+            initEthereumService(false);
+        }
+    }
+
+    private void initEthereumService(boolean isAdhocConnected){
+        usingAdhocInternet = isAdhocConnected;
+        ethereumService = EthereumService.getInstance(this.context, EthereumServiceUtil.this,
                 SharedPref.read(Constant.PreferenceKeys.GIFT_DONATE_LINK), isAdhocConnected);
     }
 
@@ -194,12 +227,43 @@ public class EthereumServiceUtil implements EthereumService.NetworkInfoCallback 
         return connectionInfo.getSSID();
     }
 
-    public boolean isAdhocConnected(Context mContext){
-        if (isWifiConnected(mContext)) {
-            if (!isPotentialGO(mContext)) {
-                return true;
+
+
+    public static void isInternetAvailable(BiConsumer<String, Boolean> consumer) {
+        new Thread(() -> {
+            try {
+                final String command = "ping -c 1 google.com";
+                boolean isSuccess = Runtime.getRuntime().exec(command).waitFor() == 0;
+                consumer.accept("Internet is available", isSuccess);
+            } catch (Exception e) {
+                try {
+                    consumer.accept("Internet is not available", false);
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                }
             }
+        }).start();
+
+    }
+
+    @Override
+    public void onWifiConnected() {
+        Log.e("Internettransport", "Adhoc connected detect in internet transport");
+        if (!isPotentialGO(this.context)) {
+            isInternetAvailable((message, isConnected) -> {
+                if (isConnected) {
+                    usingAdhocInternet = isConnected;
+                    ethereumService.changeNetworkInterface(isConnected);
+                }
+            });
         }
-        return false;
+    }
+
+    @Override
+    public void onWifiDisconnected() {
+        if (usingAdhocInternet){
+            usingAdhocInternet = false;
+            ethereumService.changeNetworkInterface(false);
+        }
     }
 }

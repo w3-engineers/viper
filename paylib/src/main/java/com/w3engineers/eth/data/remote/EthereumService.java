@@ -55,6 +55,7 @@ public class EthereumService implements BlockRequest.BlockTransactionObserver, E
     private String giftDonateUrl;
     private ParseManager parseManager;
     private NetworkInfoCallback networkInfoCallback;
+    private boolean usingAdhocInternet;
 
     private EthereumService(Context context, NetworkInfoCallback networkInfoCallback, String giftDonateUrl, boolean isAdhohcConnected) {
         mContext = context.getApplicationContext();
@@ -83,6 +84,7 @@ public class EthereumService implements BlockRequest.BlockTransactionObserver, E
             ethGift = EthGift.on(blockRequests, EthereumService.this);
         }
 
+        this.usingAdhocInternet = isAdhohcConnected;
         if (isAdhohcConnected){
             network = WiFiDataNetworkUtil.getConnectedWiFiNetwork(context);
             if (network != null){
@@ -94,17 +96,55 @@ public class EthereumService implements BlockRequest.BlockTransactionObserver, E
             CellularDataNetworkUtil.on(mContext, new CellularDataNetworkUtil.CellularDataNetworkListenerForPurchase() {
                 @Override
                 public void onAvailable(Network network1) {
-                    network = network1;
-                    Log.i(TAG, "onAvailable: " + network.toString());
+                    if (!usingAdhocInternet){
+                        network = network1;
+                        Log.i(TAG, "onAvailable: " + network.toString());
 
-                    for (BlockRequest value : blockRequests.values()) {
-                        value.setNetworkInterface(network);
+                        for (BlockRequest value : blockRequests.values()) {
+                            value.setNetworkInterface(network);
+                        }
                     }
                 }
 
                 @Override
                 public void onLost() {
-                    network = null;
+                    if (!usingAdhocInternet) {
+                        network = null;
+                    }
+                }
+            }).initMobileDataNetworkRequest();
+        }
+    }
+
+    public void changeNetworkInterface(boolean isAdhohcConnected){
+        this.usingAdhocInternet = isAdhohcConnected;
+        if (isAdhohcConnected){
+            network = WiFiDataNetworkUtil.getConnectedWiFiNetwork(mContext);
+            if (network != null){
+                for (BlockRequest value : blockRequests.values()) {
+                    value.setNetworkInterface(network);
+                }
+            }
+        } else {
+            CellularDataNetworkUtil.on(mContext, new CellularDataNetworkUtil.CellularDataNetworkListenerForPurchase() {
+                @Override
+                public void onAvailable(Network network1) {
+                    if (!usingAdhocInternet) {
+
+                        network = network1;
+                        Log.i(TAG, "onAvailable: " + network.toString());
+
+                        for (BlockRequest value : blockRequests.values()) {
+                            value.setNetworkInterface(network);
+                        }
+                    }
+                }
+
+                @Override
+                public void onLost() {
+                    if (!usingAdhocInternet) {
+                        network = null;
+                    }
                 }
             }).initMobileDataNetworkRequest();
         }
