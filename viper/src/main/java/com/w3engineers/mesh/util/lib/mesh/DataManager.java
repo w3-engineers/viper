@@ -522,6 +522,12 @@ public class DataManager {
         }
     }
 
+    public void saveOtherUserInfo(UserInfo userInfo) throws RemoteException {
+        if (mTmCommunicator != null) {
+
+        }
+    }
+
 
     /**
      * called when new peer is added
