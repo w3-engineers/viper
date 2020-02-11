@@ -49,6 +49,7 @@ public class EthereumService implements BlockRequest.BlockTransactionObserver, E
     private String TAG = "EthereumService";
 
     private TransactionObserver transactionObserver;
+    private TransactionObserverBuyer transactionObserverBuyer;
     private Network network;
     private HashMap<Integer, BlockRequest> blockRequests = null;
     EthGift ethGift;
@@ -115,9 +116,14 @@ public class EthereumService implements BlockRequest.BlockTransactionObserver, E
             }).initMobileDataNetworkRequest();
         }
     }
+    public Network getNetwork(){
+        return this.network;
+    }
 
     public void changeNetworkInterface(boolean isAdhohcConnected){
+
         this.usingAdhocInternet = isAdhohcConnected;
+        this.network = null;
         if (isAdhohcConnected){
             network = WiFiDataNetworkUtil.getConnectedWiFiNetwork(mContext);
             if (network != null){
@@ -207,6 +213,10 @@ public class EthereumService implements BlockRequest.BlockTransactionObserver, E
         if (transactionObserver != null)
             transactionObserver.onGiftCompleted(address, endpoint, status);
 
+        if (transactionObserverBuyer != null){
+            transactionObserverBuyer.onGiftCompleted(address, endpoint, status);
+        }
+
         if (status && ethTxReceipt != null){
 
             if (parseManager != null){
@@ -221,7 +231,7 @@ public class EthereumService implements BlockRequest.BlockTransactionObserver, E
                 } catch (JSONException e){
                     e.printStackTrace();
                 }
-
+                //todo majorarif set real value
                 parseManager.sendEtherGifted(ethTxReceipt.getTransactionHash(), ethTxReceipt.getFrom(), ethTxReceipt.getTo(), getWeiValue(1).toString(), log.toString());
             }
         }
@@ -239,7 +249,7 @@ public class EthereumService implements BlockRequest.BlockTransactionObserver, E
                 } catch (JSONException e){
                     e.printStackTrace();
                 }
-
+                //todo majorarif set real value
                 parseManager.sendTokenGifted(tknTxReceipt.getTransactionHash(), tknTxReceipt.getFrom(), tknTxReceipt.getTo(), getWeiValue(50).toString(), log.toString());
             }
         }
@@ -561,8 +571,16 @@ public class EthereumService implements BlockRequest.BlockTransactionObserver, E
         void onGiftCompleted(String address, int endpoint, boolean Status);
     }
 
+    public interface TransactionObserverBuyer {
+        void onGiftCompleted(String address, int endpoint, boolean Status);
+    }
+
     public void setTransactionObserver(TransactionObserver transactionObserver) {
         this.transactionObserver = transactionObserver;
+    }
+
+    public void setTransactionObserverBuyer(TransactionObserverBuyer transactionObserverBuyer) {
+        this.transactionObserverBuyer = transactionObserverBuyer;
     }
 
     public void logBalanceApproved(long blockNumber, int endpointType) {

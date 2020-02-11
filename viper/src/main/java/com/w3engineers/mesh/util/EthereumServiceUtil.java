@@ -52,6 +52,8 @@ public class EthereumServiceUtil implements EthereumService.NetworkInfoCallback,
     private EthereumServiceUtil(Context context) {
         databaseService = DatabaseService.getInstance(context);
         this.context = context;
+        ethereumService = EthereumService.getInstance(this.context, EthereumServiceUtil.this,
+                SharedPref.read(Constant.PreferenceKeys.GIFT_DONATE_LINK), false);
         checkandSetAdhocInternetConnected(context);
     }
 
@@ -65,7 +67,7 @@ public class EthereumServiceUtil implements EthereumService.NetworkInfoCallback,
                         if (isConnected){
                             isInternetConnected = isConnected;
                         } else {
-
+                            //todo
                         }
                     }
                 });
@@ -79,8 +81,8 @@ public class EthereumServiceUtil implements EthereumService.NetworkInfoCallback,
 
     private void initEthereumService(boolean isAdhocConnected){
         usingAdhocInternet = isAdhocConnected;
-        ethereumService = EthereumService.getInstance(this.context, EthereumServiceUtil.this,
-                SharedPref.read(Constant.PreferenceKeys.GIFT_DONATE_LINK), isAdhocConnected);
+        ethereumService.changeNetworkInterface(isAdhocConnected);
+
     }
 
     public static EthereumServiceUtil getInstance(Context context) {
@@ -253,6 +255,7 @@ public class EthereumServiceUtil implements EthereumService.NetworkInfoCallback,
             isInternetAvailable((message, isConnected) -> {
                 if (isConnected) {
                     usingAdhocInternet = isConnected;
+                    isInternetConnected = isConnected;
                     ethereumService.changeNetworkInterface(isConnected);
                 }
             });

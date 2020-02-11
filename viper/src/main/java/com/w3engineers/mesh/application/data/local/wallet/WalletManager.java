@@ -118,6 +118,10 @@ public class WalletManager {
         return PurchaseManager.getInstance().getEthService().getAddress();
     }
 
+    public boolean hasNetwork(){
+        return PurchaseManager.getInstance().getEthService().getNetwork() != null;
+    }
+
     public int getMyEndpoint(){
         return PurchaseManager.getInstance().getEndpoint();
     }
@@ -127,13 +131,14 @@ public class WalletManager {
 
     public void refreshMyBalance() {
 
-        if (dataPlanManager.getDataPlanRole() == DataPlanConstants.USER_ROLE.MESH_USER) {
+       /* if (dataPlanManager.getDataPlanRole() == DataPlanConstants.USER_ROLE.MESH_USER) {
 
             if (walletListener != null) {
                 walletListener.onBalanceInfo(false, "This feature is available only for data seller and data buyer and internet user.");
             }
 
-        } else if (dataPlanManager.getDataPlanRole() == DataPlanConstants.USER_ROLE.DATA_SELLER || dataPlanManager.getDataPlanRole() == DataPlanConstants.USER_ROLE.INTERNET_USER) {
+        } else */
+       if (dataPlanManager.getDataPlanRole() == DataPlanConstants.USER_ROLE.DATA_SELLER || dataPlanManager.getDataPlanRole() == DataPlanConstants.USER_ROLE.INTERNET_USER || dataPlanManager.getDataPlanRole() == DataPlanConstants.USER_ROLE.MESH_USER) {
 
             PurchaseManagerSeller.getInstance().getMyBalanceInfo();
 

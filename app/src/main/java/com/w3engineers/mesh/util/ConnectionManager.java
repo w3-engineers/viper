@@ -49,7 +49,7 @@ import java.util.Map;
 import java.util.UUID;
 
 public class ConnectionManager {
-    private static final String NETWORK_PREFIX = "arif";
+    private static final String NETWORK_PREFIX = "major";
     private static final String APP_NAME = "viper";
     private static ConnectionManager mConnectionManager;
     private ViperClient viperClient;

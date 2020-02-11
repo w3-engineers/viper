@@ -276,7 +276,9 @@ public class WalletActivity extends TelemeshBaseActivity implements WalletManage
     private void openUrl() {
         int myRole = dataPlanManager.getDataPlanRole();
 
-        if (myRole == DataPlanConstants.USER_ROLE.DATA_SELLER || myRole == DataPlanConstants.USER_ROLE.INTERNET_USER) {
+        if (walletManager.hasNetwork()){
+
+       // if (myRole == DataPlanConstants.USER_ROLE.DATA_SELLER || myRole == DataPlanConstants.USER_ROLE.INTERNET_USER) {
 
             int networkType = walletManager.getMyEndpoint();
             String networkUrl = null;
@@ -555,19 +557,6 @@ public class WalletActivity extends TelemeshBaseActivity implements WalletManage
                         }
                     }
                 }
-
-                if (dataShareMode == DataPlanConstants.USER_ROLE.DATA_SELLER || dataShareMode == DataPlanConstants.USER_ROLE.DATA_BUYER) {
-
-                    //    mBinding.currency.setText(walletInfo.currencySymbol);
-                    //  mBinding.currency.setVisibility(View.VISIBLE);
-                } else {
-                    //  mBinding.currency.setVisibility(View.GONE);
-                }
-
-      /*          mBinding.titleEthCurrency.setText(walletInfo.currencySymbol);
-                mBinding.titleRmeshCurrency.setText(walletInfo.tokenSymbol);*/
-
-                //  mBinding.currency.setText(walletInfo.currencySymbol);
             } else {
                 Log.e("Wallet_info", "Wallet info null received from ");
             }

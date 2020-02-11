@@ -7,7 +7,11 @@ import android.text.TextUtils;
 import android.widget.Toast;
 import android.support.v7.app.AlertDialog;
 
+import com.w3engineers.eth.contracts.RaidenMicroTransferChannels;
+import com.w3engineers.eth.contracts.TmeshToken;
+import com.w3engineers.eth.data.remote.EthereumService;
 import com.w3engineers.eth.util.helper.HandlerUtil;
+import com.w3engineers.eth.util.helper.InternetUtil;
 import com.w3engineers.ext.strom.util.helper.Toaster;
 import com.w3engineers.mesh.application.data.local.dataplan.DataPlanManager;
 import com.w3engineers.mesh.application.data.local.db.DatabaseService;
@@ -31,7 +35,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
-public class PurchaseManagerBuyer extends PurchaseManager implements PayController.PayControllerListenerForBuyer {
+public class PurchaseManagerBuyer extends PurchaseManager implements PayController.PayControllerListenerForBuyer, EthereumService.TransactionObserverBuyer{
     private static PurchaseManagerBuyer purchaseManagerBuyer;
     private double totalDataAmount;
     private PurchaseManagerBuyerListener purchaseManagerBuyerListener;
@@ -46,6 +50,7 @@ public class PurchaseManagerBuyer extends PurchaseManager implements PayControll
     private PurchaseManagerBuyer() {
         super();
         setPayControllerListener();
+        ethService.setTransactionObserverBuyer(this);
     }
 
     public static PurchaseManagerBuyer getInstance() {
@@ -289,25 +294,60 @@ public class PurchaseManagerBuyer extends PurchaseManager implements PayControll
 
     public void getMyBalanceInfo() {
         MeshLog.p("getMyBalanceInfo");
-        try {
-            List<String> sellerIds = payController.getDataManager().getInternetSellers();
-            if (sellerIds.size() == 0) {
 
-                if (walletListener != null) {
-                    walletListener.onBalanceInfo(false, "No internet seller connected.");
+        if (ethService.getNetwork() == null){
+            try {
+                List<String> sellerIds = payController.getDataManager().getInternetSellers();
+                if (sellerIds.size() == 0) {
+
+                    if (walletListener != null) {
+                        walletListener.onBalanceInfo(false, "No internet seller connected.");
+                    }
+                } else {
+                    String sellerId = sellerIds.get(0);
+                    String query = PurchaseConstants.INFO_KEYS.ETH_BALANCE + "," + PurchaseConstants.INFO_KEYS.TKN_BALANCE;
+                    int endPointType = getEndpoint();
+
+                    getMyInfo(sellerId, query, PurchaseConstants.INFO_PURPOSES.REFRESH_BALANCE, endPointType);
                 }
-            } else {
-                String sellerId = sellerIds.get(0);
-                String query = PurchaseConstants.INFO_KEYS.ETH_BALANCE + "," + PurchaseConstants.INFO_KEYS.TKN_BALANCE;
+            } catch (Exception ex){
+                ex.printStackTrace();
+            }
+
+        } else {
+            try {
+
                 int endPointType = getEndpoint();
 
-                getMyInfo(sellerId, query, PurchaseConstants.INFO_PURPOSES.REFRESH_BALANCE, endPointType);
-            }
-        } catch (Exception ex){
-            ex.printStackTrace();
-        }
+                Double etherBalance = ethService.getUserEthBalance(ethService.getAddress(), endPointType);
+                Double tokenBalance = ethService.getUserTokenBalance(ethService.getAddress(), endPointType);
+                if (etherBalance != null) {
+                    EthereumServiceUtil.getInstance(mContext).updateCurrency(endPointType, etherBalance);
+                }
 
+                if (tokenBalance != null) {
+                    EthereumServiceUtil.getInstance(mContext).updateToken(endPointType, tokenBalance);
+                }
+
+                if (etherBalance == null || tokenBalance == null) {
+                    if(walletListener != null) {
+                        walletListener.onBalanceInfo(false, "Can't reach network, please try again later.");
+                    }
+                } else {
+
+                    if(walletListener != null) {
+                        walletListener.onBalanceInfo(true, "Balance updated");
+                    }
+                }
+            } catch (Exception e) {
+                if(walletListener != null) {
+                    walletListener.onBalanceInfo(false, e.getMessage());
+                }
+            }
+        }
     }
+
+
 
 /*    public void sendEtherRequest() {
 
@@ -414,17 +454,98 @@ public class PurchaseManagerBuyer extends PurchaseManager implements PayControll
 
     public boolean giftEtherForOtherNetwork() {
 
-        try {
-            List<String> sellerIds = payController.getDataManager().getInternetSellers();
-            if (sellerIds.size() > 0) {
-                return giftEther(sellerIds.get(0));
+        if (ethService.getNetwork() == null){
+            try {
+                List<String> sellerIds = payController.getDataManager().getInternetSellers();
+                if (sellerIds.size() > 0) {
+                    return giftEther(sellerIds.get(0));
+                }
+            } catch (Exception ex){
+                ex.printStackTrace();
             }
-        } catch (Exception ex){
-            ex.printStackTrace();
-        }
 
+            return false;
+        } else {
+            return requestForGiftForBuyerWithOwnInternet();
+        }
+    }
+
+    public boolean requestForGiftForBuyerWithOwnInternet() {
+
+        if (InternetUtil.isNetworkConnected(mContext)) {
+
+            String address = ethService.getAddress();
+            int endpoint = getEndpoint();
+            int requestState = preferencesHelperDataplan.getEtherRequestStatus(endpoint);
+
+            if (requestState == PurchaseConstants.GIFT_REQUEST_STATE.NOT_REQUESTED_YET || requestState == PurchaseConstants.GIFT_REQUEST_STATE.REQUESTED_TO_SELLER) {
+                long currentTime = new Date().getTime();
+                long requestTime = preferencesHelperDataplan.getEtherRequestTimeStamp(endpoint);
+                if (currentTime > (requestTime + 20000)) {
+
+                    preferencesHelperDataplan.setRequestedForEther(PurchaseConstants.GIFT_REQUEST_STATE.REQUESTED_TO_SELLER, endpoint);
+                    preferencesHelperDataplan.setEtherRequestTimeStamp(currentTime, endpoint);
+
+                    ethService.requestGiftEther(address, endpoint, new EthereumService.GiftEther() {
+                        @Override
+                        public void onEtherGiftRequested(boolean success, String msg, String ethTX, String tknTx, String failedBy) {
+                            MeshLog.v("giftEther onEtherGiftRequested " + "success " + success + " msg " + msg + " ethTX " + ethTX + " tknTx " + tknTx + " failedby " + failedBy);
+
+                            PreferencesHelperDataplan preferencesHelperDataplan = PreferencesHelperDataplan.on();
+
+                            if (success) {
+
+                                preferencesHelperDataplan.setRequestedForEther(PurchaseConstants.GIFT_REQUEST_STATE.GOT_TRANX_HASH, endpoint);
+                                preferencesHelperDataplan.setGiftEtherHash(ethTX, endpoint);
+                                preferencesHelperDataplan.setGiftTokenHash(tknTx, endpoint);
+
+//                                String toastMessage = Util.getCurrencyTypeMessage("Congratulations!!!\nYou have been awarded 1 %s and 50 token.\nBalance will be added within few minutes.");
+                                String toastMessage = Util.getCurrencyTypeMessage("Congratulations!!!\nYou have been awarded with 50 points which will be added within few minutes."); //changed per decision
+
+                                sendGiftListener(success, false, toastMessage);
+
+                                /*Activity currentActivity = MeshApp.getCurrentActivity();
+                                if (currentActivity != null) {
+                                    HandlerUtil.postForeground(() -> DialogUtil.showConfirmationDialog(currentActivity, "Gift Awarded!", toastMessage, null, "OK", null));
+                                } else {
+                                    //TODO send notifications
+                                }*/
+                            } else {
+                                MeshLog.v("giftEther giftRequestSubmitted " + msg);
+                                if (failedBy.equals("admin")) {
+                                    preferencesHelperDataplan.setRequestedForEther(PurchaseConstants.GIFT_REQUEST_STATE.GOT_GIFT_ETHER, endpoint);
+                                    getMyBalanceInfo();
+                                } else {
+                                    preferencesHelperDataplan.setRequestedForEther(PurchaseConstants.GIFT_REQUEST_STATE.NOT_REQUESTED_YET, endpoint);
+
+                                    sendGiftListener(success, false, msg);
+
+                                    /*Activity currentActivity = MeshApp.getCurrentActivity();
+                                    if (currentActivity != null) {
+                                        HandlerUtil.postForeground(() -> DialogUtil.showConfirmationDialog(currentActivity, "Gift Awarded!", msg, null, "OK", null));
+                                    }*/
+                                }
+                            }
+                        }
+                    });
+                    return true;
+                }
+
+            } else if (requestState == PurchaseConstants.GIFT_REQUEST_STATE.GOT_TRANX_HASH) {
+
+                String ethTranxHash = preferencesHelperDataplan.getGiftEtherHash(endpoint);
+                String tknTranxHash = preferencesHelperDataplan.getGiftTokenHash(endpoint);
+
+                if (!TextUtils.isEmpty(ethTranxHash) && !TextUtils.isEmpty(tknTranxHash)) {
+                    ethService.getStatusOfGift(address, ethTranxHash, tknTranxHash, endpoint);
+                    return true;
+                }
+
+            }
+        }
         return false;
     }
+
 
     public void destroyObject() {
         payController.setBuyerListener(null);
@@ -1381,6 +1502,44 @@ public class PurchaseManagerBuyer extends PurchaseManager implements PayControll
                     preferencesHelperDataplan.setRequestedForEther(PurchaseConstants.GIFT_REQUEST_STATE.NOT_REQUESTED_YET, 2);
                 }
                 break;
+        }
+    }
+
+
+    @Override
+    public void onGiftCompleted(String address, int endpoint, boolean status) {
+        MeshLog.v("giftEther onGiftCompleted address " + address + " endpoint " + endpoint +  " Status " + status);
+
+        try{
+            double ethBalance = ethService.getUserEthBalance(address, endpoint);
+            double tknBalance = ethService.getUserTokenBalance(address, endpoint);
+
+            if (address.equalsIgnoreCase(ethService.getAddress())){
+                if (status) {
+
+                    preferencesHelperDataplan.setRequestedForEther(PurchaseConstants.GIFT_REQUEST_STATE.GOT_GIFT_ETHER, endpoint);
+                    preferencesHelperDataplan.setGiftEtherHash(null, endpoint);
+                    preferencesHelperDataplan.setGiftTokenHash(null, endpoint);
+                    databaseService.updateCurrencyAndToken(endpoint, ethBalance, tknBalance);
+
+                    sendGiftListener(status, true, "Congratulations!!!\nPoints have been added to your account.");
+
+                    /*Activity currentActivity = MeshApp.getCurrentActivity();
+                    if (currentActivity != null){
+                        HandlerUtil.postForeground(() -> DialogUtil.showConfirmationDialog(currentActivity, "Gift Awarded!", "Congratulations!!!\nBalance has been added to your account.", null, "OK", null));
+                    }else {
+                        //TODO send notifications
+                    }*/
+
+
+                } else {
+                    sendGiftListener(status, true, "Failed");
+                    //TODO detect fail type
+                    preferencesHelperDataplan.setRequestedForEther(PurchaseConstants.GIFT_REQUEST_STATE.NOT_REQUESTED_YET, endpoint);
+                }
+            }
+        }catch (Exception ex){
+            ex.printStackTrace();
         }
     }
 

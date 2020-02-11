@@ -314,6 +314,7 @@ public class DataManager {
     public void allowMissingPermission(List<String> missingPermission) {
         try {
             if (mTmCommunicator != null) {
+                MeshLog.v("mTmCommunicator.allowPermissions(missingPermission);");
                 mTmCommunicator.allowPermissions(missingPermission);
             }
         } catch (RemoteException e) {
