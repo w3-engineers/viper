@@ -111,6 +111,9 @@ public class ConnectionManager {
 
             boolean isUserExist = ChatDataProvider.On().checkUserExistence(peerAdd.peerId);
             if (isUserExist) {
+                MeshLog.v("startAllObserver  peerAdd.peerId " + peerAdd.peerId);
+
+
                 UserModel userModel = ChatDataProvider.On().getUserInfoById(peerAdd.peerId);
                 discoverUserMap.put(peerAdd.peerId, userModel);
                 if (nearbyCallBack != null) {
@@ -260,6 +263,8 @@ public class ConnectionManager {
                 } else if (dataAckEvent.status == Constant.MessageStatus.SEND) {
                     if (requestUserInfoList.containsKey(dataAckEvent.dataId)) {
                         String nodeId = requestUserInfoList.get(dataAckEvent.dataId);
+                        MeshLog.v("startAllObserver  nodeId " + nodeId);
+
                         UserModel userModel = ChatDataProvider.On().getUserInfoById(nodeId);
                         if (userModel == null) {
                             UserModel userModel1 = new UserModel();
