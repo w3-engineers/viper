@@ -713,6 +713,12 @@ public class DataManager {
         return mTmCommunicator.isUserConnected(address);
     }
 
+    public void checkConnectionStatus(String userId) throws RemoteException {
+        if (mTmCommunicator != null) {
+            mTmCommunicator.isLocalUseConnected(userId);
+        }
+    }
+
     public String getCurrentSellerId() throws RemoteException {
         if (mTmCommunicator == null) {
             MeshLog.v("mTmCommunicator null");

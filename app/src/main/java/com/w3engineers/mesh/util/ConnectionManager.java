@@ -169,6 +169,7 @@ public class ConnectionManager {
         });
 
 
+
         AppDataObserver.on().startObserver(ApiEvent.DATA, event -> {
             DataEvent dataEvent = (DataEvent) event;
 
@@ -436,6 +437,10 @@ public class ConnectionManager {
             e.printStackTrace();
             showToast(e.getMessage());
         }
+    }
+
+    public void checkConnectionStatus(String userId){
+        viperClient.checkConnectionStatus(userId);
     }
 
     private int getDataType(JSONObject jo) {

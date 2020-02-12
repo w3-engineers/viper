@@ -201,6 +201,14 @@ public class ViperClient {
         }
     }
 
+    public void checkConnectionStatus(String nodeID){
+        try {
+            DataManager.on().checkConnectionStatus(nodeID);
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        }
+    }
+
     public int getLinkTypeById(String nodeID) throws RemoteException {
         return DataManager.on().getLinkTypeById(nodeID);
     }
