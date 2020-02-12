@@ -111,6 +111,9 @@ public class ConnectionManager {
 
             boolean isUserExist = ChatDataProvider.On().checkUserExistence(peerAdd.peerId);
             if (isUserExist) {
+                MeshLog.v("startAllObserver  peerAdd.peerId " + peerAdd.peerId);
+
+
                 UserModel userModel = ChatDataProvider.On().getUserInfoById(peerAdd.peerId);
                 discoverUserMap.put(peerAdd.peerId, userModel);
                 if (nearbyCallBack != null) {
@@ -164,6 +167,7 @@ public class ConnectionManager {
             ServiceUpdate serviceUpdate = (ServiceUpdate) event;
             MeshLog.e("Service update needed:" + serviceUpdate.isNeeded);
         });
+
 
 
         AppDataObserver.on().startObserver(ApiEvent.DATA, event -> {
@@ -260,6 +264,8 @@ public class ConnectionManager {
                 } else if (dataAckEvent.status == Constant.MessageStatus.SEND) {
                     if (requestUserInfoList.containsKey(dataAckEvent.dataId)) {
                         String nodeId = requestUserInfoList.get(dataAckEvent.dataId);
+                        MeshLog.v("startAllObserver  nodeId " + nodeId);
+
                         UserModel userModel = ChatDataProvider.On().getUserInfoById(nodeId);
                         if (userModel == null) {
                             UserModel userModel1 = new UserModel();
@@ -433,6 +439,10 @@ public class ConnectionManager {
         }
     }
 
+    public void checkConnectionStatus(String userId){
+        viperClient.checkConnectionStatus(userId);
+    }
+
     private int getDataType(JSONObject jo) {
         try {
             return jo.getInt(JsonKeys.KEY_DATA_TYPE);
@@ -481,6 +491,12 @@ public class ConnectionManager {
             return "BT MESH";
         } else if (type == Link.Type.INTERNET.getValue()) {
             return "Internet";
+        }else if (type == Link.Type.HB.getValue()) {
+            return "HB";
+        } else if (type == Link.Type.HB_MESH.getValue()) {
+            return "HB MESH";
+        }else {
+            MeshLog.v("User Type Invalid");
         }
         return "P2P";
     }

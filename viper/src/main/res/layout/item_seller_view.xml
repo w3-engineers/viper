@@ -7,7 +7,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/margin_3"
-        android:layout_marginBottom="@dimen/margin_65"
+        android:layout_marginBottom="@dimen/margin_10"
         android:layout_marginStart="@dimen/margin_10"
         android:layout_marginEnd="@dimen/margin_10"
         android:background="@drawable/ractangular_white_small">
@@ -25,9 +25,8 @@
 
         <TextView
             android:id="@+id/user_name"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-
             android:layout_marginStart="-2dp"
             android:layout_marginTop="5dp"
             android:ellipsize="end"
@@ -37,6 +36,7 @@
             android:textColor="@color/black"
             android:textSize="@dimen/text_size_18"
             app:layout_constrainedWidth="true"
+            app:layout_constraintEnd_toStartOf="@id/status"
             app:layout_constraintStart_toEndOf="@+id/seller_mesh_status"
             app:layout_constraintTop_toTopOf="parent"
             app:tooltipText="User Name" />
