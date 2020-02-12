@@ -486,6 +486,12 @@ public class ConnectionManager {
             return "BT MESH";
         } else if (type == Link.Type.INTERNET.getValue()) {
             return "Internet";
+        }else if (type == Link.Type.HB.getValue()) {
+            return "HB";
+        } else if (type == Link.Type.HB_MESH.getValue()) {
+            return "HB MESH";
+        }else {
+            MeshLog.v("User Type Invalid");
         }
         return "P2P";
     }
