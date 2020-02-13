@@ -89,7 +89,7 @@ public class ConfigSyncUtil {
                 String userName = SharedPref.read(Constant.PreferenceKeys.AUTH_USER_NAME);
                 String userPass = SharedPref.read(Constant.PreferenceKeys.AUTH_PASSWORD);
 
-                String authString = (userName+":"+userPass);
+                String authString = (userName + ":" + userPass);
                 byte[] data1 = authString.getBytes(UTF_8);
                 String base64 = Base64.encodeToString(data1, Base64.NO_WRAP);
 
@@ -101,7 +101,7 @@ public class ConfigSyncUtil {
                     }
                 });*/
 
-                connection.setRequestProperty("Authorization", "Basic "+base64);
+                connection.setRequestProperty("Authorization", "Basic " + base64);
 
                 connection.connect();
                 InputStream stream = connection.getInputStream();
@@ -156,7 +156,7 @@ public class ConfigSyncUtil {
 //        }
 
         ConfigSyncEvent configSyncEvent = new ConfigSyncEvent();
-        if (configurationCommand != null){
+        if (configurationCommand != null) {
             MeshLog.v("configurationCommand " + configurationCommand.getConfigVersionName());
 
             int configVersion = PreferencesHelperDataplan.on().getConfigVersion();
@@ -178,6 +178,10 @@ public class ConfigSyncUtil {
                 PreferencesHelperDataplan.on().setRmeshPerPoint(configurationCommand.getRmeshPerToken());
                 SharedPref.write(Constant.PreferenceKeys.GIFT_DONATE_LINK, configurationCommand.getGiftDonateLink());
 
+                SharedPref.write(Constant.PreferenceKeys.GIFT_DONATE_USERNAME, configurationCommand.getGiftDonateLink());
+                SharedPref.write(Constant.PreferenceKeys.GIFT_DONATE_PASS, configurationCommand.getGiftDonatePass());
+                SharedPref.write(Constant.PreferenceKeys.TX_HISTORY_URL_KOTTI, configurationCommand.getHistoryUrlKotti());
+                SharedPref.write(Constant.PreferenceKeys.TX_URL_ROPSTEN, configurationCommand.getRopstenUrl());
 
 
                 PreferencesHelperDataplan.on().setWalletRmeshAvailable(configurationCommand.isWalletRmeshAvailable());
@@ -197,7 +201,7 @@ public class ConfigSyncUtil {
                 EthereumServiceUtil.getInstance(context).getEthereumService().setGIftDonateUrl(SharedPref.read(Constant.PreferenceKeys.GIFT_DONATE_LINK));
                 configSyncEvent.setUpdate(false);
             }
-        }else {
+        } else {
             EthereumServiceUtil.getInstance(context).getEthereumService().setGIftDonateUrl(SharedPref.read(Constant.PreferenceKeys.GIFT_DONATE_LINK));
             configSyncEvent.setUpdate(false);
         }
@@ -209,13 +213,13 @@ public class ConfigSyncUtil {
 
     }
 
-    public void  loadFirstTimeData(Context context,  String configData) {
+    public void loadFirstTimeData(Context context, String configData) {
         int configVersion = PreferencesHelperDataplan.on().getConfigVersion();
 
-     //   String configData = loadJSONFromAsset(context);
+        //   String configData = loadJSONFromAsset(context);
 
 
-        Log.e("config_file", "config_data:: " +configData);
+        Log.e("config_file", "config_data:: " + configData);
 
         ConfigurationCommand configurationCommand = new Gson().fromJson(configData, ConfigurationCommand.class);
 
@@ -227,6 +231,11 @@ public class ConfigSyncUtil {
             PreferencesHelperDataplan.on().setMaxPointForRmesh(configurationCommand.getMaxPointForRmesh());
             PreferencesHelperDataplan.on().setRmeshPerPoint(configurationCommand.getRmeshPerToken());
             SharedPref.write(Constant.PreferenceKeys.GIFT_DONATE_LINK, configurationCommand.getGiftDonateLink());
+
+            SharedPref.write(Constant.PreferenceKeys.GIFT_DONATE_USERNAME, configurationCommand.getGiftDonateLink());
+            SharedPref.write(Constant.PreferenceKeys.GIFT_DONATE_PASS, configurationCommand.getGiftDonatePass());
+            SharedPref.write(Constant.PreferenceKeys.TX_HISTORY_URL_KOTTI, configurationCommand.getHistoryUrlKotti());
+            SharedPref.write(Constant.PreferenceKeys.TX_URL_ROPSTEN, configurationCommand.getRopstenUrl());
 
             PreferencesHelperDataplan.on().setWalletRmeshAvailable(configurationCommand.isWalletRmeshAvailable());
             PreferencesHelperDataplan.on().setRmeshInfoText(configurationCommand.getRmeshInfoText());
@@ -252,6 +261,10 @@ public class ConfigSyncUtil {
             PreferencesHelperDataplan.on().setRmeshPerPoint(configurationCommand.getRmeshPerToken());
             SharedPref.write(Constant.PreferenceKeys.GIFT_DONATE_LINK, configurationCommand.getGiftDonateLink());
 
+            SharedPref.write(Constant.PreferenceKeys.GIFT_DONATE_USERNAME, configurationCommand.getGiftDonateLink());
+            SharedPref.write(Constant.PreferenceKeys.GIFT_DONATE_PASS, configurationCommand.getGiftDonatePass());
+            SharedPref.write(Constant.PreferenceKeys.TX_HISTORY_URL_KOTTI, configurationCommand.getHistoryUrlKotti());
+            SharedPref.write(Constant.PreferenceKeys.TX_URL_ROPSTEN, configurationCommand.getRopstenUrl());
 
 
             PreferencesHelperDataplan.on().setWalletRmeshAvailable(configurationCommand.isWalletRmeshAvailable());
@@ -310,7 +323,7 @@ public class ConfigSyncUtil {
                 String userName = SharedPref.read(Constant.PreferenceKeys.AUTH_USER_NAME);
                 String userPass = SharedPref.read(Constant.PreferenceKeys.AUTH_PASSWORD);
 
-                String authString = (userName+":"+userPass);
+                String authString = (userName + ":" + userPass);
                 byte[] data1 = authString.getBytes(UTF_8);
                 String base64 = Base64.encodeToString(data1, Base64.NO_WRAP);
 
@@ -322,7 +335,7 @@ public class ConfigSyncUtil {
                     }
                 });*/
 
-                connection.setRequestProperty("Authorization", "Basic "+base64);
+                connection.setRequestProperty("Authorization", "Basic " + base64);
 
                 connection.connect();
                 InputStream stream = connection.getInputStream();
