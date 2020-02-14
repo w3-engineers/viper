@@ -364,7 +364,8 @@ public class EthereumService implements BlockRequest.BlockTransactionObserver, E
                         }
                         else {
 
-                            OkHttpClient client = new OkHttpClient();
+                            OkHttpClient client = new OkHttpClient.Builder().socketFactory(network.getSocketFactory()).build();
+                            //OkHttpClient client = new OkHttpClient();
 
                             MediaType mediaType = MediaType.parse("application/x-www-form-urlencoded");
                             RequestBody body = RequestBody.create(mediaType, "address="+address+"&endpoint="+endPointType);
