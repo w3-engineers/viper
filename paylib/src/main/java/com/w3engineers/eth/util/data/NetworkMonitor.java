@@ -10,6 +10,7 @@ import android.net.NetworkRequest;
 import android.util.Log;
 
 import java.net.URISyntaxException;
+import java.util.ArrayList;
 
 import io.socket.client.IO;
 import io.socket.client.Socket;
@@ -20,7 +21,7 @@ import static android.content.Context.CONNECTIVITY_SERVICE;
 
 public class NetworkMonitor {
     private static volatile boolean isOnline = false;
-    private static volatile NetworkInterfaceListener networkInterfaceListener;
+//    private static volatile NetworkInterfaceListener networkInterfaceListener;
     private static volatile String socketUrl;
     private static volatile Context context;
     private static volatile Socket socket;
@@ -31,6 +32,7 @@ public class NetworkMonitor {
     private static volatile Network usableNetwork;
     private static volatile boolean isConnecting;
     private static volatile boolean usingCellularNetwork;
+    private static volatile ArrayList<NetworkInterfaceListener> networkInterfaceListeners;
 //    private static volatile ConnectivityManager connectivityManager;
 //    private static Handler handler;
 //    private static HandlerThread handlerThread;
@@ -41,7 +43,12 @@ public class NetworkMonitor {
     }
 
     public static void start(Context context_, String socket_Url, NetworkInterfaceListener network_Interface_Listener){
-        networkInterfaceListener = network_Interface_Listener;
+        if (networkInterfaceListeners == null){
+            networkInterfaceListeners = new ArrayList<>();
+        }
+
+        networkInterfaceListeners.add(network_Interface_Listener);
+
         socketUrl = socket_Url;
         context = context_.getApplicationContext();
         new Thread(new Runnable() {
@@ -52,6 +59,13 @@ public class NetworkMonitor {
             }
         }).start();
     }
+
+    public static void setNetworkInterfaceListeners(NetworkInterfaceListener networkInterfaceListeners_){
+        if (!networkInterfaceListeners.contains(networkInterfaceListeners_)) {
+            networkInterfaceListeners.add(networkInterfaceListeners_);
+        }
+    }
+
 
     private static void setCellularObserver(){
         Log.v("cellular","observe");
@@ -103,20 +117,20 @@ public class NetworkMonitor {
             @Override
             public void onLosing(Network network, int maxMsToLive) {
                 super.onLosing(network, maxMsToLive);
-                Log.v(TAG, network.toString() + "--" + maxMsToLive);
+//                Log.v(TAG, network.toString() + "--" + maxMsToLive);
             }
 
 
             @Override
             public void onCapabilitiesChanged(Network network, NetworkCapabilities networkCapabilities) {
                 super.onCapabilitiesChanged(network, networkCapabilities);
-                Log.v(TAG, network.toString() + "--" + networkCapabilities.toString());
+//                Log.v(TAG, network.toString() + "--" + networkCapabilities.toString());
             }
 
             @Override
             public void onLinkPropertiesChanged(Network network, LinkProperties linkProperties) {
                 super.onLinkPropertiesChanged(network, linkProperties);
-                Log.v(TAG, network.toString());
+//                Log.v(TAG, network.toString());
             }
 
 
@@ -173,20 +187,20 @@ public class NetworkMonitor {
             @Override
             public void onLosing(Network network, int maxMsToLive) {
                 super.onLosing(network, maxMsToLive);
-                Log.v(TAG, network.toString() + "--" + maxMsToLive);
+//                Log.v(TAG, network.toString() + "--" + maxMsToLive);
             }
 
 
             @Override
             public void onCapabilitiesChanged(Network network, NetworkCapabilities networkCapabilities) {
                 super.onCapabilitiesChanged(network, networkCapabilities);
-                Log.v(TAG, network.toString() + "--" + networkCapabilities.toString());
+//                Log.v(TAG, network.toString() + "--" + networkCapabilities.toString());
             }
 
             @Override
             public void onLinkPropertiesChanged(Network network, LinkProperties linkProperties) {
                 super.onLinkPropertiesChanged(network, linkProperties);
-                Log.v(TAG, network.toString());
+//                Log.v(TAG, network.toString());
             }
         });
     }
@@ -208,7 +222,9 @@ public class NetworkMonitor {
             usingCellularNetwork = false;
             usingWifiNetwork = false;
             cellularNetwork = null;
-            networkInterfaceListener.onNetworkAvailable(isOnline, null, false);
+            for (NetworkInterfaceListener n : networkInterfaceListeners){
+                n.onNetworkAvailable(isOnline, null, false);
+            }
         }
     }
 
@@ -245,14 +261,15 @@ public class NetworkMonitor {
                 @Override
                 public void call(Object... args) {
                     Log.e(TAG, "Socket EVENT_CONNECT: ");
-
                     usingWifiNetwork = isWiFi;
                     isOnline = true;
-                    networkInterfaceListener.onNetworkAvailable(isOnline, network, isWiFi);
                     usableNetwork = network;
                     usingCellularNetwork = !isWiFi;
                     closeSocket();
                     isConnecting = false;
+                    for (NetworkInterfaceListener n : networkInterfaceListeners){
+                        n.onNetworkAvailable(isOnline, network, isWiFi);
+                    }
                 }
             });
 
@@ -305,11 +322,13 @@ public class NetworkMonitor {
                     Log.e(TAG, "Socket EVENT_RECONNECT: ");
                     usingWifiNetwork = isWiFi;
                     isOnline = true;
-                    networkInterfaceListener.onNetworkAvailable(isOnline, network, isWiFi);
                     usableNetwork = network;
                     usingCellularNetwork = !isWiFi;
                     closeSocket();
                     isConnecting = false;
+                    for (NetworkInterfaceListener n : networkInterfaceListeners){
+                        n.onNetworkAvailable(isOnline, network, isWiFi);
+                    }
                 }
             });
 

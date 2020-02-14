@@ -56,9 +56,9 @@ public class EthereumService implements BlockRequest.BlockTransactionObserver, E
     private String giftDonateUrl;
     private ParseManager parseManager;
     private NetworkInfoCallback networkInfoCallback;
-    private boolean usingAdhocInternet;
+//    private boolean usingAdhocInternet;
 
-    private EthereumService(Context context, NetworkInfoCallback networkInfoCallback, String giftDonateUrl, boolean isAdhohcConnected) {
+    private EthereumService(Context context, NetworkInfoCallback networkInfoCallback, String giftDonateUrl) {
         mContext = context.getApplicationContext();
         executor = Executors.newSingleThreadExecutor();
         this.giftDonateUrl = giftDonateUrl;
@@ -85,7 +85,7 @@ public class EthereumService implements BlockRequest.BlockTransactionObserver, E
             ethGift = EthGift.on(blockRequests, EthereumService.this);
         }
 
-        this.usingAdhocInternet = isAdhohcConnected;
+        /*this.usingAdhocInternet = isAdhohcConnected;
         if (isAdhohcConnected){
             network = WiFiDataNetworkUtil.getConnectedWiFiNetwork(context);
             if (network != null){
@@ -114,17 +114,26 @@ public class EthereumService implements BlockRequest.BlockTransactionObserver, E
                     }
                 }
             }).initMobileDataNetworkRequest();
+        }*/
+    }
+//    public Network getNetwork(){
+//        return this.network;
+//    }
+
+    public void changeNetworkInterface(Network network_){
+        Log.i(TAG, "network changed: " + network);
+
+        this.network = network_;
+        if (this.network != null){
+            for (BlockRequest value : blockRequests.values()) {
+                value.setNetworkInterface(network);
+            }
+            Log.i(TAG, "onAvailable: " + network.toString());
         }
-    }
-    public Network getNetwork(){
-        return this.network;
-    }
 
-    public void changeNetworkInterface(boolean isAdhohcConnected){
 
-        this.usingAdhocInternet = isAdhohcConnected;
-        this.network = null;
-        if (isAdhohcConnected){
+
+        /*if (isAdhohcConnected){
             network = WiFiDataNetworkUtil.getConnectedWiFiNetwork(mContext);
             if (network != null){
                 for (BlockRequest value : blockRequests.values()) {
@@ -153,7 +162,7 @@ public class EthereumService implements BlockRequest.BlockTransactionObserver, E
                     }
                 }
             }).initMobileDataNetworkRequest();
-        }
+        }*/
     }
 
     public void setGIftDonateUrl(String giftUrl) {
@@ -265,11 +274,11 @@ public class EthereumService implements BlockRequest.BlockTransactionObserver, E
         List<PayLibNetworkInfo> getNetworkInfo();
     }
 
-    synchronized public static EthereumService getInstance(Context context, NetworkInfoCallback networkInfoCallback, String giftDonateUrl, boolean isAdhocConnected) {
+    synchronized public static EthereumService getInstance(Context context, NetworkInfoCallback networkInfoCallback, String giftDonateUrl) {
         if (instance == null) {
             synchronized (EthereumService.class) {
                 if (instance == null) {
-                    instance = new EthereumService(context, networkInfoCallback, giftDonateUrl, isAdhocConnected);
+                    instance = new EthereumService(context, networkInfoCallback, giftDonateUrl);
                 }
             }
         }

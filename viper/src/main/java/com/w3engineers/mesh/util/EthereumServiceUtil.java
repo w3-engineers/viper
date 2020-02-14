@@ -41,29 +41,31 @@ import javax.xml.parsers.DocumentBuilderFactory;
 
 import io.reactivex.functions.BiConsumer;
 
-public class EthereumServiceUtil implements EthereumService.NetworkInfoCallback, WifiDetector.Listener {
+public class EthereumServiceUtil implements EthereumService.NetworkInfoCallback {
 
     private static EthereumServiceUtil ethereumServiceUtil = null;
     private DatabaseService databaseService;
     private EthereumService ethereumService;
     private static final String GO_PREFIX = "DIRECT-";
 //    private boolean isInternetConnected;
-    private boolean usingAdhocInternet;
+//    private boolean usingAdhocInternet;
     private Context context;
-    private WifiDetector wifiDetector;
+//    private WifiDetector wifiDetector;
     private String SOCKET_URL = "https://dev-signal.telemesh.net";
 
     private EthereumServiceUtil(Context context) {
         databaseService = DatabaseService.getInstance(context);
         this.context = context;
         ethereumService = EthereumService.getInstance(this.context, EthereumServiceUtil.this,
-                SharedPref.read(Constant.PreferenceKeys.GIFT_DONATE_LINK), false);
-        checkandSetAdhocInternetConnected(context);
-        wifiDetector = new WifiDetector(this, context);
-        wifiDetector.start();
+                SharedPref.read(Constant.PreferenceKeys.GIFT_DONATE_LINK));
+
+        startNetworkMonitor();
+//        checkandSetAdhocInternetConnected(context);
+//        wifiDetector = new WifiDetector(this, context);
+//        wifiDetector.start();
     }
 
-    public void checkandSetAdhocInternetConnected(Context mContext){
+    /*public void checkandSetAdhocInternetConnected(Context mContext){
         if (isWifiConnected(mContext)) {
             if (!isPotentialGO(mContext)) {
                 isInternetAvailable(new BiConsumer<String, Boolean>() {
@@ -78,13 +80,13 @@ public class EthereumServiceUtil implements EthereumService.NetworkInfoCallback,
         } else {
             changeNetworkInterface(false);
         }
-    }
+    }*/
 
-    private void changeNetworkInterface(boolean isAdhocConnected){
+    /*private void changeNetworkInterface(boolean isAdhocConnected){
         usingAdhocInternet = isAdhocConnected;
         ethereumService.changeNetworkInterface(isAdhocConnected);
 
-    }
+    }*/
 
     public static EthereumServiceUtil getInstance(Context context) {
         if (ethereumServiceUtil == null) {
@@ -148,13 +150,13 @@ public class EthereumServiceUtil implements EthereumService.NetworkInfoCallback,
         }
     }
 
-    public static boolean isWifiConnected(Context context) {
+    /*public static boolean isWifiConnected(Context context) {
         ConnectivityManager connManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
         android.net.NetworkInfo mWifi = connManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
         return mWifi.isConnected();
-    }
+    }*/
 
-    public static boolean isPotentialGO(Context context) {
+    /*public static boolean isPotentialGO(Context context) {
         if (context != null) {
             String connectedSSID = getConnectedSSID(context);
             if (Text.isNotEmpty(connectedSSID)) {
@@ -163,17 +165,17 @@ public class EthereumServiceUtil implements EthereumService.NetworkInfoCallback,
             }
         }
         return false;
-    }
+    }*/
 
-    public static String getConnectedSSID(Context context) {
+    /*public static String getConnectedSSID(Context context) {
         WifiManager wifiManager = (WifiManager) context.getApplicationContext().getSystemService(Context.WIFI_SERVICE);
         WifiInfo connectionInfo = wifiManager.getConnectionInfo();
         if (connectionInfo == null || TextUtils.isEmpty(connectionInfo.getSSID()))
             return null;
         return connectionInfo.getSSID();
-    }
+    }*/
 
-    public static void isInternetAvailable(BiConsumer<String, Boolean> consumer) {
+/*    public static void isInternetAvailable(BiConsumer<String, Boolean> consumer) {
         new Thread(() -> {
             try {
                 final String command = "ping -c 1 google.com";
@@ -188,9 +190,9 @@ public class EthereumServiceUtil implements EthereumService.NetworkInfoCallback,
             }
         }).start();
 
-    }
+    }*/
 
-    @Override
+   /* @Override
     public void onWifiConnected() {
         Log.e("Internettransport", "Adhoc connected detect in internet transport");
         if (!isPotentialGO(this.context)) {
@@ -211,15 +213,24 @@ public class EthereumServiceUtil implements EthereumService.NetworkInfoCallback,
             usingAdhocInternet = false;
             ethereumService.changeNetworkInterface(false);
         }
-    }
+    }*/
 
 
     public void startNetworkMonitor(){
         NetworkMonitor.start(context, SOCKET_URL, new NetworkMonitor.NetworkInterfaceListener() {
             @Override
             public void onNetworkAvailable(boolean isOnline, Network network, boolean isWiFi) {
-
+                Log.v("***********************","***********************");
+                if (network != null){
+                    Log.v("onNetworkAvailable", isOnline + " " + network.toString() + (isWiFi ? " wifi" : " cellular"));
+                } else {
+                    Log.v("onNetworkAvailable", isOnline + " ");
+                }
+                Log.v("***********************","***********************");
+                ethereumService.changeNetworkInterface(network);
             }
         });
     }
+
+
 }

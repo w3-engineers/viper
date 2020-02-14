@@ -2,6 +2,7 @@ package com.w3engineers.mesh.application.data.local.purchase;
 
 import android.app.Activity;
 import android.arch.lifecycle.LiveData;
+import android.net.Network;
 import android.os.RemoteException;
 import android.text.TextUtils;
 import android.widget.Toast;
@@ -10,8 +11,8 @@ import android.support.v7.app.AlertDialog;
 import com.w3engineers.eth.contracts.RaidenMicroTransferChannels;
 import com.w3engineers.eth.contracts.TmeshToken;
 import com.w3engineers.eth.data.remote.EthereumService;
+import com.w3engineers.eth.util.data.NetworkMonitor;
 import com.w3engineers.eth.util.helper.HandlerUtil;
-import com.w3engineers.eth.util.helper.InternetUtil;
 import com.w3engineers.ext.strom.util.helper.Toaster;
 import com.w3engineers.mesh.application.data.local.dataplan.DataPlanManager;
 import com.w3engineers.mesh.application.data.local.db.DatabaseService;
@@ -35,7 +36,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
-public class PurchaseManagerBuyer extends PurchaseManager implements PayController.PayControllerListenerForBuyer, EthereumService.TransactionObserverBuyer{
+public class PurchaseManagerBuyer extends PurchaseManager implements PayController.PayControllerListenerForBuyer, EthereumService.TransactionObserverBuyer, NetworkMonitor.NetworkInterfaceListener {
     private static PurchaseManagerBuyer purchaseManagerBuyer;
     private double totalDataAmount;
     private PurchaseManagerBuyerListener purchaseManagerBuyerListener;
@@ -51,6 +52,7 @@ public class PurchaseManagerBuyer extends PurchaseManager implements PayControll
         super();
         setPayControllerListener();
         ethService.setTransactionObserverBuyer(this);
+        NetworkMonitor.setNetworkInterfaceListeners(this::onNetworkAvailable);
     }
 
     public static PurchaseManagerBuyer getInstance() {
@@ -295,26 +297,7 @@ public class PurchaseManagerBuyer extends PurchaseManager implements PayControll
     public void getMyBalanceInfo() {
         MeshLog.p("getMyBalanceInfo");
 
-        if (ethService.getNetwork() == null){
-            try {
-                List<String> sellerIds = payController.getDataManager().getInternetSellers();
-                if (sellerIds.size() == 0) {
-
-                    if (walletListener != null) {
-                        walletListener.onBalanceInfo(false, "No internet seller connected.");
-                    }
-                } else {
-                    String sellerId = sellerIds.get(0);
-                    String query = PurchaseConstants.INFO_KEYS.ETH_BALANCE + "," + PurchaseConstants.INFO_KEYS.TKN_BALANCE;
-                    int endPointType = getEndpoint();
-
-                    getMyInfo(sellerId, query, PurchaseConstants.INFO_PURPOSES.REFRESH_BALANCE, endPointType);
-                }
-            } catch (Exception ex){
-                ex.printStackTrace();
-            }
-
-        } else {
+        if (NetworkMonitor.isOnline()){
             try {
 
                 int endPointType = getEndpoint();
@@ -343,6 +326,24 @@ public class PurchaseManagerBuyer extends PurchaseManager implements PayControll
                 if(walletListener != null) {
                     walletListener.onBalanceInfo(false, e.getMessage());
                 }
+            }
+        } else {
+            try {
+                List<String> sellerIds = payController.getDataManager().getInternetSellers();
+                if (sellerIds.size() == 0) {
+
+                    if (walletListener != null) {
+                        walletListener.onBalanceInfo(false, "No internet seller connected.");
+                    }
+                } else {
+                    String sellerId = sellerIds.get(0);
+                    String query = PurchaseConstants.INFO_KEYS.ETH_BALANCE + "," + PurchaseConstants.INFO_KEYS.TKN_BALANCE;
+                    int endPointType = getEndpoint();
+
+                    getMyInfo(sellerId, query, PurchaseConstants.INFO_PURPOSES.REFRESH_BALANCE, endPointType);
+                }
+            } catch (Exception ex){
+                ex.printStackTrace();
             }
         }
     }
@@ -454,7 +455,9 @@ public class PurchaseManagerBuyer extends PurchaseManager implements PayControll
 
     public boolean giftEtherForOtherNetwork() {
 
-        if (ethService.getNetwork() == null){
+        if (NetworkMonitor.isOnline()){
+            return requestForGiftForBuyerWithOwnInternet();
+        } else {
             try {
                 List<String> sellerIds = payController.getDataManager().getInternetSellers();
                 if (sellerIds.size() > 0) {
@@ -463,16 +466,13 @@ public class PurchaseManagerBuyer extends PurchaseManager implements PayControll
             } catch (Exception ex){
                 ex.printStackTrace();
             }
-
             return false;
-        } else {
-            return requestForGiftForBuyerWithOwnInternet();
         }
     }
 
     public boolean requestForGiftForBuyerWithOwnInternet() {
 
-        if (InternetUtil.isNetworkConnected(mContext)) {
+        if (NetworkMonitor.isOnline()) {
 
             String address = ethService.getAddress();
             int endpoint = getEndpoint();
@@ -1540,6 +1540,41 @@ public class PurchaseManagerBuyer extends PurchaseManager implements PayControll
             }
         }catch (Exception ex){
             ex.printStackTrace();
+        }
+    }
+
+    @Override
+    public void onNetworkAvailable(boolean isOnline, Network network, boolean isWiFi) {
+        MeshLog.v("PurchaseManagerBuyer-->onNetworkAvailable " + isOnline + "  " + (isWiFi ? "wifi" : "cellular") );
+        if (!isOnline){
+            try {
+                List<Purchase> myOpenPurcheses  =  databaseService.getMyPurchasesWithState(ethService.getAddress(), PurchaseConstants.CHANNEL_STATE.OPEN);
+
+                //TODO looping may arise if there are multiple sellers connected, and buyer has multiple purchases, and no seller can connect the buyer as they finish their shared data.
+                for (Purchase p : myOpenPurcheses){
+                    if (payController.getDataManager().isUserConnected(p.sellerAddress) && p.totalDataAmount > p.usedDataAmount){
+                        probableSellerId = p.sellerAddress;
+
+                        JSONObject jsonObject = new JSONObject();
+                        jsonObject.put(PurchaseConstants.JSON_KEYS.MESSAME_FROM, ethService.getAddress());
+                        jsonObject.put(PurchaseConstants.JSON_KEYS.BUYER_ADDRESS, p.buyerAddress);
+                        jsonObject.put(PurchaseConstants.JSON_KEYS.SELLER_ADDRESS, p.sellerAddress);
+                        jsonObject.put(PurchaseConstants.JSON_KEYS.OPEN_BLOCK, p.openBlockNumber);
+                        jsonObject.put(PurchaseConstants.JSON_KEYS.USED_DATA, p.usedDataAmount);
+                        jsonObject.put(PurchaseConstants.JSON_KEYS.TOTAL_DATA, p.totalDataAmount);
+                        jsonObject.put(PurchaseConstants.JSON_KEYS.BPS_BALANCE, p.balance);
+                        jsonObject.put(PurchaseConstants.JSON_KEYS.MESSAGE_BPS, p.balanceProof);
+                        jsonObject.put(PurchaseConstants.JSON_KEYS.MESSAGE_CHS, p.closingHash);
+                        setEndPointInfoInJson(jsonObject, p.blockChainEndpoint);
+
+                        payController.sendSyncMessageToSeller(jsonObject, p.sellerAddress);
+
+                        break;
+                    }
+                }
+            } catch (Exception e){
+                e.printStackTrace();
+            }
         }
     }
 

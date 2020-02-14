@@ -11,6 +11,7 @@ import android.text.TextUtils;
 import android.util.Base64;
 
 import com.google.zxing.WriterException;
+import com.w3engineers.eth.util.data.NetworkMonitor;
 import com.w3engineers.mesh.application.data.local.DataPlanConstants;
 import com.w3engineers.mesh.application.data.local.dataplan.DataPlanManager;
 import com.w3engineers.mesh.application.data.local.db.SharedPref;
@@ -119,7 +120,7 @@ public class WalletManager {
     }
 
     public boolean hasNetwork(){
-        return PurchaseManager.getInstance().getEthService().getNetwork() != null;
+        return NetworkMonitor.isOnline();
     }
 
     public int getMyEndpoint(){

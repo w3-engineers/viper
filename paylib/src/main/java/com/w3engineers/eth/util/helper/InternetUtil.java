@@ -7,6 +7,7 @@ import android.net.NetworkInfo;
 import java.io.IOException;
 
 
+/*
 public class InternetUtil {
 
     public static final int TYPE_WIFI = 1;
@@ -57,4 +58,4 @@ public class InternetUtil {
         return status;
     }
 
-}
+}*/

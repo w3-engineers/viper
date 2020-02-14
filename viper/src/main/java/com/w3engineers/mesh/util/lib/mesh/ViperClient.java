@@ -166,11 +166,11 @@ public class ViperClient {
 
 
         if (PreferencesHelperDataplan.on().getDataPlanRole() == DataPlanConstants.USER_ROLE.DATA_SELLER) {
-            PurchaseManagerSeller.getInstance().setPayControllerListener();
+            PurchaseManagerSeller.getInstance();
         }
 
         if (PreferencesHelperDataplan.on().getDataPlanRole() == DataPlanConstants.USER_ROLE.DATA_BUYER) {
-            PurchaseManagerBuyer.getInstance().setPayControllerListener();
+            PurchaseManagerBuyer.getInstance();
         }
 
         WalletLoaded walletLoaded = new WalletLoaded();
