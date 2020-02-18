@@ -178,7 +178,7 @@ public class ConfigSyncUtil {
                 PreferencesHelperDataplan.on().setRmeshPerPoint(configurationCommand.getRmeshPerToken());
                 SharedPref.write(Constant.PreferenceKeys.GIFT_DONATE_LINK, configurationCommand.getGiftDonateLink());
 
-                SharedPref.write(Constant.PreferenceKeys.GIFT_DONATE_USERNAME, configurationCommand.getGiftDonateLink());
+                SharedPref.write(Constant.PreferenceKeys.GIFT_DONATE_USERNAME, configurationCommand.getGiftDonateUsername());
                 SharedPref.write(Constant.PreferenceKeys.GIFT_DONATE_PASS, configurationCommand.getGiftDonatePass());
                 SharedPref.write(Constant.PreferenceKeys.TX_HISTORY_URL_KOTTI, configurationCommand.getHistoryUrlKotti());
                 SharedPref.write(Constant.PreferenceKeys.TX_URL_ROPSTEN, configurationCommand.getRopstenUrl());
@@ -196,13 +196,13 @@ public class ConfigSyncUtil {
 
                 configSyncEvent.setUpdate(true);
 
-                EthereumServiceUtil.getInstance(context).getEthereumService().setGIftDonateUrl(configurationCommand.getGiftDonateLink());
+                EthereumServiceUtil.getInstance(context).getEthereumService().setGIftDonateUrl(configurationCommand.getGiftDonateLink(), configurationCommand.getGiftDonateUsername(), configurationCommand.getGiftDonatePass());
             } else {
-                EthereumServiceUtil.getInstance(context).getEthereumService().setGIftDonateUrl(SharedPref.read(Constant.PreferenceKeys.GIFT_DONATE_LINK));
+                EthereumServiceUtil.getInstance(context).getEthereumService().setGIftDonateUrl(SharedPref.read(Constant.PreferenceKeys.GIFT_DONATE_LINK), SharedPref.read(Constant.PreferenceKeys.GIFT_DONATE_USERNAME), SharedPref.read(Constant.PreferenceKeys.GIFT_DONATE_PASS));
                 configSyncEvent.setUpdate(false);
             }
         } else {
-            EthereumServiceUtil.getInstance(context).getEthereumService().setGIftDonateUrl(SharedPref.read(Constant.PreferenceKeys.GIFT_DONATE_LINK));
+            EthereumServiceUtil.getInstance(context).getEthereumService().setGIftDonateUrl(SharedPref.read(Constant.PreferenceKeys.GIFT_DONATE_LINK), SharedPref.read(Constant.PreferenceKeys.GIFT_DONATE_USERNAME), SharedPref.read(Constant.PreferenceKeys.GIFT_DONATE_PASS));
             configSyncEvent.setUpdate(false);
         }
 
@@ -232,7 +232,7 @@ public class ConfigSyncUtil {
             PreferencesHelperDataplan.on().setRmeshPerPoint(configurationCommand.getRmeshPerToken());
             SharedPref.write(Constant.PreferenceKeys.GIFT_DONATE_LINK, configurationCommand.getGiftDonateLink());
 
-            SharedPref.write(Constant.PreferenceKeys.GIFT_DONATE_USERNAME, configurationCommand.getGiftDonateLink());
+            SharedPref.write(Constant.PreferenceKeys.GIFT_DONATE_USERNAME, configurationCommand.getGiftDonateUsername());
             SharedPref.write(Constant.PreferenceKeys.GIFT_DONATE_PASS, configurationCommand.getGiftDonatePass());
             SharedPref.write(Constant.PreferenceKeys.TX_HISTORY_URL_KOTTI, configurationCommand.getHistoryUrlKotti());
             SharedPref.write(Constant.PreferenceKeys.TX_URL_ROPSTEN, configurationCommand.getRopstenUrl());
@@ -261,7 +261,7 @@ public class ConfigSyncUtil {
             PreferencesHelperDataplan.on().setRmeshPerPoint(configurationCommand.getRmeshPerToken());
             SharedPref.write(Constant.PreferenceKeys.GIFT_DONATE_LINK, configurationCommand.getGiftDonateLink());
 
-            SharedPref.write(Constant.PreferenceKeys.GIFT_DONATE_USERNAME, configurationCommand.getGiftDonateLink());
+            SharedPref.write(Constant.PreferenceKeys.GIFT_DONATE_USERNAME, configurationCommand.getGiftDonateUsername());
             SharedPref.write(Constant.PreferenceKeys.GIFT_DONATE_PASS, configurationCommand.getGiftDonatePass());
             SharedPref.write(Constant.PreferenceKeys.TX_HISTORY_URL_KOTTI, configurationCommand.getHistoryUrlKotti());
             SharedPref.write(Constant.PreferenceKeys.TX_URL_ROPSTEN, configurationCommand.getRopstenUrl());
@@ -276,7 +276,7 @@ public class ConfigSyncUtil {
                 EthereumServiceUtil.getInstance(context).insertNetworkInfo(new NetworkInfo().toNetworkInfo(network));
             }
 
-            EthereumServiceUtil.getInstance(context).getEthereumService().setGIftDonateUrl(configurationCommand.getGiftDonateLink());
+            EthereumServiceUtil.getInstance(context).getEthereumService().setGIftDonateUrl(configurationCommand.getGiftDonateLink(), configurationCommand.getGiftDonateUsername(), configurationCommand.getGiftDonatePass());
         }
     }
 

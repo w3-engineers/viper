@@ -1557,7 +1557,7 @@ public class PurchaseManagerSeller extends PurchaseManager implements PayControl
     @Override
     public void onReceivedEtherRequest(String from, int endpointType) {
 
-        ethService.requestEther(from, endpointType, new EthereumService.ReqEther() {
+        /*ethService.requestEther(from, endpointType, new EthereumService.ReqEther() {
             @Override
             public void onEtherRequested(int responseCode) {
                 try {
@@ -1570,7 +1570,7 @@ public class PurchaseManagerSeller extends PurchaseManager implements PayControl
                     e.printStackTrace();
                 }
             }
-        });
+        });*/
     }
 
     @Override
