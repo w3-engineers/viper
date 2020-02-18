@@ -10,6 +10,7 @@ Proprietary and confidential
 
 import android.content.Context;
 import android.net.ConnectivityManager;
+import android.net.Network;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.text.TextUtils;
@@ -17,6 +18,7 @@ import android.util.Log;
 
 import com.w3engineers.eth.data.helper.model.PayLibNetworkInfo;
 import com.w3engineers.eth.data.remote.EthereumService;
+import com.w3engineers.eth.util.data.NetworkMonitor;
 import com.w3engineers.ext.strom.util.Text;
 import com.w3engineers.mesh.BuildConfig;
 import com.w3engineers.mesh.application.data.local.db.DatabaseService;
@@ -39,51 +41,52 @@ import javax.xml.parsers.DocumentBuilderFactory;
 
 import io.reactivex.functions.BiConsumer;
 
-public class EthereumServiceUtil implements EthereumService.NetworkInfoCallback, WifiDetector.Listener {
+public class EthereumServiceUtil implements EthereumService.NetworkInfoCallback {
 
     private static EthereumServiceUtil ethereumServiceUtil = null;
     private DatabaseService databaseService;
     private EthereumService ethereumService;
     private static final String GO_PREFIX = "DIRECT-";
-    private boolean isInternetConnected;
-    private boolean usingAdhocInternet;
+//    private boolean isInternetConnected;
+//    private boolean usingAdhocInternet;
     private Context context;
+//    private WifiDetector wifiDetector;
+    private String SOCKET_URL = "https://dev-signal.telemesh.net";
 
     private EthereumServiceUtil(Context context) {
         databaseService = DatabaseService.getInstance(context);
         this.context = context;
         ethereumService = EthereumService.getInstance(this.context, EthereumServiceUtil.this,
-                SharedPref.read(Constant.PreferenceKeys.GIFT_DONATE_LINK), false);
-        checkandSetAdhocInternetConnected(context);
+                SharedPref.read(Constant.PreferenceKeys.GIFT_DONATE_LINK), SharedPref.read(Constant.PreferenceKeys.GIFT_DONATE_USERNAME), SharedPref.read(Constant.PreferenceKeys.GIFT_DONATE_PASS));
+
+        startNetworkMonitor();
+//        checkandSetAdhocInternetConnected(context);
+//        wifiDetector = new WifiDetector(this, context);
+//        wifiDetector.start();
     }
 
-    public void checkandSetAdhocInternetConnected(Context mContext){
+    /*public void checkandSetAdhocInternetConnected(Context mContext){
         if (isWifiConnected(mContext)) {
             if (!isPotentialGO(mContext)) {
                 isInternetAvailable(new BiConsumer<String, Boolean>() {
                     @Override
                     public void accept(String s, Boolean isConnected) throws Exception {
-                        initEthereumService(isConnected);
-                        if (isConnected){
-                            isInternetConnected = isConnected;
-                        } else {
-                            //todo
-                        }
+                        changeNetworkInterface(isConnected);
                     }
                 });
             } else {
-                initEthereumService(false);
+                changeNetworkInterface(false);
             }
         } else {
-            initEthereumService(false);
+            changeNetworkInterface(false);
         }
-    }
+    }*/
 
-    private void initEthereumService(boolean isAdhocConnected){
+    /*private void changeNetworkInterface(boolean isAdhocConnected){
         usingAdhocInternet = isAdhocConnected;
         ethereumService.changeNetworkInterface(isAdhocConnected);
 
-    }
+    }*/
 
     public static EthereumServiceUtil getInstance(Context context) {
         if (ethereumServiceUtil == null) {
@@ -139,59 +142,6 @@ public class EthereumServiceUtil implements EthereumService.NetworkInfoCallback,
         return 0.0D;
     }
 
-  /*  private void populateDb(Context context){
-        try {
-            InputStream is = context.getAssets().open("blockchainnetworkinfo.xml");
-
-            DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
-            DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
-            Document doc = dBuilder.parse(is);
-
-            Element element=doc.getDocumentElement();
-            element.normalize();
-
-            NodeList nList = doc.getElementsByTagName("network");
-
-            for (int i=0; i<nList.getLength(); i++) {
-
-                Node node = nList.item(i);
-                if (node.getNodeType() == Node.ELEMENT_NODE) {
-                    Element element_ = (Element) node;
-                    int network_type = Integer.parseInt(getValue("network_type", element_));
-                    String network_url = getValue("network_url", element_);
-                    String currency_symbol = getValue("currency_symbol", element_);
-                    String token_symbol = getValue("token_symbol", element_);
-                    String network_name = getValue("network_name", element_);
-                    String token_address = getValue("token_address", element_);
-                    String channel_address = getValue("channel_address", element_);
-                    long gas_price = Long.parseLong(getValue("gas_price", element_));
-                    long gas_limit = Long.parseLong(getValue("gas_limit", element_));
-                    double token_amount = Double.parseDouble(getValue("token_amount", element_));
-                    double currency_amount = Double.parseDouble(getValue("currency_amount", element_));
-
-
-                    NetworkInfo ni = new NetworkInfo();
-                    ni.channelAddress = channel_address;
-                    ni.currencyAmount = currency_amount;
-                    ni.currencySymbol = currency_symbol;
-                    ni.gasLimit = gas_limit;
-                    ni.gasPrice = gas_price;
-                    ni.networkName = network_name;
-                    ni.networkType = network_type;
-                    ni.networkUrl = network_url;
-                    ni.tokenAddress = token_address;
-                    ni.tokenAmount = token_amount;
-                    ni.tokenSymbol = token_symbol;
-
-                    insertNetworkInfo(ni);
-                }
-            }
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }*/
-
     public void insertNetworkInfo(NetworkInfo networkInfo) {
         try {
             databaseService.insertNetworkInfo(networkInfo);
@@ -200,18 +150,13 @@ public class EthereumServiceUtil implements EthereumService.NetworkInfoCallback,
         }
     }
 
-/*    private static String getValue(String tag, Element element) {
-        NodeList nodeList = element.getElementsByTagName(tag).item(0).getChildNodes();
-        Node node = nodeList.item(0);
-        return node.getNodeValue();
-    }*/
-    public static boolean isWifiConnected(Context context) {
+    /*public static boolean isWifiConnected(Context context) {
         ConnectivityManager connManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
         android.net.NetworkInfo mWifi = connManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
         return mWifi.isConnected();
-    }
+    }*/
 
-    public static boolean isPotentialGO(Context context) {
+    /*public static boolean isPotentialGO(Context context) {
         if (context != null) {
             String connectedSSID = getConnectedSSID(context);
             if (Text.isNotEmpty(connectedSSID)) {
@@ -220,18 +165,17 @@ public class EthereumServiceUtil implements EthereumService.NetworkInfoCallback,
             }
         }
         return false;
-    }
-    public static String getConnectedSSID(Context context) {
+    }*/
+
+    /*public static String getConnectedSSID(Context context) {
         WifiManager wifiManager = (WifiManager) context.getApplicationContext().getSystemService(Context.WIFI_SERVICE);
         WifiInfo connectionInfo = wifiManager.getConnectionInfo();
         if (connectionInfo == null || TextUtils.isEmpty(connectionInfo.getSSID()))
             return null;
         return connectionInfo.getSSID();
-    }
+    }*/
 
-
-
-    public static void isInternetAvailable(BiConsumer<String, Boolean> consumer) {
+/*    public static void isInternetAvailable(BiConsumer<String, Boolean> consumer) {
         new Thread(() -> {
             try {
                 final String command = "ping -c 1 google.com";
@@ -246,17 +190,18 @@ public class EthereumServiceUtil implements EthereumService.NetworkInfoCallback,
             }
         }).start();
 
-    }
+    }*/
 
-    @Override
+   /* @Override
     public void onWifiConnected() {
         Log.e("Internettransport", "Adhoc connected detect in internet transport");
         if (!isPotentialGO(this.context)) {
             isInternetAvailable((message, isConnected) -> {
                 if (isConnected) {
+                    if (usingAdhocInternet) return;
+
                     usingAdhocInternet = isConnected;
-                    isInternetConnected = isConnected;
-                    ethereumService.changeNetworkInterface(isConnected);
+                    ethereumService.changeNetworkInterface(true);
                 }
             });
         }
@@ -268,5 +213,24 @@ public class EthereumServiceUtil implements EthereumService.NetworkInfoCallback,
             usingAdhocInternet = false;
             ethereumService.changeNetworkInterface(false);
         }
+    }*/
+
+
+    public void startNetworkMonitor(){
+        NetworkMonitor.start(context, SOCKET_URL, new NetworkMonitor.NetworkInterfaceListener() {
+            @Override
+            public void onNetworkAvailable(boolean isOnline, Network network, boolean isWiFi) {
+                Log.v("***********************","***********************");
+                if (network != null){
+                    Log.v("onNetworkAvailable", isOnline + " " + network.toString() + (isWiFi ? " wifi" : " cellular"));
+                } else {
+                    Log.v("onNetworkAvailable", isOnline + " ");
+                }
+                Log.v("***********************","***********************");
+                ethereumService.changeNetworkInterface(network);
+            }
+        });
     }
+
+
 }

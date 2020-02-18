@@ -14,8 +14,9 @@ import android.text.TextUtils;
 import com.w3engineers.eth.contracts.RaidenMicroTransferChannels;
 import com.w3engineers.eth.contracts.TmeshToken;
 import com.w3engineers.eth.data.remote.EthereumService;
+import com.w3engineers.eth.util.data.NetworkMonitor;
 import com.w3engineers.eth.util.helper.HandlerUtil;
-import com.w3engineers.eth.util.helper.InternetUtil;
+//import com.w3engineers.eth.util.helper.InternetUtil;
 import com.w3engineers.ext.strom.util.helper.Toaster;
 import com.w3engineers.mesh.application.data.local.DataPlanConstants;
 import com.w3engineers.mesh.application.data.local.dataplan.DataPlanManager;
@@ -680,7 +681,7 @@ public class PurchaseManagerSeller extends PurchaseManager implements PayControl
 
     public void getMyBalanceInfo() {
 
-        if (InternetUtil.isNetworkConnected(mContext)) {
+        if (NetworkMonitor.isOnline()) {
             try {
 
                 int endPointType = getEndpoint();
@@ -751,7 +752,7 @@ public class PurchaseManagerSeller extends PurchaseManager implements PayControl
 //            double token = EthereumServiceUtil.getInstance(mContext).getToken(endPointType);
 //            double currency = EthereumServiceUtil.getInstance(mContext).getCurrency(endPointType);
 
-            if (InternetUtil.isNetworkConnected(mContext)) {
+            if (NetworkMonitor.isOnline()) {
                 try {
 
                     Integer nonce = ethService.getUserNonce(ethService.getAddress(), endPointType);
@@ -903,7 +904,7 @@ public class PurchaseManagerSeller extends PurchaseManager implements PayControl
 
     public boolean requestForGiftForSeller() {
 
-        if (InternetUtil.isNetworkConnected(mContext)) {
+        if (NetworkMonitor.isOnline()) {
 
             String address = ethService.getAddress();
             int endpoint = getEndpoint();
@@ -1556,7 +1557,7 @@ public class PurchaseManagerSeller extends PurchaseManager implements PayControl
     @Override
     public void onReceivedEtherRequest(String from, int endpointType) {
 
-        ethService.requestEther(from, endpointType, new EthereumService.ReqEther() {
+        /*ethService.requestEther(from, endpointType, new EthereumService.ReqEther() {
             @Override
             public void onEtherRequested(int responseCode) {
                 try {
@@ -1569,7 +1570,7 @@ public class PurchaseManagerSeller extends PurchaseManager implements PayControl
                     e.printStackTrace();
                 }
             }
-        });
+        });*/
     }
 
     @Override

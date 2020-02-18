@@ -5,6 +5,7 @@ import android.net.ConnectivityManager;
 import android.net.Network;
 import android.net.NetworkInfo;
 import android.text.TextUtils;
+import android.util.Base64;
 import android.util.Log;
 
 import com.google.gson.Gson;
@@ -39,6 +40,8 @@ import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
+
 public class EthereumService implements BlockRequest.BlockTransactionObserver, EthGift.EthGiftListener {
 
     private static EthereumService instance;
@@ -54,14 +57,22 @@ public class EthereumService implements BlockRequest.BlockTransactionObserver, E
     private HashMap<Integer, BlockRequest> blockRequests = null;
     EthGift ethGift;
     private String giftDonateUrl;
+    private String giftDonateUser;
+    private String giftDonatePass;
     private ParseManager parseManager;
     private NetworkInfoCallback networkInfoCallback;
-    private boolean usingAdhocInternet;
+//    private boolean usingAdhocInternet;
 
-    private EthereumService(Context context, NetworkInfoCallback networkInfoCallback, String giftDonateUrl, boolean isAdhohcConnected) {
+    private EthereumService(Context context, NetworkInfoCallback networkInfoCallback, String giftDonateUrl, String giftDonateUser, String getGiftDonatePass) {
+
+
+        Log.v("EthereumService Auth", giftDonateUrl + " " + giftDonateUser + " " + getGiftDonatePass);
+
         mContext = context.getApplicationContext();
         executor = Executors.newSingleThreadExecutor();
         this.giftDonateUrl = giftDonateUrl;
+        this.giftDonateUser = giftDonateUser;
+        this.giftDonatePass = getGiftDonatePass;
 
         if (networkInfoCallback == null) {
             throw new NullPointerException("NetworkInfoCallback shouldn't null");
@@ -85,7 +96,7 @@ public class EthereumService implements BlockRequest.BlockTransactionObserver, E
             ethGift = EthGift.on(blockRequests, EthereumService.this);
         }
 
-        this.usingAdhocInternet = isAdhohcConnected;
+        /*this.usingAdhocInternet = isAdhohcConnected;
         if (isAdhohcConnected){
             network = WiFiDataNetworkUtil.getConnectedWiFiNetwork(context);
             if (network != null){
@@ -114,17 +125,26 @@ public class EthereumService implements BlockRequest.BlockTransactionObserver, E
                     }
                 }
             }).initMobileDataNetworkRequest();
+        }*/
+    }
+//    public Network getNetwork(){
+//        return this.network;
+//    }
+
+    public void changeNetworkInterface(Network network_){
+        Log.i(TAG, "network changed: " + network);
+
+        this.network = network_;
+        if (this.network != null){
+            for (BlockRequest value : blockRequests.values()) {
+                value.setNetworkInterface(network);
+            }
+            Log.i(TAG, "onAvailable: " + network.toString());
         }
-    }
-    public Network getNetwork(){
-        return this.network;
-    }
 
-    public void changeNetworkInterface(boolean isAdhohcConnected){
 
-        this.usingAdhocInternet = isAdhohcConnected;
-        this.network = null;
-        if (isAdhohcConnected){
+
+        /*if (isAdhohcConnected){
             network = WiFiDataNetworkUtil.getConnectedWiFiNetwork(mContext);
             if (network != null){
                 for (BlockRequest value : blockRequests.values()) {
@@ -153,14 +173,20 @@ public class EthereumService implements BlockRequest.BlockTransactionObserver, E
                     }
                 }
             }).initMobileDataNetworkRequest();
-        }
+        }*/
     }
 
-    public void setGIftDonateUrl(String giftUrl) {
+    public void setGIftDonateUrl(String giftUrl, String giftUser, String giftPass) {
         this.giftDonateUrl = giftUrl;
+        this.giftDonateUser = giftUser;
+        this.giftDonatePass = giftPass;
+
+        Log.v("setGIftDonateUrl Auth", giftDonateUrl + " " + giftDonateUser + " " + giftDonatePass);
 
 
         blockRequests = new HashMap<>();
+
+        //As gift donate url has been changed, there is a possibility that networks info have also been changed. So we need to reinitialize them again.
 
         List<PayLibNetworkInfo> payLibNetworkInfos = networkInfoCallback.getNetworkInfo();
 
@@ -265,11 +291,11 @@ public class EthereumService implements BlockRequest.BlockTransactionObserver, E
         List<PayLibNetworkInfo> getNetworkInfo();
     }
 
-    synchronized public static EthereumService getInstance(Context context, NetworkInfoCallback networkInfoCallback, String giftDonateUrl, boolean isAdhocConnected) {
+    synchronized public static EthereumService getInstance(Context context, NetworkInfoCallback networkInfoCallback, String giftDonateUrl, String giftDonateUser, String giftDonatePass) {
         if (instance == null) {
             synchronized (EthereumService.class) {
                 if (instance == null) {
-                    instance = new EthereumService(context, networkInfoCallback, giftDonateUrl, isAdhocConnected);
+                    instance = new EthereumService(context, networkInfoCallback, giftDonateUrl, giftDonateUser, giftDonatePass);
                 }
             }
         }
@@ -298,7 +324,7 @@ public class EthereumService implements BlockRequest.BlockTransactionObserver, E
         void onEtherRequested(int responseCode);
     }
 
-    public void requestEther(String address, int endPointType, final ReqEther listener) {
+    /*public void requestEther(String address, int endPointType, final ReqEther listener) {
         executor.execute(new Runnable() {
             @Override
             public void run() {
@@ -315,13 +341,13 @@ public class EthereumService implements BlockRequest.BlockTransactionObserver, E
                         .addHeader("Postman-Token", "cd5a9cac-258a-4ef9-8bb1-e20201a24e3a")
                         .build();
 
-                /*OkHttpClient client = new OkHttpClient();
+                *//*OkHttpClient client = new OkHttpClient();
 
                 Request request = new Request.Builder()
                         .url(faucetDonateUrl + address)
                         .get()
                         .addHeader("cache-control", "no-cache")
-                        .build();*/
+                        .build();*//*
 
                 try {
                     Response response = client.newCall(request).execute();
@@ -334,7 +360,7 @@ public class EthereumService implements BlockRequest.BlockTransactionObserver, E
                 }
             }
         });
-    }
+    }*/
 
 
     public interface GiftEther {
@@ -364,7 +390,12 @@ public class EthereumService implements BlockRequest.BlockTransactionObserver, E
                         }
                         else {
 
-                            OkHttpClient client = new OkHttpClient();
+                            String authString = giftDonateUser + ":" + giftDonatePass;
+                            String encodedAuth = Base64.encodeToString(authString.getBytes(UTF_8), Base64.NO_WRAP);
+                            Log.v("Auth", encodedAuth);
+
+                            OkHttpClient client = new OkHttpClient.Builder().socketFactory(network.getSocketFactory()).build();
+                            //OkHttpClient client = new OkHttpClient();
 
                             MediaType mediaType = MediaType.parse("application/x-www-form-urlencoded");
                             RequestBody body = RequestBody.create(mediaType, "address="+address+"&endpoint="+endPointType);
@@ -373,7 +404,7 @@ public class EthereumService implements BlockRequest.BlockTransactionObserver, E
                                     .post(body)
                                     .addHeader("Content-Type", "application/x-www-form-urlencoded")
                                     .addHeader("cache-control", "no-cache")
-                                    .addHeader("Authorization", "Basic bWFqb3JhcmlmOndoYXRJU3RoZXA0c3N3MHJkPw")
+                                    .addHeader("Authorization", "Basic " + encodedAuth)
                                     .build();
                             Response response = client.newCall(request).execute();
                             if (response != null) {
