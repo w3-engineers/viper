@@ -320,6 +320,7 @@ public class ConfigSyncUtil {
                 URL url = new URL(params[0]);
                 connection = (HttpURLConnection) url.openConnection();
 
+
                 String userName = SharedPref.read(Constant.PreferenceKeys.AUTH_USER_NAME);
                 String userPass = SharedPref.read(Constant.PreferenceKeys.AUTH_PASSWORD);
 
