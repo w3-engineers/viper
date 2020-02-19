@@ -134,7 +134,7 @@ public class DataManager {
 
         // Todo We have to remove below implementation
 
-        Util.isConnected(new Util.ConnectionCheck() {
+        /*Util.isConnected(new Util.ConnectionCheck() {
             @Override
             public void onConnectionCheck(boolean isConnected) {
                 if (isConnected) {
@@ -143,11 +143,13 @@ public class DataManager {
                     checkAndBindService();
                 }
             }
-        });
+        });*/
 
         // Todo we will update or replace below call in the mesh init section
         if (NetworkMonitor.isOnline()) {
             ConfigSyncUtil.getInstance().startConfigurationSync(mContext, true, NetworkMonitor.getNetwork());
+        } else {
+            checkAndBindService();
         }
         Log.d("NetworkTest", "NetWork available: " + NetworkMonitor.isOnline());
     }
