@@ -98,7 +98,6 @@ public interface PurchaseConstants {
         String SELLER_ADDRESS = "sa";
         String USED_DATA = "ud";
         String TOTAL_DATA = "td";
-        String ETHER = "eth";
         String RESPONSE_CODE = "rc";
         String REQUEST_SUCCESS = "rs";
         String END_POINT_TYPE = "ept";

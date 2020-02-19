@@ -11,7 +11,6 @@ public class PreferencesHelperDataplan {
     private static final String DATA_AMOUNT_MODE = "data_amount_mode"; // Unlimited, Limited
     private static final String SELL_DATA_AMOUNT = "sell_data_amount";
     private static final String SELL_FROM_DATE = "sell_from_date";
-    private static final String SELL_TO_DATE = "sell_to_date";
     private static final String CHANNEL_CREATED_LATEST_BLOCK = "channel_create_latest_block";
     private static final String CHANNEL_CLOSED_LATEST_BLOCK = "channel_closed_latest_block";
     private static final String CHANNEL_TOPUP_LATEST_BLOCK = "channel_topup_latest_block";
@@ -21,7 +20,10 @@ public class PreferencesHelperDataplan {
     private static final String REQUESTED_FOR_ETHER_STATUS = "requested_for_ether";
     private static final String GIFT_ETHER_TRANX_HASH = "requested_ether_hash";
     private static final String GIFT_TOKEN_TRANX_HASH = "requested_token_hash";
-    private static final String GIFT_ENDPOINT_TYPE = "gift_end_point_type";
+    private static final String GIFT_ETHER_VALUE = "gift_ether_value";
+    private static final String GIFT_TOKEN_VALUE = "gift_token_value";
+
+
     private static final String ETHER_REQUEST_TIME = "ether_request_time";
     private static final String CONFIG_VERSION = "CONFIG_VERSION";
     private static final String TOKEN_GUIDE_VERSION = "TOKEN_GUIDE_VERSION";
@@ -140,6 +142,24 @@ public class PreferencesHelperDataplan {
     public int getEtherRequestStatus(int endpoint) {
         return SharedPref.readInt(REQUESTED_FOR_ETHER_STATUS+endpoint, PurchaseConstants.GIFT_REQUEST_STATE.NOT_REQUESTED_YET);
     }
+
+
+    public void setGiftEtherValue(double ethValue, int endpoint) {
+        SharedPref.write(GIFT_ETHER_VALUE + endpoint, ethValue + "");
+    }
+
+    public double getGiftEtherValue(int endpoint) {
+        return Double.parseDouble(SharedPref.read(GIFT_ETHER_VALUE + endpoint));
+    }
+
+    public void setGiftTokenValue(double tknValue, int endpoint) {
+        SharedPref.write(GIFT_TOKEN_VALUE + endpoint, tknValue + "");
+    }
+
+    public double getGiftTokenValue(int endpoint) {
+        return Double.parseDouble(SharedPref.read(GIFT_TOKEN_VALUE + endpoint));
+    }
+
 
     public void setGiftEtherHash(String tranxHash, int endpoint) {
         SharedPref.write(GIFT_ETHER_TRANX_HASH+endpoint, tranxHash);

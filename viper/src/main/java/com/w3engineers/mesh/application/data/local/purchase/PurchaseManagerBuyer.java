@@ -214,11 +214,16 @@ public class PurchaseManagerBuyer extends PurchaseManager implements PayControll
 //                int endPointType = preferencesHelperDataplan.getGiftEndpointType();
 
                 if (!TextUtils.isEmpty(ethTranxHash) && !TextUtils.isEmpty(tknTranxHash)) {
+                    double ethValue = preferencesHelperDataplan.getGiftEtherValue(endPointMode);
+                    double tknValue = preferencesHelperDataplan.getGiftTokenValue(endPointMode);
+
 
                     JSONObject jsonObject = new JSONObject();
                     jsonObject.put(PurchaseConstants.JSON_KEYS.MESSAME_FROM, ethService.getAddress());
                     jsonObject.put(PurchaseConstants.JSON_KEYS.GIFT_ETH_HASH_REQUEST_SUBMIT, ethTranxHash);
                     jsonObject.put(PurchaseConstants.JSON_KEYS.GIFT_TKN_HASH_REQUEST_SUBMIT, tknTranxHash);
+                    jsonObject.put(PurchaseConstants.JSON_KEYS.GIFT_ETH_BALANCE, ethValue);
+                    jsonObject.put(PurchaseConstants.JSON_KEYS.GIFT_TKN_BALANCE, tknValue);
 
                     setEndPointInfoInJson(jsonObject, endPointMode);
 
@@ -488,7 +493,7 @@ public class PurchaseManagerBuyer extends PurchaseManager implements PayControll
 
                     ethService.requestGiftEther(address, endpoint, new EthereumService.GiftEther() {
                         @Override
-                        public void onEtherGiftRequested(boolean success, String msg, String ethTX, String tknTx, String failedBy) {
+                        public void onEtherGiftRequested(boolean success, String msg, String ethTX, String tknTx, String failedBy, double ethValue, double tknValue) {
                             MeshLog.v("giftEther onEtherGiftRequested " + "success " + success + " msg " + msg + " ethTX " + ethTX + " tknTx " + tknTx + " failedby " + failedBy);
 
                             PreferencesHelperDataplan preferencesHelperDataplan = PreferencesHelperDataplan.on();
@@ -498,9 +503,11 @@ public class PurchaseManagerBuyer extends PurchaseManager implements PayControll
                                 preferencesHelperDataplan.setRequestedForEther(PurchaseConstants.GIFT_REQUEST_STATE.GOT_TRANX_HASH, endpoint);
                                 preferencesHelperDataplan.setGiftEtherHash(ethTX, endpoint);
                                 preferencesHelperDataplan.setGiftTokenHash(tknTx, endpoint);
+                                preferencesHelperDataplan.setGiftEtherValue(ethValue, endpoint);
+                                preferencesHelperDataplan.setGiftTokenValue(tknValue, endpoint);
 
 //                                String toastMessage = Util.getCurrencyTypeMessage("Congratulations!!!\nYou have been awarded 1 %s and 50 token.\nBalance will be added within few minutes.");
-                                String toastMessage = Util.getCurrencyTypeMessage("Congratulations!!!\nYou have been awarded with 50 points which will be added within few minutes."); //changed per decision
+                                String toastMessage = Util.getCurrencyTypeMessage("Congratulations!!!\nYou have been awarded with " + tknValue + " points which will be added within few minutes."); //changed per decision
 
                                 sendGiftListener(success, false, toastMessage);
 
@@ -537,7 +544,9 @@ public class PurchaseManagerBuyer extends PurchaseManager implements PayControll
                 String tknTranxHash = preferencesHelperDataplan.getGiftTokenHash(endpoint);
 
                 if (!TextUtils.isEmpty(ethTranxHash) && !TextUtils.isEmpty(tknTranxHash)) {
-                    ethService.getStatusOfGift(address, ethTranxHash, tknTranxHash, endpoint);
+                    double ethValue = preferencesHelperDataplan.getGiftEtherValue(endpoint);
+                    double tknValue = preferencesHelperDataplan.getGiftTokenValue(endpoint);
+                    ethService.getStatusOfGift(address, ethTranxHash, tknTranxHash, endpoint, ethValue, tknValue);
                     return true;
                 }
 
@@ -850,7 +859,7 @@ public class PurchaseManagerBuyer extends PurchaseManager implements PayControll
 
     @Override
     public void giftRequestSubmitted(boolean status, String submitMessage, String etherTransactionHash,
-                                     String tokenTransactionHash, int endPoint, String failedBy) {
+                                     String tokenTransactionHash, int endPoint, String failedBy, double ethValue, double tknValue) {
 
         MeshLog.v("giftEther giftRequestSubmitted " + status + " failedby " + failedBy);
 
@@ -862,9 +871,11 @@ public class PurchaseManagerBuyer extends PurchaseManager implements PayControll
             preferencesHelperDataplan.setRequestedForEther(PurchaseConstants.GIFT_REQUEST_STATE.GOT_TRANX_HASH, endPoint);
             preferencesHelperDataplan.setGiftEtherHash(etherTransactionHash, endPoint);
             preferencesHelperDataplan.setGiftTokenHash(tokenTransactionHash, endPoint);
+            preferencesHelperDataplan.setGiftEtherValue(ethValue, endPoint);
+            preferencesHelperDataplan.setGiftTokenValue(tknValue, endPoint);
 //            preferencesHelperDataplan.setGiftEndpointType(endPoint);
 
-            String toastMessage = Util.getCurrencyTypeMessage("Congratulations!!!\nYou have been awarded with 50 points which will be added within few minutes.");
+            String toastMessage = Util.getCurrencyTypeMessage("Congratulations!!!\nYou have been awarded with "+tknValue+" points which will be added within few minutes.");
 
             sendGiftListener(status, false, toastMessage);
 
@@ -902,10 +913,9 @@ public class PurchaseManagerBuyer extends PurchaseManager implements PayControll
     }
 
     @Override
-    public void giftResponse(boolean status, double ethBalance, double tokenBalance, int endPoint) {
+    public void giftResponse(boolean status, double ethBalance, double tokenBalance, int endPoint, double giftEtherValue, double giftTokenValue) {
         MeshLog.v("giftEther giftResponse " + status + " eth " + ethBalance + " tiken " + tokenBalance);
-        PreferencesHelperDataplan preferencesHelperDataplan =
-                PreferencesHelperDataplan.on();
+        PreferencesHelperDataplan preferencesHelperDataplan = PreferencesHelperDataplan.on();
 
         if (status) {
 
@@ -914,7 +924,7 @@ public class PurchaseManagerBuyer extends PurchaseManager implements PayControll
             preferencesHelperDataplan.setGiftTokenHash(null, endPoint);
             databaseService.updateCurrencyAndToken(endPoint, ethBalance, tokenBalance);
 
-            sendGiftListener(status, true, "Congratulations!!!\nPoints have been added to your account.");
+            sendGiftListener(status, true, "Congratulations!!!\n" + giftTokenValue + " Points have been added to your account.");
         } else {
             sendGiftListener(status, true, "Failed");
             //TODO detect fail type
@@ -1507,7 +1517,7 @@ public class PurchaseManagerBuyer extends PurchaseManager implements PayControll
 
 
     @Override
-    public void onGiftCompleted(String address, int endpoint, boolean status) {
+    public void onGiftCompleted(String address, int endpoint, boolean status, double ethValue, double tknValue) {
         MeshLog.v("giftEther onGiftCompleted address " + address + " endpoint " + endpoint +  " Status " + status);
 
         try{
@@ -1522,7 +1532,7 @@ public class PurchaseManagerBuyer extends PurchaseManager implements PayControll
                     preferencesHelperDataplan.setGiftTokenHash(null, endpoint);
                     databaseService.updateCurrencyAndToken(endpoint, ethBalance, tknBalance);
 
-                    sendGiftListener(status, true, "Congratulations!!!\nPoints have been added to your account.");
+                    sendGiftListener(status, true, "Congratulations!!!\n"+tknValue+" Points have been added to your account.");
 
                     /*Activity currentActivity = MeshApp.getCurrentActivity();
                     if (currentActivity != null){

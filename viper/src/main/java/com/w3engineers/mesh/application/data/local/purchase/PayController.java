@@ -98,10 +98,9 @@ public class PayController {
         void timeoutCallback(TimeoutModel timeoutModel);
 
         void giftRequestSubmitted(boolean status, String submitMessage, String etherTransactionHash,
-                                  String tokenTransactionHash, int endPoint, String failedBy);
+                                  String tokenTransactionHash, int endPoint, String failedBy, double ethValue, double tknValue);
 
-        void giftResponse(boolean status, double ethBalance,
-                          double tokenBalance, int endPoint);
+        void giftResponse(boolean status, double ethBalance, double tokenBalance, int endPoint, double giftEtherValue, double giftTokenValue);
         void onProbableSellerDisconnected(String sellerId);
 
         void onDisconnectedBySeller(String sellerAddress, String msg);
@@ -140,7 +139,7 @@ public class PayController {
 
         void requestForGiftEther(String fromAddress, int endPointType);
 
-        void requestForGiftEtherWithHash(String fromAddress, String ethTranxHash, String tknTranxHash, int endPointType);
+        void requestForGiftEtherWithHash(String fromAddress, String ethTranxHash, String tknTranxHash, int endPointType, double ethValue, double tknValue);
 
         void timeoutCallback(TimeoutModel timeoutModel);
 
@@ -222,7 +221,7 @@ public class PayController {
                 int type = jsonObject.getInt(PurchaseConstants.JSON_KEYS.MESSAGE_TYPE), nonce, purpose;
                 String fromAddress = jsonObject.getString(PurchaseConstants.JSON_KEYS.MESSAME_FROM), msg, sellerAddress;
                 String msg_id;
-                double balance, ethValue = 0, deposit;
+                double balance, ethValue = 0, tokenValue = 0, deposit;
                 long open_block;
                 int endPointType = jsonObject.optInt(PurchaseConstants.JSON_KEYS.END_POINT_TYPE);
                 switch (type) {
@@ -285,7 +284,7 @@ public class PayController {
 
                     case PurchaseConstants.MESSAGE_TYPES.BUY_TOKEN_RESPONSE:
 
-                        double tokenValue = jsonObject.getDouble(PurchaseConstants.INFO_KEYS.TKN_BALANCE);
+                        tokenValue = jsonObject.getDouble(PurchaseConstants.INFO_KEYS.TKN_BALANCE);
                         if (jsonObject.has(PurchaseConstants.INFO_KEYS.ETH_BALANCE)){
                             ethValue = jsonObject.getDouble(PurchaseConstants.INFO_KEYS.ETH_BALANCE);
                         }
@@ -470,12 +469,12 @@ public class PayController {
                         }
                         break;
 
-                    case PurchaseConstants.MESSAGE_TYPES.RECEIVED_ETHER:
+                   /* case PurchaseConstants.MESSAGE_TYPES.RECEIVED_ETHER:
                         ethValue = jsonObject.getDouble(PurchaseConstants.JSON_KEYS.ETHER);
                         if (payControllerListenerForBuyer != null) {
                             payControllerListenerForBuyer.onReceivedEther(fromAddress, ethValue);
                         }
-                        break;
+                        break;*/
                     case PurchaseConstants.MESSAGE_TYPES.BLOCKCHAIN_REQUEST:
                         JSONArray requestArray = null;
                         if (jsonObject.has(PurchaseConstants.JSON_KEYS.REQUEST_LIST)) {
@@ -534,29 +533,35 @@ public class PayController {
                         String ethReqHash = jsonObject.optString(PurchaseConstants.JSON_KEYS.GIFT_ETH_HASH_REQUEST_SUBMIT);
                         String tknReqHash = jsonObject.optString(PurchaseConstants.JSON_KEYS.GIFT_TKN_HASH_REQUEST_SUBMIT);
                         String failedBy = jsonObject.optString(PurchaseConstants.JSON_KEYS.GIFT_TKN_FAILED_BY);
+                        ethValue = jsonObject.optDouble(PurchaseConstants.JSON_KEYS.GIFT_ETH_BALANCE);
+                        tokenValue = jsonObject.optDouble(PurchaseConstants.JSON_KEYS.GIFT_TKN_BALANCE);
 
 
                         if (payControllerListenerForBuyer != null) {
-                            payControllerListenerForBuyer.giftRequestSubmitted(isSuccess, message, ethReqHash, tknReqHash, endPointType, failedBy);
+                            payControllerListenerForBuyer.giftRequestSubmitted(isSuccess, message, ethReqHash, tknReqHash, endPointType, failedBy, ethValue, tokenValue);
                         }
                         break;
 
                     case PurchaseConstants.MESSAGE_TYPES.GIFT_ETHER_REQUEST_WITH_HASH:
                         String ethtranxHash = jsonObject.optString(PurchaseConstants.JSON_KEYS.GIFT_ETH_HASH_REQUEST_SUBMIT);
                         String tkntranxHash = jsonObject.optString(PurchaseConstants.JSON_KEYS.GIFT_TKN_HASH_REQUEST_SUBMIT);
+                        ethValue = jsonObject.optDouble(PurchaseConstants.JSON_KEYS.GIFT_ETH_BALANCE);
+                        tokenValue = jsonObject.getDouble(PurchaseConstants.JSON_KEYS.GIFT_TKN_BALANCE);
 
                         if (payControllerListenerForSeller != null) {
-                            payControllerListenerForSeller.requestForGiftEtherWithHash(fromAddress, ethtranxHash, tkntranxHash, endPointType);
+                            payControllerListenerForSeller.requestForGiftEtherWithHash(fromAddress, ethtranxHash, tkntranxHash, endPointType, ethValue, tokenValue);
                         }
                         break;
 
                     case PurchaseConstants.MESSAGE_TYPES.GIFT_RESPONSE:
                         boolean isSuccessForGift = jsonObject.optBoolean(PurchaseConstants.JSON_KEYS.GIFT_REQUEST_IS_SUBMITTED);
-                        double ethBalance = jsonObject.optDouble(PurchaseConstants.JSON_KEYS.GIFT_ETH_BALANCE);
-                        double tknBalance = jsonObject.optDouble(PurchaseConstants.JSON_KEYS.GIFT_TKN_BALANCE);
+                        double ethBalance = jsonObject.optDouble(PurchaseConstants.INFO_KEYS.ETH_BALANCE);
+                        double tknBalance = jsonObject.optDouble(PurchaseConstants.INFO_KEYS.TKN_BALANCE);
+                        ethValue = jsonObject.optDouble(PurchaseConstants.JSON_KEYS.GIFT_ETH_BALANCE);
+                        tokenValue = jsonObject.optDouble(PurchaseConstants.JSON_KEYS.GIFT_TKN_BALANCE);
 
                         if (payControllerListenerForBuyer != null) {
-                            payControllerListenerForBuyer.giftResponse(isSuccessForGift, ethBalance, tknBalance, endPointType);
+                            payControllerListenerForBuyer.giftResponse(isSuccessForGift, ethBalance, tknBalance, endPointType, ethValue, tokenValue);
                         }
                         break;
                     case PurchaseConstants.MESSAGE_TYPES.DISCONNECTED_BY_SELLER:
