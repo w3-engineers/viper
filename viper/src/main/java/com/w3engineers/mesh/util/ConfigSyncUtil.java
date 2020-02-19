@@ -10,18 +10,22 @@ Proprietary and confidential
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+
 import android.os.AsyncTask;
 import android.text.TextUtils;
 import android.util.Base64;
 import android.util.Log;
 
 import com.google.gson.Gson;
+import com.w3engineers.eth.util.data.NetworkMonitor;
 import com.w3engineers.mesh.application.data.AppDataObserver;
 import com.w3engineers.mesh.application.data.local.db.SharedPref;
 import com.w3engineers.mesh.application.data.local.db.networkinfo.NetworkInfo;
 import com.w3engineers.mesh.application.data.local.helper.PreferencesHelperDataplan;
 import com.w3engineers.mesh.application.data.model.ConfigSyncEvent;
 import com.w3engineers.mesh.application.ui.util.FileStoreUtil;
+import com.w3engineers.mesh.util.lib.remote.RetrofitInterface;
+import com.w3engineers.mesh.util.lib.remote.RetrofitService;
 import com.w3engineers.models.ConfigurationCommand;
 import com.w3engineers.models.Network;
 
@@ -31,6 +35,11 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+
+import okhttp3.ResponseBody;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 
@@ -59,10 +68,28 @@ public class ConfigSyncUtil {
         this.configSyncCallback = configSyncCallback;
     }
 
-    public void startConfigurationSync(Context context, boolean isMeshStartTime) {
-        String downloadLink = SharedPref.read(Constant.PreferenceKeys.APP_DOWNLOAD_LINK) + "configuration.json";
-        new ConfigurationTask(context, isMeshStartTime, downloadLink)
-                .executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+    public void startConfigurationSync(Context context, boolean isMeshStartTime, android.net.Network network) {
+        // String downloadLink = SharedPref.read(Constant.PreferenceKeys.APP_DOWNLOAD_LINK) + "configuration.json";
+
+
+        RetrofitInterface downloadService = RetrofitService.createService(RetrofitInterface.class, SharedPref.read(Constant.PreferenceKeys.APP_DOWNLOAD_LINK), network);
+        Call<ResponseBody> call = downloadService.downloadFileByUrl("configuration.json");
+
+        call.enqueue(new Callback<ResponseBody>() {
+            @Override
+            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                if (response.isSuccessful()) {
+                    new ConfigurationTask(context, isMeshStartTime, response.body())
+                            .executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ResponseBody> call, Throwable t) {
+
+            }
+        });
+
     }
 
     @SuppressLint("StaticFieldLeak")
@@ -70,41 +97,20 @@ public class ConfigSyncUtil {
 
         private Context context;
         private boolean isMeshStartTime;
-        private String serverUrl;
+        private ResponseBody responseBody;
 
-        public ConfigurationTask(Context context, boolean isMeshStartTime, String url) {
+        public ConfigurationTask(Context context, boolean isMeshStartTime, ResponseBody responseBody) {
             this.context = context;
             this.isMeshStartTime = isMeshStartTime;
-            this.serverUrl = url;
+            this.responseBody = responseBody;
         }
 
         @Override
         protected String doInBackground(String... params) {
-            HttpURLConnection connection = null;
             BufferedReader reader = null;
             try {
-                URL url = new URL(serverUrl);
-                connection = (HttpURLConnection) url.openConnection();
 
-                String userName = SharedPref.read(Constant.PreferenceKeys.AUTH_USER_NAME);
-                String userPass = SharedPref.read(Constant.PreferenceKeys.AUTH_PASSWORD);
-
-                String authString = (userName + ":" + userPass);
-                byte[] data1 = authString.getBytes(UTF_8);
-                String base64 = Base64.encodeToString(data1, Base64.NO_WRAP);
-
-
-               /* Log.e("HttpError", "Credential " +userName+" password: "+userPass);
-                Authenticator.setDefault(new Authenticator() {
-                    protected PasswordAuthentication getPasswordAuthentication() {
-                        return new PasswordAuthentication(userName, userPass.toCharArray());
-                    }
-                });*/
-
-                connection.setRequestProperty("Authorization", "Basic " + base64);
-
-                connection.connect();
-                InputStream stream = connection.getInputStream();
+                InputStream stream = responseBody.byteStream();
                 reader = new BufferedReader(new InputStreamReader(stream));
                 StringBuffer buffer = new StringBuffer();
                 String line = "";
@@ -115,9 +121,6 @@ public class ConfigSyncUtil {
             } catch (IOException e) {
                 e.printStackTrace();
             } finally {
-                if (connection != null) {
-                    connection.disconnect();
-                }
                 try {
                     if (reader != null) {
                         reader.close();
@@ -165,10 +168,31 @@ public class ConfigSyncUtil {
             if (configVersion < configurationCommand.getConfigVersionCode()) {
 
                 if (tokenGuideVersion < configurationCommand.getTokenGuideVersion()) {
-                    String downloadLink = SharedPref.read(Constant.PreferenceKeys.APP_DOWNLOAD_LINK) + "point_guide.json";
-                    new DownloadGuidelineContent(context).execute(downloadLink);
 
-                    PreferencesHelperDataplan.on().setTokenGuideVersion(configurationCommand.getTokenGuideVersion());
+                    //String downloadLink = SharedPref.read(Constant.PreferenceKeys.APP_DOWNLOAD_LINK) + "point_guide.json";
+                    if (NetworkMonitor.isOnline()) {
+                        RetrofitInterface downloadService = RetrofitService.createService(RetrofitInterface.class,
+                                SharedPref.read(Constant.PreferenceKeys.APP_DOWNLOAD_LINK), NetworkMonitor.getNetwork());
+                        Call<ResponseBody> call = downloadService.downloadFileByUrl("point_guide.json");
+
+                        call.enqueue(new Callback<ResponseBody>() {
+                            @Override
+                            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                                if (response.isSuccessful()) {
+
+                                    new DownloadGuidelineContent(context).execute(response.body());
+
+                                }
+                            }
+
+                            @Override
+                            public void onFailure(Call<ResponseBody> call, Throwable t) {
+
+                            }
+                        });
+
+                        PreferencesHelperDataplan.on().setTokenGuideVersion(configurationCommand.getTokenGuideVersion());
+                    }
                 }
 
                 PreferencesHelperDataplan.on().setConfigVersion(configurationCommand.getConfigVersionCode());
@@ -305,7 +329,7 @@ public class ConfigSyncUtil {
         //FileStoreUtil.writeWebFile(context, tokenGuideLine.getContent());
     }
 
-    private class DownloadGuidelineContent extends AsyncTask<String, Void, String> {
+    private class DownloadGuidelineContent extends AsyncTask<ResponseBody, Void, String> {
         private Context context;
 
         public DownloadGuidelineContent(Context context) {
@@ -313,33 +337,11 @@ public class ConfigSyncUtil {
         }
 
         @Override
-        protected String doInBackground(String... params) {
-            HttpURLConnection connection = null;
+        protected String doInBackground(ResponseBody... params) {
             BufferedReader reader = null;
             try {
-                URL url = new URL(params[0]);
-                connection = (HttpURLConnection) url.openConnection();
 
-
-                String userName = SharedPref.read(Constant.PreferenceKeys.AUTH_USER_NAME);
-                String userPass = SharedPref.read(Constant.PreferenceKeys.AUTH_PASSWORD);
-
-                String authString = (userName + ":" + userPass);
-                byte[] data1 = authString.getBytes(UTF_8);
-                String base64 = Base64.encodeToString(data1, Base64.NO_WRAP);
-
-
-               /* Log.e("HttpError", "Credential " +userName+" password: "+userPass);
-                Authenticator.setDefault(new Authenticator() {
-                    protected PasswordAuthentication getPasswordAuthentication() {
-                        return new PasswordAuthentication(userName, userPass.toCharArray());
-                    }
-                });*/
-
-                connection.setRequestProperty("Authorization", "Basic " + base64);
-
-                connection.connect();
-                InputStream stream = connection.getInputStream();
+                InputStream stream = params[0].byteStream();
                 reader = new BufferedReader(new InputStreamReader(stream));
                 StringBuffer buffer = new StringBuffer();
                 String line = "";
@@ -350,9 +352,6 @@ public class ConfigSyncUtil {
             } catch (IOException e) {
                 e.printStackTrace();
             } finally {
-                if (connection != null) {
-                    connection.disconnect();
-                }
                 try {
                     if (reader != null) {
                         reader.close();
