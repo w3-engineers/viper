@@ -714,14 +714,15 @@ public class PurchaseManagerBuyer extends PurchaseManager implements PayControll
             case PurchaseConstants.INFO_PURPOSES.CLOSE_PURCHASE:
 
                 try {
+
                     List<Purchase> purchaseList = databaseService.getMyPurchasesWithState(ethService.getAddress(), PurchaseConstants.CHANNEL_STATE.CLOSING);
 
                     if (infoJson.has(PurchaseConstants.INFO_KEYS.NONCE) && infoJson.has(PurchaseConstants.INFO_KEYS.ETH_BALANCE)) {
+
                         int nonce = infoJson.getInt(PurchaseConstants.INFO_KEYS.NONCE);
                         double ethBalance = infoJson.getDouble(PurchaseConstants.INFO_KEYS.ETH_BALANCE);
-                        EthereumServiceUtil.getInstance(mContext).updateCurrency(endPointType, ethBalance);
-//                        ethService.setMyEthBalance(ethBalance);
 
+                        EthereumServiceUtil.getInstance(mContext).updateCurrency(endPointType, ethBalance);
 
                         if (ethBalance > 0) {
 
@@ -736,11 +737,11 @@ public class PurchaseManagerBuyer extends PurchaseManager implements PayControll
                                     String signedMessage = ethService.close(purchase.sellerAddress, purchase.openBlockNumber,
                                             purchase.balance, purchase.balanceProof, purchase.closingHash, nonce, endPointType);
 
-//                                    MeshLog.p("balanceproofcheck 5 " + purchase.sellerAddress);
-//                                    MeshLog.p("balanceproofcheck 6 " + purchase.openBlockNumber);
-//                                    MeshLog.p("balanceproofcheck 7 " + purchase.balance);
-//                                    MeshLog.p("balanceproofcheck 8 " + purchase.balanceProof);
-//                                    MeshLog.p("balanceproofcheck 9 " + purchase.closingHash);
+                                    MeshLog.p("balanceproofcheck 5 " + purchase.sellerAddress);
+                                    MeshLog.p("balanceproofcheck 6 " + purchase.openBlockNumber);
+                                    MeshLog.p("balanceproofcheck 7 " + purchase.balance);
+                                    MeshLog.p("balanceproofcheck 8 " + purchase.balanceProof);
+                                    MeshLog.p("balanceproofcheck 9 " + purchase.closingHash);
 
 
                                     JSONObject cJson = new JSONObject();
@@ -1311,6 +1312,7 @@ public class PurchaseManagerBuyer extends PurchaseManager implements PayControll
                     purchase.balanceProof = bps;
                     purchase.closingHash = chs;
                     purchase.blockChainEndpoint = endPointType;
+                    purchase.state = PurchaseConstants.CHANNEL_STATE.OPEN;
 
                     if (purchase.totalDataAmount != totalDataAmount) {
                         purchase.totalDataAmount = totalDataAmount;
@@ -1359,6 +1361,7 @@ public class PurchaseManagerBuyer extends PurchaseManager implements PayControll
 
     @Override
     public void onChannelCloseReceived(String fromAddress, String sellerAddress, long open_block, int endPointType) {
+
         try {
             Purchase closingPurchase = databaseService.getPurchaseByBlockNumber(open_block, ethService.getAddress(), sellerAddress);
             closingPurchase.state = PurchaseConstants.CHANNEL_STATE.CLOSED;
@@ -1367,8 +1370,8 @@ public class PurchaseManagerBuyer extends PurchaseManager implements PayControll
 
             databaseService.updatePurchase(closingPurchase);
 
+            //todo check the following two functions, may be one of those not needed -MajorArif
             setCurrentSellerWithStatus(null, PurchaseConstants.SELLERS_BTN_TEXT.PURCHASE);
-
             if (dataPlanListener != null) {
                 dataPlanListener.onPurchaseCloseSuccess(closingPurchase.sellerAddress);
             }
