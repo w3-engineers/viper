@@ -364,7 +364,7 @@ public class DataManager {
                 if (CommonUtil.isEmulator()) {
                     status = true;
                 } else {
-                    mTmCommunicator.setViperCommunicator(viperCommunicator);
+                    mTmCommunicator.setViperCommunicator(viperCommunicator,mContext.getPackageName());
                     status = mTmCommunicator.startMesh(appName, userRole, userInfo, mSsid, signalServerUrl);
                 }
                 MeshLog.v("status " + status);
