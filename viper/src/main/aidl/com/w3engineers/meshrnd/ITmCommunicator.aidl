@@ -7,7 +7,7 @@ interface ITmCommunicator {
    void onStartForeground(in boolean isNeeded);
    void sendData(in String senderId, in String receiverId, in String messageId, in byte[] data, in boolean isNotificationNeeded);
    int  getLinkTypeById(in String nodeID);
-   boolean startMesh(in String ssid,in int existingRole, in UserInfo userInfo, in String signalServerUrl);
+   boolean startMesh(in int existingRole, in UserInfo userInfo, in String signalServerUrl);
    String getUserId();
    void saveDiscoveredUserInfo(String userId, String userName);
    void saveUserInfo(in UserInfo userInfo);
