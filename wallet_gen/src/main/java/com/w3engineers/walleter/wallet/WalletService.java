@@ -26,7 +26,7 @@ public class WalletService {
 
     private Context mContext;
     private final String walletSuffixDir;
-//    public static final String PASSWORD = "123456789";
+    //    public static final String PASSWORD = "123456789";
     private volatile Credentials mCredentials;
     private final String WALLET_ADDRESS = "wallet_address";
     private final String WALLET_FILE_NAME = "wallet_name";
@@ -68,7 +68,8 @@ public class WalletService {
         mHandler = new Handler(mHandlerThread.getLooper());
 
         this.mContext = context;
-        walletSuffixDir = "wallet/" + mContext.getString(R.string.app_name);
+        // walletSuffixDir = "wallet/" + mContext.getString(R.string.app_name);
+        walletSuffixDir = "wallet/" + "Telemesh";
     }
 
     public static WalletService getInstance(Context context) {
@@ -195,7 +196,7 @@ public class WalletService {
         mHandler.post(new Runnable() {
             @Override
             public void run() {
-                    String savePtah = WalletService.getInstance(mContext).getWalletDirectory();
+                String savePtah = WalletService.getInstance(mContext).getWalletDirectory();
                 copyFile(mContext, fileUri, savePtah);
 
                 if (isWalletExists()) {
@@ -277,7 +278,7 @@ public class WalletService {
 
     private void loadWalletFromKeystore(String password, String keyStoreFileName) {
         mCredentials = Web3jWalletHelper.onInstance(mContext).getWallet(password, walletSuffixDir, keyStoreFileName);
-        if (mCredentials != null){
+        if (mCredentials != null) {
             mSharedPref.write(WALLET_ADDRESS, mCredentials.getAddress());
             mSharedPref.write(KEY_USER_ID, mCredentials.getAddress());
             //mSharedPref.write(PUBLIC_KEY, mCredentials.getEcKeyPair().getPublicKey().toString(16));
