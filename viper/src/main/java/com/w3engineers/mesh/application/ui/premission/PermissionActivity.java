@@ -13,7 +13,6 @@ import static com.w3engineers.mesh.util.lib.mesh.ViperClient.appName;
 import static com.w3engineers.mesh.util.lib.mesh.ViperClient.avatar;
 import static com.w3engineers.mesh.util.lib.mesh.ViperClient.configData;
 import static com.w3engineers.mesh.util.lib.mesh.ViperClient.isSync;
-import static com.w3engineers.mesh.util.lib.mesh.ViperClient.networkPrefix;
 import static com.w3engineers.mesh.util.lib.mesh.ViperClient.packageName;
 import static com.w3engineers.mesh.util.lib.mesh.ViperClient.publicKey;
 import static com.w3engineers.mesh.util.lib.mesh.ViperClient.regTime;
@@ -34,7 +33,7 @@ public class PermissionActivity extends AppCompatActivity {
     }
 
     private void closeCurrentActivity() {
-        ViperClient.on(this, appName, packageName, networkPrefix, usersName, wallerAddress, publicKey, avatar, regTime, isSync, configData).startClient(wallerAddress, publicKey);
+        ViperClient.on(this, appName, packageName, "", usersName, wallerAddress, publicKey, avatar, regTime, isSync, configData).startClient(wallerAddress, publicKey);
         finish();
     }
 

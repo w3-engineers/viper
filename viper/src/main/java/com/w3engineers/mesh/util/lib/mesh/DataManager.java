@@ -71,9 +71,7 @@ public class DataManager {
 
     private ITmCommunicator mTmCommunicator;
     private ViperCommunicator mViperCommunicator;
-    private String mSsid;
     private Context mContext;
-    private String appName;
     private UserInfo userInfo;
     private String signalServerUrl;
 
@@ -100,23 +98,14 @@ public class DataManager {
      * Start the ClientLibraryService class
      *
      * @param context
-     * @param appName
-     * @param networkPrefix
      */
-    public void doBindService(Context context, String appName, String networkPrefix, UserInfo userInfo, String signalServerUrl) {
+    public void doBindService(Context context, UserInfo userInfo, String signalServerUrl) {
         this.mContext = context;
-        this.appName = appName;
-        this.mSsid = networkPrefix;
         this.userInfo = userInfo;
         this.signalServerUrl = signalServerUrl;
 
 
         MeshLog.v("Data manager has been called");
-
-/*        Intent mIntent = new Intent(context, ClientLibraryService.class);
-        context.startService(mIntent);
-
-        context.bindService(mIntent, clientServiceConnection, Service.BIND_AUTO_CREATE);*/
     }
 
     public void startMeshService() {
@@ -365,7 +354,7 @@ public class DataManager {
                     status = true;
                 } else {
                     mTmCommunicator.setViperCommunicator(viperCommunicator,mContext.getPackageName());
-                    status = mTmCommunicator.startMesh(appName, userRole, userInfo, mSsid, signalServerUrl);
+                    status = mTmCommunicator.startMesh(userRole, userInfo, signalServerUrl);
                 }
                 MeshLog.v("status " + status);
                 mTmCommunicator.startService();
@@ -792,7 +781,7 @@ public class DataManager {
         }
 
         try {
-            mTmCommunicator.restartMesh(newRole, mSsid, signalServerUrl);
+            mTmCommunicator.restartMesh(newRole, signalServerUrl);
         } catch (RemoteException e) {
             e.printStackTrace();
         }
