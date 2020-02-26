@@ -607,6 +607,8 @@ public class EthereumService implements BlockRequest.BlockTransactionObserver, E
 
     public interface TransactionObserverBuyer {
         void onGiftCompleted(String address, int endpoint, boolean Status, double ethValue, double tknValue);
+
+        void onChannelClosedLog(RaidenMicroTransferChannels.ChannelSettledEventResponse typedResponse);
     }
 
     public void setTransactionObserver(TransactionObserver transactionObserver) {
@@ -682,6 +684,9 @@ public class EthereumService implements BlockRequest.BlockTransactionObserver, E
     public void onChannelClosedLog(RaidenMicroTransferChannels.ChannelSettledEventResponse typedResponse) {
         if (transactionObserver != null)
             transactionObserver.onChannelClosedLog(typedResponse);
+
+        if (transactionObserverBuyer != null)
+            transactionObserverBuyer.onChannelClosedLog(typedResponse);
 
         if (parseManager != null){
             String log = new Gson().toJson(typedResponse.log);
