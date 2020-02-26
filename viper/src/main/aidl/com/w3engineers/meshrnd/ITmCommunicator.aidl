@@ -5,7 +5,7 @@ import com.w3engineers.models.UserInfo;
 interface ITmCommunicator {
    void setViperCommunicator(in ViperCommunicator viperCommunicator, in String packageName);
    void onStartForeground(in boolean isNeeded);
-   void sendData(in String senderId, in String receiverId, in String messageId, in byte[] data, in boolean isNotificationNeeded);
+   void sendData(in String senderId, in String receiverId, in String messageId, in byte[] data, in boolean isNotificationNeeded,in String appToken);
    int  getLinkTypeById(in String nodeID);
    boolean startMesh(in int existingRole, in UserInfo userInfo, in String signalServerUrl);
    String getUserId();

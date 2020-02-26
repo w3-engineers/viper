@@ -490,7 +490,7 @@ public class DataManager {
      * @param data
      */
     public void sendData(String senderId, String receiverId, String messageId, byte[] data, boolean isNotificationNeeded) throws RemoteException {
-        mTmCommunicator.sendData(senderId, receiverId, messageId, data, isNotificationNeeded);
+        mTmCommunicator.sendData(senderId, receiverId, messageId, data, isNotificationNeeded,mContext.getPackageName());
     }
 
     /**
