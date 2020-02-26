@@ -101,7 +101,7 @@ public class ViperClient {
         userInfo.setPublicKey(publicKey);
         userInfo.setPackageName(packageName);
 
-        DataManager.on().doBindService(mContext, userInfo, signalServerUrl);
+        DataManager.on().doBindService(mContext, userInfo, signalServerUrl, packageName);
 
 
         DataManager.on().startMeshService();
@@ -184,13 +184,14 @@ public class ViperClient {
         }
     }
 
-    public void saveOtherUserInfo(String usersName, int avatar, String walletAddress) {
+    public void saveOtherUserInfo(String usersName, int avatar, String walletAddress, String packageName) {
         try {
             UserInfo userInfo = new UserInfo();
 
             userInfo.setAddress(walletAddress);
             userInfo.setAvatar(avatar);
             userInfo.setUserName(usersName);
+            userInfo.setPackageName(packageName);
 
             DataManager.on().saveOtherUserInfo(userInfo);
 

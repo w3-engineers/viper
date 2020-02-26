@@ -74,6 +74,7 @@ public class DataManager {
     private Context mContext;
     private UserInfo userInfo;
     private String signalServerUrl;
+    private String appTokenName;
 
     private static DataManager mDataManager;
     private boolean isAlreadyToPlayStore = false;
@@ -99,11 +100,11 @@ public class DataManager {
      *
      * @param context
      */
-    public void doBindService(Context context, UserInfo userInfo, String signalServerUrl) {
+    public void doBindService(Context context, UserInfo userInfo, String signalServerUrl, String appTokenName) {
         this.mContext = context;
         this.userInfo = userInfo;
         this.signalServerUrl = signalServerUrl;
-
+        this.appTokenName = appTokenName;
 
         MeshLog.v("Data manager has been called");
     }
@@ -357,7 +358,7 @@ public class DataManager {
                     status = mTmCommunicator.startMesh(userRole, userInfo, signalServerUrl);
                 }
                 MeshLog.v("status " + status);
-                mTmCommunicator.startService();
+                mTmCommunicator.startService(appTokenName);
 //                boolean status = mTmCommunicator.startMesh(appName, userRole, userInfo, mSsid);
                 if (!status) {
                     showPermissionPopUp();
@@ -671,7 +672,7 @@ public class DataManager {
         if (mTmCommunicator == null) {
             MeshLog.v("mTmCommunicator null");
         } else {
-            return mTmCommunicator.getUserNameByAddress(address);
+            return mTmCommunicator.getUserNameByAddress(address, appTokenName);
         }
         return null;
     }

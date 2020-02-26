@@ -27,12 +27,12 @@ interface ITmCommunicator {
    String getUserPublicKey(in String address);
    void disconnectFromInternet();
    String getCurrentSellerId();
-   String getUserNameByAddress(in String address);
+   String getUserNameByAddress(in String address, in String appToken);
    void destroyService();
 
    void allowPermissions(in List<String> permissions);
 
-   void startService();
+   void startService(in String appToken);
 
    void isLocalUseConnected(in String userId);
 }
