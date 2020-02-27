@@ -354,8 +354,9 @@ public class DataManager {
                 if (CommonUtil.isEmulator()) {
                     status = true;
                 } else {
+                    String meshControlConfig = SharedPref.read(Constant.PreferenceKeys.MESH_CONTROL_CONFIG);
                     mTmCommunicator.setViperCommunicator(viperCommunicator,mContext.getPackageName());
-                    status = mTmCommunicator.startMesh(userRole, userInfo, signalServerUrl);
+                    status = mTmCommunicator.startMesh(userRole, userInfo, signalServerUrl, meshControlConfig);
                 }
                 MeshLog.v("status " + status);
                 mTmCommunicator.startService(appTokenName);
@@ -539,8 +540,9 @@ public class DataManager {
             userInfo.setConfigVersion(configVersion);
 
             this.userInfo = userInfo;
+            String meshControlConfig = SharedPref.read(Constant.PreferenceKeys.MESH_CONTROL_CONFIG);
 
-            mTmCommunicator.saveUserInfo(userInfo);
+            mTmCommunicator.saveUserInfo(userInfo, meshControlConfig);
         }
     }
 

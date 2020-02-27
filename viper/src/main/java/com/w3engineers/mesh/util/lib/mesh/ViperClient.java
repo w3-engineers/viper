@@ -167,7 +167,8 @@ public class ViperClient {
         return DataManager.on().getUserId();
     }
 
-    public void saveUserInfo(String walletAddress, int avatar, long regTime, boolean isSync, String usersName, String publicKey, String packageName) {
+    public void saveUserInfo(String walletAddress, int avatar, long regTime, boolean isSync,
+                             String usersName, String publicKey, String packageName) {
 
         try {
             UserInfo userInfo = new UserInfo();
