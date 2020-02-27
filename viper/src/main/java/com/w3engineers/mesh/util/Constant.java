@@ -93,6 +93,9 @@ public class Constant {
         String TX_HISTORY_URL_KOTTI = "TX_HISTORY_URL_KOTTI";
         String TX_URL_ROPSTEN = "TX_URL_ROPSTEN";
         String CONFIG_FILE = "CONFIG_FILE";
+
+        String MESH_CONTROL_CONFIG = "MESH_CONTROL_CONFIG";
+        String APP_VERSION = "APP_VERSION";
     }
 
 
