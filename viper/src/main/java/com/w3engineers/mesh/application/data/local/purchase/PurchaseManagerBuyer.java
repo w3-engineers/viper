@@ -857,13 +857,6 @@ public class PurchaseManagerBuyer extends PurchaseManager implements PayControll
                                     String signedMessage = ethService.close(purchase.sellerAddress, purchase.openBlockNumber,
                                             purchase.balance, purchase.balanceProof, purchase.closingHash, nonce, endPointType);
 
-                                    MeshLog.p("balanceproofcheck 5 " + purchase.sellerAddress);
-                                    MeshLog.p("balanceproofcheck 6 " + purchase.openBlockNumber);
-                                    MeshLog.p("balanceproofcheck 7 " + purchase.balance);
-                                    MeshLog.p("balanceproofcheck 8 " + purchase.balanceProof);
-                                    MeshLog.p("balanceproofcheck 9 " + purchase.closingHash);
-
-
                                     JSONObject cJson = new JSONObject();
                                     cJson.put(PurchaseConstants.JSON_KEYS.REQUEST_TYPE, PurchaseConstants.REQUEST_TYPES.CLOSE_CHANNEL);
                                     cJson.put(PurchaseConstants.JSON_KEYS.SIGNED_MESSAGE, signedMessage);

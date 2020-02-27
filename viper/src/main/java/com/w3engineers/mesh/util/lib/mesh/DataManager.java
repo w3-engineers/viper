@@ -15,6 +15,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.net.Uri;
+import android.os.DeadObjectException;
 import android.os.IBinder;
 import android.os.RemoteException;
 import android.text.TextUtils;
@@ -167,7 +168,7 @@ public class DataManager {
                     boolean isSuccess = initServiceConnection();
 
                     if (isSuccess) {
-                        Toaster.showShort("Bind service successful");
+                        Toaster.showShort("Bind seServiceConnectionrvice successful");
                         return;
                     }
 
@@ -769,12 +770,19 @@ public class DataManager {
         MeshLog.v("sellerMode dm" + newRole);
         if (mTmCommunicator == null) {
             MeshLog.v("mTmCommunicator null");
-        }
+            checkAndBindService();
+        }else {
+            try {
 
-        try {
-            mTmCommunicator.restartMesh(newRole, mSsid, signalServerUrl);
-        } catch (RemoteException e) {
-            e.printStackTrace();
+                mTmCommunicator.restartMesh(newRole, mSsid, signalServerUrl);
+            } catch (RemoteException e) {
+                if (e.getCause() instanceof DeadObjectException) {
+                    mTmCommunicator = null;
+                    checkAndBindService();
+                } else {
+                    e.printStackTrace();
+                }
+            }
         }
     }
 
