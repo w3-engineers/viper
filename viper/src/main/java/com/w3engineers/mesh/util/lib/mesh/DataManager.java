@@ -653,9 +653,22 @@ public class DataManager {
             userInfoEvent.setConfigVersion(userInfo.getConfigVersion());
             userInfoEvent.setSync(userInfo.isSync());
 
+            sendMyAppVersionToOthers(userInfo.getAddress());
+
             AppDataObserver.on().sendObserverData(userInfoEvent);
 
             MeshLog.e("user info send to app level");
+        }
+    }
+
+    private void sendMyAppVersionToOthers(String userId) {
+        try {
+            if (mTmCommunicator != null) {
+                int myVersion = SharedPref.readInt(Constant.PreferenceKeys.APP_VERSION);
+                mTmCommunicator.sendMyVersionToOthers(userId, appTokenName, myVersion);
+            }
+        } catch (RemoteException e) {
+            e.printStackTrace();
         }
     }
 
