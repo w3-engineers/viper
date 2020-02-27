@@ -473,9 +473,21 @@ public class DataManager {
         public void onInterruption(int hardwareState, List<String> permissions) throws RemoteException {
             onInterruptionAction(hardwareState, permissions);
         }
+
+        @Override
+        public void receiveOtherAppVersion(String receiverId, int appVersion) throws RemoteException {
+            checkVersionWithOthers(receiverId, appVersion);
+        }
     };
 
 
+    private void checkVersionWithOthers(String receiverId, int otherAppVersion) {
+        int myVersion = SharedPref.readInt(Constant.PreferenceKeys.APP_VERSION);
+
+        if (myVersion < otherAppVersion) {
+            // TODO request for update app
+        }
+    }
 
 /*    public void stopService() {
         mContext.unbindService(serviceConnection);

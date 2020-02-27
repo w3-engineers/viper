@@ -52,7 +52,8 @@ public class ViperClient {
         }
     }
 
-    protected ViperClient(Context context, String packageName, String userName, String walletAddress, String publicKey, int avatar, long regTime, boolean isSync, String configData) {
+    protected ViperClient(Context context, String packageName, String userName, String walletAddress, String publicKey,
+                          int avatar, long regTime, boolean isSync, String configData) {
         this.mContext = context;
         this.packageName = packageName;
         this.usersName = userName;
@@ -79,15 +80,17 @@ public class ViperClient {
         return mViperClient;
     }
 
-    public ViperClient setConfig(String authName, String authPass, String downloadLink, String parseUrl, String parseAppId, String signalServerUrl) {
+    public ViperClient setConfig(String authName, String authPass, String downloadLink, String parseUrl,
+                                 String parseAppId, String signalServerUrl, String meshControlConfig, int appVersion) {
 
         MeshLog.v("setConfig");
 
         SharedPref.write(Constant.PreferenceKeys.AUTH_USER_NAME, authName);
         SharedPref.write(Constant.PreferenceKeys.AUTH_PASSWORD, authPass);
         SharedPref.write(Constant.PreferenceKeys.APP_DOWNLOAD_LINK, downloadLink);
-//        SharedPref.write(Constant.PreferenceKeys.GIFT_DONATE_LINK, giftUrl);
-//        SharedPref.write(Constant.PreferenceKeys.CONFIG_FILE, configData);
+        SharedPref.write(Constant.PreferenceKeys.MESH_CONTROL_CONFIG, meshControlConfig);
+        SharedPref.write(Constant.PreferenceKeys.APP_VERSION, appVersion);
+
         PurchaseManager.getInstance().setParseInfo(parseUrl, parseAppId);
 
 
