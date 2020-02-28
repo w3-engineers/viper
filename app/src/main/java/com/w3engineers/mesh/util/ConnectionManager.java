@@ -12,6 +12,7 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.gson.Gson;
 import com.w3engineers.ext.strom.util.Text;
 import com.w3engineers.ext.viper.BuildConfig;
 import com.w3engineers.ext.viper.R;
@@ -37,6 +38,7 @@ import com.w3engineers.mesh.ui.chat.MessageListener;
 import com.w3engineers.mesh.ui.main.MainActivity;
 import com.w3engineers.mesh.util.lib.mesh.DataManager;
 import com.w3engineers.mesh.util.lib.mesh.ViperClient;
+import com.w3engineers.models.MeshControlConfig;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -93,9 +95,14 @@ public class ConnectionManager {
                 String SIGNAL_SERVER_URL = AppCredentials.getInstance().getSignalServerUrl();
                 String CONFIG_DATA = AppCredentials.getInstance().getConfiguration();
 
+                MeshControlConfig meshControlConfig = new MeshControlConfig().setAppDownloadEnable(true)
+                        .setMessageEnable(false).setDiscoveryEnable(true).setBlockChainEnable(true);
+
+                String meshControlConfigData = new Gson().toJson(meshControlConfig);
+
                 viperClient = ViperClient.on(mContext, "com.w3engineers.ext.viper", SharedPref.read(Constant.KEY_USER_NAME),
                         SharedPref.read(Constant.PreferenceKeys.ADDRESS), SharedPref.read(Constant.PreferenceKeys.PUBLIC_KEY), 1, System.currentTimeMillis(), true, CONFIG_DATA)
-                        .setConfig(AUTH_USER_NAME, AUTH_PASSWORD, FILE_REPO_LINK, PARSE_URL, PARSE_APP_ID, SIGNAL_SERVER_URL, "", BuildConfig.VERSION_CODE);
+                        .setConfig(AUTH_USER_NAME, AUTH_PASSWORD, FILE_REPO_LINK, PARSE_URL, PARSE_APP_ID, SIGNAL_SERVER_URL, meshControlConfigData, BuildConfig.VERSION_CODE);
 
             }
 
