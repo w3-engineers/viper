@@ -37,4 +37,6 @@ interface ITmCommunicator {
    void isLocalUseConnected(in String userId);
 
    void sendMyVersionToOthers(in String receiverId, in String appToken, in int version);
+
+    void sendAppUpdateRequest(in String receiverId, in String appToken);
 }

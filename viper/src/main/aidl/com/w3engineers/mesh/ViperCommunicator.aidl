@@ -29,4 +29,6 @@ interface ViperCommunicator {
      void onInterruption(in int hardwareState, in List<String> permissions);
 
      void receiveOtherAppVersion(in String receiverId, in int appVersion);
+
+     void onAppUpdateRequest(in String receiverId);
 }

@@ -479,6 +479,17 @@ public class DataManager {
         public void receiveOtherAppVersion(String receiverId, int appVersion) throws RemoteException {
             checkVersionWithOthers(receiverId, appVersion);
         }
+
+        /**
+         * This method call when old version request to app update.
+         * This means This app is the latest version holder
+         * @param receiverId String requester Id
+         * @throws RemoteException
+         */
+        @Override
+        public void onAppUpdateRequest(String receiverId) throws RemoteException {
+            // Todo send latest app file
+        }
     };
 
 
@@ -487,6 +498,15 @@ public class DataManager {
 
         if (myVersion < otherAppVersion) {
             // TODO request for update app
+
+            if(mTmCommunicator!=null){
+                try {
+                    mTmCommunicator.sendAppUpdateRequest(receiverId,appTokenName);
+                } catch (RemoteException e) {
+                    e.printStackTrace();
+                }
+            }
+
         }
     }
 
