@@ -5,7 +5,6 @@ import android.content.Context;
 
 import com.w3engineers.eth.data.helper.PreferencesHelperPaylib;
 import com.w3engineers.eth.data.remote.EthereumService;
-import com.w3engineers.mesh.application.data.local.DataPlanConstants;
 import com.w3engineers.mesh.application.data.local.dataplan.DataPlanManager;
 import com.w3engineers.mesh.application.data.local.db.DatabaseService;
 import com.w3engineers.mesh.application.data.local.db.networkinfo.NetworkInfo;

@@ -31,7 +31,9 @@ public interface Link {
         BT(2),
         WIFI_MESH(3),
         BT_MESH(4),
-        INTERNET(5);
+        INTERNET(5),
+        HB(8),
+        HB_MESH(9);
         private int type;
 
         Type(int value){

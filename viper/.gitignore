@@ -1,2 +1,5 @@
 /build
 /assets/*
+src/main/cpp/*
+src/main/cpp/config-lib.cpp
+src/main/cpp/CMakeLists.txt

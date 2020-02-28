@@ -78,10 +78,6 @@ public class ParseManager {
                 Log.v("parseserver", "Feed back query Error: "+ e.getMessage());
             }
         });
-
-
-
-
     }
 
    /* public void sendBalanceApprovedLog(String tx_hash, String owner, String spender, String value, String log) {

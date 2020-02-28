@@ -127,7 +127,7 @@ public class DataPlanManager {
     public void roleSwitch(int newRole) {
 
         try {
-            MeshLog.v("sellerMode dpm " + newRole);
+            MeshLog.v("UserMode dpm " + newRole);
             preferencesHelperDataplan.setDataPlanRole(newRole);
             payController.getDataManager().restartMesh(newRole);
         } catch (Exception e) {

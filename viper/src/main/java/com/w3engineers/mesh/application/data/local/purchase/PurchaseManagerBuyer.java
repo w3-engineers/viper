@@ -2,11 +2,16 @@ package com.w3engineers.mesh.application.data.local.purchase;
 
 import android.app.Activity;
 import android.arch.lifecycle.LiveData;
+import android.net.Network;
 import android.os.RemoteException;
 import android.text.TextUtils;
 import android.widget.Toast;
 import android.support.v7.app.AlertDialog;
 
+import com.w3engineers.eth.contracts.RaidenMicroTransferChannels;
+import com.w3engineers.eth.contracts.TmeshToken;
+import com.w3engineers.eth.data.remote.EthereumService;
+import com.w3engineers.eth.util.data.NetworkMonitor;
 import com.w3engineers.eth.util.helper.HandlerUtil;
 import com.w3engineers.ext.strom.util.helper.Toaster;
 import com.w3engineers.mesh.application.data.local.dataplan.DataPlanManager;
@@ -31,7 +36,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
-public class PurchaseManagerBuyer extends PurchaseManager implements PayController.PayControllerListenerForBuyer {
+public class PurchaseManagerBuyer extends PurchaseManager implements PayController.PayControllerListenerForBuyer, EthereumService.TransactionObserverBuyer, NetworkMonitor.NetworkInterfaceListener {
     private static PurchaseManagerBuyer purchaseManagerBuyer;
     private double totalDataAmount;
     private PurchaseManagerBuyerListener purchaseManagerBuyerListener;
@@ -46,6 +51,8 @@ public class PurchaseManagerBuyer extends PurchaseManager implements PayControll
     private PurchaseManagerBuyer() {
         super();
         setPayControllerListener();
+        ethService.setTransactionObserverBuyer(this);
+        NetworkMonitor.setNetworkInterfaceListeners(this::onNetworkAvailable);
     }
 
     public static PurchaseManagerBuyer getInstance() {
@@ -248,7 +255,17 @@ public class PurchaseManagerBuyer extends PurchaseManager implements PayControll
     public void buyData(double amount, String sellerAddress) {
         try {
 
-            if (!TextUtils.isEmpty(probableSellerId) || (!TextUtils.isEmpty(payController.getDataManager().getCurrentSellerId()) && !sellerAddress.equalsIgnoreCase(payController.getDataManager().getCurrentSellerId()))){
+
+            if (!payController.getDataManager().isUserConnected(sellerAddress)) {
+                if (dataPlanListener != null) {
+                    dataPlanListener.onPurchaseFailed(sellerAddress, "Seller is not connected now.");
+                }
+                return;
+            }
+
+            String currentSellerId = payController.getDataManager().getCurrentSellerId();
+
+            if ((!TextUtils.isEmpty(probableSellerId) && !sellerAddress.equalsIgnoreCase(probableSellerId)) || (!TextUtils.isEmpty(currentSellerId) && !sellerAddress.equalsIgnoreCase(currentSellerId))){
                 if (dataPlanListener != null) {
                     dataPlanListener.onPurchaseFailed(sellerAddress, "You already have an active purchase in the same network.");
                 }
@@ -275,31 +292,63 @@ public class PurchaseManagerBuyer extends PurchaseManager implements PayControll
         } catch (RemoteException e) {
             e.printStackTrace();
         }
-
-
     }
 
     public void getMyBalanceInfo() {
         MeshLog.p("getMyBalanceInfo");
-        try {
-            List<String> sellerIds = payController.getDataManager().getInternetSellers();
-            if (sellerIds.size() == 0) {
 
-                if (walletListener != null) {
-                    walletListener.onBalanceInfo(false, "No internet seller connected.");
-                }
-            } else {
-                String sellerId = sellerIds.get(0);
-                String query = PurchaseConstants.INFO_KEYS.ETH_BALANCE + "," + PurchaseConstants.INFO_KEYS.TKN_BALANCE;
+        if (NetworkMonitor.isOnline()){
+            try {
+
                 int endPointType = getEndpoint();
 
-                getMyInfo(sellerId, query, PurchaseConstants.INFO_PURPOSES.REFRESH_BALANCE, endPointType);
-            }
-        } catch (Exception ex){
-            ex.printStackTrace();
-        }
+                Double etherBalance = ethService.getUserEthBalance(ethService.getAddress(), endPointType);
+                Double tokenBalance = ethService.getUserTokenBalance(ethService.getAddress(), endPointType);
+                if (etherBalance != null) {
+                    EthereumServiceUtil.getInstance(mContext).updateCurrency(endPointType, etherBalance);
+                }
 
+                if (tokenBalance != null) {
+                    EthereumServiceUtil.getInstance(mContext).updateToken(endPointType, tokenBalance);
+                }
+
+                if (etherBalance == null || tokenBalance == null) {
+                    if(walletListener != null) {
+                        walletListener.onBalanceInfo(false, "Can't reach network, please try again later.");
+                    }
+                } else {
+
+                    if(walletListener != null) {
+                        walletListener.onBalanceInfo(true, "Balance updated");
+                    }
+                }
+            } catch (Exception e) {
+                if(walletListener != null) {
+                    walletListener.onBalanceInfo(false, e.getMessage());
+                }
+            }
+        } else {
+            try {
+                List<String> sellerIds = payController.getDataManager().getInternetSellers();
+                if (sellerIds.size() == 0) {
+
+                    if (walletListener != null) {
+                        walletListener.onBalanceInfo(false, "No internet seller connected.");
+                    }
+                } else {
+                    String sellerId = sellerIds.get(0);
+                    String query = PurchaseConstants.INFO_KEYS.ETH_BALANCE + "," + PurchaseConstants.INFO_KEYS.TKN_BALANCE;
+                    int endPointType = getEndpoint();
+
+                    getMyInfo(sellerId, query, PurchaseConstants.INFO_PURPOSES.REFRESH_BALANCE, endPointType);
+                }
+            } catch (Exception ex){
+                ex.printStackTrace();
+            }
+        }
     }
+
+
 
 /*    public void sendEtherRequest() {
 
@@ -406,17 +455,97 @@ public class PurchaseManagerBuyer extends PurchaseManager implements PayControll
 
     public boolean giftEtherForOtherNetwork() {
 
-        try {
-            List<String> sellerIds = payController.getDataManager().getInternetSellers();
-            if (sellerIds.size() > 0) {
-                return giftEther(sellerIds.get(0));
+        if (NetworkMonitor.isOnline()){
+            return requestForGiftForBuyerWithOwnInternet();
+        } else {
+            try {
+                List<String> sellerIds = payController.getDataManager().getInternetSellers();
+                if (sellerIds.size() > 0) {
+                    return giftEther(sellerIds.get(0));
+                }
+            } catch (Exception ex){
+                ex.printStackTrace();
             }
-        } catch (Exception ex){
-            ex.printStackTrace();
+            return false;
         }
+    }
 
+    public boolean requestForGiftForBuyerWithOwnInternet() {
+
+        if (NetworkMonitor.isOnline()) {
+
+            String address = ethService.getAddress();
+            int endpoint = getEndpoint();
+            int requestState = preferencesHelperDataplan.getEtherRequestStatus(endpoint);
+
+            if (requestState == PurchaseConstants.GIFT_REQUEST_STATE.NOT_REQUESTED_YET || requestState == PurchaseConstants.GIFT_REQUEST_STATE.REQUESTED_TO_SELLER) {
+                long currentTime = new Date().getTime();
+                long requestTime = preferencesHelperDataplan.getEtherRequestTimeStamp(endpoint);
+                if (currentTime > (requestTime + 20000)) {
+
+                    preferencesHelperDataplan.setRequestedForEther(PurchaseConstants.GIFT_REQUEST_STATE.REQUESTED_TO_SELLER, endpoint);
+                    preferencesHelperDataplan.setEtherRequestTimeStamp(currentTime, endpoint);
+
+                    ethService.requestGiftEther(address, endpoint, new EthereumService.GiftEther() {
+                        @Override
+                        public void onEtherGiftRequested(boolean success, String msg, String ethTX, String tknTx, String failedBy) {
+                            MeshLog.v("giftEther onEtherGiftRequested " + "success " + success + " msg " + msg + " ethTX " + ethTX + " tknTx " + tknTx + " failedby " + failedBy);
+
+                            PreferencesHelperDataplan preferencesHelperDataplan = PreferencesHelperDataplan.on();
+
+                            if (success) {
+
+                                preferencesHelperDataplan.setRequestedForEther(PurchaseConstants.GIFT_REQUEST_STATE.GOT_TRANX_HASH, endpoint);
+                                preferencesHelperDataplan.setGiftEtherHash(ethTX, endpoint);
+                                preferencesHelperDataplan.setGiftTokenHash(tknTx, endpoint);
+
+//                                String toastMessage = Util.getCurrencyTypeMessage("Congratulations!!!\nYou have been awarded 1 %s and 50 token.\nBalance will be added within few minutes.");
+                                String toastMessage = Util.getCurrencyTypeMessage("Congratulations!!!\nYou have been awarded with 50 points which will be added within few minutes."); //changed per decision
+
+                                sendGiftListener(success, false, toastMessage);
+
+                                /*Activity currentActivity = MeshApp.getCurrentActivity();
+                                if (currentActivity != null) {
+                                    HandlerUtil.postForeground(() -> DialogUtil.showConfirmationDialog(currentActivity, "Gift Awarded!", toastMessage, null, "OK", null));
+                                } else {
+                                    //TODO send notifications
+                                }*/
+                            } else {
+                                MeshLog.v("giftEther giftRequestSubmitted " + msg);
+                                if (failedBy.equals("admin")) {
+                                    preferencesHelperDataplan.setRequestedForEther(PurchaseConstants.GIFT_REQUEST_STATE.GOT_GIFT_ETHER, endpoint);
+                                    getMyBalanceInfo();
+                                } else {
+                                    preferencesHelperDataplan.setRequestedForEther(PurchaseConstants.GIFT_REQUEST_STATE.NOT_REQUESTED_YET, endpoint);
+
+                                    sendGiftListener(success, false, msg);
+
+                                    /*Activity currentActivity = MeshApp.getCurrentActivity();
+                                    if (currentActivity != null) {
+                                        HandlerUtil.postForeground(() -> DialogUtil.showConfirmationDialog(currentActivity, "Gift Awarded!", msg, null, "OK", null));
+                                    }*/
+                                }
+                            }
+                        }
+                    });
+                    return true;
+                }
+
+            } else if (requestState == PurchaseConstants.GIFT_REQUEST_STATE.GOT_TRANX_HASH) {
+
+                String ethTranxHash = preferencesHelperDataplan.getGiftEtherHash(endpoint);
+                String tknTranxHash = preferencesHelperDataplan.getGiftTokenHash(endpoint);
+
+                if (!TextUtils.isEmpty(ethTranxHash) && !TextUtils.isEmpty(tknTranxHash)) {
+                    ethService.getStatusOfGift(address, ethTranxHash, tknTranxHash, endpoint);
+                    return true;
+                }
+
+            }
+        }
         return false;
     }
+
 
     public void destroyObject() {
         payController.setBuyerListener(null);
@@ -1166,7 +1295,7 @@ public class PurchaseManagerBuyer extends PurchaseManager implements PayControll
             }
 
             if (purchase != null) {
-                if (purchase.balance != balance) {
+//                if (purchase.balance != balance) {
                     purchase.balance = balance;
                     purchase.usedDataAmount = usedDataAmount;
                     purchase.balanceProof = bps;
@@ -1181,7 +1310,7 @@ public class PurchaseManagerBuyer extends PurchaseManager implements PayControll
                     }
                     MeshLog.p("balancemismatchcheck2 " + balance + "  " + purchase.usedDataAmount);
                     databaseService.updatePurchase(purchase);
-                }
+//                }
 
             } else {
 
@@ -1249,7 +1378,7 @@ public class PurchaseManagerBuyer extends PurchaseManager implements PayControll
 
         try {
             Purchase topupPurchase = databaseService.getPurchaseByBlockNumber(openBlock, ethService.getAddress(), fromAddress);
-            double totalData = topupPurchase.deposit / PreferencesHelperDataplan.on().getPerMbTokenValue();
+            double totalData = deposit / PreferencesHelperDataplan.on().getPerMbTokenValue();
 
             topupPurchase.deposit = deposit;
             topupPurchase.totalDataAmount = totalData;
@@ -1258,6 +1387,7 @@ public class PurchaseManagerBuyer extends PurchaseManager implements PayControll
             databaseService.updatePurchase(topupPurchase);
 
             setCurrentSellerWithStatus(null, PurchaseConstants.SELLERS_BTN_TEXT.CLOSE);
+
             if (dataPlanListener != null) {
                 dataPlanListener.onPurchaseSuccess(fromAddress, totalData, openBlock);
             }
@@ -1372,6 +1502,79 @@ public class PurchaseManagerBuyer extends PurchaseManager implements PayControll
                     preferencesHelperDataplan.setRequestedForEther(PurchaseConstants.GIFT_REQUEST_STATE.NOT_REQUESTED_YET, 2);
                 }
                 break;
+        }
+    }
+
+
+    @Override
+    public void onGiftCompleted(String address, int endpoint, boolean status) {
+        MeshLog.v("giftEther onGiftCompleted address " + address + " endpoint " + endpoint +  " Status " + status);
+
+        try{
+            double ethBalance = ethService.getUserEthBalance(address, endpoint);
+            double tknBalance = ethService.getUserTokenBalance(address, endpoint);
+
+            if (address.equalsIgnoreCase(ethService.getAddress())){
+                if (status) {
+
+                    preferencesHelperDataplan.setRequestedForEther(PurchaseConstants.GIFT_REQUEST_STATE.GOT_GIFT_ETHER, endpoint);
+                    preferencesHelperDataplan.setGiftEtherHash(null, endpoint);
+                    preferencesHelperDataplan.setGiftTokenHash(null, endpoint);
+                    databaseService.updateCurrencyAndToken(endpoint, ethBalance, tknBalance);
+
+                    sendGiftListener(status, true, "Congratulations!!!\nPoints have been added to your account.");
+
+                    /*Activity currentActivity = MeshApp.getCurrentActivity();
+                    if (currentActivity != null){
+                        HandlerUtil.postForeground(() -> DialogUtil.showConfirmationDialog(currentActivity, "Gift Awarded!", "Congratulations!!!\nBalance has been added to your account.", null, "OK", null));
+                    }else {
+                        //TODO send notifications
+                    }*/
+
+
+                } else {
+                    sendGiftListener(status, true, "Failed");
+                    //TODO detect fail type
+                    preferencesHelperDataplan.setRequestedForEther(PurchaseConstants.GIFT_REQUEST_STATE.NOT_REQUESTED_YET, endpoint);
+                }
+            }
+        }catch (Exception ex){
+            ex.printStackTrace();
+        }
+    }
+
+    @Override
+    public void onNetworkAvailable(boolean isOnline, Network network, boolean isWiFi) {
+        MeshLog.v("PurchaseManagerBuyer-->onNetworkAvailable " + isOnline + "  " + (isWiFi ? "wifi" : "cellular") );
+        if (!isOnline){
+            try {
+                List<Purchase> myOpenPurcheses  =  databaseService.getMyPurchasesWithState(ethService.getAddress(), PurchaseConstants.CHANNEL_STATE.OPEN);
+
+                //TODO looping may arise if there are multiple sellers connected, and buyer has multiple purchases, and no seller can connect the buyer as they finish their shared data.
+                for (Purchase p : myOpenPurcheses){
+                    if (payController.getDataManager().isUserConnected(p.sellerAddress) && p.totalDataAmount > p.usedDataAmount){
+                        probableSellerId = p.sellerAddress;
+
+                        JSONObject jsonObject = new JSONObject();
+                        jsonObject.put(PurchaseConstants.JSON_KEYS.MESSAME_FROM, ethService.getAddress());
+                        jsonObject.put(PurchaseConstants.JSON_KEYS.BUYER_ADDRESS, p.buyerAddress);
+                        jsonObject.put(PurchaseConstants.JSON_KEYS.SELLER_ADDRESS, p.sellerAddress);
+                        jsonObject.put(PurchaseConstants.JSON_KEYS.OPEN_BLOCK, p.openBlockNumber);
+                        jsonObject.put(PurchaseConstants.JSON_KEYS.USED_DATA, p.usedDataAmount);
+                        jsonObject.put(PurchaseConstants.JSON_KEYS.TOTAL_DATA, p.totalDataAmount);
+                        jsonObject.put(PurchaseConstants.JSON_KEYS.BPS_BALANCE, p.balance);
+                        jsonObject.put(PurchaseConstants.JSON_KEYS.MESSAGE_BPS, p.balanceProof);
+                        jsonObject.put(PurchaseConstants.JSON_KEYS.MESSAGE_CHS, p.closingHash);
+                        setEndPointInfoInJson(jsonObject, p.blockChainEndpoint);
+
+                        payController.sendSyncMessageToSeller(jsonObject, p.sellerAddress);
+
+                        break;
+                    }
+                }
+            } catch (Exception e){
+                e.printStackTrace();
+            }
         }
     }
 

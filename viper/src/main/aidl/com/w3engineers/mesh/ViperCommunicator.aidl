@@ -25,4 +25,6 @@ interface ViperCommunicator {
      void onTransportInit(in String nodeId, in String publicKey, in boolean success, in String msg);
      void onProbableSellerDisconnected(in String sellerId);
      void onServiceUpdateNeeded(in boolean isNeeded);
+
+     void onInterruption(in int hardwareState, in List<String> permissions);
 }
