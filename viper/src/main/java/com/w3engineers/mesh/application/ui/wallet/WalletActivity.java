@@ -17,10 +17,12 @@ import com.w3engineers.mesh.R;
 import com.w3engineers.mesh.application.data.BaseServiceLocator;
 import com.w3engineers.mesh.application.data.local.DataPlanConstants;
 import com.w3engineers.mesh.application.data.local.dataplan.DataPlanManager;
+import com.w3engineers.mesh.application.data.local.db.SharedPref;
 import com.w3engineers.mesh.application.data.local.wallet.WalletManager;
 import com.w3engineers.mesh.application.ui.base.TelemeshBaseActivity;
 import com.w3engineers.mesh.application.ui.tokenguide.PointGuidelineActivity;
 import com.w3engineers.mesh.databinding.ActivityWalletBinding;
+import com.w3engineers.mesh.util.Constant;
 import com.w3engineers.mesh.util.DialogUtil;
 import com.w3engineers.mesh.util.MeshLog;
 import com.w3engineers.mesh.util.lib.mesh.HandlerUtil;
@@ -44,8 +46,8 @@ public class WalletActivity extends TelemeshBaseActivity implements WalletManage
     private WalletManager walletManager;
     private DataPlanManager dataPlanManager;
 
-    private final String ropstenUrl = "https://ropsten.etherscan.io/address/";
-    private final String kottyUrl = "https://explorer.eth.events/ethereum/ethereum/kotti/address/";
+//    private final String ropstenUrl = "https://ropsten.etherscan.io/address/";
+//    private final String kottyUrl = "https://explorer.eth.events/ethereum/ethereum/kotti/address/";
     private byte[] picture;
     private final double minimumWithdrawAmount = 10.0;
 
@@ -283,9 +285,9 @@ public class WalletActivity extends TelemeshBaseActivity implements WalletManage
             int networkType = walletManager.getMyEndpoint();
             String networkUrl = null;
             if (networkType == 1) { // ETH
-                networkUrl = ropstenUrl + walletManager.getMyAddress();
+                networkUrl = SharedPref.read(Constant.PreferenceKeys.TX_URL_ROPSTEN) + walletManager.getMyAddress();
             } else if (networkType == 2) { // ETC
-                networkUrl = kottyUrl + walletManager.getMyAddress();
+                networkUrl = SharedPref.read(Constant.PreferenceKeys.TX_HISTORY_URL_KOTTI) + walletManager.getMyAddress();
             }
             if (networkUrl != null) {
                 Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(networkUrl));

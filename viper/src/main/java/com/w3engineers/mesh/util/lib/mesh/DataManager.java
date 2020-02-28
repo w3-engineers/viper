@@ -21,6 +21,7 @@ import android.os.RemoteException;
 import android.text.TextUtils;
 import android.util.Log;
 
+import com.w3engineers.eth.util.data.NetworkMonitor;
 import com.w3engineers.ext.strom.util.helper.Toaster;
 import com.w3engineers.mesh.BuildConfig;
 import com.w3engineers.mesh.R;
@@ -132,16 +133,26 @@ public class DataManager {
         });
 
 
-        Util.isConnected(new Util.ConnectionCheck() {
+        // Todo We have to remove below implementation
+
+        /*Util.isConnected(new Util.ConnectionCheck() {
             @Override
             public void onConnectionCheck(boolean isConnected) {
                 if (isConnected) {
-                    ConfigSyncUtil.getInstance().startConfigurationSync(mContext, true);
+                    ConfigSyncUtil.getInstance().startConfigurationSync(mContext, true, null);
                 } else {
                     checkAndBindService();
                 }
             }
-        });
+        });*/
+
+        // Todo we will update or replace below call in the mesh init section
+        if (NetworkMonitor.isOnline()) {
+            ConfigSyncUtil.getInstance().startConfigurationSync(mContext, true, NetworkMonitor.getNetwork());
+        } else {
+            checkAndBindService();
+        }
+        Log.d("NetworkTest", "NetWork available: " + NetworkMonitor.isOnline());
     }
 
 
@@ -230,10 +241,11 @@ public class DataManager {
 
     // Please don't remove this method. It is needed in our release time
     private void checkConnectionAndStartDownload() {
+        // Todo we have to remove below implementation
         Util.isConnected(isConnected ->
                 HandlerUtil.postForeground(() -> {
                     if (isConnected) {
-                        TSAppInstaller.downloadApkFile(mContext, SharedPref.read(Constant.PreferenceKeys.APP_DOWNLOAD_LINK));
+                        TSAppInstaller.downloadApkFile(mContext, SharedPref.read(Constant.PreferenceKeys.APP_DOWNLOAD_LINK), null);
                     } else {
                         isAlreadyToPlayStore = false;
                         Toaster.showShort("Internet connection not available");
@@ -241,6 +253,14 @@ public class DataManager {
                 })
 
         );
+
+        // Todo we hav eto replace ore change below implementation at proper section
+        if (NetworkMonitor.isOnline()) {
+            TSAppInstaller.downloadApkFile(mContext, SharedPref.read(Constant.PreferenceKeys.APP_DOWNLOAD_LINK), NetworkMonitor.getNetwork());
+        } else {
+            isAlreadyToPlayStore = false;
+            Toaster.showShort("Internet connection not available");
+        }
     }
 
     private void showPermissionPopUp() {
