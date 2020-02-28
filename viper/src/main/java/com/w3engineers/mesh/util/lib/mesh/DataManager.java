@@ -355,7 +355,7 @@ public class DataManager {
                     status = true;
                 } else {
                     String meshControlConfig = SharedPref.read(Constant.PreferenceKeys.MESH_CONTROL_CONFIG);
-                    mTmCommunicator.setViperCommunicator(viperCommunicator,mContext.getPackageName());
+                    mTmCommunicator.setViperCommunicator(viperCommunicator, mContext.getPackageName());
                     status = mTmCommunicator.startMesh(userRole, userInfo, signalServerUrl, meshControlConfig);
                 }
                 MeshLog.v("status " + status);
@@ -499,9 +499,9 @@ public class DataManager {
         if (myVersion < otherAppVersion) {
             // TODO request for update app
 
-            if(mTmCommunicator!=null){
+            if (mTmCommunicator != null) {
                 try {
-                    mTmCommunicator.sendAppUpdateRequest(receiverId,appTokenName);
+                    mTmCommunicator.sendAppUpdateRequest(receiverId, appTokenName);
                 } catch (RemoteException e) {
                     e.printStackTrace();
                 }
@@ -523,7 +523,7 @@ public class DataManager {
      * @param data
      */
     public void sendData(String senderId, String receiverId, String messageId, byte[] data, boolean isNotificationNeeded) throws RemoteException {
-        mTmCommunicator.sendData(senderId, receiverId, messageId, data, isNotificationNeeded,mContext.getPackageName());
+        mTmCommunicator.sendData(senderId, receiverId, messageId, data, isNotificationNeeded, mContext.getPackageName());
     }
 
     /**
@@ -729,21 +729,21 @@ public class DataManager {
             return;
         }
         MeshLog.v("sendPayMessage dtm");
-        mTmCommunicator.sendPayMessage(receiverId, message, messageId);
+        mTmCommunicator.sendPayMessage(receiverId, message, messageId, appTokenName);
     }
 
     public void onPaymentGotForIncomingMessage(boolean success, String receiver, String sender, String messageId, String msgData) throws RemoteException {
         if (mTmCommunicator == null) {
             return;
         }
-        mTmCommunicator.onPaymentGotForIncomingMessage(success, receiver, sender, messageId, msgData);
+        mTmCommunicator.onPaymentGotForIncomingMessage(success, receiver, sender, messageId, msgData, appTokenName);
     }
 
     public void onPaymentGotForOutgoingMessage(boolean success, String receiver, String sender, String messageId, String msgData) throws RemoteException {
         if (mTmCommunicator == null) {
             return;
         }
-        mTmCommunicator.onPaymentGotForOutgoingMessage(success, receiver, sender, messageId, msgData);
+        mTmCommunicator.onPaymentGotForOutgoingMessage(success, receiver, sender, messageId, msgData, appTokenName);
     }
 
     public List<String> getInternetSellers() throws RemoteException {
@@ -751,7 +751,7 @@ public class DataManager {
             MeshLog.v("mTmCommunicator null");
             return new ArrayList<>();
         }
-        return mTmCommunicator.getInternetSellers();
+        return mTmCommunicator.getInternetSellers(appTokenName);
     }
 
     public boolean isInternetSeller(String address) throws RemoteException {
@@ -780,7 +780,7 @@ public class DataManager {
         if (mTmCommunicator == null) {
             MeshLog.v("mTmCommunicator null");
         } else {
-            return mTmCommunicator.getCurrentSellerId();
+            return mTmCommunicator.getCurrentSellerId(appTokenName);
         }
         return null;
     }
@@ -810,7 +810,7 @@ public class DataManager {
             MeshLog.v("mTmCommunicator null");
             return;
         }
-        mTmCommunicator.disconnectFromInternet();
+        mTmCommunicator.disconnectFromInternet(appTokenName);
     }
 
     public void stopMesh() {

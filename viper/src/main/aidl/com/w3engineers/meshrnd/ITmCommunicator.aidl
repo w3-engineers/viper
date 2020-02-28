@@ -15,18 +15,18 @@ interface ITmCommunicator {
    void stopMesh();
 
 
-   void sendPayMessage(in String receiverId, in String message, in String messageId);
-   void onPaymentGotForIncomingMessage(in boolean success, in String receiver, in String sender, in String messageId, in String msgData);
-   void onPaymentGotForOutgoingMessage(in boolean success, in String receiver, in String sender, in String messageId, in String msgData);
-   List<String> getInternetSellers();
+   void sendPayMessage(in String receiverId, in String message, in String messageId,in String appToken);
+   void onPaymentGotForIncomingMessage(in boolean success, in String receiver, in String sender, in String messageId, in String msgData,in String appToken);
+   void onPaymentGotForOutgoingMessage(in boolean success, in String receiver, in String sender, in String messageId, in String msgData,in String appToken);
+   List<String> getInternetSellers(in String appToken);
    boolean isInternetSeller(in String address);
    boolean isUserConnected(in String address);
    void onBuyerConnected(in String address);
    void onBuyerDisconnected(in String address);
    void restartMesh(in int newRole, in String signalServerUrl);
    String getUserPublicKey(in String address);
-   void disconnectFromInternet();
-   String getCurrentSellerId();
+   void disconnectFromInternet(in String appToken);
+   String getCurrentSellerId(in String appToken);
    String getUserNameByAddress(in String address, in String appToken);
    void destroyService();
 
