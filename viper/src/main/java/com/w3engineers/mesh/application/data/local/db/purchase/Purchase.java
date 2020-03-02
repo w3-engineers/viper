@@ -57,6 +57,10 @@ public class Purchase {
     @ColumnInfo(name = "block_chain_endpoint")
     public int blockChainEndpoint;
 
+    @ColumnInfo(name = "trx_hash")
+    public String trxHash;
+
+
     public Seller toSeller(int label, String name) {
         Seller seller =  new Seller()
                 .setId(sellerAddress)

@@ -44,6 +44,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.Callable;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -57,21 +58,16 @@ public class BlockRequest {
     private ContractGasProvider contractGasProvider;
     private Web3j web3j;
     private Credentials credentials;
-
-    private String TAG = "INFO";
+    private String TAG = "BlockRequest";
     private String tokenAddress = null;
     private String channelAddress = null;
     private String web3jRpcURL = "";
     private BlockTransactionObserver transactionObserver;
-//    private String faucetDonateUrl = "https://faucet.ropsten.be/donate/";
+    private ConcurrentHashMap<String, Runnable> eventRequests;
     private long mGasPrice = 0;
     private long mGasLimit = 0;
     Subscription balanceApproveObserver, channelCreateObserver, channelCloseObserver, channelTopupObserver, channelWithdrawnObserver, tokenMintedObserver, tokenTransferredObserver;
-//    private TransactionObserver transactionObserver;
     private HttpService mHttpService;
-//    private Network network;
-
-
 
 
     public BlockRequest(String tokenAddress, String channelAddress, String rpcUrl, Context mContext, long gasPrice, long gasLimit, BlockTransactionObserver transactionObserver){
@@ -83,6 +79,7 @@ public class BlockRequest {
         this.mGasLimit = gasLimit;
         this.mContext = mContext;
         this.transactionObserver = transactionObserver;
+        this.eventRequests = new ConcurrentHashMap<>();
 
         callableExecutor = Executors.newFixedThreadPool(1);
     }
@@ -116,6 +113,11 @@ public class BlockRequest {
                     return BigInteger.valueOf(mGasLimit);
                 }
             };
+
+            for (String key : eventRequests.keySet()) {
+                eventRequests.get(key).run();
+            }
+
         }
     }
 
@@ -467,6 +469,10 @@ public class BlockRequest {
 
     public void logBalanceApproved(long blockNumber) {
         Log.i(TAG, "logBalanceApproved: " + blockNumber);
+        if (web3j == null){
+            eventRequests.put("logBalanceApproved", ()->logBalanceApproved(blockNumber));
+            return;
+        }
 
         if (balanceApproveObserver == null) {
 
@@ -498,6 +504,11 @@ public class BlockRequest {
     public void logTokenMinted(long blockNumber) {
         Log.i(TAG, "logTokenMinted: " + blockNumber);
 
+        if (web3j == null){
+            eventRequests.put("logTokenMinted", ()->logTokenMinted(blockNumber));
+            return;
+        }
+
         if (tokenMintedObserver == null) {
             callableExecutor.submit(new Callable() {
                 @Override
@@ -527,6 +538,11 @@ public class BlockRequest {
     public void logTokenTransferred(long blockNumber) {
         Log.i(TAG, "logTokenMinted: " + blockNumber);
 
+        if (web3j == null){
+            eventRequests.put("logTokenTransferred", ()->logTokenTransferred(blockNumber));
+            return;
+        }
+
         if (tokenTransferredObserver == null) {
             callableExecutor.submit(new Callable() {
                 @Override
@@ -555,6 +571,13 @@ public class BlockRequest {
 
     public void logChannelCreated(long blockNumber) {
         Log.i(TAG, "logChannelCreated: " + blockNumber);
+
+        if (web3j == null){
+            eventRequests.put("logChannelCreated", ()->logChannelCreated(blockNumber));
+            return;
+        }
+
+
         if (channelCreateObserver == null) {
             callableExecutor.submit(new Callable() {
                 @Override
@@ -562,7 +585,7 @@ public class BlockRequest {
                     try {
                         RaidenMicroTransferChannels channelManager = loadChannelManager();
                         channelCreateObserver = (Subscription) channelManager.channelCreatedEventFlowable(DefaultBlockParameter.valueOf(BigInteger.valueOf(blockNumber)), DefaultBlockParameterName.LATEST).subscribe(log -> {
-                            Log.i(TAG, "channelCreatedEventFlowable: " + log.log.getTransactionHash());
+                            Log.i(TAG, "channelCreatedEventFlowable: " + log.log.getTransactionHash() + " " + log.log.getBlockNumber().toString());
 
                             if (transactionObserver != null) {
                                 transactionObserver.onChannelCreatedLog(log);
@@ -584,6 +607,12 @@ public class BlockRequest {
 
     public void logChannelToppedUp(long blockNumber) {
         Log.i(TAG, "logChannelToppedUp: " + blockNumber);
+
+        if (web3j == null){
+            eventRequests.put("logChannelToppedUp", ()->logChannelToppedUp(blockNumber));
+            return;
+        }
+
         if (channelTopupObserver == null) {
             callableExecutor.submit(new Callable() {
                 @Override
@@ -607,6 +636,12 @@ public class BlockRequest {
 
     public void logChannelClosed(long blockNumber) {
         Log.i(TAG, "logChannelClosed: " + blockNumber);
+
+        if (web3j == null){
+            eventRequests.put("logChannelClosed", ()->logChannelClosed(blockNumber));
+            return;
+        }
+
         if (channelCloseObserver == null) {
             callableExecutor.submit(new Callable() {
                 @Override
@@ -638,6 +673,11 @@ public class BlockRequest {
 
     public void logChannelWithdrawn(long blockNumber) {
         Log.i(TAG, "logChannelWithdrawn: " + blockNumber);
+
+        if (web3j == null){
+            eventRequests.put("logChannelWithdrawn", ()->logChannelWithdrawn(blockNumber));
+            return;
+        }
         if (channelWithdrawnObserver == null) {
             callableExecutor.submit(new Callable() {
                 @Override

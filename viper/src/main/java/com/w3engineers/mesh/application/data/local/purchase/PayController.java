@@ -63,7 +63,7 @@ public class PayController {
 
         void onBuyTokenResponseReceived(String from, double tokenValue, double ethValue, int endPointType);
 
-        void onChannelCreateOkayReceived(String from, long openBlock, double deposit, int endPointType);
+        void onChannelCreateOkayReceived(String from, long openBlock, double deposit, int endPointType, String trxHash, String chs);
 
         void onChannelCreateErrorReceived(String from, String msg);
 
@@ -79,7 +79,7 @@ public class PayController {
 
         void onSyncSellerToBuyerReceived(String buyerAddress, String sellerAddress, long blockNumner,
                                          double usedDataAmount, double totalDataAmount, double balance,
-                                         String bps, String chs, int endPointType);
+                                         String bps, String chs, int endPointType, String trxHash);
 
         void onInfoOkayReceived(String from, int purpose, JSONObject infoJson, int endPointType);
 
@@ -98,10 +98,9 @@ public class PayController {
         void timeoutCallback(TimeoutModel timeoutModel);
 
         void giftRequestSubmitted(boolean status, String submitMessage, String etherTransactionHash,
-                                  String tokenTransactionHash, int endPoint, String failedBy);
+                                  String tokenTransactionHash, int endPoint, String failedBy, double ethValue, double tknValue);
 
-        void giftResponse(boolean status, double ethBalance,
-                          double tokenBalance, int endPoint);
+        void giftResponse(boolean status, double ethBalance, double tokenBalance, int endPoint, double giftEtherValue, double giftTokenValue);
         void onProbableSellerDisconnected(String sellerId);
 
         void onDisconnectedBySeller(String sellerAddress, String msg);
@@ -132,7 +131,7 @@ public class PayController {
 
         void onPayForMessageErrorReceived(String from, String msg_id, String errorText);
 
-        void onSynBuyerOKReceive(String from, String sellerAddress);
+        void onSynBuyerOKReceive(String from, String sellerAddress, String bps, String trxHash);
 
         void onReceivedEtherRequest(String from, int endpointType);
 
@@ -140,7 +139,7 @@ public class PayController {
 
         void requestForGiftEther(String fromAddress, int endPointType);
 
-        void requestForGiftEtherWithHash(String fromAddress, String ethTranxHash, String tknTranxHash, int endPointType);
+        void requestForGiftEtherWithHash(String fromAddress, String ethTranxHash, String tknTranxHash, int endPointType, double ethValue, double tknValue);
 
         void timeoutCallback(TimeoutModel timeoutModel);
 
@@ -148,7 +147,9 @@ public class PayController {
 
         void onSyncBuyerToSellerReceived(String buyerAddress, String sellerAddress, long blockNumber,
                                          double usedDataAmount, double totalDataAmount, double balance,
-                                         String bps, String chs, int endPointType);
+                                         String bps, String chs, int endPointType, String trx_hash);
+
+        void onChannelClosedByBuyer(String fromAddress, long open_block, double withdrawnBalance);
     }
 
     public void setSellerListener(PayControllerListenerForSeller listener2) {
@@ -221,8 +222,8 @@ public class PayController {
 
                 int type = jsonObject.getInt(PurchaseConstants.JSON_KEYS.MESSAGE_TYPE), nonce, purpose;
                 String fromAddress = jsonObject.getString(PurchaseConstants.JSON_KEYS.MESSAME_FROM), msg, sellerAddress;
-                String msg_id;
-                double balance, ethValue = 0, deposit;
+                String msg_id, trx_hash = "", bps, chs;
+                double balance, ethValue = 0, tokenValue = 0, deposit;
                 long open_block;
                 int endPointType = jsonObject.optInt(PurchaseConstants.JSON_KEYS.END_POINT_TYPE);
                 switch (type) {
@@ -285,7 +286,7 @@ public class PayController {
 
                     case PurchaseConstants.MESSAGE_TYPES.BUY_TOKEN_RESPONSE:
 
-                        double tokenValue = jsonObject.getDouble(PurchaseConstants.INFO_KEYS.TKN_BALANCE);
+                        tokenValue = jsonObject.getDouble(PurchaseConstants.INFO_KEYS.TKN_BALANCE);
                         if (jsonObject.has(PurchaseConstants.INFO_KEYS.ETH_BALANCE)){
                             ethValue = jsonObject.getDouble(PurchaseConstants.INFO_KEYS.ETH_BALANCE);
                         }
@@ -299,9 +300,11 @@ public class PayController {
 
                         long openBlock = jsonObject.getLong(PurchaseConstants.JSON_KEYS.OPEN_BLOCK);
                         deposit = jsonObject.getLong(PurchaseConstants.JSON_KEYS.DEPOSIT);
+                        trx_hash = jsonObject.getString(PurchaseConstants.JSON_KEYS.TRX_HASH);
+                        chs = jsonObject.getString(PurchaseConstants.JSON_KEYS.MESSAGE_CHS);
 
                         if (payControllerListenerForBuyer != null) {
-                            payControllerListenerForBuyer.onChannelCreateOkayReceived(fromAddress, openBlock, deposit, endPointType);
+                            payControllerListenerForBuyer.onChannelCreateOkayReceived(fromAddress, openBlock, deposit, endPointType, trx_hash, chs);
                         } else {
                             MeshLog.v("CREATE_CHANNEL_OK Listener not found");
                         }
@@ -364,7 +367,7 @@ public class PayController {
                         MeshLog.v("Message Queuing 9");
                         balance = jsonObject.getDouble(PurchaseConstants.JSON_KEYS.BPS_BALANCE);
                         open_block = jsonObject.getLong(PurchaseConstants.JSON_KEYS.OPEN_BLOCK);
-                        String bps = jsonObject.getString(PurchaseConstants.JSON_KEYS.MESSAGE_BPS);
+                        bps = jsonObject.getString(PurchaseConstants.JSON_KEYS.MESSAGE_BPS);
                         msg_id = jsonObject.getString(PurchaseConstants.JSON_KEYS.MESSAGE_ID);
                         if (payControllerListenerForSeller != null) {
                             payControllerListenerForSeller.onPayForMessageOkReceived(fromAddress, msg_id, bps, balance, open_block);
@@ -387,7 +390,7 @@ public class PayController {
                     case PurchaseConstants.MESSAGE_TYPES.PAY_FOR_MESSAGE_RESPONSE:
                         bps = jsonObject.getString(PurchaseConstants.JSON_KEYS.MESSAGE_BPS);
                         double bps_balance = jsonObject.getDouble(PurchaseConstants.JSON_KEYS.BPS_BALANCE);
-                        String chs = jsonObject.getString(PurchaseConstants.JSON_KEYS.MESSAGE_CHS);
+                        chs = jsonObject.getString(PurchaseConstants.JSON_KEYS.MESSAGE_CHS);
                         openBlock = jsonObject.getLong(PurchaseConstants.JSON_KEYS.OPEN_BLOCK);
                         long byeSize = jsonObject.getLong(PurchaseConstants.JSON_KEYS.DATA_SIZE);
                         String messageId = jsonObject.getString(PurchaseConstants.JSON_KEYS.MESSAGE_ID);
@@ -411,8 +414,8 @@ public class PayController {
                         MeshLog.v("MESSAGE_TYPES.SYNC_BUYER_TO_SELLER " + fromAddress +" " + buyerAddress);
                         sellerAddress = jsonObject.getString(PurchaseConstants.JSON_KEYS.SELLER_ADDRESS);
                         balance = 0.0;
-                        String BPS = "";
-                        String CHS = "";
+                        bps = "";
+                        chs = "";
                         open_block = 0;
                         double usedDataAmount = 0, totalDataAmount = 0;
                         if (jsonObject.has(PurchaseConstants.JSON_KEYS.OPEN_BLOCK)) {
@@ -420,12 +423,13 @@ public class PayController {
                             balance = jsonObject.getDouble(PurchaseConstants.JSON_KEYS.BPS_BALANCE);
                             usedDataAmount = jsonObject.getDouble(PurchaseConstants.JSON_KEYS.USED_DATA);
                             totalDataAmount = jsonObject.getDouble(PurchaseConstants.JSON_KEYS.TOTAL_DATA);
-                            BPS = jsonObject.getString(PurchaseConstants.JSON_KEYS.MESSAGE_BPS);
-                            CHS = jsonObject.getString(PurchaseConstants.JSON_KEYS.MESSAGE_CHS);
+                            bps = jsonObject.getString(PurchaseConstants.JSON_KEYS.MESSAGE_BPS);
+                            chs = jsonObject.getString(PurchaseConstants.JSON_KEYS.MESSAGE_CHS);
+                            trx_hash = jsonObject.getString(PurchaseConstants.JSON_KEYS.TRX_HASH);
                         }
                         if (payControllerListenerForSeller != null) {
                             payControllerListenerForSeller.onSyncBuyerToSellerReceived(buyerAddress, sellerAddress,
-                                    open_block, usedDataAmount, totalDataAmount, balance, BPS, CHS, endPointType);
+                                    open_block, usedDataAmount, totalDataAmount, balance, bps, chs, endPointType, trx_hash);
                         }
                         break;
 
@@ -443,17 +447,21 @@ public class PayController {
                             totalDataAmount1 = jsonObject.getDouble(PurchaseConstants.JSON_KEYS.TOTAL_DATA);
                             BPS1 = jsonObject.getString(PurchaseConstants.JSON_KEYS.MESSAGE_BPS);
                             CHS1 = jsonObject.getString(PurchaseConstants.JSON_KEYS.MESSAGE_CHS);
+                            trx_hash = jsonObject.getString(PurchaseConstants.JSON_KEYS.TRX_HASH);
                         }
                         if (payControllerListenerForBuyer != null) {
                             payControllerListenerForBuyer.onSyncSellerToBuyerReceived(buyerAddress1, fromAddress,
-                                    open_block, usedDataAmount1, totalDataAmount1, balance, BPS1, CHS1, endPointType);
+                                    open_block, usedDataAmount1, totalDataAmount1, balance, BPS1, CHS1, endPointType, trx_hash);
                         }
                         break;
 
                     case PurchaseConstants.MESSAGE_TYPES.SYNC_SELLER_TO_BUYER_OK:
                         sellerAddress = jsonObject.getString(PurchaseConstants.JSON_KEYS.SELLER_ADDRESS);
+                        bps = jsonObject.getString(PurchaseConstants.JSON_KEYS.MESSAGE_BPS);
+                        trx_hash = jsonObject.getString(PurchaseConstants.JSON_KEYS.TRX_HASH);
+
                         if (payControllerListenerForSeller != null) {
-                            payControllerListenerForSeller.onSynBuyerOKReceive(fromAddress, sellerAddress);
+                            payControllerListenerForSeller.onSynBuyerOKReceive(fromAddress, sellerAddress, bps, trx_hash);
                         }
                         break;
 
@@ -470,12 +478,12 @@ public class PayController {
                         }
                         break;
 
-                    case PurchaseConstants.MESSAGE_TYPES.RECEIVED_ETHER:
+                   /* case PurchaseConstants.MESSAGE_TYPES.RECEIVED_ETHER:
                         ethValue = jsonObject.getDouble(PurchaseConstants.JSON_KEYS.ETHER);
                         if (payControllerListenerForBuyer != null) {
                             payControllerListenerForBuyer.onReceivedEther(fromAddress, ethValue);
                         }
-                        break;
+                        break;*/
                     case PurchaseConstants.MESSAGE_TYPES.BLOCKCHAIN_REQUEST:
                         JSONArray requestArray = null;
                         if (jsonObject.has(PurchaseConstants.JSON_KEYS.REQUEST_LIST)) {
@@ -534,29 +542,35 @@ public class PayController {
                         String ethReqHash = jsonObject.optString(PurchaseConstants.JSON_KEYS.GIFT_ETH_HASH_REQUEST_SUBMIT);
                         String tknReqHash = jsonObject.optString(PurchaseConstants.JSON_KEYS.GIFT_TKN_HASH_REQUEST_SUBMIT);
                         String failedBy = jsonObject.optString(PurchaseConstants.JSON_KEYS.GIFT_TKN_FAILED_BY);
+                        ethValue = jsonObject.optDouble(PurchaseConstants.JSON_KEYS.GIFT_ETH_BALANCE);
+                        tokenValue = jsonObject.optDouble(PurchaseConstants.JSON_KEYS.GIFT_TKN_BALANCE);
 
 
                         if (payControllerListenerForBuyer != null) {
-                            payControllerListenerForBuyer.giftRequestSubmitted(isSuccess, message, ethReqHash, tknReqHash, endPointType, failedBy);
+                            payControllerListenerForBuyer.giftRequestSubmitted(isSuccess, message, ethReqHash, tknReqHash, endPointType, failedBy, ethValue, tokenValue);
                         }
                         break;
 
                     case PurchaseConstants.MESSAGE_TYPES.GIFT_ETHER_REQUEST_WITH_HASH:
                         String ethtranxHash = jsonObject.optString(PurchaseConstants.JSON_KEYS.GIFT_ETH_HASH_REQUEST_SUBMIT);
                         String tkntranxHash = jsonObject.optString(PurchaseConstants.JSON_KEYS.GIFT_TKN_HASH_REQUEST_SUBMIT);
+                        ethValue = jsonObject.optDouble(PurchaseConstants.JSON_KEYS.GIFT_ETH_BALANCE);
+                        tokenValue = jsonObject.getDouble(PurchaseConstants.JSON_KEYS.GIFT_TKN_BALANCE);
 
                         if (payControllerListenerForSeller != null) {
-                            payControllerListenerForSeller.requestForGiftEtherWithHash(fromAddress, ethtranxHash, tkntranxHash, endPointType);
+                            payControllerListenerForSeller.requestForGiftEtherWithHash(fromAddress, ethtranxHash, tkntranxHash, endPointType, ethValue, tokenValue);
                         }
                         break;
 
                     case PurchaseConstants.MESSAGE_TYPES.GIFT_RESPONSE:
                         boolean isSuccessForGift = jsonObject.optBoolean(PurchaseConstants.JSON_KEYS.GIFT_REQUEST_IS_SUBMITTED);
-                        double ethBalance = jsonObject.optDouble(PurchaseConstants.JSON_KEYS.GIFT_ETH_BALANCE);
-                        double tknBalance = jsonObject.optDouble(PurchaseConstants.JSON_KEYS.GIFT_TKN_BALANCE);
+                        double ethBalance = jsonObject.optDouble(PurchaseConstants.INFO_KEYS.ETH_BALANCE);
+                        double tknBalance = jsonObject.optDouble(PurchaseConstants.INFO_KEYS.TKN_BALANCE);
+                        ethValue = jsonObject.optDouble(PurchaseConstants.JSON_KEYS.GIFT_ETH_BALANCE);
+                        tokenValue = jsonObject.optDouble(PurchaseConstants.JSON_KEYS.GIFT_TKN_BALANCE);
 
                         if (payControllerListenerForBuyer != null) {
-                            payControllerListenerForBuyer.giftResponse(isSuccessForGift, ethBalance, tknBalance, endPointType);
+                            payControllerListenerForBuyer.giftResponse(isSuccessForGift, ethBalance, tknBalance, endPointType, ethValue, tokenValue);
                         }
                         break;
                     case PurchaseConstants.MESSAGE_TYPES.DISCONNECTED_BY_SELLER:
@@ -564,6 +578,15 @@ public class PayController {
 
                         if (payControllerListenerForBuyer != null) {
                             payControllerListenerForBuyer.onDisconnectedBySeller(fromAddress, msg);
+                        }
+                        break;
+
+                    case PurchaseConstants.MESSAGE_TYPES.CHANNEL_CLOSED_BY_BUYER:
+                        open_block = jsonObject.getLong(PurchaseConstants.JSON_KEYS.OPEN_BLOCK);
+                        balance = jsonObject.getDouble(PurchaseConstants.JSON_KEYS.BPS_BALANCE);
+
+                        if (payControllerListenerForBuyer != null) {
+                            payControllerListenerForSeller.onChannelClosedByBuyer(fromAddress, open_block, balance);
                         }
                         break;
 
@@ -1005,6 +1028,16 @@ public class PayController {
         MeshLog.p("sendDisconnectedBySeller " + jo.toString());
         try {
             jo.put(PurchaseConstants.JSON_KEYS.MESSAGE_TYPE, PurchaseConstants.MESSAGE_TYPES.DISCONNECTED_BY_SELLER);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        sendPayMessage(receiver, jo.toString());
+    }
+
+    public void sendChannelClosedByBuyer(JSONObject jo, String receiver){
+        MeshLog.p("sendChannelClosedByBuyer " + jo.toString());
+        try {
+            jo.put(PurchaseConstants.JSON_KEYS.MESSAGE_TYPE, PurchaseConstants.MESSAGE_TYPES.CHANNEL_CLOSED_BY_BUYER);
         } catch (JSONException e) {
             e.printStackTrace();
         }
