@@ -95,14 +95,14 @@ public class ConnectionManager {
                 String SIGNAL_SERVER_URL = AppCredentials.getInstance().getSignalServerUrl();
                 String CONFIG_DATA = AppCredentials.getInstance().getConfiguration();
 
-                MeshControlConfig meshControlConfig = new MeshControlConfig().setAppDownloadEnable(true)
+                /*MeshControlConfig meshControlConfig = new MeshControlConfig().setAppDownloadEnable(true)
                         .setMessageEnable(false).setDiscoveryEnable(true).setBlockChainEnable(true);
 
-                String meshControlConfigData = new Gson().toJson(meshControlConfig);
+                String meshControlConfigData = new Gson().toJson(meshControlConfig);*/
 
                 viperClient = ViperClient.on(mContext, "com.w3engineers.ext.viper", SharedPref.read(Constant.KEY_USER_NAME),
-                        SharedPref.read(Constant.PreferenceKeys.ADDRESS), SharedPref.read(Constant.PreferenceKeys.PUBLIC_KEY), 1, System.currentTimeMillis(), true, CONFIG_DATA)
-                        .setConfig(AUTH_USER_NAME, AUTH_PASSWORD, FILE_REPO_LINK, PARSE_URL, PARSE_APP_ID, SIGNAL_SERVER_URL, meshControlConfigData, BuildConfig.VERSION_CODE);
+                        SharedPref.read(Constant.PreferenceKeys.ADDRESS), SharedPref.read(Constant.PreferenceKeys.PUBLIC_KEY), CONFIG_DATA)
+                        .setConfig(AUTH_USER_NAME, AUTH_PASSWORD, FILE_REPO_LINK, PARSE_URL, PARSE_APP_ID, SIGNAL_SERVER_URL, BuildConfig.VERSION_CODE);
 
             }
 

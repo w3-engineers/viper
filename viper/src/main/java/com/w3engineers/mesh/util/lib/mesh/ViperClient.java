@@ -59,7 +59,6 @@ public class ViperClient {
         this.usersName = userName;
         this.wallerAddress = walletAddress;
         this.publicKey = publicKey;
-        this.usersName = userName;
         this.avatar = avatar;
         this.regTime = regTime;
         this.isSync = isSync;
@@ -80,15 +79,24 @@ public class ViperClient {
         return mViperClient;
     }
 
+    public static ViperClient on(Context context, String packageName, String userName, String walletAddress, String publicKey, String configData) {
+        if (mViperClient == null) {
+            synchronized (ViperClient.class) {
+                if (mViperClient == null)
+                    mViperClient = new ViperClient(context, packageName, userName, walletAddress, publicKey, avatar, regTime, isSync, configData);
+            }
+        }
+        return mViperClient;
+    }
+
     public ViperClient setConfig(String authName, String authPass, String downloadLink, String parseUrl,
-                                 String parseAppId, String signalServerUrl, String meshControlConfig, int appVersion) {
+                                 String parseAppId, String signalServerUrl, int appVersion) {
 
         MeshLog.v("setConfig");
 
         SharedPref.write(Constant.PreferenceKeys.AUTH_USER_NAME, authName);
         SharedPref.write(Constant.PreferenceKeys.AUTH_PASSWORD, authPass);
         SharedPref.write(Constant.PreferenceKeys.APP_DOWNLOAD_LINK, downloadLink);
-        SharedPref.write(Constant.PreferenceKeys.MESH_CONTROL_CONFIG, meshControlConfig);
         SharedPref.write(Constant.PreferenceKeys.APP_VERSION, appVersion);
 
         PurchaseManager.getInstance().setParseInfo(parseUrl, parseAppId);
