@@ -12,6 +12,7 @@ import android.content.Context;
 import android.databinding.ViewDataBinding;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
+import android.os.RemoteException;
 import android.support.annotation.NonNull;
 import android.support.v4.content.ContextCompat;
 import android.text.TextUtils;
@@ -25,6 +26,7 @@ import com.w3engineers.mesh.application.data.local.model.Seller;
 import com.w3engineers.mesh.application.data.local.purchase.PurchaseConstants;
 import com.w3engineers.mesh.databinding.ItemDataSellerBinding;
 import com.w3engineers.mesh.databinding.ItemSellerViewBinding;
+import com.w3engineers.mesh.util.lib.mesh.DataManager;
 
 
 class TestSellerListAdapter extends BaseAdapter<Seller> {
@@ -115,6 +117,8 @@ class TestSellerListAdapter extends BaseAdapter<Seller> {
 
             String totalDataInfo = String.format(context.getResources().getString(R.string.total_purchase) , " " + convertTwoDigitString(seller.getPurchasedData()));
 
+            itemDataSellerBinding.sellerMeshStatus.setBackgroundResource(activeStatusResource(seller.getLabel(), seller.getId()));
+
             itemDataSellerBinding.userUseAmount.setText(usedDataInfo);
             itemDataSellerBinding.userTotalAmount.setText(totalDataInfo);
 
@@ -129,6 +133,25 @@ class TestSellerListAdapter extends BaseAdapter<Seller> {
 
             itemDataSellerBinding.status.setTag(seller);
             itemDataSellerBinding.status.setOnClickListener(clickListener);
+        }
+    }
+
+    private int activeStatusResource(int label, String nodeID) {
+        if (label == DataPlanConstants.SELLER_LABEL.OFFLINE_PURCHASED) {
+            return R.mipmap.ic_offline;
+        } else {
+            int userType = 1;
+            try {
+                userType = DataManager.on().getLinkTypeById(nodeID);
+            } catch (RemoteException e) {
+                e.printStackTrace();
+            }
+
+            if (userType == 8 || userType == 9) {
+                return R.mipmap.ic_hb_online;
+            } else {
+                return R.mipmap.ic_mesh_online;
+            }
         }
     }
 }

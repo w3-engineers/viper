@@ -39,6 +39,7 @@ public interface PurchaseConstants {
 
         int CHANNEL_CLOSED = 28;
         int CHANNEL_TOPUP = 29;
+        int CHANNEL_CLOSED_BY_BUYER = 30;
 
         int GIFT_ETHER_REQUEST = 31;
         int GIFT_ETHER_REQUEST_SUBMITTED = 32;
@@ -75,6 +76,7 @@ public interface PurchaseConstants {
         String MESSAGE_TEXT = "msg";
         String OPEN_BLOCK = "ob";
         String DEPOSIT = "deposit";
+        String TRX_HASH = "th";
         String INFO_KEYS = "info";
         String INFO_PURPOSE = "pur";
         String INFO_JSON = "ij";
@@ -98,7 +100,6 @@ public interface PurchaseConstants {
         String SELLER_ADDRESS = "sa";
         String USED_DATA = "ud";
         String TOTAL_DATA = "td";
-        String ETHER = "eth";
         String RESPONSE_CODE = "rc";
         String REQUEST_SUCCESS = "rs";
         String END_POINT_TYPE = "ept";

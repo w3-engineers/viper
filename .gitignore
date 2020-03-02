@@ -91,3 +91,9 @@ app/src/main/assets/
 app/src/main/assets/config.json
 app/src/main/assets/configuration.json
 app/src/main/assets/point_guide.json
+
+app/src/main/cpp/native-lib.cpp
+app/src/main/cpp/CMakeLists.txt
+
+viper/src/main/cpp/config-lib.cpp
+viper/src/main/cpp/CMakeLists.txt

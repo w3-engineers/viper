@@ -56,6 +56,10 @@
             Service eventually. Apps will communicate with the service via AIDL, TCP or some other
         IPC Mechanism
     </string>
-
+    <string name="interruption_title">%s Interruption</string>
+    <string name="hardware_interruption">%s turned off. Telemesh would not work properly.</string>
+    <string name="permission_interruption">%s permission is disabled. Telemesh would not work properly.</string>
+    <string name="settings_choose_language">Language</string>
+    <string name="choose_language">Choose a Language</string>
 
 </resources>

@@ -69,6 +69,9 @@ public class UserListAdapter extends BaseAdapter<UserModel> {
         List<UserModel> userModelList = getItems();
 
         for (UserModel item : userModelList) {
+            if (item == null || TextUtils.isEmpty(item.getUserId() ))
+                continue;
+
             if (item.getUserId().equals(userId)) {
                 removeItem(item);
                 return;

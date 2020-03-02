@@ -18,11 +18,12 @@ android {
         multiDexEnabled true
         versionCode 1
         versionName "0.0.1-alpha"
+
     }
     buildTypes {
         release {
             debuggable false
-            minifyEnabled true
+            minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
 
             /*buildConfigField 'String', 'AUTH_USER_NAME', System.getenv('AUTH_USER_NAME').equals(null) ? AUTH_USER_NAME : System.getenv('AUTH_USER_NAME')
@@ -47,6 +48,7 @@ android {
     dataBinding {
         enabled = true
     }
+
 
 }
 

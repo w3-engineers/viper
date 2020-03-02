@@ -4,6 +4,12 @@ public interface DataPlanConstants {
 
     long SELLER_MINIMUM_WARNING_DATA = 1024;
 
+    interface INTERRUPTION_EVENT {
+        int USER_DISABLED_BT = 1;
+        int USER_DISABLED_WIFI = 2;
+        int LOCATION_PROVIDER_OFF = 3;
+    }
+
     interface USER_ROLE {
         int MESH_USER = 0;
         int DATA_SELLER = 1;
