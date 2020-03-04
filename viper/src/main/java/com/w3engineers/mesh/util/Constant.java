@@ -90,6 +90,7 @@ public class Constant {
         String GIFT_DONATE_LINK = "GIFT_DONATE_LINK";
         String GIFT_DONATE_USERNAME = "GIFT_DONATE_USER";
         String GIFT_DONATE_PASS = "GIFT_DONATE_PASS";
+        String GIFT_DONATE_PUBLIC_KEY = "GIFT_DONATE_PUBLIC_KEY";
         String TX_HISTORY_URL_KOTTI = "TX_HISTORY_URL_KOTTI";
         String TX_URL_ROPSTEN = "TX_URL_ROPSTEN";
         String CONFIG_FILE = "CONFIG_FILE";

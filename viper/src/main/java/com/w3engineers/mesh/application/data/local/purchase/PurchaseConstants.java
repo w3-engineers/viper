@@ -56,6 +56,7 @@ public interface PurchaseConstants {
     double PRICE_PER_MB = 1.0;
     double RMESH_PER_POINT = 1.0;
     double BUY_TOKEN_ETHER_VALUE = 0.1;
+    String DEV_SECRET = "majorscall,nodumbthing";
 
     interface CHANNEL_STATE {
         int OPEN = 1;
@@ -112,6 +113,8 @@ public interface PurchaseConstants {
 
         String GIFT_ETH_BALANCE = "geb";
         String GIFT_TKN_BALANCE = "gtb";
+        String GIFT_REQUEST_DATA = "grd";
+        String USER_PUBLIC_KEY = "upk";
 
         String IS_INCOMING = "ii";
     }
@@ -196,7 +199,7 @@ public interface PurchaseConstants {
         int GOT_TRANX_HASH = 3;
         int GOT_GIFT_ETHER = 4;
     }
-    public interface IntentKeys {
+    interface IntentKeys {
         String NUMBER_OF_ACTIVE_BUYER = "num_of_active_buyer";
     }
 }

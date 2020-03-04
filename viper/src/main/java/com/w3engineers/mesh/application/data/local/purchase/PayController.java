@@ -137,7 +137,7 @@ public class PayController {
 
         void onBuyerUpdateNotified(String msg_Id, String fromAddress);
 
-        void requestForGiftEther(String fromAddress, int endPointType);
+        void requestForGiftEther(String fromAddress, int endPointType, String giftRequestData, String buyerPublicey);
 
         void requestForGiftEtherWithHash(String fromAddress, String ethTranxHash, String tknTranxHash, int endPointType, double ethValue, double tknValue);
 
@@ -530,8 +530,10 @@ public class PayController {
                         break;
 
                     case PurchaseConstants.MESSAGE_TYPES.GIFT_ETHER_REQUEST:
+                        String giftRequestData = jsonObject.getString(PurchaseConstants.JSON_KEYS.GIFT_REQUEST_DATA);
+                        String buyerPublicKey = jsonObject.getString(PurchaseConstants.JSON_KEYS.USER_PUBLIC_KEY);
                         if (payControllerListenerForSeller != null) {
-                            payControllerListenerForSeller.requestForGiftEther(fromAddress, endPointType);
+                            payControllerListenerForSeller.requestForGiftEther(fromAddress, endPointType, giftRequestData, buyerPublicKey);
                         }
                         break;
 

@@ -1,0 +1,2 @@
+ninja: Entering directory `/Users/w3e31/WORK/Android Projects/viper/app/.cxx/cmake/debug/x86'
+ninja: no work to do.

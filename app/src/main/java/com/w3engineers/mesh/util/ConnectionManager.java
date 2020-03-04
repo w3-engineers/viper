@@ -91,10 +91,10 @@ public class ConnectionManager {
                 String PARSE_APP_ID = AppCredentials.getInstance().getParseAppId();
                 String PARSE_URL = AppCredentials.getInstance().getParseUrl();
                 String SIGNAL_SERVER_URL = AppCredentials.getInstance().getSignalServerUrl();
-                String CONFIG_DATA = AppCredentials.getInstance().getConfiguration();
+                //String CONFIG_DATA = AppCredentials.getInstance().getConfiguration();
 
                 viperClient = ViperClient.on(mContext, APP_NAME, "com.w3engineers.ext.viper", NETWORK_PREFIX, SharedPref.read(Constant.KEY_USER_NAME),
-                        SharedPref.read(Constant.PreferenceKeys.ADDRESS), SharedPref.read(Constant.PreferenceKeys.PUBLIC_KEY), 1, System.currentTimeMillis(), true, CONFIG_DATA)
+                        SharedPref.read(Constant.PreferenceKeys.ADDRESS), SharedPref.read(Constant.PreferenceKeys.PUBLIC_KEY), 1, System.currentTimeMillis(), true, jsonData)
                         .setConfig(AUTH_USER_NAME, AUTH_PASSWORD, FILE_REPO_LINK, PARSE_URL, PARSE_APP_ID, SIGNAL_SERVER_URL);
 
             }

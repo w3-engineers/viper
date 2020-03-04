@@ -1,0 +1,8 @@
+Executable : /Users/w3e31/Library/Android/sdk/cmake/3.10.2.4988404/bin/ninja
+arguments : 
+-C
+/Users/w3e31/WORK/Android Projects/viper/app/.cxx/cmake/debug/armeabi-v7a
+native-lib
+staging-native-lib
+jvmArgs : 
+

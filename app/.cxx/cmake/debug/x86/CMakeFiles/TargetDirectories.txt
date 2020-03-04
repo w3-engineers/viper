@@ -1,0 +1,4 @@
+/Users/w3e31/WORK/Android Projects/viper/app/.cxx/cmake/debug/x86/CMakeFiles/rebuild_cache.dir
+/Users/w3e31/WORK/Android Projects/viper/app/.cxx/cmake/debug/x86/CMakeFiles/edit_cache.dir
+/Users/w3e31/WORK/Android Projects/viper/app/.cxx/cmake/debug/x86/CMakeFiles/staging-native-lib.dir
+/Users/w3e31/WORK/Android Projects/viper/app/.cxx/cmake/debug/x86/CMakeFiles/native-lib.dir
