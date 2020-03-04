@@ -69,6 +69,8 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
         ConnectionManager.on(this).initNearByCallBackForChatActivity(this);
         ChatDataProvider.On().setUpdateListener(this::updateUI);
         fetchAllConversationWithThisUser();
+
+        ConnectionManager.on(this).checkConnectionStatus(mUserModel.getUserId());
     }
 
     @Override

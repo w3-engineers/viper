@@ -132,6 +132,7 @@ public class ChatDataProvider {
     }
 
     public UserModel getUserInfoById(String userId){
+        if (TextUtils.isEmpty(userId)) return null;
         UserModel userModel = userModelBox.query().equal(UserModel_.userId, userId).build().findFirst();
         return userModel;
     }

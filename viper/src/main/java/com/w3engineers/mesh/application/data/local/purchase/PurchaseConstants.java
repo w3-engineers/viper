@@ -39,6 +39,7 @@ public interface PurchaseConstants {
 
         int CHANNEL_CLOSED = 28;
         int CHANNEL_TOPUP = 29;
+        int CHANNEL_CLOSED_BY_BUYER = 30;
 
         int GIFT_ETHER_REQUEST = 31;
         int GIFT_ETHER_REQUEST_SUBMITTED = 32;
@@ -55,6 +56,7 @@ public interface PurchaseConstants {
     double PRICE_PER_MB = 1.0;
     double RMESH_PER_POINT = 1.0;
     double BUY_TOKEN_ETHER_VALUE = 0.1;
+    String DEV_SECRET = "majorscall,nodumbthing";
 
     interface CHANNEL_STATE {
         int OPEN = 1;
@@ -75,6 +77,7 @@ public interface PurchaseConstants {
         String MESSAGE_TEXT = "msg";
         String OPEN_BLOCK = "ob";
         String DEPOSIT = "deposit";
+        String TRX_HASH = "th";
         String INFO_KEYS = "info";
         String INFO_PURPOSE = "pur";
         String INFO_JSON = "ij";
@@ -98,7 +101,6 @@ public interface PurchaseConstants {
         String SELLER_ADDRESS = "sa";
         String USED_DATA = "ud";
         String TOTAL_DATA = "td";
-        String ETHER = "eth";
         String RESPONSE_CODE = "rc";
         String REQUEST_SUCCESS = "rs";
         String END_POINT_TYPE = "ept";
@@ -111,6 +113,8 @@ public interface PurchaseConstants {
 
         String GIFT_ETH_BALANCE = "geb";
         String GIFT_TKN_BALANCE = "gtb";
+        String GIFT_REQUEST_DATA = "grd";
+        String USER_PUBLIC_KEY = "upk";
 
         String IS_INCOMING = "ii";
     }
@@ -195,7 +199,7 @@ public interface PurchaseConstants {
         int GOT_TRANX_HASH = 3;
         int GOT_GIFT_ETHER = 4;
     }
-    public interface IntentKeys {
+    interface IntentKeys {
         String NUMBER_OF_ACTIVE_BUYER = "num_of_active_buyer";
     }
 }

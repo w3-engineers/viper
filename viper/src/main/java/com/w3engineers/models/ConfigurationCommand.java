@@ -5,6 +5,7 @@ import android.os.Parcel;
 import android.os.Parcelable;
 
 import java.util.List;
+
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
@@ -55,6 +56,26 @@ public class ConfigurationCommand implements Parcelable {
     @Expose
     private int mainNetNetworkType;
 
+    @SerializedName("GIFT_DONATE_USER")
+    @Expose
+    private String giftDonateUsername;
+
+    @SerializedName("GIFT_DONATE_PASS")
+    @Expose
+    private String giftDonatePass;
+
+    @SerializedName("GIFT_DONATE_PUBLIC_KEY")
+    @Expose
+    private String giftDonatePublicKey;
+
+    @SerializedName("TX_HISTORY_URL_KOTTI")
+    @Expose
+    private String historyUrlKotti;
+
+    @SerializedName("TX_URL_ROPSTEN")
+    @Expose
+    private String ropstenUrl;
+
     @SerializedName("network")
     @Expose
     private List<Network> network = null;
@@ -74,6 +95,12 @@ public class ConfigurationCommand implements Parcelable {
         rmeshInfoText = in.readString();
         rmeshOwnerAddress = in.readString();
         mainNetNetworkType = in.readInt();
+
+        giftDonateUsername = in.readString();
+        giftDonatePass = in.readString();
+        giftDonatePublicKey = in.readString();
+        historyUrlKotti = in.readString();
+        ropstenUrl = in.readString();
 
         network = in.createTypedArrayList(Network.CREATOR);
     }
@@ -146,6 +173,14 @@ public class ConfigurationCommand implements Parcelable {
         this.giftDonateLink = giftDonateLink;
     }
 
+    public String getGiftDonatePublicKey() {
+        return giftDonatePublicKey;
+    }
+
+    public void setGiftDonatePublicKey(String giftDonatePublicKey) {
+        this.giftDonatePublicKey = giftDonatePublicKey;
+    }
+
     public long getMaxPointForRmesh() {
         return maxPointForRmesh;
     }
@@ -194,6 +229,38 @@ public class ConfigurationCommand implements Parcelable {
         this.mainNetNetworkType = mainNetNetworkType;
     }
 
+    public String getGiftDonateUsername() {
+        return giftDonateUsername;
+    }
+
+    public void setGiftDonateUsername(String giftDonateUsername) {
+        this.giftDonateUsername = giftDonateUsername;
+    }
+
+    public String getGiftDonatePass() {
+        return giftDonatePass;
+    }
+
+    public void setGiftDonatePass(String giftDonatePass) {
+        this.giftDonatePass = giftDonatePass;
+    }
+
+    public String getHistoryUrlKotti() {
+        return historyUrlKotti;
+    }
+
+    public void setHistoryUrlKotti(String historyUrlKotti) {
+        this.historyUrlKotti = historyUrlKotti;
+    }
+
+    public String getRopstenUrl() {
+        return ropstenUrl;
+    }
+
+    public void setRopstenUrl(String ropstenUrl) {
+        this.ropstenUrl = ropstenUrl;
+    }
+
     @Override
     public int describeContents() {
         return 0;
@@ -215,6 +282,12 @@ public class ConfigurationCommand implements Parcelable {
         parcel.writeString(rmeshInfoText);
         parcel.writeString(rmeshOwnerAddress);
         parcel.writeInt(mainNetNetworkType);
+
+        parcel.writeString(giftDonateUsername);
+        parcel.writeString(giftDonatePass);
+        parcel.writeString(giftDonatePublicKey);
+        parcel.writeString(historyUrlKotti);
+        parcel.writeString(ropstenUrl);
 
         parcel.writeTypedList(network);
     }

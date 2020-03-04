@@ -27,5 +27,6 @@
 
 
     <color name="body_text">#4C4C4C</color>
+    <color name="link_color">#008DFF</color>
 
 </resources>

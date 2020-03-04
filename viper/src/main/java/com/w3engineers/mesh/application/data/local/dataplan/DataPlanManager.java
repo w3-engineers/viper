@@ -127,7 +127,7 @@ public class DataPlanManager {
     public void roleSwitch(int newRole) {
 
         try {
-            MeshLog.v("sellerMode dpm " + newRole);
+            MeshLog.v("UserMode dpm " + newRole);
             preferencesHelperDataplan.setDataPlanRole(newRole);
             payController.getDataManager().restartMesh(newRole);
         } catch (Exception e) {
@@ -263,9 +263,9 @@ public class DataPlanManager {
         this.currentSellerId = sellerId;
         this.currentSellerStatus = currentSellerStatus;
 
-        if (TextUtils.isEmpty(currentSellerId)) {
-            processAllSeller(context);
-        }
+//        if (TextUtils.isEmpty(currentSellerId)) {
+//            processAllSeller(context);
+//        }
     }
 
     private void processAllSeller(Context context, List<String> connectedSellers) {
@@ -333,8 +333,9 @@ public class DataPlanManager {
 
                     if (seller.getId().equals(currentSellerId)) {
 
-                        seller.setBtnEnabled(!currentSellerStatus.equals(PurchaseConstants.SELLERS_BTN_TEXT.PURCHASING)
-                                && !currentSellerStatus.equals(PurchaseConstants.SELLERS_BTN_TEXT.CLOSING));
+//                        seller.setBtnEnabled(!currentSellerStatus.equals(PurchaseConstants.SELLERS_BTN_TEXT.PURCHASING) && !currentSellerStatus.equals(PurchaseConstants.SELLERS_BTN_TEXT.CLOSING));
+                        seller.setBtnEnabled(!currentSellerStatus.equals(PurchaseConstants.SELLERS_BTN_TEXT.PURCHASING));
+
                         seller.setBtnText(currentSellerStatus);
 
                         finalSeller.set(i, seller);

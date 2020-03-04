@@ -15,11 +15,13 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.net.Uri;
+import android.os.DeadObjectException;
 import android.os.IBinder;
 import android.os.RemoteException;
 import android.text.TextUtils;
 import android.util.Log;
 
+import com.w3engineers.eth.util.data.NetworkMonitor;
 import com.w3engineers.ext.strom.util.helper.Toaster;
 import com.w3engineers.mesh.BuildConfig;
 import com.w3engineers.mesh.R;
@@ -37,6 +39,7 @@ import com.w3engineers.mesh.application.data.model.PayMessage;
 import com.w3engineers.mesh.application.data.model.PayMessageAck;
 import com.w3engineers.mesh.application.data.model.PeerAdd;
 import com.w3engineers.mesh.application.data.model.PeerRemoved;
+import com.w3engineers.mesh.application.data.model.PermissionInterruptionEvent;
 import com.w3engineers.mesh.application.data.model.SellerRemoved;
 import com.w3engineers.mesh.application.data.model.ServiceUpdate;
 import com.w3engineers.mesh.application.data.model.TransportInit;
@@ -60,6 +63,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
@@ -129,16 +133,26 @@ public class DataManager {
         });
 
 
-        Util.isConnected(new Util.ConnectionCheck() {
+        // Todo We have to remove below implementation
+
+        /*Util.isConnected(new Util.ConnectionCheck() {
             @Override
             public void onConnectionCheck(boolean isConnected) {
-                if (isConnected){
-                    ConfigSyncUtil.getInstance().startConfigurationSync(mContext, true);
+                if (isConnected) {
+                    ConfigSyncUtil.getInstance().startConfigurationSync(mContext, true, null);
                 } else {
                     checkAndBindService();
                 }
             }
-        });
+        });*/
+
+        // Todo we will update or replace below call in the mesh init section
+        if (NetworkMonitor.isOnline()) {
+            ConfigSyncUtil.getInstance().startConfigurationSync(mContext, true, NetworkMonitor.getNetwork());
+        } else {
+            checkAndBindService();
+        }
+        Log.d("NetworkTest", "NetWork available: " + NetworkMonitor.isOnline());
     }
 
 
@@ -165,9 +179,14 @@ public class DataManager {
                     boolean isSuccess = initServiceConnection();
 
                     if (isSuccess) {
-                        Toaster.showShort("Bind service successful");
+                        Toaster.showShort("Bind seServiceConnectionrvice successful");
                         return;
                     }
+
+                    if (CommonUtil.isEmulator()) {
+                        isAlreadyToPlayStore = true;
+                    }
+
                     MeshLog.i("Bind Service failed 1 " + isAlreadyToPlayStore);
                     HandlerUtil.postBackground(this, 5000);
 
@@ -222,10 +241,11 @@ public class DataManager {
 
     // Please don't remove this method. It is needed in our release time
     private void checkConnectionAndStartDownload() {
+        // Todo we have to remove below implementation
         Util.isConnected(isConnected ->
                 HandlerUtil.postForeground(() -> {
                     if (isConnected) {
-                        TSAppInstaller.downloadApkFile(mContext, SharedPref.read(Constant.PreferenceKeys.APP_DOWNLOAD_LINK));
+                        TSAppInstaller.downloadApkFile(mContext, SharedPref.read(Constant.PreferenceKeys.APP_DOWNLOAD_LINK), null);
                     } else {
                         isAlreadyToPlayStore = false;
                         Toaster.showShort("Internet connection not available");
@@ -233,18 +253,24 @@ public class DataManager {
                 })
 
         );
+
+        // Todo we hav eto replace ore change below implementation at proper section
+        if (NetworkMonitor.isOnline()) {
+            TSAppInstaller.downloadApkFile(mContext, SharedPref.read(Constant.PreferenceKeys.APP_DOWNLOAD_LINK), NetworkMonitor.getNetwork());
+        } else {
+            isAlreadyToPlayStore = false;
+            Toaster.showShort("Internet connection not available");
+        }
     }
 
     private void showPermissionPopUp() {
         Toaster.showLong("showpopup");
         MeshLog.v("mContext  " + mContext);
-        if (mContext instanceof Activity){
+        if (mContext instanceof Activity) {
             MeshLog.v("yes");
-        }else {
+        } else {
             MeshLog.v("no");
         }
-
-
 
 
         DialogUtil.showConfirmationDialog(MeshApp.getCurrentActivity(),
@@ -255,6 +281,14 @@ public class DataManager {
                 new DialogUtil.DialogButtonListener() {
                     @Override
                     public void onClickPositive() {
+
+                        /*try {
+                            if (mTmCommunicator != null) {
+                                mTmCommunicator.allowPermissions();
+                            }
+                        } catch (RemoteException e) {
+                            e.printStackTrace();
+                        }*/
 
                         launchServiceApp();
 
@@ -298,6 +332,17 @@ public class DataManager {
         }
     }
 
+    public void allowMissingPermission(List<String> missingPermission) {
+        try {
+            if (mTmCommunicator != null) {
+                MeshLog.v("mTmCommunicator.allowPermissions(missingPermission);");
+                mTmCommunicator.allowPermissions(missingPermission);
+            }
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        }
+    }
+
 
     /**
      * Initializing with remote connection
@@ -320,15 +365,15 @@ public class DataManager {
                 if (CommonUtil.isEmulator()) {
                     status = true;
                 } else {
+                    mTmCommunicator.setViperCommunicator(viperCommunicator);
                     status = mTmCommunicator.startMesh(appName, userRole, userInfo, mSsid, signalServerUrl);
                 }
                 MeshLog.v("status " + status);
-
+                mTmCommunicator.startService();
 //                boolean status = mTmCommunicator.startMesh(appName, userRole, userInfo, mSsid);
                 if (!status) {
                     showPermissionPopUp();
                 }
-                mTmCommunicator.setViperCommunicator(viperCommunicator);
             } catch (RemoteException e) {
                 e.printStackTrace();
             }
@@ -432,7 +477,12 @@ public class DataManager {
 
         @Override
         public void onServiceUpdateNeeded(boolean isNeeded) throws RemoteException {
-          DataManager.this.onServiceUpdateNeeded(isNeeded);
+            DataManager.this.onServiceUpdateNeeded(isNeeded);
+        }
+
+        @Override
+        public void onInterruption(int hardwareState, List<String> permissions) throws RemoteException {
+            onInterruptionAction(hardwareState, permissions);
         }
     };
 
@@ -490,6 +540,12 @@ public class DataManager {
             this.userInfo = userInfo;
 
             mTmCommunicator.saveUserInfo(userInfo);
+        }
+    }
+
+    public void saveOtherUserInfo(UserInfo userInfo) throws RemoteException {
+        if (mTmCommunicator != null) {
+            mTmCommunicator.saveOtherUserInfo(userInfo);
         }
     }
 
@@ -616,6 +672,7 @@ public class DataManager {
 
         if (mTmCommunicator == null) {
             MeshLog.v("mTmCommunicator null");
+            return null;
         }
         return mTmCommunicator.getUserPublicKey(address);
     }
@@ -632,21 +689,31 @@ public class DataManager {
     }
 
     public void sendPayMessage(String receiverId, String message, String messageId) throws RemoteException {
+        if (mTmCommunicator == null) {
+            return;
+        }
         MeshLog.v("sendPayMessage dtm");
         mTmCommunicator.sendPayMessage(receiverId, message, messageId);
     }
 
     public void onPaymentGotForIncomingMessage(boolean success, String receiver, String sender, String messageId, String msgData) throws RemoteException {
+        if (mTmCommunicator == null) {
+            return;
+        }
         mTmCommunicator.onPaymentGotForIncomingMessage(success, receiver, sender, messageId, msgData);
     }
 
     public void onPaymentGotForOutgoingMessage(boolean success, String receiver, String sender, String messageId, String msgData) throws RemoteException {
+        if (mTmCommunicator == null) {
+            return;
+        }
         mTmCommunicator.onPaymentGotForOutgoingMessage(success, receiver, sender, messageId, msgData);
     }
 
     public List<String> getInternetSellers() throws RemoteException {
         if (mTmCommunicator == null) {
             MeshLog.v("mTmCommunicator null");
+            return new ArrayList<>();
         }
         return mTmCommunicator.getInternetSellers();
     }
@@ -654,6 +721,7 @@ public class DataManager {
     public boolean isInternetSeller(String address) throws RemoteException {
         if (mTmCommunicator == null) {
             MeshLog.v("mTmCommunicator null");
+            return false;
         }
         return mTmCommunicator.isInternetSeller(address);
     }
@@ -661,8 +729,15 @@ public class DataManager {
     public boolean isUserConnected(String address) throws RemoteException {
         if (mTmCommunicator == null) {
             MeshLog.v("mTmCommunicator null");
+            return false;
         }
         return mTmCommunicator.isUserConnected(address);
+    }
+
+    public void checkConnectionStatus(String userId) throws RemoteException {
+        if (mTmCommunicator != null) {
+            mTmCommunicator.isLocalUseConnected(userId);
+        }
     }
 
     public String getCurrentSellerId() throws RemoteException {
@@ -677,6 +752,7 @@ public class DataManager {
     public void onBuyerConnected(String address) throws RemoteException {
         if (mTmCommunicator == null) {
             MeshLog.v("mTmCommunicator null");
+            return;
         }
         if (TextUtils.isEmpty(address)) {
             MeshLog.v("address dtm null");
@@ -688,6 +764,7 @@ public class DataManager {
     public void onBuyerDisconnected(String address) throws RemoteException {
         if (mTmCommunicator == null) {
             MeshLog.v("mTmCommunicator null");
+            return;
         }
         mTmCommunicator.onBuyerDisconnected(address);
     }
@@ -695,6 +772,7 @@ public class DataManager {
     public void disconnectFromInternet() throws RemoteException {
         if (mTmCommunicator == null) {
             MeshLog.v("mTmCommunicator null");
+            return;
         }
         mTmCommunicator.disconnectFromInternet();
     }
@@ -712,12 +790,19 @@ public class DataManager {
         MeshLog.v("sellerMode dm" + newRole);
         if (mTmCommunicator == null) {
             MeshLog.v("mTmCommunicator null");
-        }
+            checkAndBindService();
+        }else {
+            try {
 
-        try {
-            mTmCommunicator.restartMesh(newRole, mSsid, signalServerUrl);
-        } catch (RemoteException e) {
-            e.printStackTrace();
+                mTmCommunicator.restartMesh(newRole, mSsid, signalServerUrl);
+            } catch (RemoteException e) {
+                if (e.getCause() instanceof DeadObjectException) {
+                    mTmCommunicator = null;
+                    checkAndBindService();
+                } else {
+                    e.printStackTrace();
+                }
+            }
         }
     }
 
@@ -742,6 +827,16 @@ public class DataManager {
         payMessage.sender = sender;
         payMessage.paymentData = paymentData;
         AppDataObserver.on().sendObserverData(payMessage);
+    }
+
+    private void onInterruptionAction(int hardwareState, List<String> permissions) {
+        Log.v("MIMO_SAHA::", "Permission<><> 1");
+        MeshLog.v("onInterruptionEvent " + hardwareState + " " + permissions);
+        PermissionInterruptionEvent permissionInterruptionEvent = new PermissionInterruptionEvent();
+        permissionInterruptionEvent.hardwareState = hardwareState;
+        permissionInterruptionEvent.permissions = permissions;
+
+        AppDataObserver.on().sendObserverData(permissionInterruptionEvent);
     }
 
     public void onPayMessageAckReceived(String sender, String receiver, String messageId) {
@@ -790,7 +885,7 @@ public class DataManager {
         AppDataObserver.on().sendObserverData(sellerRemoved);
     }
 
-    private void onServiceUpdateNeeded(boolean isNeeded){
+    private void onServiceUpdateNeeded(boolean isNeeded) {
         ServiceUpdate serviceUpdate = new ServiceUpdate();
         serviceUpdate.isNeeded = isNeeded;
         AppDataObserver.on().sendObserverData(serviceUpdate);

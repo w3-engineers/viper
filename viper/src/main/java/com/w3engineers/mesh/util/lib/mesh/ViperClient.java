@@ -166,11 +166,11 @@ public class ViperClient {
 
 
         if (PreferencesHelperDataplan.on().getDataPlanRole() == DataPlanConstants.USER_ROLE.DATA_SELLER) {
-            PurchaseManagerSeller.getInstance().setPayControllerListener();
+            PurchaseManagerSeller.getInstance();
         }
 
         if (PreferencesHelperDataplan.on().getDataPlanRole() == DataPlanConstants.USER_ROLE.DATA_BUYER) {
-            PurchaseManagerBuyer.getInstance().setPayControllerListener();
+            PurchaseManagerBuyer.getInstance();
         }
 
         WalletLoaded walletLoaded = new WalletLoaded();
@@ -201,6 +201,14 @@ public class ViperClient {
         }
     }
 
+    public void checkConnectionStatus(String nodeID){
+        try {
+            DataManager.on().checkConnectionStatus(nodeID);
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        }
+    }
+
     public int getLinkTypeById(String nodeID) throws RemoteException {
         return DataManager.on().getLinkTypeById(nodeID);
     }
@@ -223,6 +231,21 @@ public class ViperClient {
             userInfo.setPackageName(packageName);
 
             DataManager.on().saveUserInfo(userInfo);
+
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void saveOtherUserInfo(String usersName, int avatar, String walletAddress) {
+        try {
+            UserInfo userInfo = new UserInfo();
+
+            userInfo.setAddress(walletAddress);
+            userInfo.setAvatar(avatar);
+            userInfo.setUserName(usersName);
+
+            DataManager.on().saveOtherUserInfo(userInfo);
 
         } catch (RemoteException e) {
             e.printStackTrace();

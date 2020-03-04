@@ -1,19 +1,30 @@
 package com.w3engineers.mesh.util;
 
+import android.Manifest;
+import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.content.Context;
 import android.text.TextUtils;
+import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.widget.Button;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.w3engineers.ext.strom.util.Text;
 import com.w3engineers.ext.viper.BuildConfig;
+import com.w3engineers.ext.viper.R;
 import com.w3engineers.ext.viper.ViperApp;
 import com.w3engineers.mesh.application.data.ApiEvent;
 import com.w3engineers.mesh.application.data.AppDataObserver;
+import com.w3engineers.mesh.application.data.local.DataPlanConstants;
 import com.w3engineers.mesh.application.data.local.db.SharedPref;
 import com.w3engineers.mesh.application.data.model.DataAckEvent;
 import com.w3engineers.mesh.application.data.model.DataEvent;
 import com.w3engineers.mesh.application.data.model.PeerAdd;
 import com.w3engineers.mesh.application.data.model.PeerRemoved;
+import com.w3engineers.mesh.application.data.model.PermissionInterruptionEvent;
 import com.w3engineers.mesh.application.data.model.ServiceUpdate;
 import com.w3engineers.mesh.application.data.model.UserInfoEvent;
 import com.w3engineers.mesh.data.AppCredentials;
@@ -23,6 +34,8 @@ import com.w3engineers.mesh.ui.Nearby.NearbyCallBack;
 import com.w3engineers.mesh.ui.Nearby.UserConnectionCallBack;
 import com.w3engineers.mesh.ui.chat.ChatDataProvider;
 import com.w3engineers.mesh.ui.chat.MessageListener;
+import com.w3engineers.mesh.ui.main.MainActivity;
+import com.w3engineers.mesh.util.lib.mesh.DataManager;
 import com.w3engineers.mesh.util.lib.mesh.ViperClient;
 
 import org.json.JSONException;
@@ -36,7 +49,7 @@ import java.util.Map;
 import java.util.UUID;
 
 public class ConnectionManager {
-    private static final String NETWORK_PREFIX = "arif";
+    private static final String NETWORK_PREFIX = "major";
     private static final String APP_NAME = "viper";
     private static ConnectionManager mConnectionManager;
     private ViperClient viperClient;
@@ -78,10 +91,10 @@ public class ConnectionManager {
                 String PARSE_APP_ID = AppCredentials.getInstance().getParseAppId();
                 String PARSE_URL = AppCredentials.getInstance().getParseUrl();
                 String SIGNAL_SERVER_URL = AppCredentials.getInstance().getSignalServerUrl();
-                String CONFIG_DATA = AppCredentials.getInstance().getConfiguration();
+                //String CONFIG_DATA = AppCredentials.getInstance().getConfiguration();
 
                 viperClient = ViperClient.on(mContext, APP_NAME, "com.w3engineers.ext.viper", NETWORK_PREFIX, SharedPref.read(Constant.KEY_USER_NAME),
-                        SharedPref.read(Constant.PreferenceKeys.ADDRESS), SharedPref.read(Constant.PreferenceKeys.PUBLIC_KEY), 1, System.currentTimeMillis(), true, CONFIG_DATA)
+                        SharedPref.read(Constant.PreferenceKeys.ADDRESS), SharedPref.read(Constant.PreferenceKeys.PUBLIC_KEY), 1, System.currentTimeMillis(), true, jsonData)
                         .setConfig(AUTH_USER_NAME, AUTH_PASSWORD, FILE_REPO_LINK, PARSE_URL, PARSE_APP_ID, SIGNAL_SERVER_URL);
 
             }
@@ -98,6 +111,9 @@ public class ConnectionManager {
 
             boolean isUserExist = ChatDataProvider.On().checkUserExistence(peerAdd.peerId);
             if (isUserExist) {
+                MeshLog.v("startAllObserver  peerAdd.peerId " + peerAdd.peerId);
+
+
                 UserModel userModel = ChatDataProvider.On().getUserInfoById(peerAdd.peerId);
                 discoverUserMap.put(peerAdd.peerId, userModel);
                 if (nearbyCallBack != null) {
@@ -151,6 +167,7 @@ public class ConnectionManager {
             ServiceUpdate serviceUpdate = (ServiceUpdate) event;
             MeshLog.e("Service update needed:" + serviceUpdate.isNeeded);
         });
+
 
 
         AppDataObserver.on().startObserver(ApiEvent.DATA, event -> {
@@ -247,6 +264,8 @@ public class ConnectionManager {
                 } else if (dataAckEvent.status == Constant.MessageStatus.SEND) {
                     if (requestUserInfoList.containsKey(dataAckEvent.dataId)) {
                         String nodeId = requestUserInfoList.get(dataAckEvent.dataId);
+                        MeshLog.v("startAllObserver  nodeId " + nodeId);
+
                         UserModel userModel = ChatDataProvider.On().getUserInfoById(nodeId);
                         if (userModel == null) {
                             UserModel userModel1 = new UserModel();
@@ -272,6 +291,88 @@ public class ConnectionManager {
             });
 
         });
+
+        AppDataObserver.on().startObserver(ApiEvent.PERMISSION_INTERRUPTION, event -> {
+
+
+            PermissionInterruptionEvent permissionInterruptionEvent = (PermissionInterruptionEvent) event;
+            if (permissionInterruptionEvent != null) {
+                com.w3engineers.mesh.util.lib.mesh.HandlerUtil.postForeground(() -> showPermissionEventAlert(permissionInterruptionEvent.hardwareState, permissionInterruptionEvent.permissions, MeshApp.getCurrentActivity()));
+            }
+        });
+    }
+    public void showPermissionEventAlert(int hardwareEvent, List<String> permissions, Activity activity) {
+
+        if (activity == null) return;
+        android.app.AlertDialog.Builder dialogBuilder = new android.app.AlertDialog.Builder(activity);
+        LayoutInflater inflater = activity.getLayoutInflater();
+        @SuppressLint("InflateParams")
+        View dialogView = inflater.inflate(R.layout.alert_hardware_permission, null);
+        dialogBuilder.setView(dialogView);
+
+        android.app.AlertDialog alertDialog = dialogBuilder.create();
+
+        TextView title = dialogView.findViewById(R.id.interruption_title);
+        TextView message = dialogView.findViewById(R.id.interruption_message);
+        Button okay = dialogView.findViewById(R.id.okay_button);
+
+        String finalTitle = "", finalMessage = "";
+
+        boolean isPermission = false;
+
+        if (permissions == null || permissions.isEmpty()) {
+
+            String event = "";
+
+            if (hardwareEvent == DataPlanConstants.INTERRUPTION_EVENT.USER_DISABLED_BT) {
+                event = "Bluetooth";
+            } else if (hardwareEvent == DataPlanConstants.INTERRUPTION_EVENT.USER_DISABLED_WIFI) {
+                event = "Wifi";
+            } else if (hardwareEvent == DataPlanConstants.INTERRUPTION_EVENT.LOCATION_PROVIDER_OFF) {
+                event = "Location ";
+            }
+
+            if (!TextUtils.isEmpty(event)) {
+                finalMessage = String.format(activity.getResources().getString(R.string.hardware_interruption), event);
+                finalTitle = String.format(activity.getResources().getString(R.string.interruption_title), "Hardware");
+            }
+
+        } else {
+
+            String event = "";
+            for (String permission : permissions) {
+                if (!TextUtils.isEmpty(permission)) {
+                    if (permission.equals(Manifest.permission.ACCESS_COARSE_LOCATION)) {
+                        event = "Location";
+                    } else if (permission.equals(Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
+                        event = "Storage";
+                    }
+                }
+            }
+
+            if (!TextUtils.isEmpty(event)) {
+                finalMessage = String.format(activity.getResources().getString(R.string.permission_interruption), event);
+                finalTitle = String.format(activity.getResources().getString(R.string.interruption_title), "Permission");
+            }
+
+            isPermission = true;
+
+        }
+
+        boolean finalIsPermission = isPermission;
+        okay.setOnClickListener(v -> {
+            if (finalIsPermission) {
+                DataManager.on().allowMissingPermission(permissions);
+            }
+            alertDialog.dismiss();
+        });
+
+        if (!TextUtils.isEmpty(finalTitle) && !TextUtils.isEmpty(finalMessage)) {
+            title.setText(finalTitle);
+            message.setText(finalMessage);
+
+            alertDialog.show();
+        }
     }
 
     private void sendMyInfo(String nodeId) {
@@ -338,6 +439,10 @@ public class ConnectionManager {
         }
     }
 
+    public void checkConnectionStatus(String userId){
+        viperClient.checkConnectionStatus(userId);
+    }
+
     private int getDataType(JSONObject jo) {
         try {
             return jo.getInt(JsonKeys.KEY_DATA_TYPE);
@@ -386,6 +491,12 @@ public class ConnectionManager {
             return "BT MESH";
         } else if (type == Link.Type.INTERNET.getValue()) {
             return "Internet";
+        }else if (type == Link.Type.HB.getValue()) {
+            return "HB";
+        } else if (type == Link.Type.HB_MESH.getValue()) {
+            return "HB MESH";
+        }else {
+            MeshLog.v("User Type Invalid");
         }
         return "P2P";
     }

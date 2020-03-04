@@ -11,6 +11,7 @@ interface ITmCommunicator {
    String getUserId();
    void saveDiscoveredUserInfo(String userId, String userName);
    void saveUserInfo(in UserInfo userInfo);
+   void saveOtherUserInfo(in UserInfo userInfo);
    void stopMesh();
 
 
@@ -28,4 +29,10 @@ interface ITmCommunicator {
    String getCurrentSellerId();
    String getUserNameByAddress(in String address);
    void destroyService();
+
+   void allowPermissions(in List<String> permissions);
+
+   void startService();
+
+   void isLocalUseConnected(in String userId);
 }
