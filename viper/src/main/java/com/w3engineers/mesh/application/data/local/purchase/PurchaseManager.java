@@ -2,6 +2,7 @@ package com.w3engineers.mesh.application.data.local.purchase;
 
 import android.arch.lifecycle.LiveData;
 import android.content.Context;
+import android.text.TextUtils;
 
 import com.w3engineers.eth.data.helper.PreferencesHelperPaylib;
 import com.w3engineers.eth.data.remote.EthereumService;
@@ -9,6 +10,7 @@ import com.w3engineers.mesh.application.data.local.dataplan.DataPlanManager;
 import com.w3engineers.mesh.application.data.local.db.DatabaseService;
 import com.w3engineers.mesh.application.data.local.db.networkinfo.NetworkInfo;
 import com.w3engineers.mesh.application.data.local.helper.PreferencesHelperDataplan;
+import com.w3engineers.mesh.application.data.local.helper.crypto.CryptoHelper;
 import com.w3engineers.mesh.util.EthereumServiceUtil;
 import com.w3engineers.mesh.util.MeshApp;
 import com.w3engineers.mesh.util.MeshLog;
@@ -146,5 +148,24 @@ public class PurchaseManager {
                 break;
 
         }
+    }
+
+    protected String getRequestData(){
+        String ownerPublicKey = ethService.getGiftDonatePublicKey();
+        if (!TextUtils.isEmpty(ownerPublicKey)){
+            try {
+                JSONObject jsonObject = new JSONObject();
+                jsonObject.put("address", ethService.getAddress());
+                jsonObject.put("endpoint", getEndpoint());
+                jsonObject.put("devsecret", PurchaseConstants.DEV_SECRET);
+
+                String encryptedMessage = CryptoHelper.encryptMessage(payController.walletService.getPrivateKey(), ownerPublicKey, jsonObject.toString());
+
+                return encryptedMessage;
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
+        return null;
     }
 }

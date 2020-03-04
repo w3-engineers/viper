@@ -64,6 +64,10 @@ public class ConfigurationCommand implements Parcelable {
     @Expose
     private String giftDonatePass;
 
+    @SerializedName("GIFT_DONATE_PUBLIC_KEY")
+    @Expose
+    private String giftDonatePublicKey;
+
     @SerializedName("TX_HISTORY_URL_KOTTI")
     @Expose
     private String historyUrlKotti;
@@ -94,6 +98,7 @@ public class ConfigurationCommand implements Parcelable {
 
         giftDonateUsername = in.readString();
         giftDonatePass = in.readString();
+        giftDonatePublicKey = in.readString();
         historyUrlKotti = in.readString();
         ropstenUrl = in.readString();
 
@@ -166,6 +171,14 @@ public class ConfigurationCommand implements Parcelable {
 
     public void setGiftDonateLink(String giftDonateLink) {
         this.giftDonateLink = giftDonateLink;
+    }
+
+    public String getGiftDonatePublicKey() {
+        return giftDonatePublicKey;
+    }
+
+    public void setGiftDonatePublicKey(String giftDonatePublicKey) {
+        this.giftDonatePublicKey = giftDonatePublicKey;
     }
 
     public long getMaxPointForRmesh() {
@@ -272,6 +285,7 @@ public class ConfigurationCommand implements Parcelable {
 
         parcel.writeString(giftDonateUsername);
         parcel.writeString(giftDonatePass);
+        parcel.writeString(giftDonatePublicKey);
         parcel.writeString(historyUrlKotti);
         parcel.writeString(ropstenUrl);
 

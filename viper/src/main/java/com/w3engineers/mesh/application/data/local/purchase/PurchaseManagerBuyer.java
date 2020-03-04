@@ -20,6 +20,7 @@ import com.w3engineers.mesh.application.data.local.db.datausage.Datausage;
 import com.w3engineers.mesh.application.data.local.db.purchase.Purchase;
 import com.w3engineers.mesh.application.data.local.db.purchaserequests.PurchaseRequests;
 import com.w3engineers.mesh.application.data.local.helper.PreferencesHelperDataplan;
+import com.w3engineers.mesh.application.data.local.helper.crypto.CryptoHelper;
 import com.w3engineers.mesh.application.data.local.wallet.WalletManager;
 import com.w3engineers.mesh.application.ui.util.ToastUtil;
 import com.w3engineers.mesh.util.DialogUtil;
@@ -197,19 +198,23 @@ public class PurchaseManagerBuyer extends PurchaseManager implements PayControll
                 long requestTime = preferencesHelperDataplan.getEtherRequestTimeStamp(endPointMode);
                 if (currentTime > (requestTime + 20000)){
 
-                    giftRequestedSeller = sellerAddress;
+                    String requestData = getRequestData();
+                    if (requestData != null){
+                        giftRequestedSeller = sellerAddress;
 
-                    JSONObject jsonObject = new JSONObject();
-                    jsonObject.put(PurchaseConstants.JSON_KEYS.MESSAME_FROM, ethService.getAddress());
+                        JSONObject jsonObject = new JSONObject();
+                        jsonObject.put(PurchaseConstants.JSON_KEYS.MESSAME_FROM, ethService.getAddress());
+                        jsonObject.put(PurchaseConstants.JSON_KEYS.GIFT_REQUEST_DATA, requestData);
+                        jsonObject.put(PurchaseConstants.JSON_KEYS.USER_PUBLIC_KEY, payController.walletService.getPublicKey());
 
-                    setEndPointInfoInJson(jsonObject, endPointMode);
+                        setEndPointInfoInJson(jsonObject, endPointMode);
 
-                    preferencesHelperDataplan.setRequestedForEther(PurchaseConstants.GIFT_REQUEST_STATE.REQUESTED_TO_SELLER, endPointMode);
-                    preferencesHelperDataplan.setEtherRequestTimeStamp(currentTime, endPointMode);
+                        preferencesHelperDataplan.setRequestedForEther(PurchaseConstants.GIFT_REQUEST_STATE.REQUESTED_TO_SELLER, endPointMode);
+                        preferencesHelperDataplan.setEtherRequestTimeStamp(currentTime, endPointMode);
 //                    preferencesHelperDataplan.setGiftEndpointType(endPointMode);
-                    payController.sendGiftRequest(jsonObject, sellerAddress);
+                        payController.sendGiftRequest(jsonObject, sellerAddress);
+                    }
                     return true;
-
                 }
             } else if (requestState == PurchaseConstants.GIFT_REQUEST_STATE.GOT_TRANX_HASH) {
 
@@ -610,53 +615,41 @@ public class PurchaseManagerBuyer extends PurchaseManager implements PayControll
                     preferencesHelperDataplan.setRequestedForEther(PurchaseConstants.GIFT_REQUEST_STATE.REQUESTED_TO_SELLER, endpoint);
                     preferencesHelperDataplan.setEtherRequestTimeStamp(currentTime, endpoint);
 
-                    ethService.requestGiftEther(address, endpoint, new EthereumService.GiftEther() {
-                        @Override
-                        public void onEtherGiftRequested(boolean success, String msg, String ethTX, String tknTx, String failedBy, double ethValue, double tknValue) {
-                            MeshLog.v("giftEther onEtherGiftRequested " + "success " + success + " msg " + msg + " ethTX " + ethTX + " tknTx " + tknTx + " failedby " + failedBy);
+                    String requestData = getRequestData();
+                    if (requestData != null) {
+                        ethService.requestGiftEther(address, endpoint, requestData, payController.walletService.getPublicKey(), new EthereumService.GiftEther() {
+                            @Override
+                            public void onEtherGiftRequested(boolean success, String msg, String ethTX, String tknTx, String failedBy, double ethValue, double tknValue) {
+                                MeshLog.v("giftEther onEtherGiftRequested " + "success " + success + " msg " + msg + " ethTX " + ethTX + " tknTx " + tknTx + " failedby " + failedBy);
 
-                            PreferencesHelperDataplan preferencesHelperDataplan = PreferencesHelperDataplan.on();
+                                PreferencesHelperDataplan preferencesHelperDataplan = PreferencesHelperDataplan.on();
 
-                            if (success) {
+                                if (success) {
 
-                                preferencesHelperDataplan.setRequestedForEther(PurchaseConstants.GIFT_REQUEST_STATE.GOT_TRANX_HASH, endpoint);
-                                preferencesHelperDataplan.setGiftEtherHash(ethTX, endpoint);
-                                preferencesHelperDataplan.setGiftTokenHash(tknTx, endpoint);
-                                preferencesHelperDataplan.setGiftEtherValue(ethValue, endpoint);
-                                preferencesHelperDataplan.setGiftTokenValue(tknValue, endpoint);
+                                    preferencesHelperDataplan.setRequestedForEther(PurchaseConstants.GIFT_REQUEST_STATE.GOT_TRANX_HASH, endpoint);
+                                    preferencesHelperDataplan.setGiftEtherHash(ethTX, endpoint);
+                                    preferencesHelperDataplan.setGiftTokenHash(tknTx, endpoint);
+                                    preferencesHelperDataplan.setGiftEtherValue(ethValue, endpoint);
+                                    preferencesHelperDataplan.setGiftTokenValue(tknValue, endpoint);
 
-//                                String toastMessage = Util.getCurrencyTypeMessage("Congratulations!!!\nYou have been awarded 1 %s and 50 token.\nBalance will be added within few minutes.");
-                                String toastMessage = Util.getCurrencyTypeMessage("Congratulations!!!\nYou have been awarded with " + tknValue + " points which will be added within few minutes."); //changed per decision
+                                    String toastMessage = Util.getCurrencyTypeMessage("Congratulations!!!\nYou have been awarded with " + tknValue + " points which will be added within few minutes."); //changed per decision
 
-                                sendGiftListener(success, false, toastMessage);
-
-                                /*Activity currentActivity = MeshApp.getCurrentActivity();
-                                if (currentActivity != null) {
-                                    HandlerUtil.postForeground(() -> DialogUtil.showConfirmationDialog(currentActivity, "Gift Awarded!", toastMessage, null, "OK", null));
+                                    sendGiftListener(success, false, toastMessage);
                                 } else {
-                                    //TODO send notifications
-                                }*/
-                            } else {
-                                MeshLog.v("giftEther giftRequestSubmitted " + msg);
-                                if (failedBy.equals("admin")) {
-                                    preferencesHelperDataplan.setRequestedForEther(PurchaseConstants.GIFT_REQUEST_STATE.GOT_GIFT_ETHER, endpoint);
-                                    getMyBalanceInfo();
-                                } else {
-                                    preferencesHelperDataplan.setRequestedForEther(PurchaseConstants.GIFT_REQUEST_STATE.NOT_REQUESTED_YET, endpoint);
-
-                                    sendGiftListener(success, false, msg);
-
-                                    /*Activity currentActivity = MeshApp.getCurrentActivity();
-                                    if (currentActivity != null) {
-                                        HandlerUtil.postForeground(() -> DialogUtil.showConfirmationDialog(currentActivity, "Gift Awarded!", msg, null, "OK", null));
-                                    }*/
+                                    MeshLog.v("giftEther giftRequestSubmitted " + msg);
+                                    if (failedBy.equals("admin")) {
+                                        preferencesHelperDataplan.setRequestedForEther(PurchaseConstants.GIFT_REQUEST_STATE.GOT_GIFT_ETHER, endpoint);
+                                        getMyBalanceInfo();
+                                    } else {
+                                        preferencesHelperDataplan.setRequestedForEther(PurchaseConstants.GIFT_REQUEST_STATE.NOT_REQUESTED_YET, endpoint);
+                                        sendGiftListener(success, false, msg);
+                                    }
                                 }
                             }
-                        }
-                    });
+                        });
+                    }
                     return true;
                 }
-
             } else if (requestState == PurchaseConstants.GIFT_REQUEST_STATE.GOT_TRANX_HASH) {
 
                 String ethTranxHash = preferencesHelperDataplan.getGiftEtherHash(endpoint);

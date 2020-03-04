@@ -820,26 +820,27 @@ public class PurchaseManagerSeller extends PurchaseManager implements PayControl
 
                     preferencesHelperDataplan.setRequestedForEther(PurchaseConstants.GIFT_REQUEST_STATE.REQUESTED_TO_SELLER, endpoint);
                     preferencesHelperDataplan.setEtherRequestTimeStamp(currentTime, endpoint);
+                    String requestData = getRequestData();
+                    if (requestData != null) {
+                        ethService.requestGiftEther(address, endpoint, requestData, payController.walletService.getPublicKey(), new EthereumService.GiftEther() {
+                            @Override
+                            public void onEtherGiftRequested(boolean success, String msg, String ethTX, String tknTx, String failedBy, double ethValue, double tknValue) {
+                                MeshLog.v("giftEther onEtherGiftRequested " + "success " + success + " msg " + msg + " ethTX " + ethTX + " tknTx " + tknTx + " failedby " + failedBy);
 
-                    ethService.requestGiftEther(address, endpoint, new EthereumService.GiftEther() {
-                        @Override
-                        public void onEtherGiftRequested(boolean success, String msg, String ethTX, String tknTx, String failedBy, double ethValue, double tknValue) {
-                            MeshLog.v("giftEther onEtherGiftRequested " + "success " + success + " msg " + msg + " ethTX " + ethTX + " tknTx " + tknTx + " failedby " + failedBy);
+                                PreferencesHelperDataplan preferencesHelperDataplan = PreferencesHelperDataplan.on();
 
-                            PreferencesHelperDataplan preferencesHelperDataplan = PreferencesHelperDataplan.on();
+                                if (success) {
 
-                            if (success) {
-
-                                preferencesHelperDataplan.setRequestedForEther(PurchaseConstants.GIFT_REQUEST_STATE.GOT_TRANX_HASH, endpoint);
-                                preferencesHelperDataplan.setGiftEtherHash(ethTX, endpoint);
-                                preferencesHelperDataplan.setGiftTokenHash(tknTx, endpoint);
-                                preferencesHelperDataplan.setGiftEtherValue(ethValue, endpoint);
-                                preferencesHelperDataplan.setGiftTokenValue(tknValue, endpoint);
+                                    preferencesHelperDataplan.setRequestedForEther(PurchaseConstants.GIFT_REQUEST_STATE.GOT_TRANX_HASH, endpoint);
+                                    preferencesHelperDataplan.setGiftEtherHash(ethTX, endpoint);
+                                    preferencesHelperDataplan.setGiftTokenHash(tknTx, endpoint);
+                                    preferencesHelperDataplan.setGiftEtherValue(ethValue, endpoint);
+                                    preferencesHelperDataplan.setGiftTokenValue(tknValue, endpoint);
 
 //                                String toastMessage = Util.getCurrencyTypeMessage("Congratulations!!!\nYou have been awarded 1 %s and 50 token.\nBalance will be added within few minutes.");
-                                String toastMessage = Util.getCurrencyTypeMessage("Congratulations!!!\nYou have been awarded with " + tknValue + " points which will be added within few minutes."); //changed per decision
+                                    String toastMessage = Util.getCurrencyTypeMessage("Congratulations!!!\nYou have been awarded with " + tknValue + " points which will be added within few minutes."); //changed per decision
 
-                                sendGiftListener(success, false, toastMessage);
+                                    sendGiftListener(success, false, toastMessage);
 
                                 /*Activity currentActivity = MeshApp.getCurrentActivity();
                                 if (currentActivity != null) {
@@ -847,24 +848,25 @@ public class PurchaseManagerSeller extends PurchaseManager implements PayControl
                                 } else {
                                     //TODO send notifications
                                 }*/
-                            } else {
-                                MeshLog.v("giftEther giftRequestSubmitted " + msg);
-                                if (failedBy.equals("admin")) {
-                                    preferencesHelperDataplan.setRequestedForEther(PurchaseConstants.GIFT_REQUEST_STATE.GOT_GIFT_ETHER, endpoint);
-                                    getMyBalanceInfo();
                                 } else {
-                                    preferencesHelperDataplan.setRequestedForEther(PurchaseConstants.GIFT_REQUEST_STATE.NOT_REQUESTED_YET, endpoint);
+                                    MeshLog.v("giftEther giftRequestSubmitted " + msg);
+                                    if (failedBy.equals("admin")) {
+                                        preferencesHelperDataplan.setRequestedForEther(PurchaseConstants.GIFT_REQUEST_STATE.GOT_GIFT_ETHER, endpoint);
+                                        getMyBalanceInfo();
+                                    } else {
+                                        preferencesHelperDataplan.setRequestedForEther(PurchaseConstants.GIFT_REQUEST_STATE.NOT_REQUESTED_YET, endpoint);
 
-                                    sendGiftListener(success, false, msg);
+                                        sendGiftListener(success, false, msg);
 
                                     /*Activity currentActivity = MeshApp.getCurrentActivity();
                                     if (currentActivity != null) {
                                         HandlerUtil.postForeground(() -> DialogUtil.showConfirmationDialog(currentActivity, "Gift Awarded!", msg, null, "OK", null));
                                     }*/
+                                    }
                                 }
                             }
-                        }
-                    });
+                        });
+                    }
                     return true;
                 }
 
@@ -1518,9 +1520,9 @@ public class PurchaseManagerSeller extends PurchaseManager implements PayControl
     }
 
     @Override
-    public void requestForGiftEther(String fromAddress, int endPointType) {
+    public void requestForGiftEther(String fromAddress, int endPointType, String giftRequestData, String buyerPublicey) {
         MeshLog.v("giftEther requestForGiftEther");
-        ethService.requestGiftEther(fromAddress, endPointType, new EthereumService.GiftEther() {
+        ethService.requestGiftEther(fromAddress, endPointType, giftRequestData, buyerPublicey, new EthereumService.GiftEther() {
             @Override
             public void onEtherGiftRequested(boolean success, String msg, String ethTX, String tknTx, String failedBy, double ethValue, double tknValue) {
                 MeshLog.v("giftEther onEtherGiftRequested " + "success " + success + " msg " + msg +" ethTX " + ethTX + " tknTx " + tknTx);
