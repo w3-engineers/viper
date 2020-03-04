@@ -4,6 +4,7 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.databinding.DataBindingUtil;
+import android.net.Network;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
@@ -48,15 +49,15 @@ public class TSAppInstaller {
     private static DialogServiceAppInstallProgressBinding binding;
     private static AlertDialog dialog;
 
-    public static void downloadApkFile(Context context, String baseUrl) {
+    public static void downloadApkFile(Context context, String baseUrl, Network network) {
 
 
-        showDialog(context);
+        showDialog(MeshApp.getCurrentActivity());
 
         Log.d(TAG, "File url: " + baseUrl);
 
-        RetrofitInterface downloadService = RetrofitService.createService(RetrofitInterface.class, baseUrl);
-        Call<ResponseBody> call = downloadService.downloadFileByUrl("Service.apk");
+        RetrofitInterface downloadService = RetrofitService.createService(RetrofitInterface.class, baseUrl, network);
+        Call<ResponseBody> call = downloadService.downloadFileByUrl("test/Service.apk");
 
         call.enqueue(new Callback<ResponseBody>() {
             @Override
@@ -142,10 +143,11 @@ public class TSAppInstaller {
                 Intent intent;
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
                     String packageName = context.getPackageName() + ".provider";
-                    Uri apkUri = FileProvider.getUriForFile(context,  packageName, destinationFile);
+                    Uri apkUri = FileProvider.getUriForFile(context, packageName, destinationFile);
                     intent = new Intent(Intent.ACTION_INSTALL_PACKAGE);
                     Log.d("InAppUpdateTest", "app uri: " + apkUri.getPath());
                     intent.setDataAndType(apkUri, "application/vnd.android.package-archive");
+                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                     intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
                     Log.d("InAppUpdateTest", "app install process start");
                 } else {
@@ -230,7 +232,7 @@ public class TSAppInstaller {
     }
 
     private static void closeDialog(String message) {
-        HandlerUtil.postForeground(()-> {
+        HandlerUtil.postForeground(() -> {
             Toaster.showShort(message);
             if (dialog.isShowing()) {
                 dialog.dismiss();

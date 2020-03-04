@@ -1,8 +1,8 @@
 package com.w3engineers.mesh.util.lib.remote;
 
 
+import android.net.Network;
 
-import com.w3engineers.mesh.BuildConfig;
 import com.w3engineers.mesh.application.data.local.db.SharedPref;
 import com.w3engineers.mesh.util.Constant;
 
@@ -25,7 +25,7 @@ import retrofit2.Retrofit;
 
 public class RetrofitService {
 
-    public static <T> T createService(Class<T> serviceClass, String baseUrl) {
+    public static <T> T createService(Class<T> serviceClass, String baseUrl, Network network) {
         OkHttpClient.Builder client = new OkHttpClient.Builder();
         client.addInterceptor(new Interceptor() {
             @Override
@@ -39,6 +39,11 @@ public class RetrofitService {
                 return chain.proceed(request);
             }
         });
+
+        if (network != null) {
+            client.socketFactory(network.getSocketFactory());
+        }
+
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(baseUrl)
                 .client(client.build())

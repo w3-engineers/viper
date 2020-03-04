@@ -47,7 +47,7 @@ public class DatabaseService {
 
     public int insertPurchase(String buyerAddress, String sellerAddress, double totalData, double usedData, long blockNumber,
                               double deposit, String BPS, double balance, String closingHash, double withdrawnBalance,
-                              int channelState, int endPointType)
+                              int channelState, int endPointType, String trxHash)
             throws ExecutionException, InterruptedException {
         Future<Integer> future = executor.submit(new Callable() {
             @Override
@@ -78,6 +78,8 @@ public class DatabaseService {
 
                     purchase.withdrawnBalance = withdrawnBalance;
                     purchase.state = channelState;
+
+                    purchase.trxHash = trxHash;
 
                     pid = db.purchaseDao().insertAll(purchase);
                 } catch (Exception e) {
@@ -186,6 +188,24 @@ public class DatabaseService {
         return future.get();
     }
 
+    public Purchase getPurchaseByBlockNumberAndState(long blockNumber, int state, String buyerAddress, String sellerAddress) throws ExecutionException, InterruptedException {
+        Future<Purchase> future = executor.submit(new Callable() {
+            @Override
+            public Purchase call() {
+                Purchase purchase = null;
+                try {
+                    purchase = db.purchaseDao().getPurchaseByBlockAndState(blockNumber, state, buyerAddress, sellerAddress);
+
+
+                } catch (Exception e) {
+                    Log.e("error", e.toString());
+                }
+                return purchase;
+            }
+        });
+        return future.get();
+    }
+
     public Purchase getPurchaseByState(int state, String buyerAddress, String sellerAddress, int endPointType) throws ExecutionException, InterruptedException {
 
         Future<Purchase> future = executor.submit(new Callable() {
@@ -194,6 +214,24 @@ public class DatabaseService {
                 Purchase purchase = null;
                 try {
                     purchase = db.purchaseDao().getPurchaseByState(state, buyerAddress, sellerAddress, endPointType);
+
+                } catch (Exception e) {
+                    Log.e("error", e.toString());
+                }
+                return purchase;
+            }
+        });
+        return future.get();
+    }
+
+    public Purchase getPurchaseByTrxHash(String trxHash) throws ExecutionException, InterruptedException {
+
+        Future<Purchase> future = executor.submit(new Callable() {
+            @Override
+            public Purchase call() {
+                Purchase purchase = null;
+                try {
+                    purchase = db.purchaseDao().getPurchaseByTrxHash(trxHash);
 
                 } catch (Exception e) {
                     Log.e("error", e.toString());

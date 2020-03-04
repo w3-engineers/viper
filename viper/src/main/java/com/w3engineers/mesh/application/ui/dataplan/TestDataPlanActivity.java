@@ -130,10 +130,29 @@ public class TestDataPlanActivity extends TelemeshBaseActivity implements DataPl
 
     private void checkAndCloseMesh(int role) {
         if (mCurrentRole == role) {
-            DataPlanManager.getInstance().closeMesh(DataPlanConstants.USER_ROLE.MESH_STOP);
-            mCurrentRole = DataPlanConstants.USER_ROLE.MESH_STOP;
+            DialogUtil.showConfirmationDialog(this, "Switching Mode?", "You can not turn off this mode, rather switch to another mode.", null,getResources().getString(R.string.ok) , new DialogUtil.DialogButtonListener() {
+                @Override
+                public void onClickPositive() {
+                    roleSwitches[role].setChecked(true);
+                }
+
+                @Override
+                public void onCancel() {
+
+                }
+
+                @Override
+                public void onClickNegative() {
+
+                }
+            });
+
+//            DataPlanManager.getInstance().closeMesh(DataPlanConstants.USER_ROLE.MESH_STOP);
+//            mCurrentRole = DataPlanConstants.USER_ROLE.MESH_STOP;
+        }else {
+            expandableButtons[role].setTextColor(getResources().getColor(R.color.data_plan_unselected_text));
         }
-        expandableButtons[role].setTextColor(getResources().getColor(R.color.data_plan_unselected_text));
+
     }
 
 

@@ -1,34 +1,45 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout xmlns:android="http://schemas.android.com/apk/res/android"
+<layout xmlns:tools="http://schemas.android.com/tools"
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <android.support.constraint.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/margin_3"
-        android:layout_marginBottom="@dimen/margin_65"
+        android:layout_marginBottom="@dimen/margin_10"
         android:layout_marginStart="@dimen/margin_10"
         android:layout_marginEnd="@dimen/margin_10"
         android:background="@drawable/ractangular_white_small">
 
+        <ImageView
+            android:id="@+id/seller_mesh_status"
+            android:layout_width="@dimen/width_25"
+            android:layout_height="@dimen/height_25"
+            android:layout_marginStart="10dp"
+            android:layout_marginTop="2dp"
+            android:contentDescription="@string/image"
+            app:layout_constraintBottom_toBottomOf="@+id/user_name"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/user_name" />
+
         <TextView
             android:id="@+id/user_name"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:paddingTop="@dimen/padding_5"
+            android:layout_marginStart="-2dp"
+            android:layout_marginTop="5dp"
             android:ellipsize="end"
             android:fontFamily="@font/opensans_semibold"
             android:singleLine="true"
+            android:text="Name"
             android:textColor="@color/black"
             android:textSize="@dimen/text_size_18"
             app:layout_constrainedWidth="true"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintEnd_toStartOf="@id/status"
-            app:layout_constraintHorizontal_bias="0"
-            app:tooltipText="User Name"
-            android:text="Name"/>
+            app:layout_constraintStart_toEndOf="@+id/seller_mesh_status"
+            app:layout_constraintTop_toTopOf="parent"
+            app:tooltipText="User Name" />
 
         <TextView
             android:id="@+id/user_use_amount"

@@ -1,2 +1,6 @@
 /build
 /assets/*
+
+src/main/cpp/*
+src/main/cpp/native-lib.cpp
+src/main/cpp/CMakeLists.txt
