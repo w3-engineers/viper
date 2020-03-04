@@ -95,6 +95,7 @@ public class EthereumService implements BlockRequest.BlockTransactionObserver, E
 
                 blockRequests.put(payLibNetworkInfo.networkType, blockRequestETH);
             }
+            Log.v("BlockRequest", "1 " + blockRequests.size());
             ethGift = EthGift.on(blockRequests, EthereumService.this);
         }
 
@@ -201,6 +202,8 @@ public class EthereumService implements BlockRequest.BlockTransactionObserver, E
 
             blockRequests.put(payLibNetworkInfo.networkType, blockRequestETH);
         }
+
+        Log.v("BlockRequest", "2 " + blockRequests.size());
         ethGift = EthGift.on(blockRequests, EthereumService.this);
 
 

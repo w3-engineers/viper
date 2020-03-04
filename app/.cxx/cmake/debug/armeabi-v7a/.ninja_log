@@ -1,5 +1,0 @@
-# ninja log v5
-1	3117	1582791766	CMakeFiles/native-lib.dir/native-lib.cpp.o	7284591925b7904e
-0	3118	1582791766	CMakeFiles/staging-native-lib.dir/staging-native-lib.cpp.o	81ddd35c7afc42a1
-3117	3673	1582791766	/Users/w3e31/WORK/Android Projects/viper/app/build/intermediates/cmake/debug/obj/armeabi-v7a/libnative-lib.so	e9bbb82856c29f4c
-3118	3673	1582791766	/Users/w3e31/WORK/Android Projects/viper/app/build/intermediates/cmake/debug/obj/armeabi-v7a/libstaging-native-lib.so	bb9b2258324778b6

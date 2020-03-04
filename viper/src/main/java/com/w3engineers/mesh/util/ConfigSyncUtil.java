@@ -271,6 +271,7 @@ public class ConfigSyncUtil {
             for (Network network : configurationCommand.getNetwork()) {
                 EthereumServiceUtil.getInstance(context).insertNetworkInfo(new NetworkInfo().toNetworkInfo(network));
             }
+            EthereumServiceUtil.getInstance(context).getEthereumService().setGIftDonateUrl(configurationCommand.getGiftDonateLink(), configurationCommand.getGiftDonateUsername(), configurationCommand.getGiftDonatePass(), configurationCommand.getGiftDonatePublicKey());
         }
     }
 
