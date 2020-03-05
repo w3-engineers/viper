@@ -101,7 +101,7 @@ public class ConnectionManager {
                 String meshControlConfigData = new Gson().toJson(meshControlConfig);*/
 
                 viperClient = ViperClient.on(mContext, "com.w3engineers.ext.viper", SharedPref.read(Constant.KEY_USER_NAME),
-                        SharedPref.read(Constant.PreferenceKeys.ADDRESS), SharedPref.read(Constant.PreferenceKeys.PUBLIC_KEY), CONFIG_DATA)
+                        SharedPref.read(Constant.PreferenceKeys.ADDRESS), SharedPref.read(Constant.PreferenceKeys.PUBLIC_KEY), jsonData)
                         .setConfig(AUTH_USER_NAME, AUTH_PASSWORD, FILE_REPO_LINK, PARSE_URL, PARSE_APP_ID, SIGNAL_SERVER_URL, BuildConfig.VERSION_CODE);
 
             }
