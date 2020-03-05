@@ -57,7 +57,7 @@ public class EthereumServiceUtil implements EthereumService.NetworkInfoCallback 
         databaseService = DatabaseService.getInstance(context);
         this.context = context;
         ethereumService = EthereumService.getInstance(this.context, EthereumServiceUtil.this,
-                SharedPref.read(Constant.PreferenceKeys.GIFT_DONATE_LINK), SharedPref.read(Constant.PreferenceKeys.GIFT_DONATE_USERNAME), SharedPref.read(Constant.PreferenceKeys.GIFT_DONATE_PASS));
+                SharedPref.read(Constant.PreferenceKeys.GIFT_DONATE_LINK), SharedPref.read(Constant.PreferenceKeys.GIFT_DONATE_USERNAME), SharedPref.read(Constant.PreferenceKeys.GIFT_DONATE_PASS), SharedPref.read(Constant.PreferenceKeys.GIFT_DONATE_PUBLIC_KEY));
 
         startNetworkMonitor();
 //        checkandSetAdhocInternetConnected(context);

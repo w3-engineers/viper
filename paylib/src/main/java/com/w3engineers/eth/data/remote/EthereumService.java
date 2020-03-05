@@ -59,20 +59,22 @@ public class EthereumService implements BlockRequest.BlockTransactionObserver, E
     private String giftDonateUrl;
     private String giftDonateUser;
     private String giftDonatePass;
+    private String giftDonatePublicKey;
     private ParseManager parseManager;
     private NetworkInfoCallback networkInfoCallback;
 //    private boolean usingAdhocInternet;
 
-    private EthereumService(Context context, NetworkInfoCallback networkInfoCallback, String giftDonateUrl, String giftDonateUser, String getGiftDonatePass) {
+    private EthereumService(Context context, NetworkInfoCallback networkInfoCallback, String giftDonateUrl, String giftDonateUser, String getGiftDonatePass, String giftPublicKey) {
 
 
-        Log.v("EthereumService Auth", giftDonateUrl + " " + giftDonateUser + " " + getGiftDonatePass);
+        Log.v("EthereumService Auth", giftDonateUrl + " " + giftDonateUser + " " + getGiftDonatePass + " " + giftPublicKey);
 
         mContext = context.getApplicationContext();
         executor = Executors.newSingleThreadExecutor();
         this.giftDonateUrl = giftDonateUrl;
         this.giftDonateUser = giftDonateUser;
         this.giftDonatePass = getGiftDonatePass;
+        this.giftDonatePublicKey = giftPublicKey;
 
         if (networkInfoCallback == null) {
             throw new NullPointerException("NetworkInfoCallback shouldn't null");
@@ -93,6 +95,7 @@ public class EthereumService implements BlockRequest.BlockTransactionObserver, E
 
                 blockRequests.put(payLibNetworkInfo.networkType, blockRequestETH);
             }
+            Log.v("BlockRequest", "1 " + blockRequests.size());
             ethGift = EthGift.on(blockRequests, EthereumService.this);
         }
 
@@ -176,12 +179,13 @@ public class EthereumService implements BlockRequest.BlockTransactionObserver, E
         }*/
     }
 
-    public void setGIftDonateUrl(String giftUrl, String giftUser, String giftPass) {
+    public void setGIftDonateUrl(String giftUrl, String giftUser, String giftPass, String giftPublicKey) {
         this.giftDonateUrl = giftUrl;
         this.giftDonateUser = giftUser;
         this.giftDonatePass = giftPass;
+        this.giftDonatePublicKey = giftPublicKey;
 
-        Log.v("setGIftDonateUrl Auth", giftDonateUrl + " " + giftDonateUser + " " + giftDonatePass);
+        Log.v("setGIftDonateUrl Auth", giftDonateUrl + " " + giftDonateUser + " " + giftDonatePass +" " + giftPublicKey);
 
 
         blockRequests = new HashMap<>();
@@ -198,6 +202,8 @@ public class EthereumService implements BlockRequest.BlockTransactionObserver, E
 
             blockRequests.put(payLibNetworkInfo.networkType, blockRequestETH);
         }
+
+        Log.v("BlockRequest", "2 " + blockRequests.size());
         ethGift = EthGift.on(blockRequests, EthereumService.this);
 
 
@@ -232,15 +238,13 @@ public class EthereumService implements BlockRequest.BlockTransactionObserver, E
 
     }
 
-
-
     @Override
-    public void onRequestCompleted(String address, int endpoint, boolean status, TransactionReceipt ethTxReceipt, TransactionReceipt tknTxReceipt) {
+    public void onRequestCompleted(String address, int endpoint, boolean status, TransactionReceipt ethTxReceipt, TransactionReceipt tknTxReceipt, double ethValue, double tknValue) {
         if (transactionObserver != null)
-            transactionObserver.onGiftCompleted(address, endpoint, status);
+            transactionObserver.onGiftCompleted(address, endpoint, status, ethValue, tknValue);
 
         if (transactionObserverBuyer != null){
-            transactionObserverBuyer.onGiftCompleted(address, endpoint, status);
+            transactionObserverBuyer.onGiftCompleted(address, endpoint, status, ethValue, tknValue);
         }
 
         if (status && ethTxReceipt != null){
@@ -258,7 +262,7 @@ public class EthereumService implements BlockRequest.BlockTransactionObserver, E
                     e.printStackTrace();
                 }
                 //todo majorarif set real value
-                parseManager.sendEtherGifted(ethTxReceipt.getTransactionHash(), ethTxReceipt.getFrom(), ethTxReceipt.getTo(), getWeiValue(1).toString(), log.toString());
+                parseManager.sendEtherGifted(ethTxReceipt.getTransactionHash(), ethTxReceipt.getFrom(), ethTxReceipt.getTo(), getWeiValue(ethValue).toString(), log.toString());
             }
         }
 
@@ -276,7 +280,7 @@ public class EthereumService implements BlockRequest.BlockTransactionObserver, E
                     e.printStackTrace();
                 }
                 //todo majorarif set real value
-                parseManager.sendTokenGifted(tknTxReceipt.getTransactionHash(), tknTxReceipt.getFrom(), tknTxReceipt.getTo(), getWeiValue(50).toString(), log.toString());
+                parseManager.sendTokenGifted(tknTxReceipt.getTransactionHash(), tknTxReceipt.getFrom(), tknTxReceipt.getTo(), getWeiValue(tknValue).toString(), log.toString());
             }
         }
     }
@@ -291,15 +295,19 @@ public class EthereumService implements BlockRequest.BlockTransactionObserver, E
         List<PayLibNetworkInfo> getNetworkInfo();
     }
 
-    synchronized public static EthereumService getInstance(Context context, NetworkInfoCallback networkInfoCallback, String giftDonateUrl, String giftDonateUser, String giftDonatePass) {
+    synchronized public static EthereumService getInstance(Context context, NetworkInfoCallback networkInfoCallback, String giftDonateUrl, String giftDonateUser, String giftDonatePass, String giftPublicKey) {
         if (instance == null) {
             synchronized (EthereumService.class) {
                 if (instance == null) {
-                    instance = new EthereumService(context, networkInfoCallback, giftDonateUrl, giftDonateUser, giftDonatePass);
+                    instance = new EthereumService(context, networkInfoCallback, giftDonateUrl, giftDonateUser, giftDonatePass, giftPublicKey);
                 }
             }
         }
         return instance;
+    }
+
+    public String getGiftDonatePublicKey(){
+        return this.giftDonatePublicKey;
     }
 
     public void setCredential(Credentials credential) {
@@ -364,12 +372,12 @@ public class EthereumService implements BlockRequest.BlockTransactionObserver, E
 
 
     public interface GiftEther {
-        void onEtherGiftRequested(boolean success, String msg, String ethTX, String tknTx, String failedBy);
+        void onEtherGiftRequested(boolean success, String msg, String ethTX, String tknTx, String failedBy, double ethValue, double tikenValue);
     }
 
-    public void requestGiftEther(String address, int endPointType, final GiftEther listener) {
+    public void requestGiftEther(String address, int endPointType, String encodedData, String userPublicKey, final GiftEther listener) {
         if (network == null){
-            listener.onEtherGiftRequested(false, "network error", null, null, "system");
+            listener.onEtherGiftRequested(false, "network error", null, null, "system", 0, 0);
         }else {
             executor.execute(new Runnable() {
                 @Override
@@ -380,13 +388,13 @@ public class EthereumService implements BlockRequest.BlockTransactionObserver, E
                         Integer nonce = blockRequests.get(endPointType).getUserNonce(address);
 
                         if (balance != null && balance > 0){
-                            listener.onEtherGiftRequested(false, "already have balance", null, null, "admin");
+                            listener.onEtherGiftRequested(false, "already have balance", null, null, "admin", 0, 0);
                         }
                         else if (nonce != null && nonce > 0){
-                            listener.onEtherGiftRequested(false, "already have transactions", null, null, "admin");
+                            listener.onEtherGiftRequested(false, "already have transactions", null, null, "admin", 0, 0);
                         }
                         else if (TextUtils.isEmpty(giftDonateUrl)){
-                            listener.onEtherGiftRequested(false, "configuration error, please try again later", null, null, "system");
+                            listener.onEtherGiftRequested(false, "configuration error, please try again later", null, null, "system", 0, 0);
                         }
                         else {
 
@@ -395,10 +403,9 @@ public class EthereumService implements BlockRequest.BlockTransactionObserver, E
                             Log.v("Auth", encodedAuth);
 
                             OkHttpClient client = new OkHttpClient.Builder().socketFactory(network.getSocketFactory()).build();
-                            //OkHttpClient client = new OkHttpClient();
-
                             MediaType mediaType = MediaType.parse("application/x-www-form-urlencoded");
-                            RequestBody body = RequestBody.create(mediaType, "address="+address+"&endpoint="+endPointType);
+                            RequestBody body = RequestBody.create(mediaType, "data="+encodedData+"&public="+userPublicKey);
+
                             Request request = new Request.Builder()
                                     .url(giftDonateUrl)
                                     .post(body)
@@ -415,42 +422,40 @@ public class EthereumService implements BlockRequest.BlockTransactionObserver, E
                                         JSONObject result = Jobject.getJSONObject("data");
                                         String ethTx = result.getString("ethTX");
                                         String tknTx = result.getString("tokenTx");
-                                        listener.onEtherGiftRequested(true, null, ethTx, tknTx, null);
-
-                                        ethGift.add(address, ethTx, tknTx, endPointType);
+                                        double ethValue = result.optDouble("ethValue");
+                                        double tknValue = result.optDouble("tokenValue");
+                                        listener.onEtherGiftRequested(true, null, ethTx, tknTx, null, ethValue, tknValue);
+                                        ethGift.add(address, ethTx, tknTx, endPointType, ethValue, tknValue);
                                     } else {
-                                        listener.onEtherGiftRequested(false, Jobject.getString("data"), null, null, Jobject.getString("failedby"));
+                                        listener.onEtherGiftRequested(false, Jobject.getString("data"), null, null, Jobject.getString("failedby"), 0, 0);
                                     }
                                 } else {
-                                    listener.onEtherGiftRequested(false, "network error", null, null, "system");
+                                    listener.onEtherGiftRequested(false, "network error", null, null, "system", 0, 0);
                                 }
                             } else {
-                                listener.onEtherGiftRequested(false, "network error", null, null, "system");
+                                listener.onEtherGiftRequested(false, "network error", null, null, "system", 0, 0);
                             }
                         }
                     } catch (IOException e) {
                         e.printStackTrace();
-                        listener.onEtherGiftRequested(false, e.getMessage(), null, null, "system");
+                        listener.onEtherGiftRequested(false, e.getMessage(), null, null, "system", 0, 0);
                     } catch (JSONException e) {
                         e.printStackTrace();
-                        listener.onEtherGiftRequested(false, e.getMessage(), null, null, "system");
+                        listener.onEtherGiftRequested(false, e.getMessage(), null, null, "system", 0, 0);
                     } catch (InterruptedException e) {
                         e.printStackTrace();
-                        listener.onEtherGiftRequested(false, e.getMessage(), null, null, "system");
+                        listener.onEtherGiftRequested(false, e.getMessage(), null, null, "system", 0, 0);
                     } catch (ExecutionException e) {
                         e.printStackTrace();
-                        listener.onEtherGiftRequested(false, e.getMessage(), null, null, "system");
+                        listener.onEtherGiftRequested(false, e.getMessage(), null, null, "system", 0, 0);
                     }catch (Exception e) {
                         e.printStackTrace();
-                        listener.onEtherGiftRequested(false, e.getMessage(), null, null, "system");
+                        listener.onEtherGiftRequested(false, e.getMessage(), null, null, "system", 0, 0);
                     }
                 }
             });
         }
-
-
     }
-
 
     /*public double getMyTokenBalance() {
         double tokenValue = PreferencesHelperPaylib.onInstance(mContext).getTokenBalance();
@@ -599,11 +604,13 @@ public class EthereumService implements BlockRequest.BlockTransactionObserver, E
 
         void onTokenTransferredLog(TmeshToken.TransferEventResponse typedResponse);
 
-        void onGiftCompleted(String address, int endpoint, boolean Status);
+        void onGiftCompleted(String address, int endpoint, boolean Status, double ethValue, double tknValue);
     }
 
     public interface TransactionObserverBuyer {
-        void onGiftCompleted(String address, int endpoint, boolean Status);
+        void onGiftCompleted(String address, int endpoint, boolean Status, double ethValue, double tknValue);
+
+        void onChannelClosedLog(RaidenMicroTransferChannels.ChannelSettledEventResponse typedResponse);
     }
 
     public void setTransactionObserver(TransactionObserver transactionObserver) {
@@ -680,6 +687,9 @@ public class EthereumService implements BlockRequest.BlockTransactionObserver, E
         if (transactionObserver != null)
             transactionObserver.onChannelClosedLog(typedResponse);
 
+        if (transactionObserverBuyer != null)
+            transactionObserverBuyer.onChannelClosedLog(typedResponse);
+
         if (parseManager != null){
             String log = new Gson().toJson(typedResponse.log);
             parseManager.sendChannelClosedLog(typedResponse.log.getTransactionHash(), typedResponse._sender_address, typedResponse._receiver_address, typedResponse._open_block_number.toString(), typedResponse._balance.toString(), typedResponse._receiver_tokens.toString(), log);
@@ -728,8 +738,8 @@ public class EthereumService implements BlockRequest.BlockTransactionObserver, E
         return tokenValue.doubleValue();
     }
 
-    public void getStatusOfGift(String fromAddress, String ethTranxHash, String tknTranxHash, int endPointType){
-        ethGift.add(fromAddress, ethTranxHash, tknTranxHash, endPointType);
+    public void getStatusOfGift(String fromAddress, String ethTranxHash, String tknTranxHash, int endPointType, double ethValue, double tknValue){
+        ethGift.add(fromAddress, ethTranxHash, tknTranxHash, endPointType, ethValue, tknValue);
     }
 
 }

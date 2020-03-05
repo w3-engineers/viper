@@ -147,6 +147,9 @@ public class WalletService {
         });
     }
 
+    public String getPublicKey(){
+        return mSharedPref.read(PUBLIC_KEY);
+    }
 
     public void createWallet(String password, WalletCreateListener listener) {
         if (isWalletExists()) {
@@ -280,7 +283,7 @@ public class WalletService {
         mCredentials = Web3jWalletHelper.onInstance(mContext).getWallet(password, walletSuffixDir, keyStoreFileName);
         if (mCredentials != null) {
             mSharedPref.write(WALLET_ADDRESS, mCredentials.getAddress());
-            mSharedPref.write(KEY_USER_ID, mCredentials.getAddress());
+//            mSharedPref.write(KEY_USER_ID, mCredentials.getAddress());
             //mSharedPref.write(PUBLIC_KEY, mCredentials.getEcKeyPair().getPublicKey().toString(16));
             mSharedPref.write(KEY_USER_ID, mCredentials.getAddress());
             mSharedPref.write(PRIVATE_KEY, mCredentials.getEcKeyPair().getPrivateKey().toString(16));
@@ -316,8 +319,7 @@ public class WalletService {
     }
 
     public String getPrivateKey() {
-        String privateKey = mSharedPref.read(PRIVATE_KEY);
-        return privateKey;
+        return mSharedPref.read(PRIVATE_KEY);
     }
 
     public String getWalletFilePath() {

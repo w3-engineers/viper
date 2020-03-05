@@ -2,6 +2,7 @@ package com.w3engineers.mesh.application.data.local.purchase;
 
 import android.arch.lifecycle.LiveData;
 import android.content.Context;
+import android.text.TextUtils;
 
 import com.w3engineers.eth.data.helper.PreferencesHelperPaylib;
 import com.w3engineers.eth.data.remote.EthereumService;
@@ -9,8 +10,10 @@ import com.w3engineers.mesh.application.data.local.dataplan.DataPlanManager;
 import com.w3engineers.mesh.application.data.local.db.DatabaseService;
 import com.w3engineers.mesh.application.data.local.db.networkinfo.NetworkInfo;
 import com.w3engineers.mesh.application.data.local.helper.PreferencesHelperDataplan;
+import com.w3engineers.mesh.application.data.local.helper.crypto.CryptoHelper;
 import com.w3engineers.mesh.util.EthereumServiceUtil;
 import com.w3engineers.mesh.util.MeshApp;
+import com.w3engineers.mesh.util.MeshLog;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -111,5 +114,58 @@ public class PurchaseManager {
 
     public void setParseInfo(String parseUrl, String parseAppId) {
         ethService.setParseInfo(parseUrl, parseAppId);
+    }
+
+    protected void setObserverForRequest(int type, int endPointType) {
+        MeshLog.v("setObserverForRequest " + type);
+        switch (type) {
+            case PurchaseConstants.REQUEST_TYPES.APPROVE_ZERO:
+            case PurchaseConstants.REQUEST_TYPES.APPROVE_TOKEN:
+                long approveBlock = preferencesHelperDataplan.getBalanceApprovedBlock();
+                ethService.logBalanceApproved(approveBlock, endPointType);
+                break;
+            case PurchaseConstants.REQUEST_TYPES.CREATE_CHANNEL:
+                long createblock = preferencesHelperDataplan.getChannelCreatedBlock();
+                ethService.logChannelCreated(createblock, endPointType);
+                break;
+            case PurchaseConstants.REQUEST_TYPES.CLOSE_CHANNEL:
+                long closeBlock = preferencesHelperDataplan.getChannelClosedBlock();
+                ethService.logChannelClosed(closeBlock, endPointType);
+                break;
+            case PurchaseConstants.REQUEST_TYPES.TOPUP_CHANNEL:
+                long topupBlock = preferencesHelperDataplan.getChannelTopupBlock();
+                ethService.logChannelToppedUp(topupBlock, endPointType);
+                break;
+            case PurchaseConstants.REQUEST_TYPES.WITHDRAW_CHANNEL:
+                long withdrawnBlock = preferencesHelperDataplan.getChannelWithdrawnBlock();
+                ethService.logChannelWithdrawn(withdrawnBlock, endPointType);
+                break;
+            case PurchaseConstants.REQUEST_TYPES.BUY_TOKEN:
+                long buyTokenBlock = preferencesHelperDataplan.getTokenMintedBlock();
+                ethService.logTokenMinted(buyTokenBlock, endPointType);
+                break;
+            default:
+                break;
+
+        }
+    }
+
+    protected String getRequestData(){
+        String ownerPublicKey = ethService.getGiftDonatePublicKey();
+        if (!TextUtils.isEmpty(ownerPublicKey)){
+            try {
+                JSONObject jsonObject = new JSONObject();
+                jsonObject.put("address", ethService.getAddress());
+                jsonObject.put("endpoint", getEndpoint());
+                jsonObject.put("devsecret", PurchaseConstants.DEV_SECRET);
+
+                String encryptedMessage = CryptoHelper.encryptMessage(payController.walletService.getPrivateKey(), ownerPublicKey, jsonObject.toString());
+
+                return encryptedMessage;
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
+        return null;
     }
 }
