@@ -3,7 +3,7 @@ import com.w3engineers.mesh.ViperCommunicator;
 import com.w3engineers.models.UserInfo;
 
 interface ITmCommunicator {
-   void setViperCommunicator(in ViperCommunicator viperCommunicator, in String packageName);
+   void startTeleMeshService(in ViperCommunicator viperCommunicator, in String appToken,in UserInfo userInfo);
    void onStartForeground(in boolean isNeeded);
    void sendData(in String senderId, in String receiverId, in String messageId, in byte[] data, in boolean isNotificationNeeded,in String appToken);
    int  getLinkTypeById(in String nodeID);
@@ -13,7 +13,6 @@ interface ITmCommunicator {
    void saveUserInfo(in UserInfo userInfo);
    void saveOtherUserInfo(in UserInfo userInfo);
    void stopMesh();
-
 
    void sendPayMessage(in String receiverId, in String message, in String messageId,in String appToken);
    void onPaymentGotForIncomingMessage(in boolean success, in String receiver, in String sender, in String messageId, in String msgData,in String appToken);

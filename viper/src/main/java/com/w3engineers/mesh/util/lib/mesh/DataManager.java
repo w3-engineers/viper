@@ -354,15 +354,15 @@ public class DataManager {
                 if (CommonUtil.isEmulator()) {
                     status = true;
                 } else {
-                    mTmCommunicator.setViperCommunicator(viperCommunicator, mContext.getPackageName());
-                    status = mTmCommunicator.startMesh(userRole, userInfo, signalServerUrl);
+                    mTmCommunicator.startTeleMeshService(viperCommunicator, mContext.getPackageName(), userInfo);
+                    //status = mTmCommunicator.startMesh(userRole, userInfo, signalServerUrl);
                 }
-                MeshLog.v("status " + status);
-                mTmCommunicator.startService(appTokenName);
+                //MeshLog.v("status " + status);
+                //mTmCommunicator.startService(appTokenName);
 //                boolean status = mTmCommunicator.startMesh(appName, userRole, userInfo, mSsid);
-                if (!status) {
+                /*if (!status) {
                     showPermissionPopUp();
-                }
+                }*/
             } catch (RemoteException e) {
                 e.printStackTrace();
             }
@@ -409,12 +409,12 @@ public class DataManager {
         }
 
         @Override
-        public void onAckReceived(String messageId, int status) throws RemoteException {
+        public void onAckReceived(String messageId, int status) {
             DataManager.this.onAckReceived(messageId, status);
         }
 
         @Override
-        public void onServiceAvailable(int status) throws RemoteException {
+        public void onServiceAvailable(int status) {
 
         }
 
@@ -455,8 +455,8 @@ public class DataManager {
         }
 
         @Override
-        public void onTransportInit(String nodeId, String publicKey, boolean success, String msg) throws RemoteException {
-            DataManager.this.onTransportInit(nodeId, publicKey, success, msg);
+        public void onStartTeleMeshService(boolean isSuccess,String nodeId, String message) throws RemoteException {
+            //DataManager.this.onTransportInit(nodeId, publicKey, success, msg);
         }
 
         @Override
