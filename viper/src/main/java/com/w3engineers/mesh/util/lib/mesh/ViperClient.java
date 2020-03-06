@@ -30,12 +30,7 @@ import java.util.List;
 public class ViperClient {
 
     private Context mContext;
-//    public static String networkPrefix;
-//    public static String appName;
-
     public static String usersName;
-    public static String wallerAddress;
-    public static String publicKey;
     public static int avatar;
     public static long regTime;
     public static boolean isSync;
@@ -52,38 +47,33 @@ public class ViperClient {
         }
     }
 
-    protected ViperClient(Context context, String packageName, String userName, String walletAddress, String publicKey,
-                          int avatar, long regTime, boolean isSync, String configData) {
+    protected ViperClient(Context context, String packageName, String userName, int avatar, long regTime, boolean isSync, String configData) {
         this.mContext = context;
         this.packageName = packageName;
         this.usersName = userName;
-        this.wallerAddress = walletAddress;
-        this.publicKey = publicKey;
         this.avatar = avatar;
         this.regTime = regTime;
         this.isSync = isSync;
         this.configData = configData;
 
         ConfigSyncUtil.getInstance().loadFirstTimeData(mContext, configData);
-
-        startClient(walletAddress, publicKey);
     }
 
-    public static ViperClient on(Context context, String packageName, String userName, String walletAddress, String publicKey, int avatar, long regTime, boolean isSync, String configData) {
+    public static ViperClient on(Context context, String packageName, String userName, int avatar, long regTime, boolean isSync, String configData) {
         if (mViperClient == null) {
             synchronized (ViperClient.class) {
                 if (mViperClient == null)
-                    mViperClient = new ViperClient(context, packageName, userName, walletAddress, publicKey, avatar, regTime, isSync, configData);
+                    mViperClient = new ViperClient(context, packageName, userName, avatar, regTime, isSync, configData);
             }
         }
         return mViperClient;
     }
 
-    public static ViperClient on(Context context, String packageName, String userName, String walletAddress, String publicKey, String configData) {
+    public static ViperClient on(Context context, String packageName, String userName, String configData) {
         if (mViperClient == null) {
             synchronized (ViperClient.class) {
                 if (mViperClient == null)
-                    mViperClient = new ViperClient(context, packageName, userName, walletAddress, publicKey, avatar, regTime, isSync, configData);
+                    mViperClient = new ViperClient(context, packageName, userName, avatar, regTime, isSync, configData);
             }
         }
         return mViperClient;
@@ -99,21 +89,20 @@ public class ViperClient {
         SharedPref.write(Constant.PreferenceKeys.APP_DOWNLOAD_LINK, downloadLink);
         SharedPref.write(Constant.PreferenceKeys.APP_VERSION, appVersion);
 
-        PurchaseManager.getInstance().setParseInfo(parseUrl, parseAppId);
+//        PurchaseManager.getInstance().setParseInfo(parseUrl, parseAppId);
 
+        String userAddress = SharedPref.read(Constant.PreferenceKeys.ADDRESS);
 
         UserInfo userInfo = new UserInfo();
 
-        userInfo.setAddress(wallerAddress);
         userInfo.setAvatar(avatar);
         userInfo.setRegTime(regTime);
         userInfo.setSync(isSync);
+        userInfo.setAddress(userAddress);
         userInfo.setUserName(usersName);
-        userInfo.setPublicKey(publicKey);
         userInfo.setPackageName(packageName);
 
         DataManager.on().doBindService(mContext, userInfo, signalServerUrl, packageName);
-
 
         DataManager.on().startMeshService();
 
@@ -157,6 +146,10 @@ public class ViperClient {
         } else {
             MeshLog.v("User public key not found " + senderId);
         }
+    }
+
+    public void openWalletCreationUI() {
+        DataManager.on().openWalletCreateUI();
     }
 
     public void checkConnectionStatus(String nodeID){
@@ -220,7 +213,7 @@ public class ViperClient {
 
                 UserInfo userInfo = new UserInfo();
 
-                userInfo.setAddress(walletAddress);
+                userInfo.setAddress(walletAddress);Implement notify process for specific app with users info
                 userInfo.setAvatar(avatar);
                 userInfo.setRegTime(regTime);
                 userInfo.setSync(isSync);

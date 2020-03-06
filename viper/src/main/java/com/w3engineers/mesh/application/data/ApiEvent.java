@@ -21,6 +21,7 @@ import com.w3engineers.mesh.application.data.model.SellerRemoved;
 import com.w3engineers.mesh.application.data.model.ServiceUpdate;
 import com.w3engineers.mesh.application.data.model.TransportInit;
 import com.w3engineers.mesh.application.data.model.UserInfoEvent;
+import com.w3engineers.mesh.application.data.model.WalletCreationEvent;
 import com.w3engineers.mesh.application.data.model.WalletLoaded;
 import com.w3engineers.mesh.application.data.remote.model.BuyerPendingMessage;
 
@@ -46,6 +47,7 @@ public interface ApiEvent {
     Class CONFIG_SYNC = ConfigSyncEvent.class;
     Class SERVICE_UPDATE = ServiceUpdate.class;
     Class PERMISSION_INTERRUPTION = PermissionInterruptionEvent.class;
+    Class WALLET_CREATION_EVENT = WalletCreationEvent.class;
 
     Disposable startObserver(Class event, Consumer<? extends Event> next);
 

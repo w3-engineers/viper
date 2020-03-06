@@ -44,6 +44,7 @@ import com.w3engineers.mesh.application.data.model.SellerRemoved;
 import com.w3engineers.mesh.application.data.model.ServiceUpdate;
 import com.w3engineers.mesh.application.data.model.TransportInit;
 import com.w3engineers.mesh.application.data.model.UserInfoEvent;
+import com.w3engineers.mesh.application.data.model.WalletCreationEvent;
 import com.w3engineers.mesh.application.data.remote.model.BuyerPendingMessage;
 import com.w3engineers.mesh.util.CommonUtil;
 import com.w3engineers.mesh.util.ConfigSyncUtil;
@@ -121,20 +122,6 @@ public class DataManager {
                 }
             }
         });
-
-
-        // Todo We have to remove below implementation
-
-        /*Util.isConnected(new Util.ConnectionCheck() {
-            @Override
-            public void onConnectionCheck(boolean isConnected) {
-                if (isConnected) {
-                    ConfigSyncUtil.getInstance().startConfigurationSync(mContext, true, null);
-                } else {
-                    checkAndBindService();
-                }
-            }
-        });*/
 
         // Todo we will update or replace below call in the mesh init section
         if (NetworkMonitor.isOnline()) {
@@ -355,7 +342,7 @@ public class DataManager {
                 if (CommonUtil.isEmulator()) {
                     status = true;
                 } else {
-                    mTmCommunicator.startTeleMeshService(viperCommunicator, mContext.getPackageName(), userInfo);
+                    mTmCommunicator.startTeleMeshService(viperCommunicator, mContext.getPackageName(), userInfo, signalServerUrl);
                     //status = mTmCommunicator.startMesh(userRole, userInfo, signalServerUrl);
                 }
                 //MeshLog.v("status " + status);
@@ -457,7 +444,7 @@ public class DataManager {
 
         @Override
         public void onStartTeleMeshService(boolean isSuccess,String nodeId, String message) throws RemoteException {
-            //DataManager.this.onTransportInit(nodeId, publicKey, success, msg);
+            DataManager.this.onWalletCreationEvent(isSuccess, nodeId, message);
         }
 
         @Override
@@ -657,6 +644,14 @@ public class DataManager {
         dataAckEvent.status = status;
 
         AppDataObserver.on().sendObserverData(dataAckEvent);
+    }
+
+    public void openWalletCreateUI() {
+        try {
+            mTmCommunicator.openWalletCreationUI(appTokenName);
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        }
     }
 
     public void onGetUserInfo(List<UserInfo> userInfoList) {
@@ -924,6 +919,19 @@ public class DataManager {
         ServiceUpdate serviceUpdate = new ServiceUpdate();
         serviceUpdate.isNeeded = isNeeded;
         AppDataObserver.on().sendObserverData(serviceUpdate);
+    }
+
+    private void onWalletCreationEvent(boolean status, String nodeId, String message) {
+        WalletCreationEvent walletCreationEvent = new WalletCreationEvent();
+        walletCreationEvent.successStatus = status;
+        walletCreationEvent.nodeId = nodeId;
+        walletCreationEvent.statusMessage = message;
+
+        if (!TextUtils.isEmpty(nodeId)) {
+            SharedPref.write(Constant.PreferenceKeys.ADDRESS, nodeId);
+        }
+
+        AppDataObserver.on().sendObserverData(walletCreationEvent);
     }
 
 

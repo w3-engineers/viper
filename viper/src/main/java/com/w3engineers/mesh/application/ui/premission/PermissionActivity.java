@@ -8,14 +8,13 @@ import android.support.v7.app.AppCompatActivity;
 
 import com.w3engineers.ext.strom.util.helper.PermissionUtil;
 import com.w3engineers.mesh.util.lib.mesh.ViperClient;
+
 import static com.w3engineers.mesh.util.lib.mesh.ViperClient.avatar;
 import static com.w3engineers.mesh.util.lib.mesh.ViperClient.configData;
 import static com.w3engineers.mesh.util.lib.mesh.ViperClient.isSync;
 import static com.w3engineers.mesh.util.lib.mesh.ViperClient.packageName;
-import static com.w3engineers.mesh.util.lib.mesh.ViperClient.publicKey;
 import static com.w3engineers.mesh.util.lib.mesh.ViperClient.regTime;
 import static com.w3engineers.mesh.util.lib.mesh.ViperClient.usersName;
-import static com.w3engineers.mesh.util.lib.mesh.ViperClient.wallerAddress;
 
 public class PermissionActivity extends AppCompatActivity {
     @Override
@@ -31,7 +30,7 @@ public class PermissionActivity extends AppCompatActivity {
     }
 
     private void closeCurrentActivity() {
-        ViperClient.on(this, packageName, usersName, wallerAddress, publicKey, avatar, regTime, isSync, configData).startClient(wallerAddress, publicKey);
+        ViperClient.on(this, packageName, usersName, avatar, regTime, isSync, configData)/*.startClient(wallerAddress, publicKey)*/;
         finish();
     }
 

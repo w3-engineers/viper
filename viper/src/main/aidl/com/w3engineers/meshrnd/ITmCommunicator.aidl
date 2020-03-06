@@ -3,11 +3,11 @@ import com.w3engineers.mesh.ViperCommunicator;
 import com.w3engineers.models.UserInfo;
 
 interface ITmCommunicator {
-   void startTeleMeshService(in ViperCommunicator viperCommunicator, in String appToken,in UserInfo userInfo);
+   void startTeleMeshService(in ViperCommunicator viperCommunicator, in String appToken,in UserInfo userInfo,in String signalServer);
    void onStartForeground(in boolean isNeeded);
    void sendData(in String senderId, in String receiverId, in String messageId, in byte[] data, in boolean isNotificationNeeded,in String appToken);
    int  getLinkTypeById(in String nodeID);
-   boolean startMesh(in int existingRole, in UserInfo userInfo, in String signalServerUrl);
+   boolean startMesh(in String appToken);
    String getUserId();
    void saveDiscoveredUserInfo(String userId, String userName);
    void saveUserInfo(in UserInfo userInfo);
@@ -38,4 +38,6 @@ interface ITmCommunicator {
    void sendMyVersionToOthers(in String receiverId, in String appToken, in int version);
 
     void sendAppUpdateRequest(in String receiverId, in String appToken);
+
+    void openWalletCreationUI(in String appToken);
 }

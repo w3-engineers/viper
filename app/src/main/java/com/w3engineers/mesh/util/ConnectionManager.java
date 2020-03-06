@@ -20,6 +20,7 @@ import com.w3engineers.ext.viper.ViperApp;
 import com.w3engineers.mesh.application.data.ApiEvent;
 import com.w3engineers.mesh.application.data.AppDataObserver;
 import com.w3engineers.mesh.application.data.local.DataPlanConstants;
+import com.w3engineers.mesh.application.data.local.dataplan.DataPlanManager;
 import com.w3engineers.mesh.application.data.local.db.SharedPref;
 import com.w3engineers.mesh.application.data.model.DataAckEvent;
 import com.w3engineers.mesh.application.data.model.DataEvent;
@@ -28,6 +29,8 @@ import com.w3engineers.mesh.application.data.model.PeerRemoved;
 import com.w3engineers.mesh.application.data.model.PermissionInterruptionEvent;
 import com.w3engineers.mesh.application.data.model.ServiceUpdate;
 import com.w3engineers.mesh.application.data.model.UserInfoEvent;
+import com.w3engineers.mesh.application.data.model.WalletCreationEvent;
+import com.w3engineers.mesh.application.ui.dataplan.TestDataPlanActivity;
 import com.w3engineers.mesh.data.AppCredentials;
 import com.w3engineers.mesh.model.MessageModel;
 import com.w3engineers.mesh.model.UserModel;
@@ -100,8 +103,7 @@ public class ConnectionManager {
 
                 String meshControlConfigData = new Gson().toJson(meshControlConfig);*/
 
-                viperClient = ViperClient.on(mContext, "com.w3engineers.ext.viper", SharedPref.read(Constant.KEY_USER_NAME),
-                        SharedPref.read(Constant.PreferenceKeys.ADDRESS), SharedPref.read(Constant.PreferenceKeys.PUBLIC_KEY), jsonData)
+                viperClient = ViperClient.on(mContext, "com.w3engineers.ext.viper", SharedPref.read(Constant.KEY_USER_NAME), jsonData)
                         .setConfig(AUTH_USER_NAME, AUTH_PASSWORD, FILE_REPO_LINK, PARSE_URL, PARSE_APP_ID, SIGNAL_SERVER_URL, BuildConfig.VERSION_CODE);
 
             }
@@ -305,6 +307,43 @@ public class ConnectionManager {
             PermissionInterruptionEvent permissionInterruptionEvent = (PermissionInterruptionEvent) event;
             if (permissionInterruptionEvent != null) {
                 com.w3engineers.mesh.util.lib.mesh.HandlerUtil.postForeground(() -> showPermissionEventAlert(permissionInterruptionEvent.hardwareState, permissionInterruptionEvent.permissions, MeshApp.getCurrentActivity()));
+            }
+        });
+
+        AppDataObserver.on().startObserver(ApiEvent.WALLET_CREATION_EVENT, event -> {
+
+            WalletCreationEvent walletCreationEvent = (WalletCreationEvent) event;
+
+            if (walletCreationEvent != null) {
+
+                HandlerUtil.postForeground(()-> {
+
+                    if (!walletCreationEvent.successStatus) {
+
+                        DialogUtil.showConfirmationDialog(MeshApp.getCurrentActivity(), "Wallet Create",
+                                "Do you want to create wallet?",
+                                "No",
+                                "Yes",
+                                new DialogUtil.DialogButtonListener() {
+                                    @Override
+                                    public void onClickPositive() {
+                                        viperClient.openWalletCreationUI();
+                                        DialogUtil.dismissDialog();
+                                    }
+
+                                    @Override
+                                    public void onCancel() {
+                                    }
+
+                                    @Override
+                                    public void onClickNegative() {
+                                        DialogUtil.dismissDialog();
+                                    }
+                                });
+                    }
+
+                });
+
             }
         });
     }

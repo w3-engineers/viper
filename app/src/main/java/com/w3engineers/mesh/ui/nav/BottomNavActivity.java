@@ -105,7 +105,10 @@ public class BottomNavActivity extends AppCompatActivity implements UserConnecti
 
     private void requestPermission(){
         if (PermissionUtil.init(this).request(Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE)){
-            WalletManager.getInstance().readWallet(this, "mesh_123", new WalletManager.WaletListener() {
+
+            ConnectionManager.on(BottomNavActivity.this).startViper();
+
+            /*WalletManager.getInstance().readWallet(this, "mesh_123", new WalletManager.WaletListener() {
                 @Override
                 public void onWalletLoaded(String walletAddress, String publicKey) {
                     walletLoadedSuccess = true;
@@ -142,7 +145,7 @@ public class BottomNavActivity extends AppCompatActivity implements UserConnecti
                     });
 
                 }
-            });
+            });*/
 
         }
     }
