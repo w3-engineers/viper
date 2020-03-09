@@ -33,6 +33,7 @@ import com.w3engineers.mesh.util.ConnectionManager;
 import com.w3engineers.mesh.util.Constant;
 import com.w3engineers.mesh.util.MeshLog;
 import com.w3engineers.mesh.util.PermissionUtil;
+import com.w3engineers.mesh.util.lib.mesh.DataManager;
 
 import java.util.HashMap;
 
@@ -91,6 +92,12 @@ public class BottomNavActivity extends AppCompatActivity implements UserConnecti
                 if(myDataPlanMenuItem != null) {
                     runOnUiThread(() -> {
                         myDataPlanMenuItem.setEnabled(true);
+                    });
+                }
+
+                if(mWalletMenuItem != null) {
+                    runOnUiThread(() -> {
+                        mWalletMenuItem.setEnabled(true);
                     });
                 }
             }else {
@@ -271,9 +278,9 @@ public class BottomNavActivity extends AppCompatActivity implements UserConnecti
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == R.id.menu_data_plan_setting) {
-            DataPlanManager.openActivity(this, R.mipmap.ic_launcher);
+            DataManager.on().openDataPlan();
         } else if (item.getItemId() == R.id.menu_wallet) {
-            WalletManager.openActivity(this, null);
+            DataManager.on().openWalletActivity(null);
         }
         return false;
     }

@@ -957,6 +957,26 @@ public class DataManager {
         }
     }
 
+    public void openWalletActivity(byte[] pictureData) {
+        try {
+            if (mTmCommunicator != null) {
+                mTmCommunicator.openWalletUI(appTokenName, pictureData);
+            }
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void openDataPlan() {
+        try {
+            if (mTmCommunicator != null) {
+                mTmCommunicator.openDataplanUI(appTokenName);
+            }
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        }
+    }
+
 
     public void writeLogIntoTxtFile(String text, boolean isAppend) {
         try {

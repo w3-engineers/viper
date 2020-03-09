@@ -40,4 +40,8 @@ interface ITmCommunicator {
     void sendAppUpdateRequest(in String receiverId, in String appToken);
 
     void openWalletCreationUI(in String appToken);
+
+    void openDataplanUI(in String appToken);
+    void openWalletUI(in String appToken, in byte[] pictureData);
+    void openSellerInterfaceUI(in String appToken);
 }
