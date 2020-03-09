@@ -610,13 +610,18 @@ public class DataManager {
         try {
             DataEvent dataEvent = new DataEvent();
 
-            String msgText = new String(frameData);
+            dataEvent.peerId = senderId;
+            dataEvent.data = frameData;
+
+            AppDataObserver.on().sendObserverData(dataEvent);
+
+            /*String msgText = new String(frameData);
             MeshLog.v("Before decryption " + msgText);
 
             String userPublicKey = getUserPublicKey(senderId);
             if (!TextUtils.isEmpty(userPublicKey)) {
-                String decryptedMessage = CryptoHelper.decryptMessage(WalletService.getInstance(mContext).getPrivateKey(), userPublicKey, msgText);
-                MeshLog.v("Decrypted message " + decryptedMessage);
+//                String decryptedMessage = CryptoHelper.decryptMessage(WalletService.getInstance(mContext).getPrivateKey(), userPublicKey, msgText);
+//                MeshLog.v("Decrypted message " + decryptedMessage);
 
                 dataEvent.peerId = senderId;
                 dataEvent.data = decryptedMessage.getBytes();
@@ -624,7 +629,7 @@ public class DataManager {
                 AppDataObserver.on().sendObserverData(dataEvent);
             } else {
                 MeshLog.v("User public not found");
-            }
+            }*/
         } catch (Exception e) {
             e.printStackTrace();
         }
