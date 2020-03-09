@@ -13,12 +13,16 @@ import android.view.MenuItem;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.w3engineers.ext.strom.util.helper.Toaster;
 import com.w3engineers.ext.viper.R;
 import com.w3engineers.ext.viper.databinding.ActivityCreateGroupBinding;
+import com.w3engineers.mesh.application.data.ApiEvent;
+import com.w3engineers.mesh.application.data.AppDataObserver;
 import com.w3engineers.mesh.application.data.local.dataplan.DataPlanManager;
 import com.w3engineers.mesh.application.data.local.db.SharedPref;
 import com.w3engineers.mesh.application.data.local.meshlog.MeshLogManager;
 import com.w3engineers.mesh.application.data.local.wallet.WalletManager;
+import com.w3engineers.mesh.application.data.model.WalletLoaded;
 import com.w3engineers.mesh.model.UserModel;
 import com.w3engineers.mesh.ui.Nearby.NearbyFragment;
 import com.w3engineers.mesh.ui.Nearby.UserConnectionCallBack;
@@ -76,7 +80,7 @@ public class BottomNavActivity extends AppCompatActivity implements UserConnecti
 
 
         MeshLog.v("BottomNavActivity");
-/*        AppDataObserver.on().startObserver(ApiEvent.WALLET_LOADED, event -> {
+        AppDataObserver.on().startObserver(ApiEvent.WALLET_LOADED, event -> {
 
             WalletLoaded walletLoaded = (WalletLoaded) event;
 
@@ -94,7 +98,7 @@ public class BottomNavActivity extends AppCompatActivity implements UserConnecti
                     Toaster.showLong("Wallet loading error.");
                 });
             }
-        });*/
+        });
     }
 
     @Override

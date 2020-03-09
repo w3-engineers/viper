@@ -45,6 +45,7 @@ import com.w3engineers.mesh.application.data.model.ServiceUpdate;
 import com.w3engineers.mesh.application.data.model.TransportInit;
 import com.w3engineers.mesh.application.data.model.UserInfoEvent;
 import com.w3engineers.mesh.application.data.model.WalletCreationEvent;
+import com.w3engineers.mesh.application.data.model.WalletLoaded;
 import com.w3engineers.mesh.application.data.remote.model.BuyerPendingMessage;
 import com.w3engineers.mesh.util.CommonUtil;
 import com.w3engineers.mesh.util.ConfigSyncUtil;
@@ -445,6 +446,11 @@ public class DataManager {
         @Override
         public void onStartTeleMeshService(boolean isSuccess,String nodeId, String message) throws RemoteException {
             DataManager.this.onWalletCreationEvent(isSuccess, nodeId, message);
+        }
+
+        @Override
+        public void onTeleServiceStarted(boolean isSuccess, String nodeId, String pubKey, String message) throws RemoteException {
+            onTransportInit(nodeId, pubKey, isSuccess, message);
         }
 
         @Override
@@ -927,16 +933,28 @@ public class DataManager {
     }
 
     private void onWalletCreationEvent(boolean status, String nodeId, String message) {
-        WalletCreationEvent walletCreationEvent = new WalletCreationEvent();
-        walletCreationEvent.successStatus = status;
-        walletCreationEvent.nodeId = nodeId;
-        walletCreationEvent.statusMessage = message;
 
         if (!TextUtils.isEmpty(nodeId)) {
             SharedPref.write(Constant.PreferenceKeys.ADDRESS, nodeId);
         }
 
-        AppDataObserver.on().sendObserverData(walletCreationEvent);
+        if (status) {
+            WalletLoaded walletLoaded = new WalletLoaded();
+            walletLoaded.walletAddress = nodeId;
+            walletLoaded.success = status;
+
+            AppDataObserver.on().sendObserverData(walletLoaded);
+
+        } else {
+
+            WalletCreationEvent walletCreationEvent = new WalletCreationEvent();
+            walletCreationEvent.successStatus = status;
+            walletCreationEvent.nodeId = nodeId;
+            walletCreationEvent.statusMessage = message;
+
+            AppDataObserver.on().sendObserverData(walletCreationEvent);
+
+        }
     }
 
 

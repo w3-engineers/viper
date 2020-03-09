@@ -110,7 +110,7 @@ public class ViperClient {
         return this;
     }
 
-    public void startClient(String wallerAddress, String publicKey) {
+    /*public void startClient(String wallerAddress, String publicKey) {
 
         if (PreferencesHelperDataplan.on().getDataPlanRole() == DataPlanConstants.USER_ROLE.DATA_SELLER) {
             PurchaseManagerSeller.getInstance();
@@ -126,7 +126,7 @@ public class ViperClient {
         walletLoaded.success = true;
 
         AppDataObserver.on().sendObserverData(walletLoaded);
-    }
+    }*/
 
     private void startPermissionActivity(Context context) {
         Intent permissionIntent = new Intent(context, PermissionActivity.class);

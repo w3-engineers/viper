@@ -31,7 +31,7 @@ interface ITmCommunicator {
 
    void allowPermissions(in List<String> permissions);
 
-   void startService(in String appToken);
+//   void startService(in String appToken);
 
    void isLocalUseConnected(in String userId);
 

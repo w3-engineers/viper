@@ -23,6 +23,7 @@ interface ViperCommunicator {
      void onPayMessageAckReceived(in String sender, in String receiver, in String messageId);
      void buyerInternetMessageReceived(in String sender, in String receiver, in String messageId, in String messageData, in long dataLength, in boolean isIncoming);
      void onStartTeleMeshService(in boolean isSuccess,in String nodeId, in String mseeage);
+     void onTeleServiceStarted(in boolean isSuccess, in String nodeId, in String pubKey, in String message);
      void onProbableSellerDisconnected(in String sellerId);
      void onServiceUpdateNeeded(in boolean isNeeded);
 
