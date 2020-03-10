@@ -309,6 +309,7 @@ public class ConnectionManager {
 
         AppDataObserver.on().startObserver(ApiEvent.FILE_PROGRESS_EVENT, event -> {
             FileProgressEvent fileProgressEvent = (FileProgressEvent) event;
+            ChatDataProvider.On().updateMessageProgress(fileProgressEvent.getFileMessageId(), fileProgressEvent.getPercentage());
             if (messageListener != null) {
                 messageListener.onFileProgressReceived(fileProgressEvent.getFileMessageId(), fileProgressEvent.getPercentage());
             }

@@ -94,6 +94,18 @@ public class ChatDataProvider {
         }
     }
 
+    public void updateMessageProgress(String messageId,int progress){
+        MessageModel messageModel = mMessageModelBox.query().equal(MessageModel_.messageId, messageId).build().findFirst();
+        if(messageModel != null) {
+            messageModel.progress = progress;
+            try {
+                mMessageModelBox.put(messageModel);
+            }catch (UniqueViolationException e){
+                e.printStackTrace();
+            }
+        }
+    }
+
     public int getMessageStatus(String messageId) {
         MessageModel messageModel = mMessageModelBox.query().equal(MessageModel_.messageId, messageId).build().findFirst();
         if (messageModel !=null){
