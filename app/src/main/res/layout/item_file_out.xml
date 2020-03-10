@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <android.support.constraint.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="@dimen/padding_8">
+
+        <ImageView
+            android:id="@+id/image_view_message_out"
+            android:layout_width="@dimen/width_200"
+            android:layout_height="@dimen/height_200"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <ProgressBar
+            android:id="@+id/progress_bar"
+            style="?android:attr/progressBarStyleHorizontal"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:progressDrawable="@drawable/drawable_progress"
+            app:layout_constraintBottom_toBottomOf="@+id/image_view_message_out"
+            app:layout_constraintEnd_toEndOf="@+id/image_view_message_out"
+            app:layout_constraintStart_toStartOf="@+id/image_view_message_out"
+            app:layout_constraintTop_toTopOf="@+id/image_view_message_out" />
+
+
+    </android.support.constraint.ConstraintLayout>
+</layout>

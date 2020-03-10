@@ -4,6 +4,7 @@ import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
+import android.os.RemoteException;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -22,6 +23,9 @@ import com.w3engineers.mesh.application.data.local.DataPlanConstants;
 import com.w3engineers.mesh.application.data.local.db.SharedPref;
 import com.w3engineers.mesh.application.data.model.DataAckEvent;
 import com.w3engineers.mesh.application.data.model.DataEvent;
+import com.w3engineers.mesh.application.data.model.FileProgressEvent;
+import com.w3engineers.mesh.application.data.model.FileReceivedEvent;
+import com.w3engineers.mesh.application.data.model.FileTransferEvent;
 import com.w3engineers.mesh.application.data.model.PeerAdd;
 import com.w3engineers.mesh.application.data.model.PeerRemoved;
 import com.w3engineers.mesh.application.data.model.PermissionInterruptionEvent;
@@ -32,6 +36,7 @@ import com.w3engineers.mesh.model.MessageModel;
 import com.w3engineers.mesh.model.UserModel;
 import com.w3engineers.mesh.ui.Nearby.NearbyCallBack;
 import com.w3engineers.mesh.ui.Nearby.UserConnectionCallBack;
+import com.w3engineers.mesh.ui.chat.ChatActivity;
 import com.w3engineers.mesh.ui.chat.ChatDataProvider;
 import com.w3engineers.mesh.ui.chat.MessageListener;
 import com.w3engineers.mesh.ui.main.MainActivity;
@@ -77,9 +82,9 @@ public class ConnectionManager {
         startAllObserver();
     }
 
-    public void startViper(){
+    public void startViper() {
         try {
-          //  String jsonData = loadJSONFromAsset(mContext);
+            //  String jsonData = loadJSONFromAsset(mContext);
 
             String jsonData = AppCredentials.getInstance().getConfiguration();
 
@@ -167,7 +172,6 @@ public class ConnectionManager {
             ServiceUpdate serviceUpdate = (ServiceUpdate) event;
             MeshLog.e("Service update needed:" + serviceUpdate.isNeeded);
         });
-
 
 
         AppDataObserver.on().startObserver(ApiEvent.DATA, event -> {
@@ -300,7 +304,44 @@ public class ConnectionManager {
                 com.w3engineers.mesh.util.lib.mesh.HandlerUtil.postForeground(() -> showPermissionEventAlert(permissionInterruptionEvent.hardwareState, permissionInterruptionEvent.permissions, MeshApp.getCurrentActivity()));
             }
         });
+
+        //File message receive section
+
+        AppDataObserver.on().startObserver(ApiEvent.FILE_PROGRESS_EVENT, event -> {
+            FileProgressEvent fileProgressEvent = (FileProgressEvent) event;
+            if (messageListener != null) {
+                messageListener.onFileProgressReceived(fileProgressEvent.getFileMessageId(), fileProgressEvent.getPercentage());
+            }
+        });
+
+        AppDataObserver.on().startObserver(ApiEvent.FILE_RECEIVED_EVENT, event -> {
+            FileReceivedEvent fileReceivedEvent = (FileReceivedEvent) event;
+            if (messageListener != null) {
+                Log.d("FileMessageTest", "File message id: " + fileReceivedEvent.getFileMessageId());
+                Log.d("FileMessageTest", "File message path: " + fileReceivedEvent.getFilePath());
+                MessageModel messageModel = new MessageModel();
+                messageModel.messageType = ChatActivity.FILE_MESSAGE;
+                messageModel.messageId = fileReceivedEvent.getFileMessageId();
+                messageModel.incoming = true;
+                messageModel.message = fileReceivedEvent.getFilePath();
+                messageModel.friendsId = fileReceivedEvent.getSourceAddress();
+                messageModel.receiveTime = System.currentTimeMillis();
+
+                UserModel userModel1 = discoverUserMap.get(messageModel.friendsId);
+                ChatDataProvider.On().insertMessage(messageModel, userModel1);
+
+                messageListener.onMessageReceived(messageModel);
+            }
+        });
+
+        AppDataObserver.on().startObserver(ApiEvent.FILE_TRANSFER_EVENT, event -> {
+            FileTransferEvent fileTransferEvent = (FileTransferEvent) event;
+            if (messageListener != null) {
+                messageListener.onFileTransferEvent(fileTransferEvent.getFileMessageId(), fileTransferEvent.isSuccess());
+            }
+        });
     }
+
     public void showPermissionEventAlert(int hardwareEvent, List<String> permissions, Activity activity) {
 
         if (activity == null) return;
@@ -439,7 +480,17 @@ public class ConnectionManager {
         }
     }
 
-    public void checkConnectionStatus(String userId){
+    public String sendFileMessage(String receiverId, String filePath) {
+        try {
+            return viperClient.sendFileMessage(receiverId, filePath);
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        }
+
+        return "";
+    }
+
+    public void checkConnectionStatus(String userId) {
         viperClient.checkConnectionStatus(userId);
     }
 
@@ -491,17 +542,17 @@ public class ConnectionManager {
             return "BT MESH";
         } else if (type == Link.Type.INTERNET.getValue()) {
             return "Internet";
-        }else if (type == Link.Type.HB.getValue()) {
+        } else if (type == Link.Type.HB.getValue()) {
             return "HB";
         } else if (type == Link.Type.HB_MESH.getValue()) {
             return "HB MESH";
-        }else {
+        } else {
             MeshLog.v("User Type Invalid");
         }
         return "P2P";
     }
 
-    private String getUserId() {
+    public String getUserId() {
         if (TextUtils.isEmpty(SharedPref.read(Constant.KEY_USER_ID))) {
             try {
                 String userId = viperClient.getUserId();
@@ -535,7 +586,7 @@ public class ConnectionManager {
     }*/
 
     private void showToast(String msg) {
-        if (BuildConfig.DEBUG){
+        if (BuildConfig.DEBUG) {
             HandlerUtil.postForeground(() -> Toast.makeText(mContext, msg, Toast.LENGTH_LONG).show());
         }
     }

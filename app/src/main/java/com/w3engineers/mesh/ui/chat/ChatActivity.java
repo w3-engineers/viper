@@ -1,19 +1,28 @@
 package com.w3engineers.mesh.ui.chat;
 
+
+import android.content.ContentResolver;
+import android.content.Intent;
+import android.database.Cursor;
 import android.databinding.DataBindingUtil;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
+import android.provider.MediaStore;
+import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
 
-
 import com.w3engineers.ext.viper.R;
 import com.w3engineers.ext.viper.databinding.ActivityChatBinding;
+import com.w3engineers.mesh.application.ui.util.ToastUtil;
 import com.w3engineers.mesh.model.MessageModel;
 import com.w3engineers.mesh.model.UserModel;
 import com.w3engineers.mesh.ui.Nearby.NearbyCallBack;
@@ -22,11 +31,17 @@ import com.w3engineers.mesh.util.Constants;
 import com.w3engineers.mesh.util.HandlerUtil;
 import com.w3engineers.mesh.util.TimeUtil;
 
+import java.io.File;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.UUID;
+
+import droidninja.filepicker.FilePickerBuilder;
+import droidninja.filepicker.FilePickerConst;
+import timber.log.Timber;
 
 
 /**
@@ -58,6 +73,8 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
     private MenuItem status, repeatedMsg;
     private Timer mTimer;
     private boolean isRepeatModeOn;
+    private final int REQUEST_FILE_PICK = 202;
+    public static int FILE_MESSAGE = 1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -93,15 +110,53 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
         return true;
     }
 
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == requestCode) {
+            if (resultCode == RESULT_OK) {
+                Uri uri = data.getData();
+
+                String path;
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                    path = getImageRealPath(getContentResolver(), uri, null);
+                } else {
+                    path = uri.getPath();
+                }
+
+
+                MessageModel messageModel = new MessageModel();
+                messageModel.message = path;
+                messageModel.incoming = false;
+                messageModel.friendsId = mUserModel.getUserId();
+                messageModel.messageType = FILE_MESSAGE;
+
+
+                String messageId = ConnectionManager.on(this).sendFileMessage(mUserModel.getUserId(), path);
+
+                messageModel.messageId = messageId;
+
+                Log.d("FileMessageTest", "File message id: " + messageId);
+
+                ChatDataProvider.On().insertMessage(messageModel, mUserModel);
+                mChatAdapter.addItem(messageModel);
+                scrollSmoothly();
+
+            }
+        }
+    }
+
     private void initGuiWithUserdata() {
         mBinding = DataBindingUtil.setContentView(this, R.layout.activity_chat);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         mUserModel = (UserModel) getIntent().getSerializableExtra(UserModel.class.getName());
         mBinding.imageButtonSend.setOnClickListener(this);
+        mBinding.imageButtonCamera.setOnClickListener(this);
     }
 
     private void initAdapter() {
-        mChatAdapter = new ChatAdapter();
+        mChatAdapter = new ChatAdapter(this);
         mBinding.recyclerViewMessage.setLayoutManager(new LinearLayoutManager(this));
         mBinding.recyclerViewMessage.setAdapter(mChatAdapter);
     }
@@ -129,8 +184,8 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     protected void onDestroy() {
         super.onDestroy();
-       ConnectionManager.on(this).initMessageListener(null);
-       ConnectionManager.on(this).initNearByCallBackForChatActivity(null);
+        ConnectionManager.on(this).initMessageListener(null);
+        ConnectionManager.on(this).initNearByCallBackForChatActivity(null);
         if (mTimer != null) {
             mTimer.cancel();
         }
@@ -138,24 +193,32 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
 
     @Override
     public void onClick(View v) {
-        String inputValue = mBinding.edittextMessageInput.getText().toString().trim();
-        if (TextUtils.isEmpty(inputValue)) return;
-        mBinding.edittextMessageInput.setText("");
-        MessageModel messageModel = new MessageModel();
-        messageModel.message = inputValue + "\n" + TimeUtil.parseMillisToTime(System.currentTimeMillis());
-        messageModel.incoming = false;
-        messageModel.friendsId = mUserModel.getUserId();
-        messageModel.messageId = UUID.randomUUID().toString();
+        int id = v.getId();
+        if (id == R.id.image_button_camera) {
 
-        ChatDataProvider.On().insertMessage(messageModel, mUserModel);
-        mChatAdapter.addItem(messageModel);
-        scrollSmoothly();
+            Intent photoPickerIntent = new Intent(Intent.ACTION_PICK);
+            photoPickerIntent.setType("image/*");
+            startActivityForResult(photoPickerIntent, REQUEST_FILE_PICK);
 
-        //  messageModel.messageLongId = System.currentTimeMillis();
+        } else if (id == R.id.image_button_send) {
+            String inputValue = mBinding.edittextMessageInput.getText().toString().trim();
+            if (TextUtils.isEmpty(inputValue)) return;
+            mBinding.edittextMessageInput.setText("");
+            MessageModel messageModel = new MessageModel();
+            messageModel.message = inputValue + "\n" + TimeUtil.parseMillisToTime(System.currentTimeMillis());
+            messageModel.incoming = false;
+            messageModel.friendsId = mUserModel.getUserId();
+            messageModel.messageId = UUID.randomUUID().toString();
 
-        //   String messageId = ConnectionManager.on().sendMessage(mUserModel.getUserId(), messageModel);
+            ChatDataProvider.On().insertMessage(messageModel, mUserModel);
+            mChatAdapter.addItem(messageModel);
+            scrollSmoothly();
 
-        ConnectionManager.on(this).sendMessage(mUserModel.getUserId(), messageModel);
+            //  messageModel.messageLongId = System.currentTimeMillis();
+
+            //   String messageId = ConnectionManager.on().sendMessage(mUserModel.getUserId(), messageModel);
+
+            ConnectionManager.on(this).sendMessage(mUserModel.getUserId(), messageModel);
 
 /*        if (messageId !=null){
             messageModel.messageId = messageId;
@@ -166,12 +229,13 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
 
 /*        mChatAdapter.addItem(messageModel);
         scrollSmoothly();*/
+        }
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-     //   ConnectionManager.on().initListener(this);
+        //   ConnectionManager.on().initListener(this);
     }
 
     @Override
@@ -257,6 +321,30 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     @Override
+    public void onFileProgressReceived(String fileMessageId, int progress) {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                mChatAdapter.updateProgress(fileMessageId, progress);
+            }
+        });
+    }
+
+    @Override
+    public void onFileTransferEvent(String fileMessageId, boolean isSuccess) {
+        runOnUiThread(() -> {
+            if (isSuccess) {
+                //ToastUtil.showShort(this, "File message received");
+                mChatAdapter.notifyDataSetChanged();
+            }else{
+                ToastUtil.showShort(this, "Message sending failed");
+            }
+        });
+
+    }
+
+
+    @Override
     public void onUserFound(UserModel model) {
         if (model.getUserId().equalsIgnoreCase(mUserModel.getUserId())) {
             // runOnUiThread(() -> mBinding.edittextMessageInput.setEnabled(true));
@@ -297,5 +385,34 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
                 mChatAdapter.addItem(messageModelList);
             });
         }
+    }
+
+    private String getImageRealPath(ContentResolver contentResolver, Uri uri, String whereClause) {
+        String ret = "";
+
+        // Query the uri with condition.
+        Cursor cursor = contentResolver.query(uri, null, whereClause, null, null);
+
+        if (cursor != null) {
+            boolean moveToFirst = cursor.moveToFirst();
+            if (moveToFirst) {
+
+                // Get columns name by uri type.
+                String columnName = MediaStore.Images.Media.DATA;
+                Log.d("UriTest: ", "uri: " + uri);
+                if (uri == MediaStore.Images.Media.EXTERNAL_CONTENT_URI) {
+                    columnName = MediaStore.Images.Media.DATA;
+                }
+
+
+                // Get column index.
+                int imageColumnIndex = cursor.getColumnIndex(columnName);
+
+                // Get column value which is the uri related file local path.
+                ret = cursor.getString(imageColumnIndex);
+            }
+        }
+
+        return ret;
     }
 }

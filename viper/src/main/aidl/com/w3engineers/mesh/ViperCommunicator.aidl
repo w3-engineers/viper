@@ -27,4 +27,9 @@ interface ViperCommunicator {
      void onServiceUpdateNeeded(in boolean isNeeded);
 
      void onInterruption(in int hardwareState, in List<String> permissions);
+
+     void onFileProgress(in String fileTransferId, in int percentProgress);
+     void onFileTransferFinish(in String fileTransferId);
+     void onFileTransferError(in String fileTransferId);
+     void onFileReceiveStarted(in String sourceAddress,in String fileTransferId, in String filePath);
 }

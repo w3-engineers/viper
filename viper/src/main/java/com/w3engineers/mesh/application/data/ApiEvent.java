@@ -12,6 +12,9 @@ import com.w3engineers.mesh.application.data.model.ConfigSyncEvent;
 import com.w3engineers.mesh.application.data.model.DataAckEvent;
 import com.w3engineers.mesh.application.data.model.DataEvent;
 import com.w3engineers.mesh.application.data.model.Event;
+import com.w3engineers.mesh.application.data.model.FileProgressEvent;
+import com.w3engineers.mesh.application.data.model.FileReceivedEvent;
+import com.w3engineers.mesh.application.data.model.FileTransferEvent;
 import com.w3engineers.mesh.application.data.model.PayMessage;
 import com.w3engineers.mesh.application.data.model.PayMessageAck;
 import com.w3engineers.mesh.application.data.model.PeerAdd;
@@ -46,6 +49,11 @@ public interface ApiEvent {
     Class CONFIG_SYNC = ConfigSyncEvent.class;
     Class SERVICE_UPDATE = ServiceUpdate.class;
     Class PERMISSION_INTERRUPTION = PermissionInterruptionEvent.class;
+
+    // File message section
+    Class FILE_PROGRESS_EVENT = FileProgressEvent.class;
+    Class FILE_RECEIVED_EVENT = FileReceivedEvent.class;
+    Class FILE_TRANSFER_EVENT = FileTransferEvent.class;
 
     Disposable startObserver(Class event, Consumer<? extends Event> next);
 

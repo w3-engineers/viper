@@ -30,7 +30,7 @@
     },
     {
       "id": "2:1033751320421761887",
-      "lastPropertyId": "7:1669023491628040823",
+      "lastPropertyId": "9:1393308678891713823",
       "name": "MessageModel",
       "properties": [
         {
@@ -61,6 +61,14 @@
           "id": "7:1669023491628040823",
           "indexId": "2:1415758983718959614",
           "name": "messageId"
+        },
+        {
+          "id": "8:6533526061111465476",
+          "name": "messageType"
+        },
+        {
+          "id": "9:1393308678891713823",
+          "name": "progress"
         }
       ],
       "relations": []

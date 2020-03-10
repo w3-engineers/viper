@@ -34,6 +34,9 @@ import com.w3engineers.mesh.application.data.local.helper.crypto.CryptoHelper;
 import com.w3engineers.mesh.application.data.model.ConfigSyncEvent;
 import com.w3engineers.mesh.application.data.model.DataAckEvent;
 import com.w3engineers.mesh.application.data.model.DataEvent;
+import com.w3engineers.mesh.application.data.model.FileProgressEvent;
+import com.w3engineers.mesh.application.data.model.FileReceivedEvent;
+import com.w3engineers.mesh.application.data.model.FileTransferEvent;
 import com.w3engineers.mesh.application.data.model.PayMessage;
 import com.w3engineers.mesh.application.data.model.PayMessageAck;
 import com.w3engineers.mesh.application.data.model.PeerAdd;
@@ -483,6 +486,28 @@ public class DataManager {
         public void onInterruption(int hardwareState, List<String> permissions) throws RemoteException {
             onInterruptionAction(hardwareState, permissions);
         }
+
+        // File related response
+
+        @Override
+        public void onFileProgress(String fileTransferId, int percentProgress) throws RemoteException {
+            DataManager.this.onFileProgress(fileTransferId, percentProgress);
+        }
+
+        @Override
+        public void onFileTransferFinish(String fileTransferId) throws RemoteException {
+            DataManager.this.onFileTransferFinish(fileTransferId, true);
+        }
+
+        @Override
+        public void onFileTransferError(String fileTransferId) throws RemoteException {
+            DataManager.this.onFileTransferFinish(fileTransferId, false);
+        }
+
+        @Override
+        public void onFileReceiveStarted(String sourceAddress, String fileTransferId, String filePath) throws RemoteException {
+            DataManager.this.onFileReceiveStarted(sourceAddress, fileTransferId, filePath);
+        }
     };
 
 
@@ -501,6 +526,10 @@ public class DataManager {
      */
     public void sendData(String senderId, String receiverId, String messageId, byte[] data, boolean isNotificationNeeded) throws RemoteException {
         mTmCommunicator.sendData(senderId, receiverId, messageId, data, isNotificationNeeded);
+    }
+
+    public String sendFileMessage(String receiverId, String filePath) throws RemoteException {
+        return mTmCommunicator.sendFile(receiverId, filePath);
     }
 
     /**
@@ -914,5 +943,27 @@ public class DataManager {
             ioe.printStackTrace();
         }
 
+    }
+
+    private void onFileProgress(String fileMessageId, int percentProgress) {
+        FileProgressEvent event = new FileProgressEvent();
+        event.setFileMessageId(fileMessageId);
+        event.setPercentage(percentProgress);
+        AppDataObserver.on().sendObserverData(event);
+    }
+
+    private void onFileTransferFinish(String fileMessageId, boolean isSuccess) {
+        FileTransferEvent event = new FileTransferEvent();
+        event.setFileMessageId(fileMessageId);
+        event.setSuccess(isSuccess);
+        AppDataObserver.on().sendObserverData(event);
+    }
+
+    private void onFileReceiveStarted(String sourceAddress, String fileMessageId, String filePath) {
+        FileReceivedEvent event = new FileReceivedEvent();
+        event.setFileMessageId(fileMessageId);
+        event.setFilePath(filePath);
+        event.setSourceAddress(sourceAddress);
+        AppDataObserver.on().sendObserverData(event);
     }
 }

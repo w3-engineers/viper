@@ -35,6 +35,9 @@ public class MessageModel {
     public String friendsId;
     public int messageStatus;
     public long receiveTime;
+    public int messageType;
+    public int progress;
+
     @Unique
     @Index(type = IndexType.VALUE)
     public String messageId;

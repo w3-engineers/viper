@@ -164,7 +164,6 @@ public class ViperClient {
         });*/
 
 
-
         if (PreferencesHelperDataplan.on().getDataPlanRole() == DataPlanConstants.USER_ROLE.DATA_SELLER) {
             PurchaseManagerSeller.getInstance();
         }
@@ -201,7 +200,11 @@ public class ViperClient {
         }
     }
 
-    public void checkConnectionStatus(String nodeID){
+    public String sendFileMessage(String receiverId, String filePath) throws RemoteException {
+       return DataManager.on().sendFileMessage(receiverId, filePath);
+    }
+
+    public void checkConnectionStatus(String nodeID) {
         try {
             DataManager.on().checkConnectionStatus(nodeID);
         } catch (RemoteException e) {

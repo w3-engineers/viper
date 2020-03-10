@@ -35,4 +35,6 @@ interface ITmCommunicator {
    void startService();
 
    void isLocalUseConnected(in String userId);
+
+   String sendFile(in String receiverID,in String filePath);
 }

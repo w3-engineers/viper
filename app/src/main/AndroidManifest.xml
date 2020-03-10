@@ -68,6 +68,8 @@
             android:name="com.w3engineers.mesh.ui.nav.BottomNavActivity"
             android:screenOrientation="portrait" />
 
+        <activity android:name="com.theartofdev.edmodo.cropper.CropImageActivity"
+            android:theme="@style/Base.Theme.AppCompat"/>
 
     </application>
 

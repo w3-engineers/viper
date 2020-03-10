@@ -125,6 +125,9 @@ dependencies {
     implementation 'com.github.bumptech.glide:glide:4.9.0'
     annotationProcessor 'com.github.bumptech.glide:compiler:4.9.0'
 
+    //File picker
+    implementation 'com.droidninja:filepicker:2.1.2'
+
     api project(path: ':viper')
 
    // debugImplementation "io.objectbox:objectbox-android-objectbrowser:$objectboxVersion"
