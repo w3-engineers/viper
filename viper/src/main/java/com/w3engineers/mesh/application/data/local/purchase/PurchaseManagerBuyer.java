@@ -14,6 +14,7 @@ import com.w3engineers.eth.data.remote.EthereumService;
 import com.w3engineers.eth.util.data.NetworkMonitor;
 import com.w3engineers.eth.util.helper.HandlerUtil;
 import com.w3engineers.ext.strom.util.helper.Toaster;
+import com.w3engineers.mesh.application.data.local.DataPlanConstants;
 import com.w3engineers.mesh.application.data.local.dataplan.DataPlanManager;
 import com.w3engineers.mesh.application.data.local.db.DatabaseService;
 import com.w3engineers.mesh.application.data.local.db.datausage.Datausage;
@@ -1670,21 +1671,23 @@ public class PurchaseManagerBuyer extends PurchaseManager implements PayControll
     public void onChannelClosedLog(RaidenMicroTransferChannels.ChannelSettledEventResponse typedResponse) {
         MeshLog.v("onChannelClosedLog buyer " + typedResponse._sender_address + " " + typedResponse._balance.toString());
 
+        if (!typedResponse._sender_address.equalsIgnoreCase(ethService.getAddress())){
+            return;
+        }
 
         preferencesHelperDataplan.setChannelClosedBlock(typedResponse.log.getBlockNumber().longValue());
 
         try {
-            String buyerAddress = typedResponse._sender_address;
             double balance = ethService.getETHorTOKEN(typedResponse._balance);
             PurchaseRequests purchaseRequests = databaseService.getRequestByTrxHash(typedResponse.log.getTransactionHash());
 
-            if (purchaseRequests != null && purchaseRequests.state >= PurchaseConstants.REQUEST_STATE.COMPLETED) {
+           /* if (purchaseRequests != null && purchaseRequests.state >= PurchaseConstants.REQUEST_STATE.COMPLETED) {
                 return;
             }
 
             if (purchaseRequests == null) {
                 purchaseRequests = databaseService.getPendingRequest(buyerAddress, balance, PurchaseConstants.REQUEST_TYPES.CLOSE_CHANNEL, PurchaseConstants.REQUEST_STATE.PENDING);
-            }
+            }*/
 
             if (purchaseRequests != null) {
                 purchaseRequests.state = PurchaseConstants.REQUEST_STATE.NOTIFIED;
@@ -1692,15 +1695,9 @@ public class PurchaseManagerBuyer extends PurchaseManager implements PayControll
                 purchaseRequests.trxBlock = typedResponse.log.getBlockNumber().longValue();
 
                 databaseService.updatePurchaseRequest(purchaseRequests);
-                payController.getDataManager().onBuyerDisconnected(buyerAddress);
-                //TODO notify seller about this channel close
-
-
-
             } else {
                 MeshLog.v("onChannelClosedLog buyer purchaseRequest not found");
             }
-
 
             if (typedResponse._sender_address.equalsIgnoreCase(ethService.getAddress())) {
                 Purchase purchase = databaseService.getPurchaseByBlockNumber(typedResponse._open_block_number.longValue(), typedResponse._sender_address, typedResponse._receiver_address);
@@ -1708,8 +1705,11 @@ public class PurchaseManagerBuyer extends PurchaseManager implements PayControll
                     purchase.state = PurchaseConstants.CHANNEL_STATE.CLOSED;
                     purchase.withdrawnBalance = balance;
                     databaseService.updatePurchase(purchase);
-                    payController.getDataManager().disconnectFromInternet();
-                    onProbableSellerDisconnected(typedResponse._receiver_address);
+
+                    if (typedResponse._receiver_address.equalsIgnoreCase(payController.getDataManager().getCurrentSellerId())) {
+                        payController.getDataManager().disconnectFromInternet();
+                        onProbableSellerDisconnected(typedResponse._receiver_address);
+                    }
 
                     if (dataPlanListener != null) {
                         dataPlanListener.onPurchaseCloseSuccess(typedResponse._receiver_address);

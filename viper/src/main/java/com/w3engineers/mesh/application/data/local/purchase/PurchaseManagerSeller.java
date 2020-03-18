@@ -1841,6 +1841,10 @@ public class PurchaseManagerSeller extends PurchaseManager implements PayControl
     public void onChannelClosedLog(RaidenMicroTransferChannels.ChannelSettledEventResponse typedResponse) {
         MeshLog.v("onChannelClosedLog seller " + typedResponse._sender_address + " " + typedResponse._balance.toString());
 
+        if (typedResponse._sender_address.equalsIgnoreCase(ethService.getAddress())){
+            return;
+        }
+
         preferencesHelperDataplan.setChannelClosedBlock(typedResponse.log.getBlockNumber().longValue());
 
         try {
@@ -1848,9 +1852,9 @@ public class PurchaseManagerSeller extends PurchaseManager implements PayControl
             double balance = ethService.getETHorTOKEN(typedResponse._balance);
             PurchaseRequests purchaseRequests = databaseService.getRequestByTrxHash(typedResponse.log.getTransactionHash());
 
-            if (purchaseRequests != null && purchaseRequests.state >= PurchaseConstants.REQUEST_STATE.COMPLETED) {
-                return;
-            }
+//            if (purchaseRequests != null && purchaseRequests.state >= PurchaseConstants.REQUEST_STATE.COMPLETED) {
+//                return;
+//            }
 
             /*if (purchaseRequests == null) {
                 purchaseRequests = databaseService.getPendingRequest(buyerAddress, balance, PurchaseConstants.REQUEST_TYPES.CLOSE_CHANNEL, PurchaseConstants.REQUEST_STATE.PENDING);
