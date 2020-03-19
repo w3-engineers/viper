@@ -7,9 +7,6 @@ import android.support.annotation.NonNull;
 
 @Entity
 public class BuyerPendingMessage {
-    @NonNull
-    @PrimaryKey(autoGenerate = true)
-    public int id;
 
     @ColumnInfo(name = "sender")
     public String sender;
@@ -20,6 +17,8 @@ public class BuyerPendingMessage {
     @ColumnInfo(name = "msg_data")
     public String msgData;
 
+    @NonNull
+    @PrimaryKey
     @ColumnInfo(name = "msg_id")
     public String msgId;
 
