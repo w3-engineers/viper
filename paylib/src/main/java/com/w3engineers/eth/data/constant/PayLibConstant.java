@@ -13,6 +13,7 @@ public interface PayLibConstant {
     interface END_POINT_TYPE {
         int ETH_ROPSTEN = 1;
         int ETC_KOTTI = 2;
+        int TETH_PRIVATE = 5;
     }
 
 }

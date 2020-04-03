@@ -75,6 +75,7 @@
     <string name="my_node">My node</string>
     <string name="eth">ETH</string>
     <string name="etc">ETC</string>
+    <string name="teth">TETH</string>
 
     <string name="different_network_data_for_seller">You have earning in different network.</string>
     <string name="different_network_data_for_buyer">You have purchase in different network.</string>

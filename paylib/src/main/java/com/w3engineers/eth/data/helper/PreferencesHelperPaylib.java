@@ -61,7 +61,7 @@ public class PreferencesHelperPaylib extends SharedPreferencePrivateMode {
     }
 
     public int getEndpointMode() {
-        return readInt(ENDPOINT_MODE, PayLibConstant.END_POINT_TYPE.ETC_KOTTI);
+        return readInt(ENDPOINT_MODE, PayLibConstant.END_POINT_TYPE.TETH_PRIVATE);
     }
 
 }

@@ -1,13 +1,10 @@
 package com.w3engineers.mesh.util;
 
-import android.content.Context;
 import android.text.TextUtils;
 
 import com.w3engineers.eth.data.constant.PayLibConstant;
 import com.w3engineers.eth.data.helper.PreferencesHelperPaylib;
 import com.w3engineers.mesh.R;
-import com.w3engineers.mesh.application.data.local.db.DatabaseService;
-import com.w3engineers.mesh.application.data.local.db.message.Message;
 import com.w3engineers.mesh.application.data.local.purchase.PurchaseConstants;
 
 import org.json.JSONException;
@@ -15,7 +12,6 @@ import org.json.JSONObject;
 
 import java.io.IOException;
 import java.util.Locale;
-import java.util.concurrent.ExecutionException;
 
 public class Util {
 
@@ -193,7 +189,15 @@ public class Util {
 
     public static String getEndPointCurrency() {
         int endPoint = PreferencesHelperPaylib.onInstance(MeshApp.getContext()).getEndpointMode();
-        return endPoint == PayLibConstant.END_POINT_TYPE.ETH_ROPSTEN ? MeshApp.getContext().getString(R.string.eth) : MeshApp.getContext().getString(R.string.etc);
+        if (endPoint == PayLibConstant.END_POINT_TYPE.ETH_ROPSTEN) {
+            return MeshApp.getContext().getString(com.w3engineers.mesh.R.string.eth);
+        } else if (endPoint == PayLibConstant.END_POINT_TYPE.ETC_KOTTI) {
+            return MeshApp.getContext().getString(com.w3engineers.mesh.R.string.etc);
+        } else if (endPoint == PayLibConstant.END_POINT_TYPE.TETH_PRIVATE) {
+            return MeshApp.getContext().getString(com.w3engineers.mesh.R.string.teth);
+        } else {
+            return MeshApp.getContext().getString(com.w3engineers.mesh.R.string.teth);
+        }
     }
 
     public static void isConnected(ConnectionCheck connectionCheck) {
